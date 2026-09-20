@@ -2,6 +2,52 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — M1: facility spine + geography (done)
+
+**Done.**
+- `Facility` model; VA Facilities **v1** client (`providers/va_facilities.py`) with paging,
+  raw-page caching, JSON:API → GeoJSON conversion; parser tested against a hand-written v1
+  page sample derived from the public OpenAPI document, plus a mocked two-page pull.
+- ZIP → county crosswalk fixture (`fixtures/reference/zip_county.csv`, 33,791 ZIPs) built
+  from the Census 2020 ZCTA↔county relationship file; HUD USPS used automatically when
+  `HUD_API_TOKEN` is set. Loader + attribution (`geography/`) with an unresolved report.
+- SQLAlchemy store (`store.py`, SQLite fallback or Postgres) with upsert by facility id;
+  FastAPI `GET /health`, `GET /facilities[?state=&visn=&county=]` (GeoJSON), `GET /facilities/{id}`.
+- `make reference` (build fixtures), `make load` (attribute + persist, exit 1 if any facility
+  lacks county/VISN), `make serve`. Network contract test is `@pytest.mark.network`, skipped
+  without the key.
+- Live pull done with the user's key: **1,400 health facilities** from `sandbox-api.va.gov`
+  (self-service keys are sandbox-only; the builder retries against sandbox on a production
+  401). Cached to `fixtures/reference/facilities.geojson` with raw pages.
+- County attribution switched to **point-in-polygon** on facility coordinates against Census
+  1:5m county boundaries (`fixtures/reference/counties.geojson`, builder
+  `scripts/build_county_boundaries.py`, new dep `pyshp` to read the shapefile), with the ZIP
+  crosswalk as fallback. ZIP-only missed 22 facilities including seven VAMCs on institutional
+  ZIPs (15240, 23249, 84148, …) that are not ZCTAs; the 1:20m boundary file omits Guam and
+  other territories, hence 1:5m.
+- **Done when verified:** 1,399/1,400 facilities resolve to county + VISN; the sole exception
+  is `vha_358` Manila VA Clinic (Philippines, no US county), pinned by a golden test
+  (`test_m1_done_when_every_health_facility_resolves`). Loaded into both SQLite and the
+  docker-compose Postgres.
+- `.env` support: every `make` target passes `--env-file .env` to `uv run` when the file
+  exists; `.env.example` defaults `DATABASE_URL` to SQLite.
+- `make lint test`: green.
+
+**Findings / corrections.**
+- Facilities API v0 is gone (`/v0/facilities/all` → 404). v1 has no `/facilities/all` and no
+  GeoJSON media type; the plan's "must request GeoJSON or CSV" note was v0-era. CLAUDE.md
+  constraint 6 updated. The `search-va-facilities-api` skill's v1 base path was right.
+- data.va.gov `9hbf-9jzg` (VISN/market/county) is a broken FY2017 blob; no tabular substitute
+  found. VISN comes from the facility record; **market attribution is not available** (a
+  `market` column exists, left null). Revisit if a source turns up.
+- HUD crosswalk needs a token; Census ZCTA fallback documented with its caveats in
+  `fixtures/reference/README.md`.
+- Deprecation warnings from starlette's TestClient about httpx are upstream noise.
+
+**Next:** M2 event providers (NWS alerts, AirNow, HMS smoke, OpenFEMA, replay) and the three
+fixture scenarios. The county boundary index built here can serve HMS polygon → county
+intersection if PostGIS friction appears.
+
 ## 2026-09-20 — M0: scaffolding + card library (done)
 
 **Done.**

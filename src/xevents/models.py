@@ -292,3 +292,50 @@ class Card(StrictModel):
     @property
     def event_types(self) -> set[EventType]:
         return {t.type for t in self.event_triggers}
+
+
+# --------------------------------------------------------------------------- facilities
+
+
+class OperatingStatusCode(StrEnum):
+    """VA Facilities API v1 ``operatingStatus.code`` values."""
+
+    NORMAL = "NORMAL"
+    NOTICE = "NOTICE"
+    LIMITED = "LIMITED"
+    CLOSED = "CLOSED"
+    TEMPORARY_CLOSURE = "TEMPORARY_CLOSURE"
+    TEMPORARY_LOCATION = "TEMPORARY_LOCATION"
+    VIRTUAL_CARE = "VIRTUAL_CARE"
+    COMING_SOON = "COMING_SOON"
+
+
+class Facility(StrictModel):
+    """A VA health facility (location tier L3) with its county/VISN attribution.
+
+    ``visn`` comes from the Facilities API itself; ``county_fips`` is attributed from the
+    physical ZIP via the ZIP↔county crosswalk and ``county_source`` records how.
+    """
+
+    id: Annotated[str, Field(pattern=r"^vha_[A-Za-z0-9]+$")]
+    name: NonEmptyStr
+    facility_type: NonEmptyStr
+    classification: str | None = None
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    zip5: Annotated[str, Field(pattern=r"^\d{5}$")] | None = None
+    city: str | None = None
+    state: str | None = None
+    visn: Annotated[str, Field(pattern=r"^\d{1,2}$")] | None = None
+    health_care_system: str | None = None
+    operating_status: OperatingStatusCode
+    operating_status_info: str | None = None
+    county_fips: Annotated[str, Field(pattern=r"^\d{5}$")] | None = None
+    county_source: str | None = None
+    market: str | None = Field(
+        default=None, description="VHA market; unavailable until a county→market source exists."
+    )
+
+    @property
+    def resolved(self) -> bool:
+        return self.county_fips is not None and self.visn is not None

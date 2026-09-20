@@ -18,7 +18,7 @@ Repo home: `shlyakhter1` GitHub. Stack: Python 3.12, FastAPI, SQLAlchemy + Postg
 3. **The matching engine stays pure** — no I/O in `engine.py`; providers are the only network code; every external call cacheable to `fixtures/`.
 4. **Patient-facing strings come only from card YAML** — never generated, paraphrased, or "improved" in code. Clinical language is reviewed content.
 5. **Never advise stopping or changing a medication dose** anywhere in generated output; "contact your care team" is the templated escalation.
-6. **API etiquette:** NWS requires a User-Agent header (`NWS_USER_AGENT` env); AirNow is limited to 500 req/h — cache aggressively and use only the 2026 consolidated endpoints (legacy retired Sep 30, 2026); VA Facilities API key from `VA_FACILITIES_API_KEY`; `/facilities/all` must request GeoJSON or CSV (JSON:API returns 406).
+6. **API etiquette:** NWS requires a User-Agent header (`NWS_USER_AGENT` env); AirNow is limited to 500 req/h — cache aggressively and use only the 2026 consolidated endpoints (legacy retired Sep 30, 2026); VA Facilities API key from `VA_FACILITIES_API_KEY` as an `apikey` header. Facilities API **v1** only (v0 and its `/facilities/all` GeoJSON endpoint are gone, verified 2026-09-20): page `GET /facilities?type=health&page=&per_page=` as JSON:API and build GeoJSON ourselves.
 7. **Prefer boring choices.** No new dependencies without a note in `PROGRESS.md`.
 
 ## Working agreement

@@ -1,0 +1,74 @@
+{
+  "_comment": "Shape sample for the Facilities API v1 JSON:API response, hand-written from the public OpenAPI document (2026-09-20). Values are illustrative, not a real pull; replace with a saved raw page once VA_FACILITIES_API_KEY is available.",
+  "data": [
+    {
+      "id": "vha_648",
+      "type": "va_facilities",
+      "attributes": {
+        "name": "Portland VA Medical Center",
+        "facilityType": "va_health_facility",
+        "classification": "VA Medical Center (VAMC)",
+        "parent": {"id": "vha_648", "link": "https://api.va.gov/services/va_facilities/v1/facilities/vha_648"},
+        "website": "https://www.va.gov/portland-health-care/",
+        "lat": 45.49707,
+        "long": -122.68344,
+        "timeZone": "America/Los_Angeles",
+        "address": {
+          "mailing": {},
+          "physical": {"address1": "3710 Southwest US Veterans Hospital Road", "zip": "97239-2964", "city": "Portland", "state": "OR"}
+        },
+        "phone": {"main": "503-220-8262"},
+        "hours": {},
+        "services": {},
+        "mobile": false,
+        "operatingStatus": {"code": "NORMAL"},
+        "visn": "20",
+        "healthCareSystem": {"name": "VA Portland Health Care System"}
+      }
+    },
+    {
+      "id": "vha_663",
+      "type": "va_facilities",
+      "attributes": {
+        "name": "Seattle VA Medical Center",
+        "facilityType": "va_health_facility",
+        "classification": "VA Medical Center (VAMC)",
+        "lat": 47.5495,
+        "long": -122.3059,
+        "address": {"physical": {"zip": "98108", "city": "Seattle", "state": "WA"}},
+        "operatingStatus": {"code": "NOTICE", "additionalInfo": "Parking construction; allow extra time."},
+        "visn": 20,
+        "healthCareSystem": {"name": "VA Puget Sound Health Care System"}
+      }
+    },
+    {
+      "id": "vha_516GC",
+      "type": "va_facilities",
+      "attributes": {
+        "name": "Fort Myers VA Clinic",
+        "facilityType": "va_health_facility",
+        "classification": "Multi-Specialty CBOC",
+        "lat": 26.6098,
+        "long": -81.8115,
+        "address": {"physical": {"zip": "33912", "city": "Fort Myers", "state": "FL"}},
+        "operatingStatus": {"code": "NORMAL"},
+        "visn": "8"
+      }
+    },
+    {
+      "id": "vha_999ZZ",
+      "type": "va_facilities",
+      "attributes": {
+        "name": "Sample clinic with no ZIP",
+        "facilityType": "va_health_facility",
+        "lat": 40.0,
+        "long": -100.0,
+        "address": {"physical": {"city": "Nowhere", "state": "KS"}},
+        "operatingStatus": {"code": "TEMPORARY_CLOSURE"},
+        "visn": "15"
+      }
+    }
+  ],
+  "links": {"self": "https://api.va.gov/services/va_facilities/v1/facilities?type=health&page=1&per_page=500"},
+  "meta": {"pagination": {"currentPage": 1, "perPage": 500, "totalPages": 1, "totalEntries": 4}}
+}
