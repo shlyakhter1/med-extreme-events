@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -13,11 +13,18 @@ import pytest
 from xevents.geography.counties import CountyIndex
 from xevents.geography.nws_zones import STATE_FIPS, UgcResolver
 from xevents.geography.polygons import counties_covered
-from xevents.models import CapSeverity, EventSource, EventType, TimeWindow
+from xevents.models import (
+    CapSeverity,
+    Event,
+    EventGeography,
+    EventSource,
+    EventType,
+    TimeWindow,
+)
 from xevents.providers.airnow import parse_observations
 from xevents.providers.base import ProviderError
 from xevents.providers.hms import parse_smoke
-from xevents.providers.nws import NWSAlertsProvider, parse_alerts
+from xevents.providers.nws import NWS_EVENT_TYPES, NWSAlertsProvider, parse_alerts
 from xevents.providers.openfema import parse_declarations
 
 FIX = Path(__file__).parent / "fixtures" / "events"
@@ -207,3 +214,57 @@ def test_parse_airnow_observations(counties: CountyIndex) -> None:
     assert e.metrics["aqi"] == 342, "max AQI per county/parameter wins"
     assert e.severity is CapSeverity.SEVERE
     assert e.source_id == "2023-06-07:36061:pm2.5"
+
+
+# --------------------------------------------------------------------------- IEM archive
+
+
+def test_parse_iem_archive_sample(resolver: UgcResolver) -> None:
+    """The archive backfills recent NWS products; they must land in the same Event model."""
+    from xevents.providers.iem_archive import parse_iem_csv
+
+    events = parse_iem_csv(FIX / "iem_watchwarn_sample.csv", resolver, scenario=None)
+    assert events
+    assert all(e.source is EventSource.NWS for e in events), "archived NWS products stay NWS"
+    assert all(e.scenario is None for e in events), "live events carry no scenario"
+    assert all(e.metrics["retrieval"] == "iem_vtec_archive" for e in events)
+    assert all(e.geography.county_fips for e in events), "every archived alert resolves"
+    names = {e.event_name for e in events}
+    assert names <= set(NWS_EVENT_TYPES), names
+    for e in events:
+        assert e.expires >= e.onset
+        assert e.event_key.startswith("nws:")
+
+
+def test_live_dedupe_drops_archive_copies_of_active_alerts() -> None:
+    """The same warning arrives from CAP and from the archive under different ids; only the
+    live copy should survive."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "ingest", Path(__file__).parents[1] / "scripts" / "ingest.py"
+    )
+    assert spec and spec.loader
+    ingest = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ingest)
+
+    onset = datetime(2026, 9, 20, 6, 30, tzinfo=UTC)
+    common = {
+        "event_type": EventType.HEAT,
+        "event_name": "Heat Advisory",
+        "onset": onset,
+        "expires": onset + timedelta(hours=12),
+        "geography": EventGeography(county_fips=["41051", "53033"]),
+    }
+    live = Event(source=EventSource.NWS, source_id="urn:oid:cap-1", **common)
+    archived = Event(source=EventSource.NWS, source_id="2026-KPQR-HT.Y-0007", **common)
+    other = Event(
+        source=EventSource.NWS,
+        source_id="2026-KPQR-HT.Y-0008",
+        **{**common, "geography": EventGeography(county_fips=["12071"])},
+    )
+
+    kept, dropped = ingest.dedupe([live, archived, other])
+    assert dropped == 1
+    assert [e.source_id for e in kept] == ["urn:oid:cap-1", "2026-KPQR-HT.Y-0008"]
+    assert ingest.dedupe([live])[1] == 0

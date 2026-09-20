@@ -158,8 +158,15 @@ writable storage and outbound network access.
    feed stale after six hours:
 
    ```sh
-   EVENT_MODE=live python scripts/ingest.py && python scripts/match.py
+   EVENT_MODE=live python scripts/ingest.py && python scripts/match.py --mode live
    ```
+
+   Live ingestion loads the **trailing two weeks** of NWS watches, warnings and advisories
+   from the Iowa State VTEC archive, plus whatever is in force right now from
+   `api.weather.gov`. `/alerts/active` alone reports only the current instant, so a live view
+   built on it empties out whenever the weather is calm. Change the window with
+   `--lookback-days N`. Duplicates between the two sources are dropped by matching product
+   name, counties and onset hour.
 
    Run that from a cron job, a Fly machine scheduled task, or a Render cron service, every
    15 to 30 minutes. NWS asks that you poll no more often than every 30 seconds; AirNow

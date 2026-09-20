@@ -52,7 +52,7 @@ make serve                 # the server on its own
 make lint test             # ruff + mypy + pytest
 make reference             # rebuild cached source data (needs VA_FACILITIES_API_KEY)
 make scenarios             # rebuild the replay fixtures from their archived sources
-EVENT_MODE=live make ingest match   # today's real NWS / FEMA / NOAA feeds
+EVENT_MODE=live make ingest match   # real feeds: last 2 weeks of NWS alerts + FEMA + NOAA
 ```
 
 ## How it works

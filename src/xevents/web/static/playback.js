@@ -10,16 +10,35 @@
 
   const state = {
     scenarios: [], facilities: null, events: [], items: [], t0: 0, t1: 0, t: 0,
-    playing: false, timer: null, selectedFacility: null, selectedEvent: null,
+    playing: false, timer: null, selectedFacility: null, selectedEvent: null, selectedCard: null,
     role: "care_team", detailCache: new Map(), lastCountyPaint: new Map(), lastFacilityPaint: new Map(),
   };
-  let ctx = null, facilityLayer = null, facilityById = new Map();
+  let ctx = null, facilityLayer = null, facilityById = new Map(), facilityProps = new Map();
 
   const fmt = (ms) => new Date(ms).toISOString().replace("T", " ").slice(0, 16) + "Z";
   const fmtShort = (ms) => new Date(ms).toISOString().slice(5, 16).replace("T", " ");
   const parse = (s) => Date.parse(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const CARD_COLORS = ["#4c8dff", "#e4572e", "#2fb37a", "#d9a41a", "#a05cd6", "#e06c9f"];
+  const cardColor = (id) => {
+    const list = [...new Set(state.items.map((i) => i.card_id))].sort();
+    return CARD_COLORS[Math.max(0, list.indexOf(id)) % CARD_COLORS.length];
+  };
+  const placeOf = (e) => {
+    if (e.geography.area_desc) {
+      const d = e.geography.area_desc;
+      return d.length > 68 ? d.slice(0, 67) + "…" : d;
+    }
+    const st = (e.geography.states || []).join(", ");
+    const n = e.geography.county_fips.length;
+    return st ? `${st} · ${n} count${n === 1 ? "y" : "ies"}` : `${n} counties`;
+  };
+  const facilityPlace = (fid) => {
+    const p = facilityProps.get(fid);
+    if (!p) return "";
+    return [p.city, p.state].filter(Boolean).join(", ") + (p.visn ? ` · VISN ${p.visn}` : "");
+  };
   const activeEvents = (t) => state.events.filter((e) => e._t0 <= t && t <= e._t1);
   const activeItems = (t) => state.items.filter((i) => i.status !== "superseded" && i._t0 <= t && t <= i._t1);
 
@@ -57,12 +76,15 @@
       pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 2.5, weight: 1, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.85 }),
       onEachFeature: (f, layer) => {
         facilityById.set(f.properties.id, layer);
+        facilityProps.set(f.properties.id, f.properties);
         layer.on("click", () => selectFacility(f.properties.id));
       },
     }).addTo(ctx.map);
 
     const sel = $("scenario");
-    sel.innerHTML = scenarios.map((s) => `<option value="${s.id}">${s.id} — ${s.events} events</option>`).join("");
+    sel.innerHTML =
+      `<option value="live">live (now) — last 2 weeks</option>` +
+      scenarios.map((s) => `<option value="${s.id}">${s.id} — replay, ${s.events} events</option>`).join("");
     sel.addEventListener("change", () => loadScenario(sel.value));
     $("play").addEventListener("click", togglePlay);
     $("step-back").addEventListener("click", () => { pause(); step(-1); });
@@ -73,22 +95,33 @@
       if (e.code === "ArrowLeft") { pause(); step(-1); }
       if (e.code === "ArrowRight") { pause(); step(1); }
     });
-    window.addEventListener("resize", drawTimeline);
+    window.addEventListener("resize", () => drawTimeline(true));
     initTimelineInput();
-    if (scenarios.length) await loadScenario(scenarios[0].id);
+    // Honour ?scenario= so the dashboard can hand off to the same view.
+    let initial = "live";
+    try {
+      const want = new URLSearchParams(window.location.search || "").get("scenario");
+      if (want && (want === "live" || scenarios.some((s) => s.id === want))) initial = want;
+    } catch { /* no URL available (tests) */ }
+    sel.value = initial;
+    await loadScenario(initial);
   }
 
   async function loadScenario(id) {
     pause();
     $("status").textContent = `loading ${id}…`;
+    const live = id === "live";
+    const q = live ? "" : `scenario=${encodeURIComponent(id)}&`;
     const [ev, it] = await Promise.all([
-      getJSON(`/events?scenario=${encodeURIComponent(id)}`),
-      getJSON(`/action-items?scenario=${encodeURIComponent(id)}&include_superseded=true`),
+      getJSON(`/events?${q}`.replace(/[?&]$/, "")),
+      getJSON(`/action-items?${q}include_superseded=true`),
     ]);
+    syncNav(id);
     state.events = ev.events.map((e) => ({ ...e, _t0: parse(e.onset), _t1: parse(e.expires) }));
     state.items = it.items.map((i) => ({ ...i, _t0: parse(i.window_start), _t1: parse(i.window_end) }));
     state.selectedFacility = null;
     state.selectedEvent = null;
+    state.selectedCard = null;
     state.detailCache.clear();
     state.lastCountyPaint = new Map();
     state.lastFacilityPaint = new Map();
@@ -105,10 +138,16 @@
     const superseded = state.items.filter((i) => i.status === "superseded").length;
     $("status").textContent = `${state.events.length} events · ${state.items.length} items (${superseded} superseded)`;
     drawTimeline();
-    // Start at the busiest hour so the first frame is not an empty map.
-    const peak = state.scenarios.find((s) => s.id === id)?.peak_at;
-    setT(peak ? clamp(parse(peak), state.t0, state.t1) : state.t0);
+    // Start where there is something to see: now for live, the busiest hour for a replay.
+    const peak = live ? Date.now() : state.scenarios.find((s) => s.id === id)?.peak_at;
+    setT(peak ? clamp(typeof peak === "number" ? peak : parse(peak), state.t0, state.t1) : state.t0);
     fitToEvents();
+  }
+
+  function syncNav(id) {
+    const qs = `?scenario=${encodeURIComponent(id)}`;
+    $("nav-dashboard").href = `/${qs}`;
+    $("nav-events").href = `/dashboard/events${qs}`;
   }
 
   function fitToEvents() {
@@ -175,9 +214,24 @@
   const xOf = (t, w) => TL.labelW + ((clamp(t, state.t0, state.t1) - state.t0) / (state.t1 - state.t0 || 1)) * (w - TL.labelW - TL.margin);
   const tOf = (x, w) => state.t0 + ((x - TL.labelW) / (w - TL.labelW - TL.margin)) * (state.t1 - state.t0);
 
-  function drawTimeline() {
+  function movePlayhead() {
+    const svg = $("timeline");
+    if (!svg || !svg.querySelector) return;
+    const w = svg.clientWidth || (svg.parentElement && svg.parentElement.clientWidth) || 1200;
+    const px = xOf(state.t, w);
+    const line = svg.querySelector("#playhead-line");
+    const head = svg.querySelector("#playhead-head");
+    if (!line || !head) return false;
+    line.setAttribute("x1", px);
+    line.setAttribute("x2", px);
+    head.setAttribute("points", `${px - 5},${TL.axisH - 10} ${px + 5},${TL.axisH - 10} ${px},${TL.axisH - 3}`);
+    return true;
+  }
+
+  function drawTimeline(full = true) {
     const svg = $("timeline");
     if (!state.events.length) { svg.innerHTML = ""; return; }
+    if (!full && movePlayhead()) return;
     const w = svg.clientWidth || svg.parentElement.clientWidth;
     const ls = lanes();
     const h = TL.axisH + ls.length * TL.laneH + 10;
@@ -213,8 +267,8 @@
     });
 
     const px = xOf(state.t, w);
-    parts.push(`<line x1="${px}" y1="${TL.axisH - 6}" x2="${px}" y2="${h - 4}" stroke="#fff" stroke-width="1.5"/>`);
-    parts.push(`<polygon points="${px - 5},${TL.axisH - 10} ${px + 5},${TL.axisH - 10} ${px},${TL.axisH - 3}" fill="#fff"/>`);
+    parts.push(`<line id="playhead-line" x1="${px}" y1="${TL.axisH - 6}" x2="${px}" y2="${h - 4}" stroke="#fff" stroke-width="1.5"/>`);
+    parts.push(`<polygon id="playhead-head" points="${px - 5},${TL.axisH - 10} ${px + 5},${TL.axisH - 10} ${px},${TL.axisH - 3}" fill="#fff"/>`);
     svg.innerHTML = parts.join("");
   }
 
@@ -270,60 +324,122 @@
     state.lastCountyPaint = paint;
 
     const byFacility = new Map();
-    for (const i of items) { const a = byFacility.get(i.facility_id) || []; a.push(i); byFacility.set(i.facility_id, a); }
+    for (const i of items) {
+      if (state.selectedCard && i.card_id !== state.selectedCard) continue;
+      const a = byFacility.get(i.facility_id) || [];
+      a.push(i);
+      byFacility.set(i.facility_id, a);
+    }
     const fseen = new Set();
     byFacility.forEach((its, fid) => {
       fseen.add(fid);
       const top = its.reduce((b, i) => (i.acuity_rank < b.acuity_rank ? i : b), its[0]);
       const panel = Math.max(...its.map((i) => i.panel || 0));
-      const key = `${top.event_type}|${Math.round(panel)}`;
+      // When a card is selected the map answers "where is this card firing?", so colour by
+      // card; otherwise colour by the event driving the highest-acuity item.
+      const fill = state.selectedCard ? cardColor(state.selectedCard) : COLORS[top.event_type] || "#fff";
+      const key = `${fill}|${Math.round(panel)}|${state.selectedFacility === fid}`;
       if (state.lastFacilityPaint.get(fid) !== key) {
         const layer = facilityById.get(fid);
         if (layer) {
-          layer.setStyle({ radius: 5 + Math.min(10, Math.sqrt(panel) / 8), color: "#fff", fillColor: COLORS[top.event_type] || "#fff", fillOpacity: 0.95, weight: 1 });
+          layer.setStyle({
+            radius: 5 + Math.min(10, Math.sqrt(panel) / 8),
+            color: state.selectedFacility === fid ? "#ffe680" : "#fff",
+            weight: state.selectedFacility === fid ? 2.5 : 1,
+            fillColor: fill,
+            fillOpacity: 0.95,
+          });
           layer.bringToFront();
         }
       }
       state.lastFacilityPaint.set(fid, key);
+      const l = facilityById.get(fid);
+      if (l) {
+        const cards = [...new Set(its.map((i) => i.card_title))];
+        l.bindTooltip(
+          `<b>${esc(facilityProps.get(fid)?.name || fid)}</b><br>${esc(facilityPlace(fid))}` +
+          `<br>${cards.length} card${cards.length > 1 ? "s" : ""}: ${esc(cards.join(" · "))}` +
+          `<br>panel ≈ ${panel.toLocaleString()}`
+        );
+      }
     });
     state.lastFacilityPaint.forEach((_, fid) => {
       if (!fseen.has(fid)) {
         const layer = facilityById.get(fid);
-        if (layer) layer.setStyle({ radius: 2.5, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.85, weight: 1 });
+        if (layer) {
+          layer.setStyle({ radius: 2.5, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.85, weight: 1 });
+          layer.unbindTooltip();
+        }
         state.lastFacilityPaint.delete(fid);
       }
     });
 
-    drawTimeline();
+    drawTimeline(false);
     renderSide(evs, items, byFacility);
+  }
+
+  function cardsAt(items) {
+    const byCard = new Map();
+    for (const i of items) {
+      const c = byCard.get(i.card_id) || {
+        id: i.card_id, title: i.card_title, acuity: i.acuity_rank, acuityClass: i.acuity_class,
+        facilities: new Set(), events: new Set(), panel: 0, types: new Set(),
+      };
+      c.facilities.add(i.facility_id);
+      c.events.add(i.event_name);
+      c.types.add(i.event_type);
+      c.panel = Math.max(c.panel, i.panel || 0);
+      c.acuity = Math.min(c.acuity, i.acuity_rank);
+      byCard.set(i.card_id, c);
+    }
+    return [...byCard.values()].sort((a, b) => a.acuity - b.acuity);
   }
 
   function renderSide(evs, items, byFacility) {
     const board = [...byFacility.entries()].map(([fid, its]) => {
-      const f = state.facilities.features.find((x) => x.properties.id === fid);
       const top = its.reduce((b, i) => (i.acuity_rank < b.acuity_rank ? i : b), its[0]);
       const panel = Math.max(...its.map((i) => i.panel || 0));
       const sev = Math.max(...its.map((i) => SEV[i.event_severity] || 0));
-      return { fid, name: f ? f.properties.name : fid, state: f ? f.properties.state : "", cards: new Set(its.map((i) => i.card_id)).size, top, panel, sev };
+      const p = facilityProps.get(fid);
+      return { fid, name: p ? p.name : fid, cards: new Set(its.map((i) => i.card_id)).size, top, panel, sev };
     }).sort((a, b) => a.top.acuity_rank - b.top.acuity_rank || b.sev * b.panel - a.sev * a.panel);
 
+    const cards = cardsAt(items);
     const evList = [...evs].sort((a, b) => (SEV[b.severity] || 0) - (SEV[a.severity] || 0) || a.event_name.localeCompare(b.event_name));
+    const filterNote = state.selectedCard
+      ? `<span class="clear">filtered to this card · <a href="#" id="clear-card">show all</a></span>` : "";
+
     const html = [
       `<h2>At ${fmt(state.t)}</h2>`,
-      `<div><b>${evs.length}</b> active events · <b>${board.length}</b> facilities · <b>${items.length}</b> action items</div>`,
+      `<div><b>${evs.length}</b> active events · <b>${cards.length}</b> cards firing · <b>${board.length}</b> facilities · <b>${items.length}</b> action items</div>`,
+
+      `<h2>Cards firing now (${cards.length}) ${filterNote}</h2>`,
+      cards.map((c) => {
+        const on = state.selectedCard === c.id ? " on" : "";
+        return `<div class="row${on}" data-card="${esc(c.id)}">
+          <span><span class="swatch" style="background:${cardColor(c.id)}"></span><b>${esc(c.title)}</b>
+            <span class="loc">${c.facilities.size} facilit${c.facilities.size === 1 ? "y" : "ies"} · triggered by ${esc([...c.events].join(", "))}</span></span>
+          <span><span class="tag">${esc(c.acuityClass)}</span> <span class="tag">≈${Math.round(c.panel).toLocaleString()}</span></span></div>`;
+      }).join("") || `<div class="muted">No cards fire at this time.</div>`,
+
       `<h2>Events now (${evList.length})</h2>`,
       evList.slice(0, 25).map((e) => {
         const on = state.selectedEvent === e.event_key ? " on" : "";
         return `<div class="row${on}" data-event="${esc(e.event_key)}">
-          <span><b>${esc(e.event_name)}</b><div class="prov">${fmtShort(e._t0)} → ${fmtShort(e._t1)} · ${e.geography.county_fips.length} counties</div></span>
+          <span><b>${esc(e.event_name)}</b>
+            <span class="loc">${esc(placeOf(e))}</span>
+            <span class="loc">${fmtShort(e._t0)} → ${fmtShort(e._t1)} UTC</span></span>
           <span><span class="tag sev-${SEV[e.severity] || 0}">${esc(e.severity)}</span></span></div>`;
       }).join("") || `<div class="muted">No events active at this time.</div>`,
       evList.length > 25 ? `<div class="muted">… ${evList.length - 25} more</div>` : "",
+
       `<h2>Facilities by acuity (${board.length})</h2>`,
       board.slice(0, 30).map((b) => {
         const on = state.selectedFacility === b.fid ? " on" : "";
         return `<div class="row${on}" data-fid="${esc(b.fid)}">
-          <span><b>${esc(b.name)}</b> <span class="muted">${esc(b.state)}</span></span>
+          <span><b>${esc(b.name)}</b>
+            <span class="loc">${esc(facilityPlace(b.fid))}</span>
+            <span class="loc">until ${fmtShort(b.top._t1)} UTC</span></span>
           <span><span class="tag">${esc(b.top.acuity_class)}</span> <span class="tag">${b.cards} card${b.cards > 1 ? "s" : ""}</span> <span class="tag">≈${b.panel.toLocaleString()}</span></span></div>`;
       }).join("") || `<div class="muted">No action items at this time.</div>`,
       board.length > 30 ? `<div class="muted">… ${board.length - 30} more</div>` : "",
@@ -332,21 +448,33 @@
     $("side").innerHTML = html;
     $("side").querySelectorAll("[data-fid]").forEach((r) => r.addEventListener("click", () => selectFacility(r.dataset.fid)));
     $("side").querySelectorAll("[data-event]").forEach((r) => r.addEventListener("click", () => selectEvent(r.dataset.event)));
+    $("side").querySelectorAll("[data-card]").forEach((r) => r.addEventListener("click", () => selectCard(r.dataset.card)));
+    const clear = document.getElementById("clear-card");
+    if (clear) clear.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); state.selectedCard = null; render(); });
     if (state.selectedEvent) renderEventDetail();
     if (state.selectedFacility) renderFacilityDetail();
   }
 
   // ------------------------------------------------------------------ selection
 
+  function selectCard(id) {
+    state.selectedCard = state.selectedCard === id ? null : id;
+    state.lastFacilityPaint = new Map();  // force a repaint: colours change with the filter
+    render();
+  }
+
   function selectEvent(key) {
     state.selectedEvent = state.selectedEvent === key ? null : key;
+    drawTimeline(true);
     state.selectedFacility = null;
+    state.lastFacilityPaint = new Map();
     render();
   }
 
   async function selectFacility(fid) {
     state.selectedFacility = state.selectedFacility === fid ? null : fid;
     state.selectedEvent = null;
+    state.lastFacilityPaint = new Map();
     if (state.selectedFacility && !state.detailCache.has(fid)) {
       const scenario = $("scenario").value;
       const doc = await getJSON(`/facilities/${encodeURIComponent(fid)}/action-items?scenario=${encodeURIComponent(scenario)}`);
@@ -360,15 +488,24 @@
     if (!e) return;
     const mine = state.items.filter((i) => i.event_key === e.event_key);
     const facs = new Set(mine.map((i) => i.facility_id));
-    const cards = new Set(mine.map((i) => i.card_title));
+    const byCard = new Map();
+    for (const i of mine) {
+      const c = byCard.get(i.card_id) || { title: i.card_title, facilities: new Set() };
+      c.facilities.add(i.facility_id);
+      byCard.set(i.card_id, c);
+    }
+    const cardList = [...byCard.entries()]
+      .map(([id, c]) => `<li><span class="swatch" style="background:${cardColor(id)}"></span>${esc(c.title)} — ${c.facilities.size} facilities</li>`)
+      .join("");
     $("detail").innerHTML = `<h2>Selected event</h2><div class="card">
       <h3>${esc(e.event_name)} <span class="tag sev-${SEV[e.severity] || 0}">${esc(e.severity)}</span></h3>
       <div class="prov">${esc(e.event_key)}</div>
-      <div class="prov">Window ${fmt(e._t0)} → ${fmt(e._t1)} · urgency ${esc(e.urgency)} · certainty ${esc(e.certainty)}</div>
-      <div class="prov">${e.geography.county_fips.length} counties${e.geography.states?.length ? ` in ${esc(e.geography.states.join(", "))}` : ""} · source ${esc(e.source)}</div>
-      ${e.geography.area_desc ? `<div class="prov">${esc(e.geography.area_desc)}</div>` : ""}
+      <div class="prov"><b>Where:</b> ${esc(placeOf(e))}${e.geography.states?.length ? ` (${esc(e.geography.states.join(", "))})` : ""}</div>
+      <div class="prov"><b>When:</b> ${fmt(e._t0)} → ${fmt(e._t1)} UTC (${Math.round((e._t1 - e._t0) / 36e5)} h)</div>
+      <div class="prov">Urgency ${esc(e.urgency)} · certainty ${esc(e.certainty)} · source ${esc(e.source)}</div>
       ${e.geography.note ? `<div class="prov">${esc(e.geography.note)}</div>` : ""}
-      <div style="margin-top:6px">Produced <b>${mine.length}</b> action items at <b>${facs.size}</b> facilities: ${esc([...cards].join(" · ")) || "none (no card trigger matches)"}</div>
+      <div style="margin-top:6px"><b>Cards fired:</b> ${byCard.size ? `${mine.length} action items at ${facs.size} facilities` : "none — no card trigger matches this event"}</div>
+      ${cardList ? `<ul>${cardList}</ul>` : ""}
       <div class="prov" style="margin-top:6px"><a href="/dashboard/events/${encodeURIComponent(e.event_key)}?scenario=${encodeURIComponent($("scenario").value)}">open full event page →</a></div>
     </div>`;
   }
@@ -388,14 +525,16 @@
     const p = f ? f.properties : {};
     const roles = ["care_team", "patient", "caregiver"];
     let html = `<h2>${esc(p.name || fid)}</h2>
-      <div class="prov">${esc(p.classification || "")} · ${esc(p.city || "")}, ${esc(p.state || "")} · VISN ${esc(p.visn || "?")}</div>
+      <div class="prov"><b>Where:</b> ${esc(p.city || "")}, ${esc(p.state || "")} · VISN ${esc(p.visn || "?")} · county ${esc(p.county_fips || "?")}</div>
+      <div class="prov">${esc(p.classification || "")} · as of ${fmt(state.t)} UTC</div>
       <div class="roles">${roles.map((r) => `<button data-role="${r}" class="${state.role === r ? "on" : ""}">${r.replace("_", " ")}</button>`).join("")}</div>`;
     if (!byCard.size) html += `<div class="muted">No action items active at ${fmt(state.t)}.</div>`;
     for (const [cardId, entry] of [...byCard.entries()].sort((a, b) => a[1].acuity - b[1].acuity)) {
       const any = Object.values(entry.roles)[0];
       const it = entry.roles[state.role];
       html += `<div class="card"><h3>${esc(entry.title)}</h3>
-        <div class="prov">${esc(any.event_name)} · ${esc(any.event_severity)} · until ${fmtShort(parse(any.window_end))}</div>`;
+        <div class="prov">${esc(any.event_name)} · ${esc(any.event_severity)}</div>
+        <div class="prov"><b>Window:</b> ${fmtShort(parse(any.window_start))} → ${fmtShort(parse(any.window_end))} UTC</div>`;
       if (any.panel) {
         html += `<div class="prov">Affected panel ≈ <b style="color:var(--ink)">${Math.round(any.panel.value).toLocaleString()}</b>
           <details><summary>how was this computed?</summary><div>${esc(any.panel.formula)}</div>

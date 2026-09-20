@@ -8,12 +8,13 @@
   · times are UTC · click an event for its counties, metrics and the action items it produced
 </p>
 <table>
-  <thead><tr><th>Event</th><th>Severity</th><th>Onset (UTC)</th><th>Expires (UTC)</th><th>Counties</th><th>Facilities</th><th>Source</th></tr></thead>
+  <thead><tr><th>Event</th><th>Where</th><th>Severity</th><th>Onset (UTC)</th><th>Expires (UTC)</th><th>Counties</th><th>Facilities</th><th>Source</th></tr></thead>
   <tbody>
   {% for r in rows %}{% set e = r.event %}
     <tr>
       <td><a href="/dashboard/events/{{ e.event_key }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">{{ e.event_name }}</a>
         {% if e.headline %}<div class="muted" style="font-size:12px">{{ e.headline[:110] }}</div>{% endif %}</td>
+      <td class="muted" style="font-size:12px">{% if e.geography.area_desc %}{{ e.geography.area_desc[:70] }}{% elif e.geography.states %}{{ e.geography.states|join(', ') }}{% else %}—{% endif %}</td>
       <td><span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[e.severity.value] }}">{{ e.severity.value }}</span>
         <span class="tag">{{ e.urgency.value }}</span></td>
       <td>{{ e.onset.strftime('%Y-%m-%d %H:%M') }}</td>
@@ -23,7 +24,7 @@
       <td><span class="tag">{{ e.source.value }}</span></td>
     </tr>
   {% else %}
-    <tr><td colspan="7" class="muted">No events{{ ' active at ' ~ as_of_iso if window == 'active' }}.
+    <tr><td colspan="8" class="muted">No events{{ ' active at ' ~ as_of_iso if window == 'active' }}.
       {% if mode == 'live' %} Run <code>EVENT_MODE=live make ingest match</code> to pull current feeds.{% endif %}</td></tr>
   {% endfor %}
   </tbody>

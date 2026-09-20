@@ -185,6 +185,28 @@ def test_events_pages(client: TestClient) -> None:
     assert client.get("/dashboard/events/nws:nope", params=base).status_code == 404
 
 
+def test_events_show_location_and_timestamps(client: TestClient) -> None:
+    base = {"scenario": "ian_2022", "at": "2022-09-27T16:00"}
+    html = client.get("/dashboard/events", params=base).text
+    assert "<th>Where</th>" in html and "<th>Onset (UTC)</th>" in html
+    assert "2022-09-2" in html, "timestamps are rendered"
+    assert "FL" in html, "location is rendered"
+    dash = client.get("/", params=base).text
+    assert "<th>Where</th>" in dash
+
+
+def test_playback_offers_live_and_navigation(client: TestClient) -> None:
+    """You must be able to get from playback back to live without editing the URL."""
+    html = client.get("/playback").text
+    assert 'id="nav-dashboard"' in html and 'id="nav-events"' in html
+    assert 'id="scenario"' in html
+    js = client.get("/static/playback.js").text
+    assert 'value="live"' in js, "the view selector offers live"
+    assert "Cards firing now" in js, "cards are surfaced in playback, not only on the dashboard"
+    assert "selectCard" in js and "cardColor" in js, "cards can be selected and shown on the map"
+    assert client.get("/playback", params={"scenario": "ian_2022"}).status_code == 200
+
+
 def test_feeds_and_scenario_peak(client: TestClient) -> None:
     feeds = client.get("/feeds").json()
     assert feeds["feeds"] == [] and feeds["stale_after_hours"] == 6.0

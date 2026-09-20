@@ -2,6 +2,36 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — feedback round 3: cards everywhere, live window, locations, navigation
+
+- **Live is now the trailing two weeks, not just this instant.** `api.weather.gov/alerts/active`
+  reports only what is in force right now, so the live view emptied out whenever the weather
+  was calm. `IEMArchiveProvider` backfills the same NWS products from the Iowa State VTEC
+  archive (`--lookback-days`, default 14): 683 archived events plus 77 currently active, 44
+  duplicates dropped by matching product name, counties and onset hour. 731 events → 10,502
+  action items. Events stay `source=nws` because they are NWS products;
+  `metrics.retrieval` records that they came from the archive.
+- **Cards are surfaced in playback, not just on the dashboard.** New "Cards firing now"
+  panel listing each card with the facilities it covers, what triggered it, its acuity class
+  and its largest panel. Cards were always being generated in replay; they were simply
+  invisible until you clicked a facility.
+- **Cards are on the map.** Selecting a card filters the map to the facilities where it
+  fires and recolours them by card, so the map answers "where is this card firing?" as well
+  as "what weather is happening?". Facility tooltips name the cards and the panel size.
+- **Getting back to live from playback.** The playback view selector now offers
+  `live (now) — last 2 weeks` alongside the replays, the header carries Dashboard and Events
+  links that preserve the chosen view, and the dashboard links into playback for the same
+  view. `/playback?scenario=` round-trips.
+- **Location and timestamp on everything.** Events show where (CAP area description, else
+  states and county count) and their window in UTC; facilities show city, state and VISN;
+  cards show their window. Added as a "Where" column on the dashboard and events tables, and
+  as sub-lines on every row in playback.
+
+**Performance.** With 733 events the timeline was rebuilding 226 KB of SVG on every tick.
+Bars are now drawn once per view or selection change and only the playhead moves per tick.
+
+`make lint test`: 113 passed.
+
 ## 2026-09-20 — follow-up: "no events, live or playback"
 
 Three separate causes, all fixed.

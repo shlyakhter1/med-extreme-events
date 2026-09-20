@@ -14,6 +14,7 @@ import os
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 from xevents.geography.counties import CountyIndex
 from xevents.geography.nws_zones import UgcResolver
@@ -21,6 +22,7 @@ from xevents.models import Event, TimeWindow
 from xevents.providers.airnow import AirNowProvider
 from xevents.providers.base import ProviderError
 from xevents.providers.hms import HMSSmokeProvider
+from xevents.providers.iem_archive import IEMArchiveProvider
 from xevents.providers.nws import NWSAlertsProvider
 from xevents.providers.openfema import OpenFEMAProvider
 from xevents.providers.replay import list_scenarios, load_scenario
@@ -43,29 +45,69 @@ def ingest_replay(engine: object, scenario: str | None) -> int:
     return 0
 
 
-def ingest_live(engine: object, days_ahead: int) -> int:
+def dedupe(events: list[Event]) -> tuple[list[Event], int]:
+    """Drop archive copies of alerts the live CAP feed already gave us.
+
+    The same warning can arrive twice: once from ``/alerts/active`` (authoritative for what
+    is in force now) and once from the archive backfill. They carry different ids, so the
+    natural key cannot catch it. Match on what actually identifies the alert instead —
+    product name, counties and onset hour — and keep the first, which is the live copy.
+    """
+
+    def signature(e: Event) -> tuple[str, tuple[str, ...], str]:
+        counties = tuple(sorted(e.geography.county_fips))
+        return (e.event_name, counties, e.onset.strftime("%Y-%m-%dT%H"))
+
+    seen: set[tuple[str, tuple[str, ...], str]] = set()
+    kept: list[Event] = []
+    for e in events:
+        sig = signature(e)
+        if sig in seen:
+            continue
+        seen.add(sig)
+        kept.append(e)
+    return kept, len(events) - len(kept)
+
+
+def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
     now = datetime.now(UTC)
-    window = TimeWindow(start=now - timedelta(days=1), end=now + timedelta(days=days_ahead))
+    window = TimeWindow(
+        start=now - timedelta(days=lookback_days), end=now + timedelta(days=days_ahead)
+    )
     counties = CountyIndex.load()
+    resolver = UgcResolver.load()
     events: list[Event] = []
     failures = 0
-    providers: list[tuple[str, object]] = [
-        ("nws", lambda: NWSAlertsProvider(UgcResolver.load(), raw_dir=LIVE_RAW)),
-        ("openfema", lambda: OpenFEMAProvider(raw_dir=LIVE_RAW)),
-        ("hms", lambda: HMSSmokeProvider(counties, raw_dir=LIVE_RAW)),
+
+    # Ordered: the live CAP feed first, so de-duplication keeps it over the archive copy.
+    providers: list[tuple[str, Any, TimeWindow]] = [
+        ("nws (active)", lambda: NWSAlertsProvider(resolver, raw_dir=LIVE_RAW), window),
+        (
+            f"nws (archive, {lookback_days}d)",
+            lambda: IEMArchiveProvider(resolver, raw_dir=LIVE_RAW),
+            TimeWindow(start=now - timedelta(days=lookback_days), end=now),
+        ),
+        ("openfema", lambda: OpenFEMAProvider(raw_dir=LIVE_RAW), window),
+        (
+            "hms",
+            lambda: HMSSmokeProvider(counties, raw_dir=LIVE_RAW),
+            TimeWindow(start=now - timedelta(days=2), end=now),
+        ),
     ]
     if os.environ.get("AIRNOW_API_KEY"):
-        providers.append(("airnow", lambda: AirNowProvider(counties, raw_dir=LIVE_RAW)))
+        providers.append(
+            (
+                "airnow",
+                lambda: AirNowProvider(counties, raw_dir=LIVE_RAW),
+                TimeWindow(start=now - timedelta(hours=6), end=now),
+            )
+        )
     else:
         print("airnow: skipped (AIRNOW_API_KEY not set)")
-    for name, factory in providers:
+
+    for name, factory, w in providers:
         try:
-            provider = factory()  # type: ignore[operator]
-            w = window
-            if name == "hms":
-                w = TimeWindow(start=now - timedelta(days=2), end=now)
-            if name == "airnow":
-                w = TimeWindow(start=now - timedelta(hours=6), end=now)
+            provider = factory()
             got = provider.fetch(w)
             provider.close()
         except (ProviderError, OSError) as exc:
@@ -74,6 +116,10 @@ def ingest_live(engine: object, days_ahead: int) -> int:
             continue
         print(f"{name}: {len(got)} events")
         events.extend(got)
+
+    events, dropped = dedupe(events)
+    if dropped:
+        print(f"de-duplicated {dropped} archive copies of currently-active alerts")
     n = upsert_events(engine, events)  # type: ignore[arg-type]
     print(f"live: {n} events upserted from {len(providers) - failures}/{len(providers)} providers")
     return 1 if failures == len(providers) else 0
@@ -86,13 +132,16 @@ def main() -> int:
     )
     parser.add_argument("--scenario", default=None, help="replay only: a single scenario")
     parser.add_argument("--days-ahead", type=int, default=7)
+    parser.add_argument(
+        "--lookback-days", type=int, default=14, help="live: how much recent weather to load"
+    )
     parser.add_argument("--database-url", default=None)
     args = parser.parse_args()
     engine = make_engine(args.database_url)
     init_db(engine)
     if args.mode == "replay":
         return ingest_replay(engine, args.scenario)
-    return ingest_live(engine, args.days_ahead)
+    return ingest_live(engine, args.days_ahead, args.lookback_days)
 
 
 if __name__ == "__main__":

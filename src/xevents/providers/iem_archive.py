@@ -10,10 +10,13 @@ with a resolver appropriate to the scenario's date (zone numbering changes over 
 from __future__ import annotations
 
 import csv
+import os
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+import httpx
 
 from xevents.geography.nws_zones import UgcResolver
 from xevents.models import (
@@ -23,8 +26,13 @@ from xevents.models import (
     Event,
     EventGeography,
     EventSource,
+    TimeWindow,
 )
+from xevents.providers.base import EventProvider, ProviderError
 from xevents.providers.nws import NWS_EVENT_TYPES
+
+BASE_URL = "https://mesonet.agron.iastate.edu"
+WATCHWARN = "/cgi-bin/request/gis/watchwarn.py"
 
 # VTEC phenomena.significance → NWS product name (only the products the cards use).
 VTEC_NAMES: dict[str, str] = {
@@ -60,7 +68,7 @@ def parse_iem_csv(
     path: Path,
     resolver: UgcResolver,
     *,
-    scenario: str,
+    scenario: str | None,
     states: set[str] | None = None,
     raw_ref: str | None = None,
 ) -> list[Event]:
@@ -115,6 +123,7 @@ def parse_iem_csv(
                     "wfo": wfo,
                     "statuses": ",".join(sorted(g["statuses"])),
                     "product_count": len(g["products"]),
+                    "retrieval": "iem_vtec_archive",
                 },
                 scenario=scenario,
                 raw_ref=raw_ref,
@@ -147,3 +156,57 @@ def resolver_from_zone_geojson(
         for ugc, fips in base.zone_map().items():
             zones.setdefault(ugc, fips)
     return UgcResolver(zones)
+
+
+class IEMArchiveProvider(EventProvider):
+    """Recent NWS watch/warning/advisory history from the IEM VTEC archive.
+
+    ``api.weather.gov/alerts/active`` only reports what is in force *right now*, so a live
+    view built on it alone shows an empty map the moment the weather calms down. This
+    provider backfills the trailing window (two weeks by default) with the same NWS products,
+    normalised into the same ``Event`` model. Events stay ``source=nws`` because they are NWS
+    products; ``metrics.retrieval`` records that they came from the archive rather than CAP.
+    """
+
+    source = EventSource.NWS
+    PHENOMENA = "EH,XH,HT,HU,TR,SS,FF,FA"
+    SIGNIFICANCE = "W,A,Y"
+
+    def __init__(
+        self,
+        resolver: UgcResolver,
+        *,
+        base_url: str = BASE_URL,
+        raw_dir: Path | None = None,
+        timeout: float = 300.0,
+        transport: httpx.BaseTransport | None = None,
+    ) -> None:
+        self.resolver = resolver
+        self.raw_dir = raw_dir
+        ua = os.environ.get("NWS_USER_AGENT") or "med-extreme-events"
+        self._client = httpx.Client(
+            base_url=base_url, headers={"User-Agent": ua}, timeout=timeout, transport=transport
+        )
+
+    def close(self) -> None:
+        self._client.close()
+
+    def fetch(self, window: TimeWindow) -> list[Event]:
+        params = {
+            "accept": "csv",
+            "sts": window.start.astimezone(UTC).strftime("%Y-%m-%dT%H:%MZ"),
+            "ets": window.end.astimezone(UTC).strftime("%Y-%m-%dT%H:%MZ"),
+            "phenomena": self.PHENOMENA,
+            "significance": self.SIGNIFICANCE,
+            "limit1": "no",
+        }
+        r = self._client.get(WATCHWARN, params=params)
+        if r.status_code != 200:
+            raise ProviderError(f"IEM archive: HTTP {r.status_code} {r.text[:200]}")
+        raw_dir = self.raw_dir or Path(os.environ.get("TMPDIR", "/tmp"))
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+        path = raw_dir / f"iem_watchwarn_{stamp}.csv"
+        path.write_bytes(r.content)
+        events = parse_iem_csv(path, self.resolver, scenario=None, raw_ref=str(path))
+        return [e for e in events if e.expires >= window.start and e.onset <= window.end]

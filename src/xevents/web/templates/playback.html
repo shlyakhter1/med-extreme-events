@@ -51,7 +51,7 @@
 <div id="app">
   <header>
     <h1>playback</h1>
-    <label>Scenario <select id="scenario"></select></label>
+    <label>View <select id="scenario"></select></label>
     <button id="play" class="primary">▶ Play</button>
     <button id="step-back" title="back one step (←)">◀</button>
     <button id="step-fwd" title="forward one step (→)">▶</button>
@@ -67,7 +67,12 @@
       <span class="sw" style="background:var(--air)"></span>air
       <span class="sw" style="background:var(--idle)"></span>idle facility
     </span>
-    <span style="margin-left:auto"><a href="/">← Dashboard</a> <span id="status" class="muted"></span></span>
+    <span style="margin-left:auto">
+      <a id="nav-dashboard" href="/">Dashboard</a> ·
+      <a id="nav-events" href="/dashboard/events">Events</a> ·
+      <span class="muted">Playback</span>
+      <span id="status" class="muted" style="margin-left:10px"></span>
+    </span>
   </header>
   <div id="map"></div>
   <aside id="side"><div class="muted">Loading…</div></aside>
