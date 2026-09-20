@@ -1,0 +1,149 @@
+"""Archived NWS watch/warning/advisory records (Iowa Environmental Mesonet VTEC archive)
+→ the same Event model the live NWS provider produces. Used only by scenario builders.
+
+Source: https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=csv
+Rows are per (WFO, phenomena, significance, event id, UGC, status update). We group by the
+VTEC event identity, take the earliest issue and latest expiry, and resolve UGCs to counties
+with a resolver appropriate to the scenario's date (zone numbering changes over time).
+"""
+
+from __future__ import annotations
+
+import csv
+from collections import defaultdict
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
+
+from xevents.geography.nws_zones import UgcResolver
+from xevents.models import (
+    CapCertainty,
+    CapSeverity,
+    CapUrgency,
+    Event,
+    EventGeography,
+    EventSource,
+)
+from xevents.providers.nws import NWS_EVENT_TYPES
+
+# VTEC phenomena.significance → NWS product name (only the products the cards use).
+VTEC_NAMES: dict[str, str] = {
+    "EH.W": "Excessive Heat Warning",
+    "EH.A": "Excessive Heat Watch",
+    "XH.W": "Extreme Heat Warning",
+    "XH.A": "Extreme Heat Watch",
+    "HT.Y": "Heat Advisory",
+    "HU.W": "Hurricane Warning",
+    "HU.A": "Hurricane Watch",
+    "TR.W": "Tropical Storm Warning",
+    "TR.A": "Tropical Storm Watch",
+    "SS.W": "Storm Surge Warning",
+    "SS.A": "Storm Surge Watch",
+    "FF.W": "Flash Flood Warning",
+    "FF.A": "Flash Flood Watch",
+    "FA.A": "Flood Watch",
+    "FA.W": "Flood Warning",
+    "AQ.Y": "Air Quality Alert",
+}
+SEVERITY: dict[str, CapSeverity] = {
+    "W": CapSeverity.SEVERE,
+    "A": CapSeverity.MODERATE,
+    "Y": CapSeverity.MINOR,
+}
+
+
+def _dt(value: str) -> datetime:
+    return datetime.strptime(value.strip(), "%Y-%m-%d %H:%M").replace(tzinfo=UTC)
+
+
+def parse_iem_csv(
+    path: Path,
+    resolver: UgcResolver,
+    *,
+    scenario: str,
+    states: set[str] | None = None,
+    raw_ref: str | None = None,
+) -> list[Event]:
+    groups: dict[tuple[str, str, str, str, str], dict[str, Any]] = defaultdict(
+        lambda: {"ugcs": set(), "issue": None, "expire": None, "statuses": set(), "products": set()}
+    )
+    with path.open(newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            if r["gtype"] != "C":
+                continue
+            ugc = r["ugc"].strip()
+            if not ugc or (states and ugc[:2] not in states):
+                continue
+            ph_sig = f"{r['phenomena']}.{r['significance']}"
+            if ph_sig not in VTEC_NAMES:
+                continue
+            key = (r["vtec_year"], r["wfo"], r["phenomena"], r["significance"], r["eventid"])
+            g = groups[key]
+            g["ugcs"].add(ugc)
+            issue, expire = _dt(r["utc_issue"]), _dt(r["utc_expire"])
+            g["issue"] = issue if g["issue"] is None else min(g["issue"], issue)
+            g["expire"] = expire if g["expire"] is None else max(g["expire"], expire)
+            g["statuses"].add(r["status"])
+            g["products"].add(r["product_id"])
+    events = []
+    for (year, wfo, ph, sig, eid), g in sorted(groups.items()):
+        name = VTEC_NAMES[f"{ph}.{sig}"]
+        ugcs = sorted(g["ugcs"])
+        counties, note = resolver.resolve(ugcs)
+        onset, expires = g["issue"], g["expire"]
+        events.append(
+            Event(
+                source=EventSource.NWS,
+                source_id=f"{year}-K{wfo}-{ph}.{sig}-{int(eid):04d}",
+                event_type=NWS_EVENT_TYPES[name],
+                event_name=name,
+                headline=f"{name} (NWS {wfo}, VTEC {ph}.{sig} #{eid}, {year})",
+                severity=SEVERITY.get(sig, CapSeverity.UNKNOWN),
+                urgency=CapUrgency.EXPECTED,
+                certainty=CapCertainty.LIKELY,
+                onset=onset,
+                expires=max(expires, onset),
+                sent=onset,
+                geography=EventGeography(
+                    county_fips=counties,
+                    ugc=ugcs,
+                    states=sorted({u[:2] for u in ugcs}),
+                    note=f"IEM VTEC archive; {note}",
+                ),
+                metrics={
+                    "vtec": f"{ph}.{sig}",
+                    "wfo": wfo,
+                    "statuses": ",".join(sorted(g["statuses"])),
+                    "product_count": len(g["products"]),
+                },
+                scenario=scenario,
+                raw_ref=raw_ref,
+            )
+        )
+    return events
+
+
+def resolver_from_zone_geojson(
+    geojson_paths: list[Path], counties: Any, base: UgcResolver | None = None
+) -> UgcResolver:
+    """Build a UGC resolver from dated zone geometries (IEM ``/api/1/nws/ugcs.geojson``)
+    by approximate polygon coverage — needed when a scenario predates the current NWS
+    zone-county file (zones get renumbered)."""
+    import json
+
+    from xevents.geography.polygons import counties_covered
+
+    zones: dict[str, list[str]] = {}
+    for path in geojson_paths:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        for feat in doc.get("features", []):
+            ugc = feat["properties"]["ugc"]
+            if ugc[2] != "Z" or ugc in zones:
+                continue
+            covered = counties_covered(feat["geometry"], counties)
+            if covered:
+                zones[ugc] = covered
+    if base is not None:  # dated geometry wins; current file fills gaps
+        for ugc, fips in base.zone_map().items():
+            zones.setdefault(ugc, fips)
+    return UgcResolver(zones)

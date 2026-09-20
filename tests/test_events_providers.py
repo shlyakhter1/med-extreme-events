@@ -1,0 +1,209 @@
+"""Event providers: parsers against saved raw payloads (network boundary only)."""
+
+from __future__ import annotations
+
+import json
+from datetime import UTC, date, datetime
+from pathlib import Path
+from typing import Any
+
+import httpx
+import pytest
+
+from xevents.geography.counties import CountyIndex
+from xevents.geography.nws_zones import STATE_FIPS, UgcResolver
+from xevents.geography.polygons import counties_covered
+from xevents.models import CapSeverity, EventSource, EventType, TimeWindow
+from xevents.providers.airnow import parse_observations
+from xevents.providers.base import ProviderError
+from xevents.providers.hms import parse_smoke
+from xevents.providers.nws import NWSAlertsProvider, parse_alerts
+from xevents.providers.openfema import parse_declarations
+
+FIX = Path(__file__).parent / "fixtures" / "events"
+
+
+@pytest.fixture(scope="module")
+def counties() -> CountyIndex:
+    return CountyIndex.load()
+
+
+@pytest.fixture(scope="module")
+def resolver() -> UgcResolver:
+    return UgcResolver.load()
+
+
+# --------------------------------------------------------------------------- NWS
+
+
+def test_ugc_resolver_counties_and_zones(resolver: UgcResolver) -> None:
+    assert resolver.counties("WVC013") == ["54013"]
+    assert resolver.counties("NYZ072") == ["36061"]  # Manhattan public zone
+    assert resolver.counties("XXZ999") == []
+    assert STATE_FIPS["FL"] == "12"
+    fips, note = resolver.resolve(["WVC013"], ["054013", "054017"])
+    assert fips == ["54013", "54017"]
+    assert "SAME" in note
+
+
+def test_parse_live_alert_sample(resolver: UgcResolver) -> None:
+    doc = json.loads((FIX / "nws_alerts_active_sample.json").read_text(encoding="utf-8"))
+    events = parse_alerts(doc, resolver, raw_ref="sample")
+    names = {e.event_name for e in events}
+    assert names == {"Flash Flood Warning", "Heat Advisory", "Flood Watch"}, (
+        "Small Craft Advisory is not tracked"
+    )
+    ffw = next(e for e in events if e.event_name == "Flash Flood Warning")
+    assert ffw.event_type is EventType.HURRICANE_FLOOD
+    assert ffw.severity is CapSeverity.SEVERE
+    assert ffw.geography.county_fips[:2] == ["54013", "54017"]
+    assert ffw.geography.polygon is not None and ffw.geography.polygon["type"] == "Polygon"
+    assert ffw.onset.tzinfo is not None and ffw.expires >= ffw.onset
+    heat = next(e for e in events if e.event_name == "Heat Advisory")
+    assert heat.event_type is EventType.HEAT
+    assert heat.geography.ugc and heat.geography.ugc[0][2] == "Z"
+    assert heat.geography.county_fips, "zone-based alert must resolve to counties"
+    assert heat.event_key == f"nws:{heat.source_id}"
+
+
+def test_nws_provider_requires_user_agent(
+    monkeypatch: pytest.MonkeyPatch, resolver: UgcResolver
+) -> None:
+    monkeypatch.delenv("NWS_USER_AGENT", raising=False)
+    with pytest.raises(ProviderError, match="NWS_USER_AGENT"):
+        NWSAlertsProvider(resolver)
+
+
+def test_nws_provider_fetch_filters_window(resolver: UgcResolver, tmp_path: Path) -> None:
+    doc = json.loads((FIX / "nws_alerts_active_sample.json").read_text(encoding="utf-8"))
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.headers["user-agent"].startswith("test-agent")
+        assert request.url.path == "/alerts/active"
+        assert request.url.params["status"] == "actual"
+        return httpx.Response(200, json=doc)
+
+    provider = NWSAlertsProvider(
+        resolver,
+        user_agent="test-agent (x@y)",
+        raw_dir=tmp_path,
+        transport=httpx.MockTransport(handler),
+    )
+    window = TimeWindow(
+        start=datetime(2026, 9, 20, tzinfo=UTC), end=datetime(2026, 9, 27, tzinfo=UTC)
+    )
+    events = provider.fetch(window)
+    provider.close()
+    assert len(events) == 3
+    assert list(tmp_path.glob("nws_alerts_active_*.json"))
+    far = TimeWindow(start=datetime(2030, 1, 1, tzinfo=UTC), end=datetime(2030, 1, 2, tzinfo=UTC))
+    assert (
+        NWSAlertsProvider(
+            resolver, user_agent="test-agent", transport=httpx.MockTransport(handler)
+        ).fetch(far)
+        == []
+    )
+
+
+# --------------------------------------------------------------------------- HMS
+
+
+def test_polygon_county_coverage(counties: CountyIndex) -> None:
+    # A box around downtown Portland → Multnomah (and maybe neighbours), never Florida.
+    box = {
+        "type": "Polygon",
+        "coordinates": [
+            [[-122.75, 45.45], [-122.55, 45.45], [-122.55, 45.6], [-122.75, 45.6], [-122.75, 45.45]]
+        ],
+    }
+    covered = counties_covered(box, counties)
+    assert "41051" in covered
+    assert all(c.startswith(("41", "53")) for c in covered)
+    assert counties_covered({"type": "Point", "coordinates": [0, 0]}, counties) == []
+
+
+def test_parse_hms_smoke_day(counties: CountyIndex) -> None:
+    data = (FIX / "hms_smoke20230607.zip").read_bytes()
+    events = parse_smoke(data, date(2023, 6, 7), counties, raw_ref="hms")
+    by_density = {e.metrics["smoke_density"]: e for e in events}
+    assert set(by_density) <= {"Light", "Medium", "Heavy"}
+    heavy = by_density["Heavy"]
+    assert heavy.event_type is EventType.WILDFIRE_SMOKE
+    assert heavy.severity is CapSeverity.SEVERE
+    assert heavy.source_id == "2023-06-07:heavy"
+    assert "36061" in heavy.geography.county_fips, "June 7 2023 heavy smoke covered Manhattan"
+    assert heavy.onset.date() == date(2023, 6, 7)
+    assert heavy.geography.polygon is not None and heavy.geography.polygon["type"] == "MultiPolygon"
+    assert sum(int(e.metrics["polygon_count"]) for e in events) == 88
+
+
+# --------------------------------------------------------------------------- OpenFEMA
+
+
+def test_parse_openfema_ian() -> None:
+    rows = json.loads((FIX / "openfema_ian_4673.json").read_text(encoding="utf-8"))[
+        "DisasterDeclarationsSummaries"
+    ]
+    events = parse_declarations(rows, raw_ref="fema")
+    assert len(events) == 1
+    ian = events[0]
+    assert ian.source is EventSource.OPENFEMA and ian.source_id == "4673"
+    assert ian.event_type is EventType.HURRICANE_FLOOD
+    assert ian.headline == "HURRICANE IAN"
+    assert len(ian.geography.county_fips) == 67
+    assert "12071" in ian.geography.county_fips  # Lee County
+    assert ian.onset == datetime(2022, 9, 23, tzinfo=UTC)
+    assert ian.metrics["fema_disaster_number"] == 4673
+    assert ian.geography.states == ["FL"]
+
+
+# --------------------------------------------------------------------------- AirNow
+
+
+def test_parse_airnow_observations(counties: CountyIndex) -> None:
+    rows: list[dict[str, Any]] = [
+        {
+            "Latitude": 40.7128,
+            "Longitude": -74.0060,
+            "UTC": "2023-06-07T18:00",
+            "Parameter": "PM2.5",
+            "AQI": 342,
+            "Category": 5,
+            "SiteName": "NYC",
+        },
+        {
+            "Latitude": 40.7128,
+            "Longitude": -74.0060,
+            "UTC": "2023-06-07T17:00",
+            "Parameter": "PM2.5",
+            "AQI": 300,
+            "Category": 5,
+            "SiteName": "NYC",
+        },
+        {
+            "Latitude": 45.5,
+            "Longitude": -122.68,
+            "UTC": "2023-06-07T18:00",
+            "Parameter": "OZONE",
+            "AQI": 42,
+            "Category": 1,
+            "SiteName": "PDX",
+        },
+        {
+            "Latitude": 0.0,
+            "Longitude": 0.0,
+            "UTC": "2023-06-07T18:00",
+            "Parameter": "PM2.5",
+            "AQI": 500,
+            "Category": 6,
+        },
+        {"Latitude": "bad", "AQI": "x"},
+    ]
+    events = parse_observations(rows, counties)
+    assert len(events) == 1
+    e = events[0]
+    assert e.event_type is EventType.AIR_POLLUTION
+    assert e.geography.county_fips == ["36061"]
+    assert e.metrics["aqi"] == 342, "max AQI per county/parameter wins"
+    assert e.severity is CapSeverity.SEVERE
+    assert e.source_id == "2023-06-07:36061:pm2.5"

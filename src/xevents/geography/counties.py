@@ -81,6 +81,9 @@ class CountyIndex:
     def __len__(self) -> int:
         return len(self._shapes)
 
+    def shapes(self) -> list[_Shape]:
+        return self._shapes
+
     @property
     def states(self) -> frozenset[str]:
         """USPS codes of every state/territory with county coverage."""

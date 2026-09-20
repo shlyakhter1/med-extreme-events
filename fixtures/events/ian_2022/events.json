@@ -1,0 +1,3346 @@
+[
+ {
+  "source": "openfema",
+  "source_id": "4673",
+  "event_type": "hurricane_flood",
+  "event_name": "FEMA DR declaration: Hurricane",
+  "headline": "HURRICANE IAN",
+  "severity": "Severe",
+  "urgency": "Past",
+  "certainty": "Observed",
+  "onset": "2022-09-23T00:00:00Z",
+  "expires": "2022-11-04T00:00:00Z",
+  "sent": "2022-09-29T00:00:00Z",
+  "geography": {
+   "county_fips": [
+    "12001",
+    "12003",
+    "12005",
+    "12007",
+    "12009",
+    "12011",
+    "12013",
+    "12015",
+    "12017",
+    "12019",
+    "12021",
+    "12023",
+    "12027",
+    "12029",
+    "12031",
+    "12033",
+    "12035",
+    "12037",
+    "12039",
+    "12041",
+    "12043",
+    "12045",
+    "12047",
+    "12049",
+    "12051",
+    "12053",
+    "12055",
+    "12057",
+    "12059",
+    "12061",
+    "12063",
+    "12065",
+    "12067",
+    "12069",
+    "12071",
+    "12073",
+    "12075",
+    "12077",
+    "12079",
+    "12081",
+    "12083",
+    "12085",
+    "12086",
+    "12087",
+    "12089",
+    "12091",
+    "12093",
+    "12095",
+    "12097",
+    "12099",
+    "12101",
+    "12103",
+    "12105",
+    "12107",
+    "12109",
+    "12111",
+    "12113",
+    "12115",
+    "12117",
+    "12119",
+    "12121",
+    "12123",
+    "12125",
+    "12127",
+    "12129",
+    "12131",
+    "12133"
+   ],
+   "ugc": [],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "designated counties from OpenFEMA rows"
+  },
+  "metrics": {
+   "fema_disaster_number": 4673,
+   "declaration_type": "DR",
+   "incident_type": "Hurricane"
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/openfema_DR-4673.json"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KKEY-TR.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Watch",
+  "headline": "Tropical Storm Watch (NWS KEY, VTEC TR.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-25T21:09:00Z",
+  "expires": "2022-09-27T21:20:00Z",
+  "sent": "2022-09-25T21:09:00Z",
+  "geography": {
+   "county_fips": [
+    "12087"
+   ],
+   "ugc": [
+    "FLZ076",
+    "FLZ077",
+    "FLZ078"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.A",
+   "wfo": "KEY",
+   "statuses": "UPG",
+   "product_count": 3
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-SS.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Watch",
+  "headline": "Storm Surge Watch (NWS MFL, VTEC SS.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T03:04:00Z",
+  "expires": "2022-09-29T03:18:00Z",
+  "sent": "2022-09-26T03:04:00Z",
+  "geography": {
+   "county_fips": [
+    "12011",
+    "12021",
+    "12051",
+    "12071",
+    "12086",
+    "12087"
+   ],
+   "ugc": [
+    "FLZ069",
+    "FLZ070",
+    "FLZ075",
+    "FLZ174"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.A",
+   "wfo": "MFL",
+   "statuses": "CAN,UPG",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-TR.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Watch",
+  "headline": "Tropical Storm Watch (NWS MFL, VTEC TR.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T03:04:00Z",
+  "expires": "2022-09-27T20:59:00Z",
+  "sent": "2022-09-26T03:04:00Z",
+  "geography": {
+   "county_fips": [
+    "12011",
+    "12015",
+    "12021",
+    "12043",
+    "12051",
+    "12055",
+    "12071",
+    "12085",
+    "12086",
+    "12087",
+    "12093",
+    "12099"
+   ],
+   "ugc": [
+    "FLZ063",
+    "FLZ066",
+    "FLZ067",
+    "FLZ068",
+    "FLZ069",
+    "FLZ070",
+    "FLZ071",
+    "FLZ072",
+    "FLZ073",
+    "FLZ074",
+    "FLZ075",
+    "FLZ168",
+    "FLZ172",
+    "FLZ173",
+    "FLZ174"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.A",
+   "wfo": "MFL",
+   "statuses": "UPG",
+   "product_count": 4
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-SS.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Watch",
+  "headline": "Storm Surge Watch (NWS TBW, VTEC SS.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T03:15:00Z",
+  "expires": "2022-09-27T15:16:00Z",
+  "sent": "2022-09-26T03:15:00Z",
+  "geography": {
+   "county_fips": [
+    "12015",
+    "12017",
+    "12021",
+    "12027",
+    "12029",
+    "12051",
+    "12053",
+    "12057",
+    "12071",
+    "12075",
+    "12081",
+    "12101",
+    "12103",
+    "12115"
+   ],
+   "ugc": [
+    "FLZ050",
+    "FLZ139",
+    "FLZ142",
+    "FLZ148",
+    "FLZ149",
+    "FLZ151",
+    "FLZ155",
+    "FLZ160",
+    "FLZ162",
+    "FLZ165",
+    "FLZ265"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.A",
+   "wfo": "TBW",
+   "statuses": "UPG",
+   "product_count": 4
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-TR.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Watch",
+  "headline": "Tropical Storm Watch (NWS TBW, VTEC TR.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T03:15:00Z",
+  "expires": "2022-09-26T21:10:00Z",
+  "sent": "2022-09-26T03:15:00Z",
+  "geography": {
+   "county_fips": [
+    "12015",
+    "12021",
+    "12027",
+    "12043",
+    "12049",
+    "12051",
+    "12055",
+    "12057",
+    "12069",
+    "12071",
+    "12081",
+    "12093",
+    "12097",
+    "12101",
+    "12105",
+    "12115",
+    "12119"
+   ],
+   "ugc": [
+    "FLZ052",
+    "FLZ056",
+    "FLZ057",
+    "FLZ061",
+    "FLZ162",
+    "FLZ165",
+    "FLZ262",
+    "FLZ265"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.A",
+   "wfo": "TBW",
+   "statuses": "UPG",
+   "product_count": 3
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KKEY-SS.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Watch",
+  "headline": "Storm Surge Watch (NWS KEY, VTEC SS.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T03:26:00Z",
+  "expires": "2022-09-28T21:16:00Z",
+  "sent": "2022-09-26T03:26:00Z",
+  "geography": {
+   "county_fips": [
+    "12087"
+   ],
+   "ugc": [
+    "FLZ076",
+    "FLZ077",
+    "FLZ078"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.A",
+   "wfo": "KEY",
+   "statuses": "CAN,UPG",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KKEY-TR.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Warning",
+  "headline": "Tropical Storm Warning (NWS KEY, VTEC TR.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T03:26:00Z",
+  "expires": "2022-09-28T21:16:00Z",
+  "sent": "2022-09-26T03:26:00Z",
+  "geography": {
+   "county_fips": [
+    "12087"
+   ],
+   "ugc": [
+    "FLZ076",
+    "FLZ077",
+    "FLZ078"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.W",
+   "wfo": "KEY",
+   "statuses": "CAN",
+   "product_count": 3
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-HU.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Hurricane Watch",
+  "headline": "Hurricane Watch (NWS TBW, VTEC HU.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T09:12:00Z",
+  "expires": "2022-09-27T21:27:00Z",
+  "sent": "2022-09-26T09:12:00Z",
+  "geography": {
+   "county_fips": [
+    "12001",
+    "12015",
+    "12017",
+    "12021",
+    "12027",
+    "12029",
+    "12041",
+    "12043",
+    "12049",
+    "12051",
+    "12053",
+    "12055",
+    "12057",
+    "12069",
+    "12071",
+    "12075",
+    "12081",
+    "12083",
+    "12093",
+    "12097",
+    "12101",
+    "12103",
+    "12105",
+    "12115",
+    "12119"
+   ],
+   "ugc": [
+    "FLZ043",
+    "FLZ050",
+    "FLZ052",
+    "FLZ056",
+    "FLZ057",
+    "FLZ061",
+    "FLZ139",
+    "FLZ142",
+    "FLZ148",
+    "FLZ149",
+    "FLZ151",
+    "FLZ155",
+    "FLZ160",
+    "FLZ162",
+    "FLZ165",
+    "FLZ239",
+    "FLZ242",
+    "FLZ248",
+    "FLZ249",
+    "FLZ251",
+    "FLZ255",
+    "FLZ260",
+    "FLZ262",
+    "FLZ265"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "HU.A",
+   "wfo": "TBW",
+   "statuses": "CAN,UPG",
+   "product_count": 4
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-TR.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Watch",
+  "headline": "Tropical Storm Watch (NWS MLB, VTEC TR.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T15:10:00Z",
+  "expires": "2022-09-27T15:19:00Z",
+  "sent": "2022-09-26T15:10:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12035",
+    "12043",
+    "12055",
+    "12061",
+    "12069",
+    "12083",
+    "12085",
+    "12093",
+    "12095",
+    "12097",
+    "12099",
+    "12105",
+    "12107",
+    "12111",
+    "12117",
+    "12119",
+    "12127"
+   ],
+   "ugc": [
+    "FLZ041",
+    "FLZ044",
+    "FLZ045",
+    "FLZ046",
+    "FLZ053",
+    "FLZ058",
+    "FLZ141",
+    "FLZ144",
+    "FLZ154",
+    "FLZ159",
+    "FLZ164",
+    "FLZ247",
+    "FLZ254",
+    "FLZ259",
+    "FLZ264",
+    "FLZ347",
+    "FLZ447",
+    "FLZ547",
+    "FLZ647",
+    "FLZ747"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.A",
+   "wfo": "MLB",
+   "statuses": "UPG",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.A-0002",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Watch",
+  "headline": "Flood Watch (NWS MLB, VTEC FA.A #2, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T18:29:00Z",
+  "expires": "2022-09-30T02:00:00Z",
+  "sent": "2022-09-26T18:29:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12035",
+    "12043",
+    "12055",
+    "12061",
+    "12069",
+    "12083",
+    "12085",
+    "12093",
+    "12095",
+    "12097",
+    "12099",
+    "12105",
+    "12107",
+    "12111",
+    "12117",
+    "12119",
+    "12127"
+   ],
+   "ugc": [
+    "FLZ041",
+    "FLZ044",
+    "FLZ045",
+    "FLZ046",
+    "FLZ053",
+    "FLZ058",
+    "FLZ141",
+    "FLZ144",
+    "FLZ154",
+    "FLZ159",
+    "FLZ164",
+    "FLZ247",
+    "FLZ254",
+    "FLZ259",
+    "FLZ264",
+    "FLZ347",
+    "FLZ447",
+    "FLZ547",
+    "FLZ647",
+    "FLZ747"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "FA.A",
+   "wfo": "MLB",
+   "statuses": "CAN,EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-FA.A-0003",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Watch",
+  "headline": "Flood Watch (NWS MFL, VTEC FA.A #3, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:00:00Z",
+  "expires": "2022-09-29T00:40:00Z",
+  "sent": "2022-09-26T21:00:00Z",
+  "geography": {
+   "county_fips": [
+    "12011",
+    "12015",
+    "12021",
+    "12043",
+    "12051",
+    "12055",
+    "12071",
+    "12085",
+    "12086",
+    "12087",
+    "12093",
+    "12099"
+   ],
+   "ugc": [
+    "FLZ063",
+    "FLZ066",
+    "FLZ067",
+    "FLZ068",
+    "FLZ069",
+    "FLZ070",
+    "FLZ071",
+    "FLZ072",
+    "FLZ073",
+    "FLZ074",
+    "FLZ075",
+    "FLZ168",
+    "FLZ172",
+    "FLZ173",
+    "FLZ174"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "FA.A",
+   "wfo": "MFL",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-FA.A-0003",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Watch",
+  "headline": "Flood Watch (NWS TBW, VTEC FA.A #3, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:00:00Z",
+  "expires": "2022-09-29T08:51:00Z",
+  "sent": "2022-09-26T21:00:00Z",
+  "geography": {
+   "county_fips": [
+    "12001",
+    "12015",
+    "12017",
+    "12021",
+    "12027",
+    "12029",
+    "12041",
+    "12043",
+    "12049",
+    "12051",
+    "12053",
+    "12055",
+    "12057",
+    "12069",
+    "12071",
+    "12075",
+    "12081",
+    "12083",
+    "12093",
+    "12097",
+    "12101",
+    "12103",
+    "12105",
+    "12115",
+    "12119"
+   ],
+   "ugc": [
+    "FLZ043",
+    "FLZ050",
+    "FLZ052",
+    "FLZ056",
+    "FLZ057",
+    "FLZ061",
+    "FLZ139",
+    "FLZ142",
+    "FLZ148",
+    "FLZ149",
+    "FLZ151",
+    "FLZ155",
+    "FLZ160",
+    "FLZ162",
+    "FLZ165",
+    "FLZ239",
+    "FLZ242",
+    "FLZ248",
+    "FLZ249",
+    "FLZ251",
+    "FLZ255",
+    "FLZ260",
+    "FLZ262",
+    "FLZ265"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "FA.A",
+   "wfo": "TBW",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-SS.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Warning",
+  "headline": "Storm Surge Warning (NWS MFL, VTEC SS.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:04:00Z",
+  "expires": "2022-09-29T12:09:00Z",
+  "sent": "2022-09-26T21:04:00Z",
+  "geography": {
+   "county_fips": [
+    "12021",
+    "12071",
+    "12086",
+    "12087"
+   ],
+   "ugc": [
+    "FLZ069",
+    "FLZ075"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.W",
+   "wfo": "MFL",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-TR.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Warning",
+  "headline": "Tropical Storm Warning (NWS MFL, VTEC TR.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:04:00Z",
+  "expires": "2022-09-29T12:09:00Z",
+  "sent": "2022-09-26T21:04:00Z",
+  "geography": {
+   "county_fips": [
+    "12011",
+    "12015",
+    "12021",
+    "12043",
+    "12051",
+    "12055",
+    "12071",
+    "12085",
+    "12086",
+    "12087",
+    "12093",
+    "12099"
+   ],
+   "ugc": [
+    "FLZ063",
+    "FLZ066",
+    "FLZ067",
+    "FLZ068",
+    "FLZ069",
+    "FLZ070",
+    "FLZ071",
+    "FLZ072",
+    "FLZ073",
+    "FLZ074",
+    "FLZ075",
+    "FLZ168",
+    "FLZ172",
+    "FLZ173",
+    "FLZ174"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.W",
+   "wfo": "MFL",
+   "statuses": "CAN,UPG",
+   "product_count": 4
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-SS.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Watch",
+  "headline": "Storm Surge Watch (NWS JAX, VTEC SS.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:07:00Z",
+  "expires": "2022-09-27T21:09:00Z",
+  "sent": "2022-09-26T21:07:00Z",
+  "geography": {
+   "county_fips": [
+    "12019",
+    "12031",
+    "12035",
+    "12083",
+    "12089",
+    "12107",
+    "12109",
+    "12127",
+    "13039"
+   ],
+   "ugc": [
+    "FLZ033",
+    "FLZ124",
+    "FLZ125",
+    "FLZ132",
+    "FLZ133",
+    "FLZ137",
+    "FLZ138",
+    "FLZ325"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.A",
+   "wfo": "JAX",
+   "statuses": "UPG",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-TR.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Watch",
+  "headline": "Tropical Storm Watch (NWS JAX, VTEC TR.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:07:00Z",
+  "expires": "2022-09-29T21:06:00Z",
+  "sent": "2022-09-26T21:07:00Z",
+  "geography": {
+   "county_fips": [
+    "12001",
+    "12003",
+    "12007",
+    "12017",
+    "12019",
+    "12023",
+    "12029",
+    "12031",
+    "12035",
+    "12041",
+    "12067",
+    "12069",
+    "12075",
+    "12083",
+    "12089",
+    "12107",
+    "12109",
+    "12119",
+    "12121",
+    "12125",
+    "12127",
+    "13039",
+    "13049",
+    "13299"
+   ],
+   "ugc": [
+    "FLZ023",
+    "FLZ024",
+    "FLZ030",
+    "FLZ031",
+    "FLZ033",
+    "FLZ035",
+    "FLZ038",
+    "FLZ124",
+    "FLZ125",
+    "FLZ132",
+    "FLZ133",
+    "FLZ136",
+    "FLZ137",
+    "FLZ138",
+    "FLZ140",
+    "FLZ225",
+    "FLZ232",
+    "FLZ236",
+    "FLZ237",
+    "FLZ240",
+    "FLZ325",
+    "FLZ340",
+    "FLZ425"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.A",
+   "wfo": "JAX",
+   "statuses": "CAN,UPG",
+   "product_count": 3
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-HU.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Hurricane Warning",
+  "headline": "Hurricane Warning (NWS TBW, VTEC HU.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:10:00Z",
+  "expires": "2022-09-29T09:10:00Z",
+  "sent": "2022-09-26T21:10:00Z",
+  "geography": {
+   "county_fips": [
+    "12015",
+    "12021",
+    "12027",
+    "12043",
+    "12049",
+    "12051",
+    "12055",
+    "12057",
+    "12069",
+    "12071",
+    "12081",
+    "12093",
+    "12097",
+    "12101",
+    "12103",
+    "12105",
+    "12115",
+    "12119"
+   ],
+   "ugc": [
+    "FLZ050",
+    "FLZ052",
+    "FLZ056",
+    "FLZ057",
+    "FLZ061",
+    "FLZ151",
+    "FLZ155",
+    "FLZ160",
+    "FLZ162",
+    "FLZ165",
+    "FLZ251",
+    "FLZ255",
+    "FLZ260",
+    "FLZ262",
+    "FLZ265"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "HU.W",
+   "wfo": "TBW",
+   "statuses": "CAN",
+   "product_count": 4
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-SS.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Warning",
+  "headline": "Storm Surge Warning (NWS TBW, VTEC SS.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:10:00Z",
+  "expires": "2022-09-29T12:25:00Z",
+  "sent": "2022-09-26T21:10:00Z",
+  "geography": {
+   "county_fips": [
+    "12015",
+    "12017",
+    "12021",
+    "12027",
+    "12029",
+    "12051",
+    "12053",
+    "12057",
+    "12071",
+    "12075",
+    "12081",
+    "12101",
+    "12103",
+    "12115"
+   ],
+   "ugc": [
+    "FLZ050",
+    "FLZ139",
+    "FLZ142",
+    "FLZ148",
+    "FLZ149",
+    "FLZ151",
+    "FLZ155",
+    "FLZ160",
+    "FLZ162",
+    "FLZ165",
+    "FLZ265"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.W",
+   "wfo": "TBW",
+   "statuses": "CAN",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-TR.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Warning",
+  "headline": "Tropical Storm Warning (NWS TBW, VTEC TR.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:10:00Z",
+  "expires": "2022-09-29T15:30:00Z",
+  "sent": "2022-09-26T21:10:00Z",
+  "geography": {
+   "county_fips": [
+    "12001",
+    "12015",
+    "12017",
+    "12021",
+    "12027",
+    "12029",
+    "12041",
+    "12043",
+    "12049",
+    "12051",
+    "12053",
+    "12055",
+    "12057",
+    "12069",
+    "12071",
+    "12075",
+    "12081",
+    "12083",
+    "12093",
+    "12097",
+    "12101",
+    "12103",
+    "12105",
+    "12115",
+    "12119"
+   ],
+   "ugc": [
+    "FLZ043",
+    "FLZ050",
+    "FLZ052",
+    "FLZ056",
+    "FLZ057",
+    "FLZ061",
+    "FLZ139",
+    "FLZ142",
+    "FLZ148",
+    "FLZ149",
+    "FLZ151",
+    "FLZ155",
+    "FLZ160",
+    "FLZ162",
+    "FLZ165",
+    "FLZ239",
+    "FLZ242",
+    "FLZ248",
+    "FLZ249",
+    "FLZ251",
+    "FLZ255",
+    "FLZ260",
+    "FLZ262",
+    "FLZ265"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.W",
+   "wfo": "TBW",
+   "statuses": "CAN,UPG",
+   "product_count": 3
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTAE-SS.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Watch",
+  "headline": "Storm Surge Watch (NWS TAE, VTEC SS.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:34:00Z",
+  "expires": "2022-09-27T21:04:00Z",
+  "sent": "2022-09-26T21:34:00Z",
+  "geography": {
+   "county_fips": [
+    "12029",
+    "12065",
+    "12075",
+    "12123"
+   ],
+   "ugc": [
+    "FLZ128",
+    "FLZ134"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.A",
+   "wfo": "TAE",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTAE-TR.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Watch",
+  "headline": "Tropical Storm Watch (NWS TAE, VTEC TR.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-26T21:34:00Z",
+  "expires": "2022-09-27T21:04:00Z",
+  "sent": "2022-09-26T21:34:00Z",
+  "geography": {
+   "county_fips": [
+    "12029",
+    "12037",
+    "12041",
+    "12045",
+    "12065",
+    "12067",
+    "12075",
+    "12123",
+    "12129"
+   ],
+   "ugc": [
+    "FLZ034",
+    "FLZ115",
+    "FLZ118",
+    "FLZ127",
+    "FLZ128",
+    "FLZ134"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.A",
+   "wfo": "TAE",
+   "statuses": "UPG",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KKEY-FA.A-0002",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Watch",
+  "headline": "Flood Watch (NWS KEY, VTEC FA.A #2, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T00:55:00Z",
+  "expires": "2022-09-28T08:32:00Z",
+  "sent": "2022-09-27T00:55:00Z",
+  "geography": {
+   "county_fips": [
+    "12087"
+   ],
+   "ugc": [
+    "FLZ076",
+    "FLZ077",
+    "FLZ078"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "FA.A",
+   "wfo": "KEY",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-HU.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Hurricane Watch",
+  "headline": "Hurricane Watch (NWS MLB, VTEC HU.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T03:21:00Z",
+  "expires": "2022-09-27T21:17:00Z",
+  "sent": "2022-09-27T03:21:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12043",
+    "12055",
+    "12061",
+    "12069",
+    "12083",
+    "12093",
+    "12095",
+    "12097",
+    "12105",
+    "12117",
+    "12119",
+    "12127"
+   ],
+   "ugc": [
+    "FLZ044",
+    "FLZ045",
+    "FLZ046",
+    "FLZ053",
+    "FLZ058",
+    "FLZ144"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "HU.A",
+   "wfo": "MLB",
+   "statuses": "UPG",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-TR.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Warning",
+  "headline": "Tropical Storm Warning (NWS MLB, VTEC TR.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T03:21:00Z",
+  "expires": "2022-09-30T03:17:00Z",
+  "sent": "2022-09-27T03:21:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12035",
+    "12043",
+    "12055",
+    "12061",
+    "12069",
+    "12083",
+    "12085",
+    "12093",
+    "12095",
+    "12097",
+    "12099",
+    "12105",
+    "12107",
+    "12111",
+    "12117",
+    "12119",
+    "12127"
+   ],
+   "ugc": [
+    "FLZ041",
+    "FLZ044",
+    "FLZ045",
+    "FLZ046",
+    "FLZ053",
+    "FLZ058",
+    "FLZ141",
+    "FLZ144",
+    "FLZ154",
+    "FLZ159",
+    "FLZ164",
+    "FLZ247",
+    "FLZ254",
+    "FLZ259",
+    "FLZ264",
+    "FLZ347",
+    "FLZ447",
+    "FLZ547",
+    "FLZ647",
+    "FLZ747"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.W",
+   "wfo": "MLB",
+   "statuses": "CAN,UPG",
+   "product_count": 4
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-FA.A-0005",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Watch",
+  "headline": "Flood Watch (NWS JAX, VTEC FA.A #5, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T08:50:00Z",
+  "expires": "2022-09-29T09:23:00Z",
+  "sent": "2022-09-27T08:50:00Z",
+  "geography": {
+   "county_fips": [
+    "12001",
+    "12003",
+    "12007",
+    "12017",
+    "12019",
+    "12023",
+    "12029",
+    "12031",
+    "12035",
+    "12041",
+    "12067",
+    "12069",
+    "12075",
+    "12083",
+    "12089",
+    "12107",
+    "12109",
+    "12119",
+    "12121",
+    "12125",
+    "12127",
+    "13039",
+    "13049",
+    "13299"
+   ],
+   "ugc": [
+    "FLZ023",
+    "FLZ024",
+    "FLZ030",
+    "FLZ031",
+    "FLZ033",
+    "FLZ035",
+    "FLZ038",
+    "FLZ124",
+    "FLZ125",
+    "FLZ132",
+    "FLZ133",
+    "FLZ136",
+    "FLZ137",
+    "FLZ138",
+    "FLZ140",
+    "FLZ225",
+    "FLZ232",
+    "FLZ236",
+    "FLZ237",
+    "FLZ240",
+    "FLZ325",
+    "FLZ340",
+    "FLZ425"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "FA.A",
+   "wfo": "JAX",
+   "statuses": "CAN",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-HU.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Hurricane Watch",
+  "headline": "Hurricane Watch (NWS MFL, VTEC HU.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T15:10:00Z",
+  "expires": "2022-09-28T03:05:00Z",
+  "sent": "2022-09-27T15:10:00Z",
+  "geography": {
+   "county_fips": [
+    "12011",
+    "12015",
+    "12021",
+    "12043",
+    "12051",
+    "12055",
+    "12071",
+    "12086",
+    "12087",
+    "12093",
+    "12099"
+   ],
+   "ugc": [
+    "FLZ063",
+    "FLZ066",
+    "FLZ069",
+    "FLZ070"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "HU.A",
+   "wfo": "MFL",
+   "statuses": "UPG",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-SS.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Warning",
+  "headline": "Storm Surge Warning (NWS JAX, VTEC SS.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T15:13:00Z",
+  "expires": "2022-09-30T15:00:00Z",
+  "sent": "2022-09-27T15:13:00Z",
+  "geography": {
+   "county_fips": [
+    "12019",
+    "12031",
+    "12035",
+    "12083",
+    "12089",
+    "12107",
+    "12109",
+    "12127",
+    "13039"
+   ],
+   "ugc": [
+    "FLZ033",
+    "FLZ124",
+    "FLZ125",
+    "FLZ132",
+    "FLZ133",
+    "FLZ137",
+    "FLZ138",
+    "FLZ325"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.W",
+   "wfo": "JAX",
+   "statuses": "CAN",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-TR.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Warning",
+  "headline": "Tropical Storm Warning (NWS JAX, VTEC TR.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T15:13:00Z",
+  "expires": "2022-09-30T08:55:00Z",
+  "sent": "2022-09-27T15:13:00Z",
+  "geography": {
+   "county_fips": [
+    "12001",
+    "12003",
+    "12007",
+    "12017",
+    "12019",
+    "12031",
+    "12035",
+    "12069",
+    "12075",
+    "12083",
+    "12089",
+    "12107",
+    "12109",
+    "12119",
+    "12127",
+    "13039",
+    "13049"
+   ],
+   "ugc": [
+    "FLZ024",
+    "FLZ033",
+    "FLZ038",
+    "FLZ124",
+    "FLZ125",
+    "FLZ132",
+    "FLZ133",
+    "FLZ137",
+    "FLZ138",
+    "FLZ140",
+    "FLZ225",
+    "FLZ232",
+    "FLZ237",
+    "FLZ240",
+    "FLZ325",
+    "FLZ340",
+    "FLZ425"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.W",
+   "wfo": "JAX",
+   "statuses": "CAN",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-HU.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Hurricane Warning",
+  "headline": "Hurricane Warning (NWS MFL, VTEC HU.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T20:59:00Z",
+  "expires": "2022-09-29T06:15:00Z",
+  "sent": "2022-09-27T20:59:00Z",
+  "geography": {
+   "county_fips": [
+    "12011",
+    "12015",
+    "12021",
+    "12043",
+    "12051",
+    "12055",
+    "12071",
+    "12086",
+    "12087",
+    "12093",
+    "12099"
+   ],
+   "ugc": [
+    "FLZ063",
+    "FLZ066",
+    "FLZ069",
+    "FLZ070"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "HU.W",
+   "wfo": "MFL",
+   "statuses": "CAN",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTAE-TR.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Tropical Storm Warning",
+  "headline": "Tropical Storm Warning (NWS TAE, VTEC TR.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T21:04:00Z",
+  "expires": "2022-09-29T15:07:00Z",
+  "sent": "2022-09-27T21:04:00Z",
+  "geography": {
+   "county_fips": [
+    "12029",
+    "12037",
+    "12041",
+    "12045",
+    "12065",
+    "12067",
+    "12075",
+    "12123",
+    "12129"
+   ],
+   "ugc": [
+    "FLZ034",
+    "FLZ115",
+    "FLZ118",
+    "FLZ127",
+    "FLZ128",
+    "FLZ134"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "TR.W",
+   "wfo": "TAE",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-HU.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Hurricane Warning",
+  "headline": "Hurricane Warning (NWS MLB, VTEC HU.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-27T21:17:00Z",
+  "expires": "2022-09-29T09:41:00Z",
+  "sent": "2022-09-27T21:17:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12035",
+    "12043",
+    "12055",
+    "12061",
+    "12069",
+    "12083",
+    "12093",
+    "12095",
+    "12097",
+    "12105",
+    "12107",
+    "12117",
+    "12119",
+    "12127"
+   ],
+   "ugc": [
+    "FLZ041",
+    "FLZ044",
+    "FLZ045",
+    "FLZ046",
+    "FLZ053",
+    "FLZ058",
+    "FLZ141",
+    "FLZ144",
+    "FLZ247",
+    "FLZ347",
+    "FLZ447",
+    "FLZ547",
+    "FLZ647",
+    "FLZ747"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "HU.W",
+   "wfo": "MLB",
+   "statuses": "CAN",
+   "product_count": 2
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-FF.W-0030",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MFL, VTEC FF.W #30, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T00:05:00Z",
+  "expires": "2022-09-28T02:00:00Z",
+  "sent": "2022-09-28T00:05:00Z",
+  "geography": {
+   "county_fips": [
+    "12086"
+   ],
+   "ugc": [
+    "FLC086"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MFL",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-FF.W-0031",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MFL, VTEC FF.W #31, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T00:26:00Z",
+  "expires": "2022-09-28T02:30:00Z",
+  "sent": "2022-09-28T00:26:00Z",
+  "geography": {
+   "county_fips": [
+    "12011"
+   ],
+   "ugc": [
+    "FLC011"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MFL",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KKEY-SS.W-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Storm Surge Warning",
+  "headline": "Storm Surge Warning (NWS KEY, VTEC SS.W #1009, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T04:29:00Z",
+  "expires": "2022-09-28T21:16:00Z",
+  "sent": "2022-09-28T04:29:00Z",
+  "geography": {
+   "county_fips": [
+    "12087"
+   ],
+   "ugc": [
+    "FLZ078"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "SS.W",
+   "wfo": "KEY",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.W-0012",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MLB, VTEC FA.W #12, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T11:34:00Z",
+  "expires": "2022-09-28T13:30:00Z",
+  "sent": "2022-09-28T11:34:00Z",
+  "geography": {
+   "county_fips": [
+    "12085",
+    "12111"
+   ],
+   "ugc": [
+    "FLC085",
+    "FLC111"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MLB",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.W-0013",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MLB, VTEC FA.W #13, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T12:48:00Z",
+  "expires": "2022-09-28T14:45:00Z",
+  "sent": "2022-09-28T12:48:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12061"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC061"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MLB",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-HU.A-1009",
+  "event_type": "hurricane_flood",
+  "event_name": "Hurricane Watch",
+  "headline": "Hurricane Watch (NWS JAX, VTEC HU.A #1009, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T15:11:00Z",
+  "expires": "2022-09-30T02:57:00Z",
+  "sent": "2022-09-28T15:11:00Z",
+  "geography": {
+   "county_fips": [
+    "12031",
+    "12035",
+    "12089",
+    "12109",
+    "12127",
+    "13039"
+   ],
+   "ugc": [
+    "FLZ124",
+    "FLZ125",
+    "FLZ133",
+    "FLZ138"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "HU.A",
+   "wfo": "JAX",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMFL-FA.W-0001",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MFL, VTEC FA.W #1, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T15:54:00Z",
+  "expires": "2022-09-28T21:00:00Z",
+  "sent": "2022-09-28T15:54:00Z",
+  "geography": {
+   "county_fips": [
+    "12043",
+    "12051"
+   ],
+   "ugc": [
+    "FLC043",
+    "FLC051"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MFL",
+   "statuses": "EXT",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.W-0014",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MLB, VTEC FA.W #14, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T16:50:00Z",
+  "expires": "2022-09-28T20:00:00Z",
+  "sent": "2022-09-28T16:50:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12095",
+    "12097",
+    "12127"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC095",
+    "FLC097",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MLB",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-FF.W-0005",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS TBW, VTEC FF.W #5, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T19:15:00Z",
+  "expires": "2022-09-28T23:15:00Z",
+  "sent": "2022-09-28T19:15:00Z",
+  "geography": {
+   "county_fips": [
+    "12015",
+    "12081",
+    "12115"
+   ],
+   "ugc": [
+    "FLC015",
+    "FLC081",
+    "FLC115"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "TBW",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.W-0015",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MLB, VTEC FA.W #15, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T20:22:00Z",
+  "expires": "2022-09-29T00:15:00Z",
+  "sent": "2022-09-28T20:22:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12069",
+    "12095",
+    "12097",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC069",
+    "FLC095",
+    "FLC097",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MLB",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-FF.W-0006",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS TBW, VTEC FF.W #6, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T21:52:00Z",
+  "expires": "2022-09-29T01:00:00Z",
+  "sent": "2022-09-28T21:52:00Z",
+  "geography": {
+   "county_fips": [
+    "12015",
+    "12027",
+    "12049",
+    "12055",
+    "12071",
+    "12081",
+    "12115"
+   ],
+   "ugc": [
+    "FLC015",
+    "FLC027",
+    "FLC049",
+    "FLC055",
+    "FLC071",
+    "FLC081",
+    "FLC115"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "TBW",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-FF.W-0007",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS TBW, VTEC FF.W #7, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T23:47:00Z",
+  "expires": "2022-09-29T02:45:00Z",
+  "sent": "2022-09-28T23:47:00Z",
+  "geography": {
+   "county_fips": [
+    "12015",
+    "12027",
+    "12049",
+    "12055",
+    "12081",
+    "12115"
+   ],
+   "ugc": [
+    "FLC015",
+    "FLC027",
+    "FLC049",
+    "FLC055",
+    "FLC081",
+    "FLC115"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "TBW",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.W-0016",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MLB, VTEC FA.W #16, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-28T23:59:00Z",
+  "expires": "2022-09-29T03:45:00Z",
+  "sent": "2022-09-28T23:59:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12069",
+    "12095",
+    "12097",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC069",
+    "FLC095",
+    "FLC097",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MLB",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-FF.W-0008",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS TBW, VTEC FF.W #8, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T01:07:00Z",
+  "expires": "2022-09-29T05:00:00Z",
+  "sent": "2022-09-29T01:07:00Z",
+  "geography": {
+   "county_fips": [
+    "12049",
+    "12055",
+    "12105"
+   ],
+   "ugc": [
+    "FLC049",
+    "FLC055",
+    "FLC105"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "TBW",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-FF.W-0009",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS TBW, VTEC FF.W #9, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T02:45:00Z",
+  "expires": "2022-09-29T05:00:00Z",
+  "sent": "2022-09-29T02:45:00Z",
+  "geography": {
+   "county_fips": [
+    "12027",
+    "12049",
+    "12055",
+    "12081",
+    "12115"
+   ],
+   "ugc": [
+    "FLC027",
+    "FLC049",
+    "FLC055",
+    "FLC081",
+    "FLC115"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "TBW",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.W-0017",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MLB, VTEC FA.W #17, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T03:41:00Z",
+  "expires": "2022-09-29T09:30:00Z",
+  "sent": "2022-09-29T03:41:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12061",
+    "12069",
+    "12093",
+    "12095",
+    "12097",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC061",
+    "FLC069",
+    "FLC093",
+    "FLC095",
+    "FLC097",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MLB",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0001",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #1, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T03:48:00Z",
+  "expires": "2022-09-29T14:45:00Z",
+  "sent": "2022-09-29T03:48:00Z",
+  "geography": {
+   "county_fips": [
+    "12095",
+    "12097"
+   ],
+   "ugc": [
+    "FLC095",
+    "FLC097"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0002",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #2, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T04:16:00Z",
+  "expires": "2022-09-29T09:15:00Z",
+  "sent": "2022-09-29T04:16:00Z",
+  "geography": {
+   "county_fips": [
+    "12097"
+   ],
+   "ugc": [
+    "FLC097"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0003",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #3, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T04:58:00Z",
+  "expires": "2022-09-29T10:00:00Z",
+  "sent": "2022-09-29T04:58:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12095",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC095",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXT",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-FF.W-0010",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS TBW, VTEC FF.W #10, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T05:16:00Z",
+  "expires": "2022-09-29T07:30:00Z",
+  "sent": "2022-09-29T05:16:00Z",
+  "geography": {
+   "county_fips": [
+    "12105"
+   ],
+   "ugc": [
+    "FLC105"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "TBW",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0004",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #4, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T07:16:00Z",
+  "expires": "2022-09-29T15:15:00Z",
+  "sent": "2022-09-29T07:16:00Z",
+  "geography": {
+   "county_fips": [
+    "12095",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC095",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KTBW-FA.W-0003",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS TBW, VTEC FA.W #3, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T07:23:00Z",
+  "expires": "2022-10-03T18:00:00Z",
+  "sent": "2022-09-29T07:23:00Z",
+  "geography": {
+   "county_fips": [
+    "12115"
+   ],
+   "ugc": [
+    "FLC115"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "TBW",
+   "statuses": "EXT",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0005",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #5, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T07:24:00Z",
+  "expires": "2022-09-29T15:30:00Z",
+  "sent": "2022-09-29T07:24:00Z",
+  "geography": {
+   "county_fips": [
+    "12095",
+    "12097",
+    "12117"
+   ],
+   "ugc": [
+    "FLC095",
+    "FLC097",
+    "FLC117"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0006",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #6, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T08:50:00Z",
+  "expires": "2022-09-29T12:45:00Z",
+  "sent": "2022-09-29T08:50:00Z",
+  "geography": {
+   "county_fips": [
+    "12117"
+   ],
+   "ugc": [
+    "FLC117"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXT",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-FA.A-0006",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Watch",
+  "headline": "Flood Watch (NWS JAX, VTEC FA.A #6, 2022)",
+  "severity": "Moderate",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T09:27:00Z",
+  "expires": "2022-09-29T20:54:00Z",
+  "sent": "2022-09-29T09:27:00Z",
+  "geography": {
+   "county_fips": [
+    "12001",
+    "12003",
+    "12007",
+    "12019",
+    "12031",
+    "12035",
+    "12069",
+    "12083",
+    "12089",
+    "12107",
+    "12109",
+    "12119",
+    "12127",
+    "13039",
+    "13049"
+   ],
+   "ugc": [
+    "FLZ024",
+    "FLZ033",
+    "FLZ038",
+    "FLZ124",
+    "FLZ125",
+    "FLZ132",
+    "FLZ133",
+    "FLZ137",
+    "FLZ138",
+    "FLZ140",
+    "FLZ225",
+    "FLZ232",
+    "FLZ237",
+    "FLZ240",
+    "FLZ325",
+    "FLZ425"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties via NWS zone-county correlation"
+  },
+  "metrics": {
+   "vtec": "FA.A",
+   "wfo": "JAX",
+   "statuses": "CAN",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.W-0018",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MLB, VTEC FA.W #18, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T09:30:00Z",
+  "expires": "2022-09-29T18:30:00Z",
+  "sent": "2022-09-29T09:30:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12069",
+    "12095",
+    "12097",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC069",
+    "FLC095",
+    "FLC097",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MLB",
+   "statuses": "EXT",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0007",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #7, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T09:57:00Z",
+  "expires": "2022-09-29T16:00:00Z",
+  "sent": "2022-09-29T09:57:00Z",
+  "geography": {
+   "county_fips": [
+    "12127"
+   ],
+   "ugc": [
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0008",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #8, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T10:27:00Z",
+  "expires": "2022-09-29T13:30:00Z",
+  "sent": "2022-09-29T10:27:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12095",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC095",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0009",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #9, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T12:18:00Z",
+  "expires": "2022-09-29T16:15:00Z",
+  "sent": "2022-09-29T12:18:00Z",
+  "geography": {
+   "county_fips": [
+    "12069",
+    "12095",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC069",
+    "FLC095",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0010",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #10, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T12:43:00Z",
+  "expires": "2022-09-29T15:45:00Z",
+  "sent": "2022-09-29T12:43:00Z",
+  "geography": {
+   "county_fips": [
+    "12117"
+   ],
+   "ugc": [
+    "FLC117"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FF.W-0011",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS MLB, VTEC FF.W #11, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T12:52:00Z",
+  "expires": "2022-09-29T16:00:00Z",
+  "sent": "2022-09-29T12:52:00Z",
+  "geography": {
+   "county_fips": [
+    "12127"
+   ],
+   "ugc": [
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "MLB",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-FF.W-0007",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS JAX, VTEC FF.W #7, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T15:21:00Z",
+  "expires": "2022-09-29T19:15:00Z",
+  "sent": "2022-09-29T15:21:00Z",
+  "geography": {
+   "county_fips": [
+    "12109"
+   ],
+   "ugc": [
+    "FLC109"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "JAX",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-FF.W-0008",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS JAX, VTEC FF.W #8, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T16:14:00Z",
+  "expires": "2022-09-29T19:15:00Z",
+  "sent": "2022-09-29T16:14:00Z",
+  "geography": {
+   "county_fips": [
+    "12035"
+   ],
+   "ugc": [
+    "FLC035"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "JAX",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KMLB-FA.W-0019",
+  "event_type": "hurricane_flood",
+  "event_name": "Flood Warning",
+  "headline": "Flood Warning (NWS MLB, VTEC FA.W #19, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T18:37:00Z",
+  "expires": "2022-09-30T00:30:00Z",
+  "sent": "2022-09-29T18:37:00Z",
+  "geography": {
+   "county_fips": [
+    "12009",
+    "12061",
+    "12069",
+    "12095",
+    "12097",
+    "12117",
+    "12127"
+   ],
+   "ugc": [
+    "FLC009",
+    "FLC061",
+    "FLC069",
+    "FLC095",
+    "FLC097",
+    "FLC117",
+    "FLC127"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FA.W",
+   "wfo": "MLB",
+   "statuses": "NEW",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ },
+ {
+  "source": "nws",
+  "source_id": "2022-KJAX-FF.W-0009",
+  "event_type": "hurricane_flood",
+  "event_name": "Flash Flood Warning",
+  "headline": "Flash Flood Warning (NWS JAX, VTEC FF.W #9, 2022)",
+  "severity": "Severe",
+  "urgency": "Expected",
+  "certainty": "Likely",
+  "onset": "2022-09-29T19:08:00Z",
+  "expires": "2022-09-30T01:00:00Z",
+  "sent": "2022-09-29T19:08:00Z",
+  "geography": {
+   "county_fips": [
+    "12035",
+    "12109"
+   ],
+   "ugc": [
+    "FLC035",
+    "FLC109"
+   ],
+   "zips": [],
+   "states": [
+    "FL"
+   ],
+   "polygon": null,
+   "area_desc": null,
+   "note": "IEM VTEC archive; counties from SAME/county UGC"
+  },
+  "metrics": {
+   "vtec": "FF.W",
+   "wfo": "JAX",
+   "statuses": "EXP",
+   "product_count": 1
+  },
+  "scenario": "ian_2022",
+  "raw_ref": "fixtures/events/ian_2022/raw/iem_watchwarn_2022-09-24_2022-09-30_HU-TR-SS-FF-FA.csv"
+ }
+]

@@ -1,0 +1,571 @@
+{
+ "type": "FeatureCollection",
+ "title": "sample of api.weather.gov /alerts/active?status=actual retrieved 2026-09-20",
+ "features": [
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.4784406ee85774d9fe31461994b843c8687f3e0b.001.1",
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -81.62,
+       39.04
+      ],
+      [
+       -81.43,
+       39.2
+      ],
+      [
+       -80.77,
+       39.18
+      ],
+      [
+       -80.73,
+       38.92
+      ],
+      [
+       -81.24,
+       38.67
+      ],
+      [
+       -81.7,
+       38.97
+      ],
+      [
+       -81.62,
+       39.04
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.4784406ee85774d9fe31461994b843c8687f3e0b.001.1",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.4784406ee85774d9fe31461994b843c8687f3e0b.001.1",
+    "areaDesc": "Calhoun, WV; Doddridge, WV; Gilmer, WV; Jackson, WV; Ritchie, WV; Roane, WV; Wirt, WV; Wood, WV",
+    "geocode": {
+     "SAME": [
+      "054013",
+      "054017",
+      "054021",
+      "054035",
+      "054085",
+      "054087",
+      "054105",
+      "054107"
+     ],
+     "UGC": [
+      "WVC013",
+      "WVC017",
+      "WVC021",
+      "WVC035",
+      "WVC085",
+      "WVC087",
+      "WVC105",
+      "WVC107"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/county/WVC013",
+     "https://api.weather.gov/zones/county/WVC017",
+     "https://api.weather.gov/zones/county/WVC021",
+     "https://api.weather.gov/zones/county/WVC035",
+     "https://api.weather.gov/zones/county/WVC085",
+     "https://api.weather.gov/zones/county/WVC087",
+     "https://api.weather.gov/zones/county/WVC105",
+     "https://api.weather.gov/zones/county/WVC107"
+    ],
+    "references": [],
+    "sent": "2026-09-20T03:44:00-04:00",
+    "effective": "2026-09-20T03:44:00-04:00",
+    "onset": "2026-09-20T03:44:00-04:00",
+    "expires": "2026-09-20T07:45:00-04:00",
+    "ends": "2026-09-20T07:45:00-04:00",
+    "status": "Actual",
+    "messageType": "Alert",
+    "category": "Met",
+    "severity": "Severe",
+    "certainty": "Likely",
+    "urgency": "Immediate",
+    "event": "Flash Flood Warning",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Charleston WV",
+    "headline": "Flash Flood Warning issued September 20 at 3:44AM EDT until September 20 at 7:45AM EDT by NWS Charleston WV",
+    "description": "FFWRLX\n\nThe National Weather Service in Charleston has issued a\n\n* Flash Flood Warning for...\nNorthern Roane County in central West Virginia...\nCalhoun County in north central West Virginia...\nGilmer County in north central West Virginia...\nSouthwestern Doddridge County in northern West Virginia...\nNortheastern Jackson County in northwestern West Virginia...\nSouthern Ritchie County in northwestern West Virginia...\nWirt County in northwestern West Virginia...\nSoutheastern Wood County in northwestern West Virginia...\n\n* Until 745 AM EDT.\n\n* At 344 AM EDT, Doppler radar indicated thunderstorms producing\nheavy rain across the warned area. Between 1 and 1.5 inches of rain\nhave fallen. Additional rainfall amounts up to 1.5 inches are\npossible in the warned area. Flash flooding is ongoing or expected\nto begin shortly.\n\nHAZARD...Flash flooding caused by thunderstorms.\n\nSOURCE...Radar indicated.\n\nIMPACT...Flash flooding of small creeks and streams, urban areas,\nhighways, streets and underpasses as well as other poor\ndrainage and low-lying areas.\n\n* Some locations that will experience flash flooding include...\nSpencer, Glenville, Elizabeth, Grantsville, Arnoldsburg, Cedar\nCreek State Park, Reedy, Sand Fork, Pullman, Auburn, Munday,\nAnnamoriah, Brohard, Creston, Macfarlan, Big Springs, Mount Zion,\nSmithville, Cherry and Millstone.\n\nThis includes Interstate 77 in West Virginia near mile marker 150...\nand between mile markers 152 and 163.",
+    "instruction": "Turn around, don't drown when encountering flooded roads. Most flood\ndeaths occur in vehicles.\n\nBe especially cautious at night when it is harder to recognize the\ndangers of flooding.",
+    "response": "Avoid",
+    "note": null,
+    "parameters": {
+     "AWIPSidentifier": [
+      "FFWRLX"
+     ],
+     "WMOidentifier": [
+      "WGUS51 KRLX 200744"
+     ],
+     "flashFloodDetection": [
+      "RADAR INDICATED"
+     ],
+     "BLOCKCHANNEL": [
+      "EAS",
+      "NWEM",
+      "CMAS"
+     ],
+     "EAS-ORG": [
+      "WXR"
+     ],
+     "VTEC": [
+      "/O.NEW.KRLX.FF.W.0217.260920T0744Z-260920T1145Z/"
+     ],
+     "eventEndingTime": [
+      "2026-09-20T07:45:00-04:00"
+     ]
+    },
+    "scope": "Public",
+    "code": "IPAWSv1.0",
+    "language": "en-US",
+    "web": "http://www.weather.gov",
+    "eventCode": {
+     "SAME": [
+      "FFW"
+     ],
+     "NationalWeatherService": [
+      "FFW"
+     ]
+    }
+   }
+  },
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.20c7b7da8eabc584e0baa3ee16c72275cf6c4ac5.001.1",
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.20c7b7da8eabc584e0baa3ee16c72275cf6c4ac5.001.1",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.20c7b7da8eabc584e0baa3ee16c72275cf6c4ac5.001.1",
+    "areaDesc": "Maumee Bay to Reno Beach OH; Reno Beach to The Islands OH; The Islands to Vermilion OH; Vermilion to Avon Point OH; Avon Point to Willowick OH",
+    "geocode": {
+     "SAME": [
+      "096142",
+      "096143",
+      "096144",
+      "096145",
+      "096146"
+     ],
+     "UGC": [
+      "LEZ142",
+      "LEZ143",
+      "LEZ144",
+      "LEZ145",
+      "LEZ146"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/forecast/LEZ142",
+     "https://api.weather.gov/zones/forecast/LEZ143",
+     "https://api.weather.gov/zones/forecast/LEZ144",
+     "https://api.weather.gov/zones/forecast/LEZ145",
+     "https://api.weather.gov/zones/forecast/LEZ146"
+    ],
+    "references": [],
+    "sent": "2026-09-20T03:42:00-04:00",
+    "effective": "2026-09-20T03:42:00-04:00",
+    "onset": "2026-09-20T20:00:00-04:00",
+    "expires": "2026-09-20T11:45:00-04:00",
+    "ends": "2026-09-23T22:00:00-04:00",
+    "status": "Actual",
+    "messageType": "Alert",
+    "category": "Met",
+    "severity": "Minor",
+    "certainty": "Likely",
+    "urgency": "Expected",
+    "event": "Small Craft Advisory",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Cleveland OH",
+    "headline": "Small Craft Advisory issued September 20 at 3:42AM EDT until September 23 at 10:00PM EDT by NWS Cleveland OH",
+    "description": "* WHAT...Northeast winds 15 to 25 knots and waves 4 to 7 feet\nexpected.\n\n* WHERE...The nearshore waters of Lake Erie from Maumee Bay to\nWillowick OH.\n\n* WHEN...From 8 PM this evening to 10 PM EDT Wednesday.\n\n* IMPACTS...Conditions will be hazardous to small craft.",
+    "instruction": "Inexperienced mariners, especially those operating smaller\nvessels, should avoid navigating in hazardous conditions.",
+    "response": "Avoid",
+    "note": null,
+    "parameters": {
+     "AWIPSidentifier": [
+      "MWWCLE"
+     ],
+     "WMOidentifier": [
+      "WHUS71 KCLE 200742"
+     ],
+     "NWSheadline": [
+      "SMALL CRAFT ADVISORY IN EFFECT FROM 8 PM THIS EVENING TO 10 PM EDT WEDNESDAY"
+     ],
+     "BLOCKCHANNEL": [
+      "EAS",
+      "NWEM",
+      "CMAS"
+     ],
+     "VTEC": [
+      "/O.NEW.KCLE.SC.Y.0041.260921T0000Z-260924T0200Z/"
+     ],
+     "eventEndingTime": [
+      "2026-09-23T22:00:00-04:00"
+     ]
+    },
+    "scope": "Public",
+    "code": "IPAWSv1.0",
+    "language": "en-US",
+    "web": "http://www.weather.gov",
+    "eventCode": {
+     "SAME": [
+      "NWS"
+     ],
+     "NationalWeatherService": [
+      "SCY"
+     ]
+    }
+   }
+  },
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.367a1c710b567b934be2a70f54b0eb3c8ab7a22a.001.1",
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.367a1c710b567b934be2a70f54b0eb3c8ab7a22a.001.1",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.367a1c710b567b934be2a70f54b0eb3c8ab7a22a.001.1",
+    "areaDesc": "Dubois; Perry; Hancock; Breckinridge; Meade; Ohio; Grayson; Hardin; Larue; Butler; Edmonson; Hart; Logan; Warren; Simpson; Allen; Barren; Monroe; Metcalfe",
+    "geocode": {
+     "SAME": [
+      "018037",
+      "018123",
+      "021091",
+      "021027",
+      "021163",
+      "021183",
+      "021085",
+      "021093",
+      "021123",
+      "021031",
+      "021061",
+      "021099",
+      "021141",
+      "021227",
+      "021213",
+      "021003",
+      "021009",
+      "021171",
+      "021169"
+     ],
+     "UGC": [
+      "INZ083",
+      "INZ089",
+      "KYZ023",
+      "KYZ024",
+      "KYZ025",
+      "KYZ026",
+      "KYZ027",
+      "KYZ028",
+      "KYZ053",
+      "KYZ061",
+      "KYZ062",
+      "KYZ063",
+      "KYZ070",
+      "KYZ071",
+      "KYZ072",
+      "KYZ073",
+      "KYZ074",
+      "KYZ075",
+      "KYZ076"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/forecast/INZ083",
+     "https://api.weather.gov/zones/forecast/INZ089",
+     "https://api.weather.gov/zones/forecast/KYZ023",
+     "https://api.weather.gov/zones/forecast/KYZ024",
+     "https://api.weather.gov/zones/forecast/KYZ025",
+     "https://api.weather.gov/zones/forecast/KYZ026",
+     "https://api.weather.gov/zones/forecast/KYZ027",
+     "https://api.weather.gov/zones/forecast/KYZ028",
+     "https://api.weather.gov/zones/forecast/KYZ053",
+     "https://api.weather.gov/zones/forecast/KYZ061",
+     "https://api.weather.gov/zones/forecast/KYZ062",
+     "https://api.weather.gov/zones/forecast/KYZ063",
+     "https://api.weather.gov/zones/forecast/KYZ070",
+     "https://api.weather.gov/zones/forecast/KYZ071",
+     "https://api.weather.gov/zones/forecast/KYZ072",
+     "https://api.weather.gov/zones/forecast/KYZ073",
+     "https://api.weather.gov/zones/forecast/KYZ074",
+     "https://api.weather.gov/zones/forecast/KYZ075",
+     "https://api.weather.gov/zones/forecast/KYZ076"
+    ],
+    "references": [
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d079e2dd8365155ff011f7dffcc4b3f78c651561.001.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.d079e2dd8365155ff011f7dffcc4b3f78c651561.001.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T15:31:00-04:00"
+     }
+    ],
+    "sent": "2026-09-20T02:53:00-04:00",
+    "effective": "2026-09-20T02:53:00-04:00",
+    "onset": "2026-09-20T02:53:00-04:00",
+    "expires": "2026-09-20T20:00:00-04:00",
+    "ends": "2026-09-20T20:00:00-04:00",
+    "status": "Actual",
+    "messageType": "Update",
+    "category": "Met",
+    "severity": "Moderate",
+    "certainty": "Likely",
+    "urgency": "Expected",
+    "event": "Heat Advisory",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Louisville KY",
+    "headline": "Heat Advisory issued September 20 at 2:53AM EDT until September 20 at 8:00PM EDT by NWS Louisville KY",
+    "description": "* WHAT...Heat index values up to 105.\n\n* WHERE...Portions of Indiana and north central, northwest, and south\ncentral Kentucky.\n\n* WHEN...Until 8 PM EDT /7 PM CDT/ this evening.\n\n* IMPACTS...Hot temperatures and high humidity may cause heat\nillnesses.",
+    "instruction": "Drink plenty of fluids, stay in an air-conditioned room, stay out of\nthe sun, and check up on relatives and neighbors.\n\nTo reduce risk during outdoor work, the Occupational Safety and\nHealth Administration recommends scheduling frequent rest breaks in\nshaded or air conditioned environments. Anyone overcome by heat\nshould be moved to a cool and shaded location. Heat stroke is an\nemergency! Call 9 1 1.",
+    "response": "Execute",
+    "note": null,
+    "parameters": {
+     "AWIPSidentifier": [
+      "NPWLMK"
+     ],
+     "WMOidentifier": [
+      "WWUS73 KLMK 200653"
+     ],
+     "NWSheadline": [
+      "HEAT ADVISORY REMAINS IN EFFECT UNTIL 8 PM EDT /7 PM CDT/ THIS EVENING"
+     ],
+     "BLOCKCHANNEL": [
+      "EAS",
+      "NWEM",
+      "CMAS"
+     ],
+     "VTEC": [
+      "/O.CON.KLMK.HT.Y.0013.000000T0000Z-260921T0000Z/"
+     ],
+     "eventEndingTime": [
+      "2026-09-20T20:00:00-04:00"
+     ],
+     "expiredReferences": [
+      "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.b8aca7237a12fd11755605f7e682c166fe08abf4.001.1,2026-09-19T06:54:00-04:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.e241f25cd8284fdd0fbf023db664347b64cf9790.001.2,2026-09-18T19:56:00-04:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.29fc3aeda56502b2d4519ad7af898ad585017f53.001.1,2026-09-18T22:21:00-04:00"
+     ]
+    },
+    "scope": "Public",
+    "code": "IPAWSv1.0",
+    "language": "en-US",
+    "web": "http://www.weather.gov",
+    "eventCode": {
+     "SAME": [
+      "NWS"
+     ],
+     "NationalWeatherService": [
+      "HTY"
+     ]
+    }
+   }
+  },
+  {
+   "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.5031f89eca654afa3fbf8159e6c677416586b8ea.001.1",
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.5031f89eca654afa3fbf8159e6c677416586b8ea.001.1",
+    "@type": "wx:Alert",
+    "id": "urn:oid:2.49.0.1.840.0.5031f89eca654afa3fbf8159e6c677416586b8ea.001.1",
+    "areaDesc": "Buchanan; Delaware; Dubuque; Benton; Linn; Jones; Jackson; Iowa; Johnson; Cedar; Clinton; Muscatine; Scott; Keokuk; Washington; Louisa; Jo Daviess; Stephenson; Carroll; Whiteside; Rock Island; Henry; Bureau; Putnam; Mercer",
+    "geocode": {
+     "SAME": [
+      "019019",
+      "019055",
+      "019061",
+      "019011",
+      "019113",
+      "019105",
+      "019097",
+      "019095",
+      "019103",
+      "019031",
+      "019045",
+      "019139",
+      "019163",
+      "019107",
+      "019183",
+      "019115",
+      "017085",
+      "017177",
+      "017015",
+      "017195",
+      "017161",
+      "017073",
+      "017011",
+      "017155",
+      "017131"
+     ],
+     "UGC": [
+      "IAZ040",
+      "IAZ041",
+      "IAZ042",
+      "IAZ051",
+      "IAZ052",
+      "IAZ053",
+      "IAZ054",
+      "IAZ063",
+      "IAZ064",
+      "IAZ065",
+      "IAZ066",
+      "IAZ067",
+      "IAZ068",
+      "IAZ076",
+      "IAZ077",
+      "IAZ078",
+      "ILZ001",
+      "ILZ002",
+      "ILZ007",
+      "ILZ009",
+      "ILZ015",
+      "ILZ016",
+      "ILZ017",
+      "ILZ018",
+      "ILZ024"
+     ]
+    },
+    "affectedZones": [
+     "https://api.weather.gov/zones/forecast/IAZ040",
+     "https://api.weather.gov/zones/forecast/IAZ041",
+     "https://api.weather.gov/zones/forecast/IAZ042",
+     "https://api.weather.gov/zones/forecast/IAZ051",
+     "https://api.weather.gov/zones/forecast/IAZ052",
+     "https://api.weather.gov/zones/forecast/IAZ053",
+     "https://api.weather.gov/zones/forecast/IAZ054",
+     "https://api.weather.gov/zones/forecast/IAZ063",
+     "https://api.weather.gov/zones/forecast/IAZ064",
+     "https://api.weather.gov/zones/forecast/IAZ065",
+     "https://api.weather.gov/zones/forecast/IAZ066",
+     "https://api.weather.gov/zones/forecast/IAZ067",
+     "https://api.weather.gov/zones/forecast/IAZ068",
+     "https://api.weather.gov/zones/forecast/IAZ076",
+     "https://api.weather.gov/zones/forecast/IAZ077",
+     "https://api.weather.gov/zones/forecast/IAZ078",
+     "https://api.weather.gov/zones/forecast/ILZ001",
+     "https://api.weather.gov/zones/forecast/ILZ002",
+     "https://api.weather.gov/zones/forecast/ILZ007",
+     "https://api.weather.gov/zones/forecast/ILZ009",
+     "https://api.weather.gov/zones/forecast/ILZ015",
+     "https://api.weather.gov/zones/forecast/ILZ016",
+     "https://api.weather.gov/zones/forecast/ILZ017",
+     "https://api.weather.gov/zones/forecast/ILZ018",
+     "https://api.weather.gov/zones/forecast/ILZ024"
+    ],
+    "references": [
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.62ca7bd1b32bba9d7f1009e49d658dd45bd305bb.001.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.62ca7bd1b32bba9d7f1009e49d658dd45bd305bb.001.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T01:45:00-05:00"
+     },
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.62ca7bd1b32bba9d7f1009e49d658dd45bd305bb.002.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.62ca7bd1b32bba9d7f1009e49d658dd45bd305bb.002.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T01:45:00-05:00"
+     },
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.983919bbddb639e003ae74fa65f5db8033144e4b.001.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.983919bbddb639e003ae74fa65f5db8033144e4b.001.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T10:29:00-05:00"
+     },
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a9b7961e8c58a68a41a4759cb6195ebbcaeeb8d6.001.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.a9b7961e8c58a68a41a4759cb6195ebbcaeeb8d6.001.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T11:22:00-05:00"
+     },
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a9b7961e8c58a68a41a4759cb6195ebbcaeeb8d6.002.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.a9b7961e8c58a68a41a4759cb6195ebbcaeeb8d6.002.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T11:22:00-05:00"
+     },
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.98ed9e7474e148ad0b514b74630abfc6bb33230e.001.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.98ed9e7474e148ad0b514b74630abfc6bb33230e.001.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T11:36:00-05:00"
+     },
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.eb25b1babe3c01c9ef14577bb08ebc2ef7c23303.001.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.eb25b1babe3c01c9ef14577bb08ebc2ef7c23303.001.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T20:00:00-05:00"
+     },
+     {
+      "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.eb25b1babe3c01c9ef14577bb08ebc2ef7c23303.002.1",
+      "identifier": "urn:oid:2.49.0.1.840.0.eb25b1babe3c01c9ef14577bb08ebc2ef7c23303.002.1",
+      "sender": "w-nws.webmaster@noaa.gov",
+      "sent": "2026-09-19T20:00:00-05:00"
+     }
+    ],
+    "sent": "2026-09-20T01:44:00-05:00",
+    "effective": "2026-09-20T01:44:00-05:00",
+    "onset": "2026-09-20T01:44:00-05:00",
+    "expires": "2026-09-20T13:00:00-05:00",
+    "ends": "2026-09-20T13:00:00-05:00",
+    "status": "Actual",
+    "messageType": "Update",
+    "category": "Met",
+    "severity": "Severe",
+    "certainty": "Possible",
+    "urgency": "Future",
+    "event": "Flood Watch",
+    "sender": "w-nws.webmaster@noaa.gov",
+    "senderName": "NWS Quad Cities IA IL",
+    "headline": "Flood Watch issued September 20 at 1:44AM CDT until September 20 at 1:00PM CDT by NWS Quad Cities IA IL",
+    "description": "* WHAT...Flooding and flash flooding caused by excessive rainfall is\npossible.\n\n* WHERE...Portions of Illinois, including the following areas,\nBureau, Carroll, Henry IL, Jo Daviess, Mercer, Putnam, Rock Island,\nStephenson and Whiteside and Iowa, including the following areas,\nBenton, Buchanan, Cedar, Clinton, Delaware, Dubuque, Iowa, Jackson,\nJohnson, Jones, Keokuk, Linn, Louisa, Muscatine, Scott and\nWashington.\n\n* WHEN...Until 1 PM CDT this afternoon.\n\n* IMPACTS...Excessive runoff may result in flooding of rivers,\ncreeks, streams, and other low-lying and flood-prone locations.\nFlooding may occur in poor drainage and urban areas.\n\n* ADDITIONAL DETAILS...\n- Widespread showers and storms will continue to move across the\nwatch area through at least late Sunday morning. These storms\nwill be capable of rainfall rates between 1 to 2 inches per hour.\nRainfall totals of 1 to 3 inches are likely in the hardest hit\nareas, with the potential for localized areas of 4 to 5 inches.",
+    "instruction": "You should monitor later forecasts and be alert for possible Flash\nFlood Warnings. Those living in areas prone to flooding should be\nprepared to take action should flooding develop.",
+    "response": "Prepare",
+    "note": null,
+    "parameters": {
+     "AWIPSidentifier": [
+      "FFADVN"
+     ],
+     "WMOidentifier": [
+      "WGUS63 KDVN 200644"
+     ],
+     "NWSheadline": [
+      "FLOOD WATCH NOW IN EFFECT UNTIL 1 PM CDT THIS AFTERNOON"
+     ],
+     "BLOCKCHANNEL": [
+      "EAS",
+      "NWEM",
+      "CMAS"
+     ],
+     "EAS-ORG": [
+      "WXR"
+     ],
+     "VTEC": [
+      "/O.EXT.KDVN.FA.A.0011.000000T0000Z-260920T1800Z/"
+     ],
+     "eventEndingTime": [
+      "2026-09-20T13:00:00-05:00"
+     ],
+     "expiredReferences": [
+      "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.3f2321049fc759fd10ce334fc65afd6a4bba82bb.002.1,2026-09-18T13:56:00-05:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.3f2321049fc759fd10ce334fc65afd6a4bba82bb.001.1,2026-09-18T13:56:00-05:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.aef94b7767caec2597f778f5616bb9ab78e49491.002.1,2026-09-18T10:45:00-05:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.aef94b7767caec2597f778f5616bb9ab78e49491.001.1,2026-09-18T10:45:00-05:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.fa0cfc4b23f808118c061987e380d435866f1695.001.1,2026-09-18T01:23:00-05:00"
+     ]
+    },
+    "scope": "Public",
+    "code": "IPAWSv1.0",
+    "language": "en-US",
+    "web": "http://www.weather.gov",
+    "eventCode": {
+     "SAME": [
+      "FFA"
+     ],
+     "NationalWeatherService": [
+      "FAA"
+     ]
+    }
+   }
+  }
+ ]
+}

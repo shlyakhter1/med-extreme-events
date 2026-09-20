@@ -10,8 +10,9 @@ data in ``cards/*.yaml``; nothing here generates or rewrites it.
 
 from __future__ import annotations
 
+from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Self
+from typing import Annotated, Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
@@ -339,3 +340,95 @@ class Facility(StrictModel):
     @property
     def resolved(self) -> bool:
         return self.county_fips is not None and self.visn is not None
+
+
+# --------------------------------------------------------------------------- events
+
+
+class EventSource(StrEnum):
+    NWS = "nws"
+    AIRNOW = "airnow"
+    HMS = "hms"
+    OPENFEMA = "openfema"
+    REPLAY = "replay"
+
+
+class CapSeverity(StrEnum):
+    EXTREME = "Extreme"
+    SEVERE = "Severe"
+    MODERATE = "Moderate"
+    MINOR = "Minor"
+    UNKNOWN = "Unknown"
+
+
+class CapUrgency(StrEnum):
+    IMMEDIATE = "Immediate"
+    EXPECTED = "Expected"
+    FUTURE = "Future"
+    PAST = "Past"
+    UNKNOWN = "Unknown"
+
+
+class CapCertainty(StrEnum):
+    OBSERVED = "Observed"
+    LIKELY = "Likely"
+    POSSIBLE = "Possible"
+    UNLIKELY = "Unlikely"
+    UNKNOWN = "Unknown"
+
+
+class EventGeography(StrictModel):
+    """Geography keys per requirements §5: county FIPS (L1) is the join key for matching;
+    zones/ZIPs/polygons are kept for provenance and finer joins."""
+
+    county_fips: list[Annotated[str, Field(pattern=r"^\d{5}$")]] = Field(default_factory=list)
+    ugc: list[Annotated[str, Field(pattern=r"^[A-Z]{2}[CZ]\d{3}$")]] = Field(default_factory=list)
+    zips: list[Annotated[str, Field(pattern=r"^\d{5}$")]] = Field(default_factory=list)
+    states: list[Annotated[str, Field(pattern=r"^[A-Z]{2}$")]] = Field(default_factory=list)
+    polygon: dict[str, Any] | None = Field(default=None, description="GeoJSON geometry, if any")
+    area_desc: str | None = None
+    note: str | None = Field(default=None, description="How counties were derived, if indirect")
+
+
+class Event(StrictModel):
+    """CAP-derived normalized event. ``event_key`` (source + source_id) is the natural key
+    for upserts; a strengthened alert replaces its predecessor rather than duplicating it."""
+
+    source: EventSource
+    source_id: NonEmptyStr
+    event_type: EventType
+    event_name: NonEmptyStr = Field(description="Source vocabulary, e.g. NWS 'Heat Advisory'")
+    headline: str | None = None
+    severity: CapSeverity = CapSeverity.UNKNOWN
+    urgency: CapUrgency = CapUrgency.UNKNOWN
+    certainty: CapCertainty = CapCertainty.UNKNOWN
+    onset: datetime
+    expires: datetime
+    sent: datetime | None = None
+    geography: EventGeography
+    metrics: dict[str, float | int | str] = Field(
+        default_factory=dict, description="e.g. aqi, heatrisk, smoke_density, fema_disaster_number"
+    )
+    scenario: str | None = Field(default=None, description="Replay scenario id, else None")
+    raw_ref: str | None = Field(default=None, description="Path or URL of the raw payload")
+
+    @property
+    def event_key(self) -> str:
+        return f"{self.source}:{self.source_id}"
+
+    @model_validator(mode="after")
+    def window_ordered(self) -> Self:
+        if self.expires < self.onset:
+            raise ValueError("expires must be >= onset")
+        return self
+
+
+class TimeWindow(StrictModel):
+    start: datetime
+    end: datetime
+
+    @model_validator(mode="after")
+    def ordered(self) -> Self:
+        if self.end < self.start:
+            raise ValueError("end must be >= start")
+        return self

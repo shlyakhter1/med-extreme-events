@@ -5,7 +5,7 @@ SKILLS_REPO ?= ../../nyc2026-dataset
 ENV_FILE := $(wildcard .env)
 RUN = $(UV) run $(if $(ENV_FILE),--env-file $(ENV_FILE),)
 
-.PHONY: help install lint fmt test schema skills skills-check db-up db-down reference load serve ingest demo clean
+.PHONY: help install lint fmt test schema skills skills-check db-up db-down reference load serve ingest scenarios demo clean
 
 help: ## list targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-14s %s\n", $$1, $$2}'
@@ -42,6 +42,7 @@ db-down: ## stop the database
 
 reference: ## rebuild cached reference data (county boundaries, ZIP↔county; facilities needs VA_FACILITIES_API_KEY)
 	$(RUN) python scripts/build_county_boundaries.py
+	$(RUN) python scripts/build_nws_zones.py
 	$(RUN) python scripts/build_zip_county.py
 	$(RUN) python scripts/build_facilities.py
 
@@ -51,8 +52,13 @@ load: ## load cached reference data into DATABASE_URL (SQLite fallback) with cou
 serve: ## run the API locally
 	$(RUN) uvicorn xevents.api:app --reload --port 8000
 
-ingest: ## (M2) load events for EVENT_MODE=replay|live
-	@echo "ingest: not implemented until M2" && exit 1
+ingest: ## load events for EVENT_MODE=replay|live (default replay: all fixture scenarios)
+	$(RUN) python scripts/ingest.py
+
+scenarios: ## rebuild fixtures/events/*/events.json from their raw archived sources
+	$(RUN) python fixtures/events/heat_dome_2021/build.py
+	$(RUN) python fixtures/events/ian_2022/build.py
+	$(RUN) python fixtures/events/smoke_nyc_2023/build.py
 
 demo: ## (M5) fresh DB, reference data, cards, heat-dome replay, dashboard
 	@echo "demo: not implemented until M5" && exit 1

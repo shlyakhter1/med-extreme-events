@@ -2,6 +2,47 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — M2: event providers + replay scenarios (done)
+
+**Done.**
+- CAP-derived `Event` model (source, type, CAP severity/urgency/certainty, onset/expires,
+  geography keys: county FIPS, UGC, ZIPs, polygon; metrics; scenario; raw_ref) and an
+  `events` table with upsert by natural key `source:source_id` (`store.py`).
+- Providers (`providers/`): `NWSAlertsProvider` (api.weather.gov `/alerts/active`, SAME +
+  UGC → counties via the NWS zone-county correlation file), `OpenFEMAProvider`
+  (declarations grouped per disaster, county rows), `HMSSmokeProvider` (daily shapefiles →
+  one event per day × density, counties by approximate polygon coverage), `AirNowProvider`
+  (`/aq/data/` monitoring-site bbox endpoint from AirNow's retained list; monitors →
+  counties by point-in-polygon), `ReplayProvider` (fixture `events.json`).
+- Reference: `fixtures/reference/nws_zone_county.csv` (NWS bp16ap26.dbx, 4,848 rows) built
+  by `scripts/build_nws_zones.py`.
+- Three replay scenarios built from archived real data with per-scenario `build.py` and raw
+  files kept in git (`fixtures/events/README.md` has provenance and gaps).
+- `make ingest` (`scripts/ingest.py`): `EVENT_MODE=replay` loads all three scenarios
+  (96 events) — verified into SQLite and the compose Postgres; `EVENT_MODE=live` ingested 87
+  real events (78 NWS, 3 OpenFEMA, 6 HMS) into the same table. `make scenarios` rebuilds.
+- `make lint test`: green.
+
+**Findings / corrections.**
+- api.weather.gov keeps no alert history (2021/2022 windows return empty), so archived
+  alerts come from the Iowa Environmental Mesonet VTEC archive (`watchwarn.py` CSV), parsed
+  by `providers/iem_archive.py` into the same Event model.
+- NWS renumbered WA/OR/ID public zones after 2021; the current zone-county file lacks
+  e.g. ORZ006/WAZ558. Dated zone geometries from IEM (`/api/1/nws/ugcs.geojson?valid=`)
+  are intersected with county polygons to resolve them (heat dome: 129 counties, 0
+  unresolved). Same for two 2022 FL zones.
+- NWS Air Quality Alerts are non-VTEC and absent from the archive; the smoke scenario is
+  HMS-only. The live provider tracks "Air Quality Alert".
+- AirNow: the detailed endpoint docs are login-gated. The provider targets `/aq/data/`
+  ("Observations by Monitoring Site", in the retained 2026 list) rather than the retiring
+  ZIP/lat-long observation services. **Response shape unverified until a key exists** —
+  first live run should be checked against `fixtures/live/raw/airnow_data_*.json`.
+- `NWS_USER_AGENT` in `.env` is still empty; the live run used a repo-URL contact string
+  passed on the command line. Set it in `.env` for `make ingest` live.
+- No new dependencies (pyshp reused for HMS shapefiles).
+
+**Next:** M3 denominators (CDC PLACES county measures × VetPop × profile multipliers).
+
 ## 2026-09-20 — M1: facility spine + geography (done)
 
 **Done.**
