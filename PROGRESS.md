@@ -2,6 +2,46 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — M3: denominators (done)
+
+**Done.**
+- Reference tables: `fixtures/reference/places_county.csv` (CDC PLACES 2025 county release,
+  10 measures) and `vetpop_county.csv` (VetPop2023 Table 9L, 2023–2030 projections) with
+  builders `scripts/build_places.py` / `build_vetpop.py` (new deps: `openpyxl` to read the
+  VetPop workbook, `types-openpyxl` for mypy).
+- Catchments (`geography/catchment.py`): county → nearest anchor station (VAMC/HCC);
+  non-anchor facilities map to a station by health care system (else nearest). Persisted in
+  `county_catchment` and `facility_station` tables by `make load`.
+- `denominators.py`: `ReferenceTables` + `PanelEstimator` producing `Estimate` objects
+  (value, formula, inputs, sources, caveats, components). Rate paths: VA-literature rate on
+  the `vha_users` scope, national count allocated by veteran share, PLACES county rate;
+  card panels add profile class shares (`panel_multipliers`) and sub-panels (Card 3).
+- `GET /facilities/{id}/panels[?card=]` returns sized panels with provenance.
+- National sanity anchors in the profile, checked by `make load` and a test: veterans total
+  vs VetPop 17,260,286 (±5%), heart-failure panel vs ~510k VHA HF patients (±20%).
+- `make lint test`: green. Example: Portland VAMC ≈ 84k veterans in catchment (9 counties); Card 4
+  panel ≈ 1.3k.
+
+**Decisions.**
+- Anchors are stations, not clinics: with CBOCs as anchors, most VAMCs received no
+  counties (a CBOC is usually nearer to a county centroid), which broke the demo's
+  "Portland VAMC with sized panels". Panels live at the station; clinics inherit.
+- VA-literature rates ("of VHA enrollees / VA patients") are applied to veterans × 0.50
+  (`scopes.vha_users`, VHA enrollees ≈ 9.1M / 18.3M veterans). Without this, HF came out
+  at 855k vs the 510k anchor. **The 0.50 share needs verification before real use.**
+- PLACES 2024/2025 have no CKD measure; the plan's CKD column is dropped (no v1 card sizes
+  on CKD; it is a Card 1 risk flag only).
+- VetPop territory rows are spread evenly over the territory's counties (PR ≈ 69k veterans
+  over 78 municipios); "Foreign Countries" is excluded from `national_veterans`.
+- Connecticut: VetPop, PLACES and the Census 2023 boundaries all use the 2022 planning
+  regions (09110–09190), but NWS SAME/UGC codes use legacy counties (09001–09015). **M4
+  needs a CT legacy-county → planning-region crosswalk** or CT alerts will not match.
+
+**Also:** `docs/playback-view.md` drafts the map playback (time scrubber over a scenario)
+for M5.
+
+**Next:** M4 matching engine + action-item store.
+
 ## 2026-09-20 — M2: event providers + replay scenarios (done)
 
 **Done.**

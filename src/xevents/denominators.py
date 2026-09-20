@@ -1,1 +1,317 @@
-"""denominators — implemented in later milestones (see docs/implementation-plan.md)."""
+"""Mode A panel sizing: veterans in a station's catchment × condition rate × class share.
+
+Rates come from the population profile: a VA-literature multiplier when the profile gives
+one (diabetes 0.25, CHF 0.05, ...) applied to the scope it was measured on (VHA users =
+veterans × share), else a CDC PLACES county prevalence applied to all veterans; national
+counts (dialysis) are allocated by the station's share of veterans. Every ``Estimate``
+carries formula, inputs, sources and caveats for the UI's "how was this computed" popover.
+"""
+
+from __future__ import annotations
+
+import csv
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from xevents.models import Card, Estimate
+from xevents.profiles import Denominator, Profile
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+REFERENCE = REPO_ROOT / "fixtures" / "reference"
+VETPOP_PATH = REFERENCE / "vetpop_county.csv"
+PLACES_PATH = REFERENCE / "places_county.csv"
+META_COLUMNS = {"county_fips", "state", "county", "population", "population_18plus"}
+# VetPop reports territories as single rows; spread them over the territory's counties.
+TERRITORY_ROWS = {"72000": "72", "90066": "66", "90078": "78", "90060": "60", "90069": "69"}
+
+PLACES_CAVEAT = (
+    "CDC PLACES rates are model-based estimates for adults 18+ in the general population, "
+    "not veterans; treat as a planning benchmark."
+)
+ESTIMATE_CAVEAT = "Planning estimate (aggregate, no patient data): population × rate, not a count."
+CATCHMENT_CAVEAT = (
+    "Catchment = counties whose nearest anchor station (VAMC/HCC) is this one; clinics report "
+    "their station's panel (Mode A approximation)."
+)
+
+
+@dataclass
+class ReferenceTables:
+    veterans: dict[str, int]  # county FIPS → veterans (projection year)
+    places: dict[str, dict[str, float | None]]  # county FIPS → measure → crude prevalence %
+    projection_year: int
+    vetpop_source: str = field(default="VetPop2023 Table 9L")
+    places_source: str = field(default="CDC PLACES 2025 county release")
+    excluded: dict[str, int] = field(default_factory=dict)  # VetPop rows with no US county
+
+    @classmethod
+    def load(
+        cls,
+        projection_year: int,
+        vetpop_path: Path = VETPOP_PATH,
+        places_path: Path = PLACES_PATH,
+        county_ids: set[str] | None = None,
+    ) -> ReferenceTables:
+        col = f"veterans_{projection_year}"
+        veterans: dict[str, int] = {}
+        excluded: dict[str, int] = {}
+        with vetpop_path.open(newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                if r.get(col):
+                    veterans[r["county_fips"]] = int(r[col])
+        if county_ids is not None:
+            for row_fips, state_fips in TERRITORY_ROWS.items():
+                n = veterans.pop(row_fips, None)
+                if n is None:
+                    continue
+                targets = sorted(c for c in county_ids if c.startswith(state_fips))
+                for i, c in enumerate(targets):  # even split, remainder to the first counties
+                    veterans[c] = (
+                        veterans.get(c, 0) + n // len(targets) + (1 if i < n % len(targets) else 0)
+                    )
+            for fips in [k for k in veterans if k not in county_ids]:
+                excluded[fips] = veterans.pop(fips)
+        places: dict[str, dict[str, float | None]] = {}
+        with places_path.open(newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            measures = [c for c in (reader.fieldnames or []) if c not in META_COLUMNS]
+            for r in reader:
+                places[r["county_fips"]] = {m: (float(r[m]) if r[m] else None) for m in measures}
+        return cls(
+            veterans=veterans, places=places, projection_year=projection_year, excluded=excluded
+        )
+
+    @property
+    def national_veterans(self) -> int:
+        return sum(self.veterans.values())
+
+    def national_places_rate(self, measure: str) -> float | None:
+        """Veteran-weighted national mean of a PLACES measure (fallback for gaps)."""
+        num = den = 0.0
+        for fips, vets in self.veterans.items():
+            v = (self.places.get(fips) or {}).get(measure)
+            if v is not None:
+                num += vets * v
+                den += vets
+        return num / den if den else None
+
+
+class PanelEstimator:
+    def __init__(
+        self,
+        profile: Profile,
+        tables: ReferenceTables,
+        catchment: dict[str, list[str]],
+        stations: dict[str, tuple[str, str]] | None = None,
+    ) -> None:
+        self.profile = profile
+        self.tables = tables
+        self.catchment = catchment  # station id → county FIPS list
+        self.stations = stations or {}  # facility id → (station id, method)
+
+    def station_for(self, facility_id: str) -> tuple[str, str]:
+        if facility_id in self.catchment:
+            return facility_id, "self"
+        return self.stations.get(facility_id, (facility_id, "none"))
+
+    # ------------------------------------------------------------------ building blocks
+
+    def veterans(self, facility_id: str) -> Estimate:
+        station, method = self.station_for(facility_id)
+        counties = self.catchment.get(station, [])
+        total = sum(self.tables.veterans.get(c, 0) for c in counties)
+        caveats = [CATCHMENT_CAVEAT]
+        if method not in ("self", "none"):
+            caveats.append(f"Sized at parent station {station} (matched by {method}).")
+        return Estimate(
+            label="Veterans in catchment",
+            value=float(total),
+            formula=(
+                f"Σ VetPop {self.tables.projection_year} veterans over "
+                f"{len(counties)} catchment counties of station {station}"
+            ),
+            inputs={
+                "facility_id": facility_id,
+                "station_id": station,
+                "counties": ",".join(counties),
+                "projection_year": self.tables.projection_year,
+            },
+            sources=[self.tables.vetpop_source, "profile catchment rule: nearest anchor station"],
+            caveats=caveats,
+        )
+
+    def _scoped_population(self, facility_id: str, den: Denominator) -> Estimate:
+        vets = self.veterans(facility_id)
+        if den.scope == "veterans":
+            return vets
+        scope = self.profile.scopes[den.scope]
+        return Estimate(
+            label=f"{den.scope} in catchment",
+            value=vets.value * scope.share_of_veterans,
+            formula=(
+                f"veterans_in_catchment × share_of_veterans[{den.scope}] = "
+                f"{vets.value:.0f} × {scope.share_of_veterans}"
+            ),
+            inputs={
+                "veterans_in_catchment": vets.value,
+                "share_of_veterans": scope.share_of_veterans,
+            },
+            sources=[scope.source],
+            caveats=[c for c in [scope.note] if c],
+            components=[vets],
+        )
+
+    def condition_panel(self, facility_id: str, key: str) -> Estimate:
+        den = self.profile.denominators[key]
+        if den.rate is not None:
+            pop = self._scoped_population(facility_id, den)
+            return Estimate(
+                label=f"{key} panel",
+                value=pop.value * den.rate,
+                formula=f"{den.scope}_in_catchment × rate[{key}] = {pop.value:.0f} × {den.rate}",
+                inputs={"population": round(pop.value, 1), "scope": den.scope, "rate": den.rate},
+                sources=[den.source],
+                caveats=[den.basis, ESTIMATE_CAVEAT],
+                components=[pop],
+            )
+        vets = self.veterans(facility_id)
+        if den.count is not None:
+            national = self.tables.national_veterans
+            share = vets.value / national if national else 0.0
+            return Estimate(
+                label=f"{key} panel",
+                value=den.count * share,
+                formula=(
+                    f"national_count[{key}] × veterans_in_catchment / national_veterans = "
+                    f"{den.count} × {vets.value:.0f} / {national}"
+                ),
+                inputs={
+                    "national_count": den.count,
+                    "veterans_in_catchment": vets.value,
+                    "national_veterans": national,
+                },
+                sources=[den.source, self.tables.vetpop_source],
+                caveats=[
+                    den.basis,
+                    "National count allocated by veteran share (no regional variation).",
+                    ESTIMATE_CAVEAT,
+                ],
+                components=[vets],
+            )
+        return self._places_panel(facility_id, key, den, vets)
+
+    def _places_panel(
+        self, facility_id: str, key: str, den: Denominator, vets: Estimate
+    ) -> Estimate:
+        station, _ = self.station_for(facility_id)
+        counties = self.catchment.get(station, [])
+        measure = den.places_measure or ""
+        fallback = self.tables.national_places_rate(measure)
+        total = 0.0
+        missing = 0
+        for c in counties:
+            n = self.tables.veterans.get(c, 0)
+            rate = (self.tables.places.get(c) or {}).get(measure)
+            if rate is None:
+                missing += 1
+                rate = fallback or 0.0
+            total += n * rate / 100.0
+        caveats = [den.basis, PLACES_CAVEAT, ESTIMATE_CAVEAT]
+        if missing:
+            caveats.append(
+                f"{missing} of {len(counties)} counties lack the PLACES measure; "
+                "national veteran-weighted mean used."
+            )
+        return Estimate(
+            label=f"{key} panel",
+            value=total,
+            formula=(
+                f"Σ_county veterans(c) × PLACES {measure}(c) / 100 over {len(counties)} counties"
+            ),
+            inputs={
+                "measure": measure,
+                "counties": len(counties),
+                "fallback_rate_pct": round(fallback or 0.0, 2),
+            },
+            sources=[den.source, self.tables.places_source],
+            caveats=caveats,
+            components=[vets],
+        )
+
+    # ------------------------------------------------------------------ cards
+
+    def _share_estimate(
+        self, label: str, base: Estimate, key: str, notes: list[str | None]
+    ) -> Estimate:
+        share = self.profile.denominators[key]
+        rate = share.rate or 0.0
+        return Estimate(
+            label=label,
+            value=base.value * rate,
+            formula=f"condition_panel × share[{key}] = {base.value:.0f} × {rate}",
+            inputs={"condition_panel": round(base.value, 1), "share": rate, "share_key": key},
+            sources=[share.source],
+            caveats=[c for c in notes if c] + [ESTIMATE_CAVEAT],
+            components=[base],
+        )
+
+    def _upper_bound(self, label: str, base: Estimate, notes: list[str | None]) -> Estimate:
+        return Estimate(
+            label=label,
+            value=base.value,
+            formula="condition_panel (no medication/device-class share in the profile)",
+            inputs={"condition_panel": round(base.value, 1)},
+            sources=base.sources,
+            caveats=[c for c in notes if c]
+            + ["Upper bound: whole condition panel stands in for the class.", ESTIMATE_CAVEAT],
+            components=[base],
+        )
+
+    def card_panel(self, facility_id: str, card: Card) -> Estimate:
+        """The card's affected panel: condition panel × profile class share (if any), with
+        sub-panels as components."""
+        sel = card.population_selector
+        base = self.condition_panel(facility_id, sel.denominator_key)
+        label = f"{card.title} — affected panel"
+        mult = self.profile.panel_multipliers.get(card.id)
+        if mult is not None:
+            panel = self._share_estimate(label, base, mult.denominator_key, [mult.note])
+        else:
+            panel = self._upper_bound(label, base, [])
+        for sp in sel.sub_panels:
+            sub_label = f"{sp.label} (sub-panel)"
+            if sp.denominator_key:
+                panel.components.append(
+                    self._share_estimate(sub_label, base, sp.denominator_key, [sp.note])
+                )
+            else:
+                panel.components.append(self._upper_bound(sub_label, base, [sp.note]))
+        return panel
+
+    # ------------------------------------------------------------------ sanity
+
+    def national_totals(self, cards: list[Card]) -> dict[str, float]:
+        totals: dict[str, float] = {"veterans_total": float(self.tables.national_veterans)}
+        for key in {c.population_selector.denominator_key for c in cards}:
+            totals[f"panel:{key}"] = sum(self.condition_panel(f, key).value for f in self.catchment)
+        return totals
+
+    def check_national_anchors(self, cards: list[Card]) -> list[str]:
+        """Return anchor violations (empty = all within tolerance)."""
+        totals = self.national_totals(cards)
+        observed = {
+            "veterans_total": totals["veterans_total"],
+            "vha_heart_failure_patients": totals.get("panel:heart_failure"),
+        }
+        problems = []
+        for name, anchor in self.profile.national_anchors.items():
+            got = observed.get(name)
+            if got is None:
+                continue
+            dev = abs(got - anchor.value) / anchor.value
+            if dev > anchor.tolerance:
+                problems.append(
+                    f"{name}: {got:,.0f} vs anchor {anchor.value:,.0f} "
+                    f"(±{anchor.tolerance:.0%}), off by {dev:.0%}"
+                )
+        return problems

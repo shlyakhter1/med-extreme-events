@@ -27,19 +27,53 @@ class _Strict(BaseModel):
 
 
 class Denominator(_Strict):
-    """Either a rate (share of the profile population) or an absolute count."""
+    """Exactly one of: a rate (share of the profile population), an absolute national
+    count (allocated to facilities by veteran share), or a PLACES county measure name
+    (county-specific crude prevalence among adults, general population)."""
 
     rate: float | None = Field(default=None, ge=0.0, le=1.0)
     count: int | None = Field(default=None, ge=0)
+    places_measure: str | None = Field(default=None, pattern=r"^[a-z]+$")
+    scope: Annotated[str, Field(pattern=r"^[a-z_]+$")] = Field(
+        default="veterans",
+        description="Population a rate applies to: 'veterans' (VetPop) or a key in "
+        "profile.scopes (e.g. 'vha_users' = veterans × share_of_veterans).",
+    )
     basis: Annotated[str, Field(min_length=1)]
     source: Annotated[str, Field(min_length=1)]
     note: str | None = None
 
     @model_validator(mode="after")
     def exactly_one(self) -> Self:
-        if (self.rate is None) == (self.count is None):
-            raise ValueError("set exactly one of rate or count")
+        set_ = [x is not None for x in (self.rate, self.count, self.places_measure)]
+        if sum(set_) != 1:
+            raise ValueError("set exactly one of rate, count or places_measure")
         return self
+
+
+class PopulationScope(_Strict):
+    share_of_veterans: float = Field(gt=0, le=1)
+    source: Annotated[str, Field(min_length=1)]
+    note: str | None = None
+
+
+class Catchment(_Strict):
+    anchor_classifications: list[Annotated[str, Field(min_length=1)]] = Field(min_length=1)
+    projection_year: int = Field(ge=2023, le=2053)
+    note: str | None = None
+
+
+class PanelMultiplier(_Strict):
+    """Medication/device-class share applied on top of a card's condition panel."""
+
+    denominator_key: Annotated[str, Field(min_length=1)]
+    note: str | None = None
+
+
+class NationalAnchor(_Strict):
+    value: float = Field(gt=0)
+    tolerance: float = Field(default=0.20, gt=0, le=1)
+    source: Annotated[str, Field(min_length=1)]
 
 
 class Hook(_Strict):
@@ -60,11 +94,24 @@ class Profile(_Strict):
     escalation_default: Annotated[str, Field(min_length=1)] = Field(
         description="Templated escalation used when a card's escalation.response is null."
     )
+    catchment: Catchment
+    scopes: dict[str, PopulationScope] = Field(default_factory=dict)
+    panel_multipliers: dict[str, PanelMultiplier] = Field(
+        default_factory=dict, description="card id → medication-class share multiplier"
+    )
+    national_anchors: dict[str, NationalAnchor] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def unique_acuity(self) -> Self:
         if len(self.acuity_order) != len(set(self.acuity_order)):
             raise ValueError(f"duplicate entries in acuity_order: {self.acuity_order}")
+        return self
+
+    @model_validator(mode="after")
+    def scopes_resolve(self) -> Self:
+        for key, den in self.denominators.items():
+            if den.scope != "veterans" and den.scope not in self.scopes:
+                raise ValueError(f"denominators[{key}].scope '{den.scope}' is not in scopes")
         return self
 
     def acuity_rank(self, acuity_class: str) -> int:
@@ -101,4 +148,11 @@ def check_cards_against_profile(cards: list[Card], profile: Profile) -> list[str
         for hook in card.care_system_hooks:
             if hook not in profile.hooks:
                 problems.append(f"{card.id}: care_system_hook '{hook}' not in profile")
+    for card_id, mult in profile.panel_multipliers.items():
+        if card_id not in {c.id for c in cards}:
+            problems.append(f"profile panel_multipliers: unknown card '{card_id}'")
+        if mult.denominator_key not in profile.denominators:
+            problems.append(
+                f"profile panel_multipliers[{card_id}]: unknown key '{mult.denominator_key}'"
+            )
     return problems

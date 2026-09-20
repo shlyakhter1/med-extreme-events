@@ -16,6 +16,7 @@ from typing import Any
 from sqlalchemy import JSON, DateTime, Engine, Float, String, Text, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
+from xevents.geography.catchment import CatchmentAssignment, StationAssignment
 from xevents.models import Event, Facility, OperatingStatusCode
 
 DEFAULT_DATABASE_URL = "sqlite:///xevents.db"
@@ -233,3 +234,66 @@ def delete_scenario_events(engine: Engine, scenario: str) -> int:
         for row in rows:
             s.delete(row)
     return len(rows)
+
+
+# --------------------------------------------------------------------------- catchments
+
+
+class CatchmentRow(Base):
+    __tablename__ = "county_catchment"
+
+    county_fips: Mapped[str] = mapped_column(String(5), primary_key=True)
+    facility_id: Mapped[str] = mapped_column(String(32), index=True)
+    distance_km: Mapped[float] = mapped_column(Float)
+
+
+def replace_catchments(engine: Engine, assignments: list[CatchmentAssignment]) -> int:
+    with session_scope(engine) as s:
+        for row in s.scalars(select(CatchmentRow)):
+            s.delete(row)
+        s.flush()
+        for a in assignments:
+            s.add(
+                CatchmentRow(
+                    county_fips=a.county_fips, facility_id=a.facility_id, distance_km=a.distance_km
+                )
+            )
+    return len(assignments)
+
+
+def catchment_map(engine: Engine) -> dict[str, list[str]]:
+    """facility id → sorted county FIPS list."""
+    out: dict[str, list[str]] = {}
+    with Session(engine) as s:
+        for row in s.scalars(select(CatchmentRow).order_by(CatchmentRow.county_fips)):
+            out.setdefault(row.facility_id, []).append(row.county_fips)
+    return out
+
+
+class FacilityStationRow(Base):
+    __tablename__ = "facility_station"
+
+    facility_id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    station_id: Mapped[str] = mapped_column(String(32), index=True)
+    method: Mapped[str] = mapped_column(String(32))
+
+
+def replace_stations(engine: Engine, assignments: list[StationAssignment]) -> int:
+    with session_scope(engine) as s:
+        for row in s.scalars(select(FacilityStationRow)):
+            s.delete(row)
+        s.flush()
+        for a in assignments:
+            s.add(
+                FacilityStationRow(
+                    facility_id=a.facility_id, station_id=a.station_id, method=a.method
+                )
+            )
+    return len(assignments)
+
+
+def station_map(engine: Engine) -> dict[str, tuple[str, str]]:
+    """facility id → (station id, method)."""
+    with Session(engine) as s:
+        rows = s.scalars(select(FacilityStationRow))
+        return {r.facility_id: (r.station_id, r.method) for r in rows}

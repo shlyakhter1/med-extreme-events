@@ -52,6 +52,14 @@ def _point_in_polygon(x: float, y: float, polygon: list[Ring]) -> bool:
     return not any(_point_in_ring(x, y, hole) for hole in polygon[1:])
 
 
+def _rep_point_of_shape(shape: _Shape) -> tuple[float, float]:
+    """Representative point: vertex centroid of the largest outer ring (good enough for
+    nearest-facility distance and polygon coverage tests)."""
+    outer = max((poly[0] for poly in shape.polygons), key=len)
+    n = len(outer)
+    return (sum(p[0] for p in outer) / n, sum(p[1] for p in outer) / n)
+
+
 class CountyIndex:
     def __init__(self, shapes: list[_Shape], source: str) -> None:
         self._shapes = shapes
@@ -83,6 +91,9 @@ class CountyIndex:
 
     def shapes(self) -> list[_Shape]:
         return self._shapes
+
+    def ids(self) -> set[str]:
+        return {s.county.geoid for s in self._shapes}
 
     @property
     def states(self) -> frozenset[str]:

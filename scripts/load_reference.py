@@ -15,9 +15,21 @@ import json
 import sys
 from pathlib import Path
 
+from xevents.cards import load_cards
+from xevents.denominators import PanelEstimator, ReferenceTables
 from xevents.geography import CountyIndex, ZipCountyCrosswalk, attribute_facilities
+from xevents.geography.catchment import assign_catchments, assign_stations
+from xevents.profiles import PROFILES_DIR, load_profile
 from xevents.providers.va_facilities import from_geojson
-from xevents.store import init_db, make_engine, upsert_facilities
+from xevents.store import (
+    catchment_map,
+    init_db,
+    make_engine,
+    replace_catchments,
+    replace_stations,
+    station_map,
+    upsert_facilities,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FACILITIES = REPO_ROOT / "fixtures" / "reference" / "facilities.geojson"
@@ -46,6 +58,20 @@ def main() -> int:
     print(
         f"loaded {n} facilities into {engine.url}; county attribution by method: {report.by_method}"
     )
+    profile = load_profile(PROFILES_DIR / "va.yaml")
+    assignments = assign_catchments(
+        report.facilities, counties, profile.catchment.anchor_classifications
+    )
+    replace_catchments(engine, assignments)
+    stations = assign_stations(report.facilities, profile.catchment.anchor_classifications)
+    replace_stations(engine, stations)
+    anchors = len({a.facility_id for a in assignments})
+    print(f"catchments: {len(assignments)} counties assigned to {anchors} anchor stations")
+    tables = ReferenceTables.load(profile.catchment.projection_year, county_ids=counties.ids())
+    estimator = PanelEstimator(profile, tables, catchment_map(engine), station_map(engine))
+    for problem in estimator.check_national_anchors(load_cards()):
+        print(f"ANCHOR CHECK FAILED: {problem}", file=sys.stderr)
+        failures.append("anchor:" + problem)
     if outside:
         print(f"outside US county coverage, excluded from matching: {outside}")
     if failures:

@@ -432,3 +432,20 @@ class TimeWindow(StrictModel):
         if self.end < self.start:
             raise ValueError("end must be >= start")
         return self
+
+
+# --------------------------------------------------------------------------- estimates
+
+
+class Estimate(StrictModel):
+    """A sized aggregate with its provenance: every number the UI shows carries the
+    formula and inputs that produced it (requirements G2/G9; CLAUDE.md constraint 1)."""
+
+    label: NonEmptyStr
+    value: float = Field(ge=0)
+    unit: NonEmptyStr = "veterans"
+    formula: NonEmptyStr
+    inputs: dict[str, float | int | str] = Field(default_factory=dict)
+    sources: list[NonEmptyStr] = Field(default_factory=list)
+    caveats: list[NonEmptyStr] = Field(default_factory=list)
+    components: list[Estimate] = Field(default_factory=list)

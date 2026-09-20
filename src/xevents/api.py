@@ -8,8 +8,11 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from sqlalchemy import Engine
 
 from xevents import __version__
+from xevents.cards import load_cards
+from xevents.denominators import PanelEstimator, ReferenceTables
+from xevents.profiles import PROFILES_DIR, load_profile
 from xevents.providers.va_facilities import to_geojson
-from xevents.store import get_facility, list_facilities, make_engine
+from xevents.store import catchment_map, get_facility, list_facilities, make_engine, station_map
 
 
 def create_app(engine: Engine | None = None) -> FastAPI:
@@ -19,6 +22,20 @@ def create_app(engine: Engine | None = None) -> FastAPI:
     def _engine(request: Request) -> Engine:
         eng: Engine = request.app.state.engine
         return eng
+
+    def _estimator(request: Request) -> PanelEstimator:
+        est = getattr(request.app.state, "estimator", None)
+        if est is None:
+            profile = load_profile(PROFILES_DIR / "va.yaml")
+            from xevents.geography.counties import CountyIndex
+
+            tables = ReferenceTables.load(
+                profile.catchment.projection_year, county_ids=CountyIndex.load().ids()
+            )
+            eng = _engine(request)
+            est = PanelEstimator(profile, tables, catchment_map(eng), station_map(eng))
+            request.app.state.estimator = est
+        return est
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -42,6 +59,26 @@ def create_app(engine: Engine | None = None) -> FastAPI:
             raise HTTPException(status_code=404, detail=f"unknown facility {facility_id}")
         feature: dict[str, Any] = to_geojson([f])["features"][0]
         return feature
+
+    @app.get("/facilities/{facility_id}/panels")
+    def panels(
+        request: Request, facility_id: str, card: str | None = Query(default=None)
+    ) -> dict[str, Any]:
+        """Sized panel per card (or one card) for a facility, with provenance."""
+        f = get_facility(_engine(request), facility_id)
+        if f is None:
+            raise HTTPException(status_code=404, detail=f"unknown facility {facility_id}")
+        cards = load_cards()
+        if card is not None:
+            cards = [c for c in cards if c.id == card]
+            if not cards:
+                raise HTTPException(status_code=404, detail=f"unknown card {card}")
+        est = _estimator(request)
+        return {
+            "facility": f.model_dump(mode="json"),
+            "veterans": est.veterans(facility_id).model_dump(mode="json"),
+            "panels": {c.id: est.card_panel(facility_id, c).model_dump(mode="json") for c in cards},
+        }
 
     return app
 
