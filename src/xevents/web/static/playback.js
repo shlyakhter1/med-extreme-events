@@ -2,8 +2,8 @@
    Everything for the chosen scenario is loaded once, so scrubbing never waits on the network;
    only the per-facility card text is fetched on demand (and cached). */
 (() => {
-  const COLORS = { heat: "#e4572e", hurricane_flood: "#3d7fdc", wildfire_smoke: "#8c6d3f", air_pollution: "#a05cd6", power_outage: "#d9a41a" };
-  const SEV = { Extreme: 4, Severe: 3, Moderate: 2, Minor: 1, Unknown: 0 };
+  const COLORS = XMap.EVENT_COLORS;
+  const SEV = XMap.SEVERITY_RANK;
   const TYPE_ORDER = ["hurricane_flood", "heat", "power_outage", "air_pollution", "wildfire_smoke"];
   const HOUR = 3600e3;
   const $ = (id) => document.getElementById(id);
@@ -309,7 +309,14 @@
       for (const c of e.geography.county_fips) {
         const cur = paint.get(c), sev = SEV[e.severity] || 0;
         const better = !cur || sev > cur.sev || (sev === cur.sev && TYPE_ORDER.indexOf(e.event_type) < TYPE_ORDER.indexOf(cur.type));
-        if (better) paint.set(c, { color: COLORS[e.event_type] || "#4c8dff", opacity: 0.22 + 0.13 * sev, sev, type: e.event_type });
+        if (better) {
+          paint.set(c, {
+            color: COLORS[e.event_type] || "#4c8dff",
+            opacity: XMap.fillOpacity(sev),
+            sev,
+            type: e.event_type,
+          });
+        }
       }
     }
     if (state.selectedEvent) {
@@ -598,20 +605,28 @@
   }
 
   function renderLegend(cards) {
-    const el = document.getElementById("card-legend");
+    const el = document.getElementById("map-legend");
     if (!el) return;
-    if (!cards.length) { el.hidden = true; return; }
     el.hidden = false;
-    el.innerHTML =
-      `<div class="hdr">Cards firing — click to isolate</div>` +
-      cards
-        .map((c) => {
-          const dim = state.selectedCard && state.selectedCard !== c.id ? "opacity:.45;" : "";
-          return `<div data-legend="${esc(c.id)}" style="${dim}"><i style="background:${cardColor(c.id)}"></i>
-            <span>${esc(c.title.length > 34 ? c.title.slice(0, 33) + "…" : c.title)}</span>
-            <span class="muted">${c.facilities.size}</span></div>`;
-        })
-        .join("");
+    const counts = {};
+    for (const e of activeEvents(state.t)) {
+      for (const c of e.geography.county_fips) {
+        (counts[e.event_type] ||= new Set()).add(c);
+      }
+    }
+    const countyCounts = Object.fromEntries(Object.entries(counts).map(([k, v]) => [k, v.size]));
+    const cardRows = cards.length
+      ? `<div class="hdr">Cards — click to isolate</div>` +
+        cards
+          .map((c) => {
+            const dim = state.selectedCard && state.selectedCard !== c.id ? "opacity:.45;" : "";
+            const title = c.title.length > 30 ? c.title.slice(0, 29) + "…" : c.title;
+            return `<div data-legend="${esc(c.id)}" style="${dim}cursor:pointer"><i class="card-chip" style="background:${cardColor(c.id)}"></i>
+              <span>${esc(title)}</span><span class="muted">${c.facilities.size}</span></div>`;
+          })
+          .join("")
+      : `<div class="hdr">Cards</div><div class="muted" style="padding:2px 0">none firing now</div>`;
+    el.innerHTML = XMap.legendHtml(countyCounts) + cardRows;
     el.querySelectorAll("[data-legend]").forEach((r) =>
       r.addEventListener("click", () => selectCard(r.dataset.legend))
     );

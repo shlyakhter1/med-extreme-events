@@ -32,7 +32,7 @@
   </section>
   <section>
     <h2 style="margin:0 0 6px">Facilities <span class="muted" style="font-weight:normal">— colored by active event, sized by affected panel</span></h2>
-    <div id="map"></div>
+    <div style="position:relative"><div id="map"></div><div id="map-legend" hidden></div></div>
     <div class="muted" style="margin-top:6px">Counties under an active event are shaded. Click a facility for its fired cards; every number links to its formula and sources.</div>
   </section>
 </div>
@@ -62,8 +62,8 @@
 
 <script>
 (async () => {
-  const COLORS = { heat: "#e4572e", hurricane_flood: "#3d7fdc", wildfire_smoke: "#8c6d3f", air_pollution: "#a05cd6", power_outage: "#d9a41a" };
-  const SEV = { Extreme: 4, Severe: 3, Moderate: 2, Minor: 1, Unknown: 0 };
+  const COLORS = XMap.EVENT_COLORS;
+  const SEV = XMap.SEVERITY_RANK;
   const scenario = {{ (scenario or '')|tojson }}, at = {{ as_of_iso|tojson }}, atInput = {{ as_of_input|tojson }};
   const qs = (scenario ? `scenario=${scenario}&` : "") + `at=${encodeURIComponent(at)}`;
   const ctx = await XMap.create("map");
@@ -73,11 +73,20 @@
     fetch(`/events?${qs}`).then((r) => r.json()),
   ]);
   const paint = new Map();
+  const counties = {};
   for (const e of events.events) for (const c of e.geography.county_fips) {
     const cur = paint.get(c), sev = SEV[e.severity] || 0;
-    if (!cur || sev > cur.sev) paint.set(c, { color: COLORS[e.event_type] || "#4c8dff", opacity: 0.2 + 0.1 * sev, sev });
+    if (!cur || sev > cur.sev) paint.set(c, { color: COLORS[e.event_type] || "#4c8dff", opacity: XMap.fillOpacity(sev), sev });
+    (counties[e.event_type] ||= new Set()).add(c);
   }
   XMap.paintCounties(ctx, paint);
+  const legend = document.getElementById("map-legend");
+  legend.hidden = false;
+  legend.innerHTML =
+    XMap.legendHtml(Object.fromEntries(Object.entries(counties).map(([k, v]) => [k, v.size]))) +
+    `<div class="hdr">Facilities</div>
+     <div><i class="dot" style="background:#fff"></i><span>card firing</span><span class="muted">size ∝ panel</span></div>
+     <div><i class="dot" style="background:#5b6673"></i><span class="muted">no card firing</span><span></span></div>`;
   const byFacility = new Map();
   for (const i of items.items) { const a = byFacility.get(i.facility_id) || []; a.push(i); byFacility.set(i.facility_id, a); }
   const bounds = [];

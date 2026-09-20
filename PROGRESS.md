@@ -2,6 +2,27 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — map colour legend
+
+- **Both maps now carry a legend.** Counties keyed by event type (heat, hurricane/flood,
+  wildfire smoke, air pollution, power outage) with the live county count beside each, the
+  base colour labelled "no active event", and a note that shading deepens with severity.
+  Playback adds its card key below; the dashboard adds a facility-dot key.
+- **Smoke was the colour that read as "nothing".** It was a muted brown at 0.35 opacity
+  against a dark base, indistinguishable from an unshaded county. It is now a warmer tan
+  and the opacity floor rose from 0.22 to 0.34, so a minor alert is unambiguously shaded.
+- The palette, severity ranks and legend markup moved into `web/static/map.js` so the
+  dashboard and playback cannot drift apart.
+
+**Process note, second occurrence.** Editing `playback.js` by slicing between two anchors
+silently removed the whole selection block (`focusDetail`, `selectCard`, `selectEvent`,
+`selectFacility`) — the page still loaded and clicks did nothing. Caught by the headless
+harness, restored from git, and there is now a structural test that asserts every function
+the script calls is defined. Reviewing `git diff` for unexpected deletions is the habit
+this needs, not more careful slicing.
+
+`make lint test`: 127 passed.
+
 ## 2026-09-20 — feedback round 5: honest panels, card detail visible, carbon panel
 
 - **Cards were firing at every facility in a county, inflating the panels several-fold.**

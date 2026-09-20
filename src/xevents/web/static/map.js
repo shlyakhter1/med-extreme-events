@@ -2,6 +2,22 @@
    /reference/counties instead of pulling raster tiles from a third party. That keeps the
    demo working offline, behind a firewall and when hosted, with no API key anywhere. */
 window.XMap = (() => {
+  /* One palette for every map. Smoke used to be a muted brown that read as "no event" at
+     low opacity, so it is now a clearly warmer tan, and the opacity floor is high enough
+     that any shaded county is obviously shaded. */
+  const EVENT_TYPES = [
+    { id: "heat", color: "#e4572e", label: "heat" },
+    { id: "hurricane_flood", color: "#3d7fdc", label: "hurricane / flood" },
+    { id: "wildfire_smoke", color: "#b5894e", label: "wildfire smoke" },
+    { id: "air_pollution", color: "#a05cd6", label: "air pollution" },
+    { id: "power_outage", color: "#d9a41a", label: "power outage" },
+  ];
+  const EVENT_COLORS = Object.fromEntries(EVENT_TYPES.map((t) => [t.id, t.color]));
+  const SEVERITY_RANK = { Extreme: 4, Severe: 3, Moderate: 2, Minor: 1, Unknown: 0 };
+  /* Shading deepens with CAP severity; the floor keeps a minor alert visible. */
+  const fillOpacity = (severityRank) => 0.34 + 0.12 * (severityRank || 0);
+  const IDLE_COLOR = "#121a23";
+
   const BASE_STYLE = { weight: 0.35, color: "#243040", fillColor: "#121a23", fillOpacity: 1 };
   let countiesPromise = null;
 
@@ -35,5 +51,19 @@ window.XMap = (() => {
     });
   }
 
-  return { create, paintCounties, counties };
+  /* Shared legend markup so the dashboard and playback explain the map the same way. */
+  function legendHtml(countsByType, options = {}) {
+    const rows = EVENT_TYPES.filter((t) => !options.onlyActive || (countsByType || {})[t.id])
+      .map((t) => {
+        const n = (countsByType || {})[t.id];
+        return `<div><i style="background:${t.color}"></i><span>${t.label}</span>` +
+          `<span class="muted">${n === undefined ? "" : n}</span></div>`;
+      })
+      .join("");
+    return `<div class="hdr">Counties — active event</div>${rows}` +
+      `<div><i style="background:${IDLE_COLOR};border-color:#2a3440"></i><span class="muted">no active event</span><span></span></div>` +
+      `<div class="note">Shading deepens with severity.</div>`;
+  }
+
+  return { create, paintCounties, counties, legendHtml, EVENT_TYPES, EVENT_COLORS, SEVERITY_RANK, fillOpacity, IDLE_COLOR };
 })();

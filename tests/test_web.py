@@ -218,9 +218,69 @@ def test_playback_shows_card_content_and_map_symbols(client: TestClient) -> None
     assert "/cards" in js, "card text comes from the card library, not from strings in JS"
 
     page = client.get("/playback").text
-    assert 'id="card-legend"' in page, "the map needs a card legend"
-    for rule in (".card-badge .cards i", ".card-badge .cards.one i", "#card-legend"):
+    assert 'id="map-legend"' in page, "the map needs a legend"
+    for rule in (".card-badge .cards i", ".card-badge .cards.one i", "#map-legend"):
         assert rule in page, rule
+
+
+def test_playback_script_defines_everything_it_calls(client: TestClient) -> None:
+    """Structural guard. Editing this file by slicing between two anchors has twice removed
+    a whole block of functions; the page then loads and silently does nothing on click."""
+    js = client.get("/static/playback.js").text
+    required = [
+        "function init",
+        "function loadScenario",
+        "function setT",
+        "function play",
+        "function pause",
+        "function togglePlay",
+        "function drawTimeline",
+        "function movePlayhead",
+        "function render",
+        "function renderSide",
+        "function renderLegend",
+        "function drawBadges",
+        "function focusDetail",
+        "function selectCard",
+        "function selectEvent",
+        "function selectFacility",
+        "function loadCardSample",
+        "function renderCardDetail",
+        "function renderEventDetail",
+        "function renderFacilityDetail",
+        "function roleToggle",
+        "function roleContent",
+        "function carbonBlock",
+        "function cardsAt",
+        "function badgeHtml",
+    ]
+    for name in required:
+        assert name in js, f"{name} is missing from playback.js"
+    # every function the code calls by name must also be defined
+    import re
+
+    defined = set(re.findall(r"function (\w+)\(", js))
+    for call in re.findall(r"(?<![.\w])(select\w+|render\w+|draw\w+|load\w+|focus\w+)\(", js):
+        assert call in defined or call.startswith(("loadScenario", "loadCardSample")), call
+
+
+def test_map_legend_explains_the_colours(client: TestClient) -> None:
+    """Counties are shaded by event type and facilities are dots; both need a key, and a
+    shaded county must never be mistakable for an unshaded one."""
+    shared = client.get("/static/map.js").text
+    assert "legendHtml" in shared and "EVENT_COLORS" in shared
+    for label in ("heat", "hurricane / flood", "wildfire smoke", "air pollution", "power outage"):
+        assert f'label: "{label}"' in shared, label
+    assert "no active event" in shared, "the base colour needs a key too"
+    assert "Shading deepens with severity" in shared
+    assert "#8c6d3f" not in shared, "the old smoke brown read as unshaded at low opacity"
+    assert "fillOpacity = (severityRank) => 0.34" in shared, "minor alerts must stay visible"
+
+    for path in ("/", "/playback"):
+        page = client.get(path).text
+        assert 'id="map-legend"' in page, path
+    dash = client.get("/", params={"scenario": "heat_dome_2021"}).text
+    assert "XMap.legendHtml" in dash and "no card firing" in dash
 
 
 def test_card_definitions_available_for_the_playback_panel(client: TestClient) -> None:

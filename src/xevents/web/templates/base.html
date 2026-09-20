@@ -36,6 +36,15 @@
   .status { font-size:11px; padding:1px 6px; border-radius:10px; border:1px solid var(--line); }
   .status.issued { color:#ffcf6b; border-color:#7a5b12; } .status.acknowledged, .status.completed, .status.delivered { color:#7bd88f; border-color:#2f6b3d; }
   #map { height:460px; border:1px solid var(--line); border-radius:8px; background:#0b1015; }
+  #map-legend { position:absolute; right:10px; bottom:10px; z-index:500; background:rgba(22,29,38,.94);
+    border:1px solid var(--line); border-radius:8px; padding:7px 9px; font-size:11px; max-width:250px; }
+  #map-legend div { display:flex; align-items:center; gap:6px; margin:2px 0; }
+  #map-legend i { width:9px; height:12px; border-radius:2px; border:1px solid rgba(0,0,0,.6); flex:none; }
+  #map-legend i.dot { width:9px; height:9px; border-radius:50%; }
+  #map-legend .hdr { color:var(--muted); margin:6px 0 3px; text-transform:uppercase; letter-spacing:.04em; font-size:10px; }
+  #map-legend .hdr:first-child { margin-top:0; }
+  #map-legend .note { color:var(--muted); font-style:italic; margin-top:3px; }
+  #map-legend span:last-child { margin-left:auto; }
   .leaflet-container { background:#0b1015; }
   .leaflet-tooltip { background:#161d26; border:1px solid var(--line); color:var(--ink); }
   .leaflet-tooltip::before { border-top-color:var(--line); }

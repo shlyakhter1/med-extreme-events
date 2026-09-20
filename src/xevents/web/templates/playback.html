@@ -39,11 +39,15 @@
     border:1px solid rgba(0,0,0,.7); box-shadow:0 1px 2px rgba(0,0,0,.55); transform-origin:50% 100%; }
   .card-badge .cards.one i { width:11px; height:15px; border-color:#fff; }
   .card-badge .cards b { color:#e6edf3; font-size:9px; margin-left:2px; text-shadow:0 1px 2px #000; }
-  #card-legend { position:absolute; right:10px; bottom:10px; z-index:500; background:rgba(22,29,38,.94);
+  #map-legend { position:absolute; right:10px; bottom:10px; z-index:500; background:rgba(22,29,38,.94);
     border:1px solid var(--line); border-radius:8px; padding:7px 9px; font-size:11px; max-width:270px; }
-  #card-legend div { display:flex; align-items:center; gap:6px; margin:2px 0; cursor:pointer; }
-  #card-legend i { width:9px; height:12px; border-radius:2px; border:1px solid rgba(0,0,0,.6); flex:none; }
-  #card-legend .hdr { color:var(--muted); cursor:default; margin-bottom:4px; }
+  #map-legend div { display:flex; align-items:center; gap:6px; margin:2px 0; cursor:pointer; }
+  #map-legend i { width:9px; height:12px; border-radius:2px; border:1px solid rgba(0,0,0,.6); flex:none; }
+  #map-legend .hdr { color:var(--muted); cursor:default; margin:6px 0 3px; text-transform:uppercase; letter-spacing:.04em; font-size:10px; }
+  #map-legend .hdr:first-child { margin-top:0; }
+  #map-legend .note { color:var(--muted); font-style:italic; margin-top:3px; display:block; }
+  #map-legend span:last-child { margin-left:auto; }
+  #map-legend i.card-chip { height:13px; border-color:rgba(0,0,0,.7); }
   table.carbon { width:100%; border-collapse:collapse; font-size:11px; margin-top:4px; }
   table.carbon th { text-align:left; color:var(--muted); font-weight:500; padding:3px 5px; border-bottom:1px solid var(--line); }
   table.carbon td { padding:4px 5px; border-bottom:1px solid var(--line); vertical-align:top; }
@@ -81,13 +85,7 @@
       <option value="6">6 h</option><option value="12">12 h</option><option value="24">1 day</option>
     </select></label>
     <span class="clock" id="clock">—</span>
-    <span class="legend muted">
-      <span class="sw" style="background:var(--heat)"></span>heat
-      <span class="sw" style="background:var(--flood)"></span>hurricane/flood
-      <span class="sw" style="background:var(--smoke)"></span>smoke
-      <span class="sw" style="background:var(--air)"></span>air
-      <span class="sw" style="background:var(--idle)"></span>idle facility
-    </span>
+    <span class="legend muted"><span class="sw" style="background:var(--idle)"></span>grey dot = facility with no card firing</span>
     <span style="margin-left:auto">
       <a id="nav-dashboard" href="/">Dashboard</a> ·
       <a id="nav-events" href="/dashboard/events">Events</a> ·
@@ -95,7 +93,7 @@
       <span id="status" class="muted" style="margin-left:10px"></span>
     </span>
   </header>
-  <div id="map" style="position:relative"><div id="card-legend" hidden></div></div>
+  <div id="map" style="position:relative"><div id="map-legend" hidden></div></div>
   <aside id="side"><div class="muted">Loading…</div></aside>
   <footer>
     <div class="muted" style="display:flex; justify-content:space-between; font-size:12px; padding:2px 0">
