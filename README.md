@@ -75,6 +75,10 @@ Read `CLAUDE.md` first, then `docs/implementation-plan.md` for the milestones,
 `docs/requirements.md` for the system concept, and `docs/card-library.md` for the clinical
 content, which is the source of truth for every patient-facing sentence.
 
+Building a UI against this? Start with
+**[docs/card-reference-for-frontend.md](docs/card-reference-for-frontend.md)** — what is in
+each card, the API shapes, and the rules for rendering clinical text.
+
 `PROGRESS.md` is the running log: what each milestone did, what was decided, and what still
 needs a clinical reviewer.
 
