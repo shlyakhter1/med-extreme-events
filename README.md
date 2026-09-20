@@ -13,7 +13,12 @@ Read first: `CLAUDE.md`, then `docs/implementation-plan.md` (milestones M0–M5)
 uv sync           # Python 3.12 venv with runtime + dev deps
 make lint test    # ruff + mypy, then pytest
 make schema       # regenerate cards/card.schema.json after editing src/xevents/models.py
-make db-up        # postgres + postgis via docker compose (needed from M1)
+make db-up        # postgres + postgis via docker compose (optional; SQLite is the default)
+make reference    # build cached reference data (facilities needs VA_FACILITIES_API_KEY)
+make load         # facilities + catchments into the DB
+make ingest       # events: EVENT_MODE=replay (three scenarios) or live
+make match        # action items from stored events
+make serve        # API + playback view at http://localhost:8000/playback
 ```
 
 ## Layout

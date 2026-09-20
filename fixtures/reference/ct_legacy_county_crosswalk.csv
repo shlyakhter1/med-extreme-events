@@ -1,0 +1,20 @@
+legacy_county_fips,legacy_county,county_fips,area_share
+09001,Fairfield,09120,0.219
+09001,Fairfield,09140,0.051
+09001,Fairfield,09190,0.730
+09003,Hartford,09110,0.876
+09003,Hartford,09140,0.036
+09003,Hartford,09160,0.088
+09005,Litchfield,09140,0.127
+09005,Litchfield,09160,0.787
+09005,Litchfield,09190,0.085
+09007,Middlesex,09130,0.993
+09009,New Haven,09140,0.387
+09009,New Haven,09170,0.613
+09011,New London,09130,0.088
+09011,New London,09150,0.059
+09011,New London,09180,0.853
+09013,Tolland,09110,0.920
+09013,Tolland,09150,0.079
+09015,Windham,09150,0.951
+09015,Windham,09180,0.049

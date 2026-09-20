@@ -1,6 +1,6 @@
 # Playback view — replaying a scenario on the US map
 
-*Drafted 2026-09-20 during M2/M3; implemented in M5.*
+*Drafted 2026-09-20 during M2/M3; implemented with M4 (`/playback`, `src/xevents/web/`). Endpoints below exist as of M4.*
 
 ## Goal
 

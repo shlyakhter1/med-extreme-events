@@ -17,7 +17,14 @@ from sqlalchemy import JSON, DateTime, Engine, Float, String, Text, create_engin
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 from xevents.geography.catchment import CatchmentAssignment, StationAssignment
-from xevents.models import Event, Facility, OperatingStatusCode
+from xevents.models import (
+    ALLOWED_TRANSITIONS,
+    ActionItem,
+    ActionItemStatus,
+    Event,
+    Facility,
+    OperatingStatusCode,
+)
 
 DEFAULT_DATABASE_URL = "sqlite:///xevents.db"
 
@@ -297,3 +304,201 @@ def station_map(engine: Engine) -> dict[str, tuple[str, str]]:
     with Session(engine) as s:
         rows = s.scalars(select(FacilityStationRow))
         return {r.facility_id: (r.station_id, r.method) for r in rows}
+
+
+# --------------------------------------------------------------------------- action items
+
+
+class ActionItemRow(Base):
+    __tablename__ = "action_items"
+
+    id: Mapped[str] = mapped_column(String(512), primary_key=True)
+    event_key: Mapped[str] = mapped_column(String(256), index=True)
+    card_id: Mapped[str] = mapped_column(String(64), index=True)
+    scope_id: Mapped[str] = mapped_column(String(32), index=True)
+    role: Mapped[str] = mapped_column(String(16))
+    event_type: Mapped[str] = mapped_column(String(32), index=True)
+    event_severity: Mapped[str] = mapped_column(String(16))
+    acuity_rank: Mapped[int] = mapped_column(index=True)
+    panel_value: Mapped[float | None] = mapped_column(Float, nullable=True)
+    status: Mapped[str] = mapped_column(String(16), index=True)
+    superseded_by: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    window_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    scenario: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    acknowledged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)
+
+    def to_model(self) -> ActionItem:
+        data = dict(self.payload)
+        data.update(
+            status=self.status,
+            superseded_by=self.superseded_by,
+            created_at=_aware(self.created_at),
+            acknowledged_at=_aware(self.acknowledged_at) if self.acknowledged_at else None,
+        )
+        return ActionItem.model_validate(data)
+
+    @classmethod
+    def from_model(cls, item: ActionItem) -> ActionItemRow:
+        return cls(
+            id=item.id,
+            event_key=item.event_key,
+            card_id=item.card_id,
+            scope_id=item.scope_id,
+            role=item.role.value,
+            event_type=item.event_type.value,
+            event_severity=item.event_severity.value,
+            acuity_rank=item.acuity_rank,
+            panel_value=item.panel.value if item.panel else None,
+            status=item.status.value,
+            superseded_by=item.superseded_by,
+            window_start=item.window_start,
+            window_end=item.window_end,
+            scenario=item.scenario,
+            created_at=item.created_at,
+            acknowledged_at=item.acknowledged_at,
+            payload=item.model_dump(mode="json"),
+        )
+
+
+class TransitionError(ValueError):
+    pass
+
+
+def upsert_action_items(engine: Engine, items: list[ActionItem]) -> dict[str, int]:
+    """Insert new items; refresh content of existing ones by natural key while keeping any
+    status progress (delivered/acknowledged/completed) — except that engine-computed
+    supersession always applies. Returns counts."""
+    counts = {"inserted": 0, "updated": 0, "unchanged": 0}
+    with session_scope(engine) as s:
+        for item in items:
+            existing = s.get(ActionItemRow, item.id)
+            if existing is None:
+                s.add(ActionItemRow.from_model(item))
+                counts["inserted"] += 1
+                continue
+            current = ActionItemStatus(existing.status)
+            new_status = current
+            if item.status is ActionItemStatus.SUPERSEDED and current not in (
+                ActionItemStatus.COMPLETED,
+                ActionItemStatus.EXPIRED,
+            ):
+                new_status = ActionItemStatus.SUPERSEDED
+            elif (
+                current is ActionItemStatus.SUPERSEDED
+                and item.status is not ActionItemStatus.SUPERSEDED
+            ):
+                new_status = ActionItemStatus.ISSUED  # the stronger alert went away
+            fresh = ActionItemRow.from_model(item)
+            changed = (
+                existing.payload.get("actions") != fresh.payload.get("actions")
+                or _aware(existing.window_end) != item.window_end
+                or existing.panel_value != fresh.panel_value
+                or new_status is not current
+                or existing.superseded_by != item.superseded_by
+            )
+            if not changed:
+                counts["unchanged"] += 1
+                continue
+            payload = dict(fresh.payload)
+            payload["created_at"] = existing.payload.get("created_at", payload["created_at"])
+            existing.payload = payload
+            existing.window_start = item.window_start
+            existing.window_end = item.window_end
+            existing.panel_value = fresh.panel_value
+            existing.status = new_status.value
+            existing.superseded_by = (
+                item.superseded_by if new_status is ActionItemStatus.SUPERSEDED else None
+            )
+            counts["updated"] += 1
+    return counts
+
+
+def transition_action_item(
+    engine: Engine, item_id: str, new_status: ActionItemStatus
+) -> ActionItem:
+    with session_scope(engine) as s:
+        row = s.get(ActionItemRow, item_id)
+        if row is None:
+            raise KeyError(item_id)
+        current = ActionItemStatus(row.status)
+        if new_status not in ALLOWED_TRANSITIONS[current]:
+            raise TransitionError(f"{current.value} → {new_status.value} is not allowed")
+        row.status = new_status.value
+        if new_status is ActionItemStatus.ACKNOWLEDGED:
+            row.acknowledged_at = datetime.now(UTC)
+        s.flush()
+        return row.to_model()
+
+
+def expire_action_items(engine: Engine, now: datetime) -> int:
+    """Auto-expire open items whose window has ended."""
+    n = 0
+    with session_scope(engine) as s:
+        stmt = select(ActionItemRow).where(
+            ActionItemRow.window_end < now,
+            ActionItemRow.status.in_(
+                [
+                    st.value
+                    for st in (
+                        ActionItemStatus.ISSUED,
+                        ActionItemStatus.DELIVERED,
+                        ActionItemStatus.ACKNOWLEDGED,
+                    )
+                ]
+            ),
+        )
+        for row in s.scalars(stmt):
+            row.status = ActionItemStatus.EXPIRED.value
+            n += 1
+    return n
+
+
+def list_action_items(
+    engine: Engine,
+    *,
+    scenario: str | None = None,
+    facility_id: str | None = None,
+    role: str | None = None,
+    card_id: str | None = None,
+    status: str | None = None,
+    active_at: datetime | None = None,
+    include_superseded: bool = False,
+) -> list[ActionItem]:
+    stmt = select(ActionItemRow).order_by(
+        ActionItemRow.acuity_rank, ActionItemRow.panel_value.desc(), ActionItemRow.id
+    )
+    if scenario is not None:
+        stmt = stmt.where(ActionItemRow.scenario == scenario)
+    if facility_id:
+        stmt = stmt.where(ActionItemRow.scope_id == facility_id)
+    if role:
+        stmt = stmt.where(ActionItemRow.role == role)
+    if card_id:
+        stmt = stmt.where(ActionItemRow.card_id == card_id)
+    if status:
+        stmt = stmt.where(ActionItemRow.status == status)
+    elif not include_superseded:
+        stmt = stmt.where(ActionItemRow.status != ActionItemStatus.SUPERSEDED.value)
+    if active_at is not None:
+        stmt = stmt.where(
+            ActionItemRow.window_start <= active_at, ActionItemRow.window_end >= active_at
+        )
+    with Session(engine) as s:
+        return [row.to_model() for row in s.scalars(stmt)]
+
+
+def get_action_item(engine: Engine, item_id: str) -> ActionItem | None:
+    with Session(engine) as s:
+        row = s.get(ActionItemRow, item_id)
+        return row.to_model() if row else None
+
+
+def delete_scenario_action_items(engine: Engine, scenario: str) -> int:
+    with session_scope(engine) as s:
+        rows = list(s.scalars(select(ActionItemRow).where(ActionItemRow.scenario == scenario)))
+        for row in rows:
+            s.delete(row)
+    return len(rows)

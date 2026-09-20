@@ -12,6 +12,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PATH = REPO_ROOT / "fixtures" / "reference" / "nws_zone_county.csv"
+CT_CROSSWALK_PATH = REPO_ROOT / "fixtures" / "reference" / "ct_legacy_county_crosswalk.csv"
 
 STATE_FIPS: dict[str, str] = {
     "AL": "01",
@@ -73,17 +74,38 @@ STATE_FIPS: dict[str, str] = {
 }
 
 
+def load_legacy_crosswalk(path: Path = CT_CROSSWALK_PATH) -> dict[str, list[str]]:
+    """Legacy county FIPS (still used by NWS) → current county FIPS list."""
+    out: dict[str, list[str]] = defaultdict(list)
+    if not path.exists():
+        return {}
+    with path.open(newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            out[r["legacy_county_fips"]].append(r["county_fips"])
+    return dict(out)
+
+
 class UgcResolver:
-    def __init__(self, zone_to_counties: dict[str, list[str]]) -> None:
+    def __init__(
+        self, zone_to_counties: dict[str, list[str]], legacy: dict[str, list[str]] | None = None
+    ) -> None:
         self._zones = zone_to_counties
+        self._legacy = legacy or {}
 
     @classmethod
-    def load(cls, path: Path = DEFAULT_PATH) -> UgcResolver:
+    def load(cls, path: Path = DEFAULT_PATH, legacy_path: Path = CT_CROSSWALK_PATH) -> UgcResolver:
         zones: dict[str, list[str]] = defaultdict(list)
         with path.open(newline="", encoding="utf-8") as f:
             for r in csv.DictReader(f):
                 zones[r["ugc_zone"]].append(r["county_fips"])
-        return cls(dict(zones))
+        return cls(dict(zones), load_legacy_crosswalk(legacy_path))
+
+    def _current(self, fips_list: list[str]) -> list[str]:
+        """Translate legacy county codes to current ones (e.g. Connecticut)."""
+        out: list[str] = []
+        for fips in fips_list:
+            out.extend(self._legacy.get(fips, [fips]))
+        return out
 
     @classmethod
     def empty(cls) -> UgcResolver:
@@ -100,8 +122,8 @@ class UgcResolver:
         state, kind, num = ugc[:2], ugc[2], ugc[3:]
         if kind == "C":
             fips = STATE_FIPS.get(state)
-            return [fips + num] if fips and num.isdigit() else []
-        return list(self._zones.get(ugc, []))
+            return self._current([fips + num]) if fips and num.isdigit() else []
+        return self._current(list(self._zones.get(ugc, [])))
 
     def resolve(self, ugcs: list[str], same: list[str] | None = None) -> tuple[list[str], str]:
         """Counties for a set of UGCs plus optional CAP SAME codes. Returns (fips, note)."""
@@ -110,7 +132,7 @@ class UgcResolver:
         for code in same or []:
             digits = code.strip()
             if len(digits) == 6 and digits.isdigit() and digits[0] == "0":
-                found.add(digits[1:])
+                found.update(self._current([digits[1:]]))
         for ugc in ugcs:
             hits = self.counties(ugc)
             if hits:

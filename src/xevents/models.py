@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Any, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
@@ -449,3 +449,85 @@ class Estimate(StrictModel):
     sources: list[NonEmptyStr] = Field(default_factory=list)
     caveats: list[NonEmptyStr] = Field(default_factory=list)
     components: list[Estimate] = Field(default_factory=list)
+
+
+# --------------------------------------------------------------------------- action items
+
+
+class Role(StrEnum):
+    CARE_TEAM = "care_team"
+    PATIENT = "patient"
+    CAREGIVER = "caregiver"
+
+
+class ActionItemStatus(StrEnum):
+    ISSUED = "issued"
+    DELIVERED = "delivered"
+    ACKNOWLEDGED = "acknowledged"
+    COMPLETED = "completed"
+    EXPIRED = "expired"
+    SUPERSEDED = "superseded"
+
+
+ALLOWED_TRANSITIONS: dict[ActionItemStatus, set[ActionItemStatus]] = {
+    ActionItemStatus.ISSUED: {
+        ActionItemStatus.DELIVERED,
+        ActionItemStatus.ACKNOWLEDGED,
+        ActionItemStatus.EXPIRED,
+        ActionItemStatus.SUPERSEDED,
+    },
+    ActionItemStatus.DELIVERED: {
+        ActionItemStatus.ACKNOWLEDGED,
+        ActionItemStatus.EXPIRED,
+        ActionItemStatus.SUPERSEDED,
+    },
+    ActionItemStatus.ACKNOWLEDGED: {
+        ActionItemStatus.COMPLETED,
+        ActionItemStatus.EXPIRED,
+        ActionItemStatus.SUPERSEDED,
+    },
+    ActionItemStatus.COMPLETED: set(),
+    ActionItemStatus.EXPIRED: set(),
+    ActionItemStatus.SUPERSEDED: set(),
+}
+
+
+class ActionItem(StrictModel):
+    """One row per (event, card, facility, role) — requirements §7. Content is copied
+    verbatim from the card so an item is self-contained for delivery and audit."""
+
+    id: NonEmptyStr = Field(description="Natural key: event_key|card_id|facility_id|role")
+    event_key: NonEmptyStr
+    event_type: EventType
+    event_name: NonEmptyStr
+    event_severity: CapSeverity
+    card_id: NonEmptyStr
+    card_version: NonEmptyStr
+    card_title: NonEmptyStr
+    scope_type: Literal["facility"] = "facility"
+    scope_id: NonEmptyStr
+    role: Role
+    actions: list[Action]
+    message: str | None = Field(
+        default=None, description="Patient/caregiver: the verbatim card sentences joined."
+    )
+    escalation: list[Escalation]
+    safety_message: str | None = Field(
+        default=None, description="Profile-templated do-not-stop / escalation line."
+    )
+    evidence_tier: EvidenceTier
+    sources: list[NonEmptyStr]
+    panel: Estimate | None = None
+    acuity_class: NonEmptyStr
+    acuity_rank: int = Field(ge=0)
+    window_start: datetime
+    window_end: datetime
+    status: ActionItemStatus = ActionItemStatus.ISSUED
+    superseded_by: str | None = None
+    scenario: str | None = None
+    created_at: datetime
+    acknowledged_at: datetime | None = None
+
+    @property
+    def natural_key(self) -> tuple[str, str, str, str]:
+        return (self.event_key, self.card_id, self.scope_id, self.role.value)

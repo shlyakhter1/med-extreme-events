@@ -2,6 +2,57 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — M4: matching engine + action-item store (done) + playback view
+
+**Done.**
+- `engine.py`: pure `match(events, cards, facilities, profile, panels, now)` → one
+  `ActionItem` per (event, card, facility, role), acuity-ranked; every trigger evaluation is
+  logged (event, card, matched / why not). Facilities in scope = facility county ∈ event
+  counties; triggers = card `event_triggers` (NWS product names, HeatRisk, AQI, FEMA,
+  outage). Within (card, facility, role, event type) the strongest overlapping event wins
+  and weaker items are marked `superseded_by` it.
+- `ActionItem` model per requirements §7 with card content copied verbatim (actions,
+  patient message, escalation with the profile's templated default response, safety line,
+  evidence tier, sources, panel estimate, window = onset − card.window_days.max → expires).
+- Store: `action_items` table; upsert by natural key keeps delivery/acknowledgement
+  progress and `created_at`, applies/lifts supersession; status machine
+  issued→delivered→acknowledged→completed|expired|superseded (`transition_action_item`,
+  `expire_action_items`). `make match` (replay: all scenarios; live: now + auto-expire).
+- Golden tests (`tests/test_golden.py`, `tests/golden/*.json`): heat dome 2021 → 1,608
+  items (720 issued, 888 superseded) across 70 WA/OR/ID facilities, Cards 1/2/4 only,
+  Portland + Seattle + American Lake included; Ian 2022 → 3,122 items across 81 FL
+  facilities, Cards 3/5/6 only, dialysis ranked first. Re-runs are byte-identical;
+  supersede path covered in `tests/test_engine.py`. Regenerate with `UPDATE_GOLDEN=1`.
+- API: `GET /scenarios`, `GET /events?scenario=&at=&county=`, `GET /events/active`,
+  `GET /action-items?scenario=&at=&facility=&role=&card=&status=` (compact rows),
+  `GET /action-items/{id}`, `POST /action-items/{id}/status`,
+  `GET /facilities/{id}/action-items?role=&at=`, `GET /cards`, `GET /reference/counties`,
+  gzip middleware.
+- **Playback view** (`/playback`, from `docs/playback-view.md`): Leaflet map, county layer
+  colored by the most severe active event, facility markers sized by affected panel, a
+  time scrubber with play/pause and speed, an acuity-ranked event board, and a facility
+  drill-down with fired cards, sized panels ("how was this computed?" provenance), role
+  toggle (care team / patient / caregiver), verbatim card text, safety line, escalation.
+  `make serve` then open http://localhost:8000/playback.
+- Connecticut: `fixtures/reference/ct_legacy_county_crosswalk.csv` (legacy county →
+  planning regions by grid-sampled area share, builder `scripts/build_ct_crosswalk.py`);
+  `UgcResolver` translates NWS legacy CT codes, so CT alerts now match facilities.
+- `make lint test`: green.
+
+**Decisions.**
+- Heat cards now also fire on `Excessive Heat Watch` / `Extreme Heat Watch`: the watch is
+  the 3–7-day lead signal the cards are designed around (the library names the advisory
+  and warning only). **Confirm with the clinical reviewer.** Watches are superseded by the
+  warnings that follow, so the map shows the escalation.
+- OpenFEMA declarations are context, not triggers (no card lists them), matching
+  requirements §4.
+- Caregiver items are generated only when a card has caregiver content (none in v1).
+- Item volume is high (a warning over 20 counties × 3 cards × 2 roles × facilities); the
+  compact `/action-items` rows keep the playback page responsive; detail is per item.
+
+**Next:** M5 — dashboard/event board and patient view as server-rendered pages sharing the
+playback's API; scenario switcher + live toggle; `make demo`.
+
 ## 2026-09-20 — M3: denominators (done)
 
 **Done.**

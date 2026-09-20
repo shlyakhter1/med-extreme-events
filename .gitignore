@@ -10,3 +10,4 @@ __pycache__/
 dist/
 fixtures/live/
 fixtures/reference/raw/*.xlsx
+fixtures/reference/raw/cb_2021_us_county_5m.zip

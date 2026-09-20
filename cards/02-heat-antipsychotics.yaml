@@ -14,7 +14,9 @@ event_triggers:
     conditions:
       nws_events:
         - Heat Advisory
+        - Excessive Heat Watch
         - Excessive Heat Warning
+        - Extreme Heat Watch
         - Extreme Heat Warning
   - type: heat
     conditions:

@@ -5,7 +5,7 @@ SKILLS_REPO ?= ../../nyc2026-dataset
 ENV_FILE := $(wildcard .env)
 RUN = $(UV) run $(if $(ENV_FILE),--env-file $(ENV_FILE),)
 
-.PHONY: help install lint fmt test schema skills skills-check db-up db-down reference load serve ingest scenarios demo clean
+.PHONY: help install lint fmt test schema skills skills-check db-up db-down reference load serve ingest match scenarios demo clean
 
 help: ## list targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-14s %s\n", $$1, $$2}'
@@ -43,6 +43,7 @@ db-down: ## stop the database
 reference: ## rebuild cached reference data (county boundaries, ZIP↔county; facilities needs VA_FACILITIES_API_KEY)
 	$(RUN) python scripts/build_county_boundaries.py
 	$(RUN) python scripts/build_nws_zones.py
+	$(RUN) python scripts/build_ct_crosswalk.py
 	$(RUN) python scripts/build_zip_county.py
 	$(RUN) python scripts/build_facilities.py
 
@@ -54,6 +55,9 @@ serve: ## run the API locally
 
 ingest: ## load events for EVENT_MODE=replay|live (default replay: all fixture scenarios)
 	$(RUN) python scripts/ingest.py
+
+match: ## run the matching engine over stored events (EVENT_MODE=replay|live) → action items
+	$(RUN) python scripts/match.py
 
 scenarios: ## rebuild fixtures/events/*/events.json from their raw archived sources
 	$(RUN) python fixtures/events/heat_dome_2021/build.py
