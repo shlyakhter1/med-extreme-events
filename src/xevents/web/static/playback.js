@@ -102,6 +102,7 @@
       if (e.code === "Space") { e.preventDefault(); togglePlay(); }
       if (e.code === "ArrowLeft") { pause(); step(-1); }
       if (e.code === "ArrowRight") { pause(); step(1); }
+      if (e.code === "Escape" && closeTop()) e.preventDefault();
     });
     window.addEventListener("resize", () => drawTimeline(true));
     initTimelineInput();
@@ -467,6 +468,88 @@
       </details>`;
   }
 
+  /* Selections nest: a card filter can hold a facility drill-down inside it. The detail
+     panel therefore needs a way back to the level above, not only a way out — so it carries
+     a breadcrumb, a close button and an Escape binding rather than relying on the reader
+     discovering that clicking the same row again toggles it off. */
+  function selectionCrumbs() {
+    const out = [{ key: "all", label: "All cards" }];
+    if (state.selectedCard) {
+      const def = state.cards.get(state.selectedCard);
+      out.push({ key: "card", label: def ? def.title : state.selectedCard });
+    }
+    if (state.selectedEvent) {
+      const e = state.events.find((x) => x.event_key === state.selectedEvent);
+      out.push({ key: "event", label: e ? e.event_name : state.selectedEvent });
+    }
+    if (state.selectedFacility) {
+      const fp = facilityProps.get(state.selectedFacility);
+      out.push({ key: "facility", label: fp ? fp.name : state.selectedFacility });
+    }
+    return out;
+  }
+
+  function detailHeader() {
+    const crumbs = selectionCrumbs();
+    const trail = crumbs
+      .map((c, i) => {
+        const label = c.label.length > 34 ? c.label.slice(0, 33) + "…" : c.label;
+        return i === crumbs.length - 1
+          ? `<span class="crumb on">${esc(label)}</span>`
+          : `<a href="#" class="crumb" data-crumb="${c.key}">${esc(label)}</a>`;
+      })
+      .join('<span class="sep">\u203a</span>');
+    return `<div class="crumbs">${trail}` +
+      `<button class="closebtn" data-close="1" title="Close (Esc)" aria-label="Close">\u00d7</button></div>`;
+  }
+
+  function invalidatePaint() {
+    state.lastFacilityPaint = new Map();
+    state.lastBadges = new Map();
+  }
+
+  function clearSelection() {
+    state.selectedCard = null;
+    state.selectedEvent = null;
+    state.selectedFacility = null;
+    invalidatePaint();
+    render();
+    focusDetail();
+  }
+
+  /* Close one level: the facility drill-down first, then the card or event filter. */
+  function closeTop() {
+    if (state.selectedFacility) state.selectedFacility = null;
+    else if (state.selectedEvent) state.selectedEvent = null;
+    else if (state.selectedCard) state.selectedCard = null;
+    else return false;
+    invalidatePaint();
+    render();
+    focusDetail();
+    return true;
+  }
+
+  function goToCrumb(key) {
+    if (key === "all") return clearSelection();
+    state.selectedFacility = null;
+    invalidatePaint();
+    render();
+    focusDetail();
+  }
+
+  /* Called after any detail panel writes its markup. */
+  function wireDetailChrome() {
+    const el = $("detail");
+    if (!el || !el.querySelectorAll) return;
+    el.querySelectorAll("[data-crumb]").forEach((a) =>
+      a.addEventListener("click", (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        goToCrumb(a.dataset.crumb);
+      })
+    );
+    el.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => closeTop()));
+  }
+
   function cardsAt(items) {
     const byCard = new Map();
     for (const i of items) {
@@ -597,11 +680,17 @@
     $("side").querySelectorAll("[data-event]").forEach((r) => r.addEventListener("click", () => selectEvent(r.dataset.event)));
     $("side").querySelectorAll("[data-card]").forEach((r) => r.addEventListener("click", () => selectCard(r.dataset.card)));
     const clear = document.getElementById("clear-card");
-    if (clear) clear.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); state.selectedCard = null; render(); });
+    if (clear) {
+      clear.addEventListener("click", (e) => {
+        if (e && e.preventDefault) { e.preventDefault(); e.stopPropagation(); }
+        clearSelection();
+      });
+    }
     renderLegend(cards);
     if (state.selectedFacility) renderFacilityDetail();
     else if (state.selectedEvent) renderEventDetail();
     else if (state.selectedCard) renderCardDetail(cards);
+    else $("detail").innerHTML = "";
   }
 
   function renderLegend(cards) {
@@ -702,7 +791,10 @@
     const summary = cards.find((c) => c.id === state.selectedCard);
     const def = state.cards.get(state.selectedCard);
     if (!summary || !def) {
-      $("detail").innerHTML = `<h2>Selected card</h2><div class="muted">This card is not firing at ${fmt(state.t)}.</div>`;
+      $("detail").innerHTML =
+        detailHeader() +
+        `<h2>Selected card</h2><div class="muted">This card is not firing at ${fmt(state.t)}.</div>`;
+      wireDetailChrome();
       return;
     }
     const sample = state.cardSample.get(state.selectedCard) || {};
@@ -712,7 +804,7 @@
       .sort((a, b) => b.panel - a.panel);
     const totalPanel = facs.reduce((sum, f) => sum + (f.panel || 0), 0);
 
-    let html = `<h2>Selected card</h2><div class="card">
+    let html = detailHeader() + `<h2>Selected card</h2><div class="card">
       <h3><span class="swatch" style="background:${cardColor(def.id)}"></span>${esc(def.title)}</h3>
       <div class="prov">${esc(def.id)} v${esc(def.version)} · acuity ${esc(def.acuity_class)} · evidence ${esc(def.evidence_tier)}</div>
       <div class="prov"><b>When:</b> fires ${def.window_days.min}–${def.window_days.max} days ahead · active at ${fmt(state.t)} UTC</div>
@@ -740,6 +832,7 @@
     $("detail").querySelectorAll("[data-goto]").forEach((a) =>
       a.addEventListener("click", (e) => { e.preventDefault(); selectFacility(a.dataset.goto); })
     );
+    wireDetailChrome();
   }
 
   function renderEventDetail() {
@@ -756,7 +849,7 @@
     const cardList = [...byCard.entries()]
       .map(([id, c]) => `<li><span class="swatch" style="background:${cardColor(id)}"></span>${esc(c.title)} — ${c.facilities.size} facilities</li>`)
       .join("");
-    $("detail").innerHTML = `<h2>Selected event</h2><div class="card">
+    $("detail").innerHTML = detailHeader() + `<h2>Selected event</h2><div class="card">
       <h3>${esc(e.event_name)} <span class="tag sev-${SEV[e.severity] || 0}">${esc(e.severity)}</span></h3>
       <div class="prov">${esc(e.event_key)}</div>
       <div class="prov"><b>Where:</b> ${esc(placeOf(e))}${e.geography.states?.length ? ` (${esc(e.geography.states.join(", "))})` : ""}</div>
@@ -767,6 +860,7 @@
       ${cardList ? `<ul>${cardList}</ul>` : ""}
       <div class="prov" style="margin-top:6px"><a href="/dashboard/events/${encodeURIComponent(e.event_key)}?scenario=${encodeURIComponent($("scenario").value)}">open full event page →</a></div>
     </div>`;
+    wireDetailChrome();
   }
 
   function renderFacilityDetail() {
@@ -782,7 +876,7 @@
       byCard.set(i.card_id, entry);
     }
     const p = f ? f.properties : {};
-    let html = `<h2>${esc(p.name || fid)}</h2>
+    let html = detailHeader() + `<h2>${esc(p.name || fid)}</h2>
       <div class="prov"><b>Where:</b> ${esc(p.city || "")}, ${esc(p.state || "")} · VISN ${esc(p.visn || "?")} · county ${esc(p.county_fips || "?")}</div>
       <div class="prov">${esc(p.classification || "")} · as of ${fmt(state.t)} UTC</div>
       ${roleToggle()}`;
@@ -809,6 +903,7 @@
     }
     $("detail").innerHTML = html;
     $("detail").querySelectorAll(".roles button").forEach((b) => b.addEventListener("click", () => { state.role = b.dataset.role; renderFacilityDetail(); }));
+    wireDetailChrome();
   }
 
   init().catch((e) => {

@@ -350,6 +350,16 @@ Rules:
 
 ---
 
+## 7a. Selections nest, so closing is layered
+
+Playback selections stack: a card filter can contain a facility drill-down. Closing must
+therefore go back one level, not all the way out. The detail panel carries a breadcrumb
+(`All cards › <card> › <facility>`) where each earlier step links back to that level, an
+explicit × close for the deepest level, and an Escape binding. Apply the same pattern in
+any new view: an explicit close, a keyboard escape, and a visible trail back.
+
+---
+
 ## 8. Edge cases to handle
 
 | Case | What you get | What to do |

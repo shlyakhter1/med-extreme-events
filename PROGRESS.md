@@ -2,6 +2,28 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — closing an open card in playback
+
+Opening a card in playback had no visible way out. Clicking the same row again did close
+it, but nothing on screen said so, and there was no way back one level — only all the way
+out, via a "show all" link buried in a section heading below the panel.
+
+Selections nest (`card` → `facility` drill-down inside the card filter), so a single
+"close" is not enough. The detail panel now carries:
+
+- a **breadcrumb** — `All cards › <card> › <facility>` — where each earlier step is a link
+  back to that level, so closing a facility returns to its card rather than to the base;
+- an explicit **× close** button, labelled with its shortcut, that closes the deepest level;
+- **Escape**, which does the same;
+- the existing click-the-same-row-again toggle, kept because it now matches what the panel
+  shows.
+
+The breadcrumb bar is sticky, so the way out stays on screen while the panel scrolls. With
+nothing selected the panel renders empty rather than holding stale content.
+
+`make lint test`: 128 passed, including a test that the facility level closes before the
+card level and that an empty selection clears the panel.
+
 ## 2026-09-20 — map colour legend
 
 - **Both maps now carry a legend.** Counties keyed by event type (heat, hurricane/flood,

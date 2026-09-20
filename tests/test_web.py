@@ -264,6 +264,34 @@ def test_playback_script_defines_everything_it_calls(client: TestClient) -> None
         assert call in defined or call.startswith(("loadScenario", "loadCardSample")), call
 
 
+def test_playback_detail_can_be_closed(client: TestClient) -> None:
+    """Opening a card must be reversible without guessing. Clicking the same row again did
+    close it, but nothing on screen said so, and there was no way back one level."""
+    js = client.get("/static/playback.js").text
+    for fn in (
+        "detailHeader",
+        "selectionCrumbs",
+        "closeTop",
+        "goToCrumb",
+        "clearSelection",
+        "wireDetailChrome",
+    ):
+        assert f"function {fn}" in js, fn
+    assert 'data-close="1"' in js, "an explicit close control"
+    assert "data-crumb=" in js, "a breadcrumb back to the level above"
+    assert 'e.code === "Escape" && closeTop()' in js, "Escape closes one level"
+    assert "Close (Esc)" in js, "the shortcut is discoverable from the control"
+    # closing the deepest level first, not everything at once
+    close_fn = js[js.index("function closeTop") : js.index("function goToCrumb")]
+    assert close_fn.index("selectedFacility") < close_fn.index("selectedCard")
+    # nothing selected leaves an empty panel rather than a stale one
+    assert 'else $("detail").innerHTML = "";' in js
+
+    page = client.get("/playback").text
+    for rule in (".crumbs", ".crumbs .closebtn", ".crumbs .crumb.on"):
+        assert rule in page, rule
+
+
 def test_map_legend_explains_the_colours(client: TestClient) -> None:
     """Counties are shaded by event type and facilities are dots; both need a key, and a
     shaded county must never be mistakable for an unshaded one."""
