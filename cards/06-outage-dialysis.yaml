@@ -1,0 +1,147 @@
+# yaml-language-server: $schema=card.schema.json
+# Transcribed from docs/card-library.md — Card 6. Clinical strings are verbatim; do not edit in code.
+id: outage-dialysis
+version: 1.0.0
+number: 6
+title: Hurricane/Power Outage × Dialysis-Dependent ESRD
+summary: >-
+  Disasters cut transportation, power, and water, forcing missed dialysis sessions →
+  fluid overload, hyperkalemia, and uremia that can be fatal. Early dialysis before
+  landfall is the single most evidence-backed intervention.
+
+event_triggers:
+  - type: hurricane_flood
+    conditions:
+      nws_events:
+        - Hurricane Watch
+        - Hurricane Warning
+        - Tropical Storm Watch
+        - Tropical Storm Warning
+  - type: power_outage
+    conditions:
+      outage_forecast: true
+
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: N18.6, display: End stage renal disease}
+    - {system: icd10cm, code: Z99.2, display: Dependence on renal dialysis}
+  device_classes:
+    - {system: local, code: in_center_hemodialysis, display: In-center hemodialysis (VA-operated and VA-financed community units)}
+    - {system: local, code: home_dialysis, display: Home dialysis (electricity/water-dependent)}
+  flags:
+    - home_dialysis
+    - empower_electricity_dependent
+  denominator_key: dialysis
+  denominator_note: >-
+    Denominator anchor: >52,000 veterans on dialysis; ~13,000 new kidney-failure
+    cases/year; VA historically finances ~60% of these veterans' dialysis, mostly in
+    community units. Cross-reference HHS emPOWER ZIP-level electricity-dependent counts.
+
+actions:
+  care_team:
+    - phase: pre_event
+      text: >-
+        Pre-schedule early dialysis for all patients before projected landfall/outage — the
+        single most evidence-backed intervention.
+    - phase: pre_event
+      text: >-
+        Verify each patient's transportation plan and a backup/partner facility; confirm
+        generator/water status and KCER/ESRD-network facility-status reporting.
+    - phase: pre_event
+      text: >-
+        Distribute the CMS/KCER 3-day emergency renal diet (~2 cups fluid/day, strict
+        potassium limits) and an emergency kit (med list + ≥3-day supply, dry weight,
+        dialysis prescription, contacts).
+    - phase: pre_event
+      text: >-
+        Home dialysis: confirm backup power/water and manual PD capability; flag to
+        emPOWER/utility priority-restoration lists.
+    - phase: during_event
+      text: Activate the KCER hotline / ESRD-network coordination.
+    - phase: during_event
+      text: Track against a missed-session list.
+    - phase: during_event
+      text: Arrange emergency dialysis or transfer (Brooklyn VAMC model).
+    - phase: during_event
+      text: Triage hyperkalemia/fluid overload.
+    - phase: during_event
+      text: Start the 3-day emergency diet immediately in a widespread disaster.
+  patient:
+    - text: Missing dialysis in a disaster can be life-threatening.
+    - text: If a storm or outage is coming, get your dialysis EARLY — before it hits.
+    - text: Know a second center and how you'll get there.
+    - text: >-
+        If you can't get treatment, start the 3-day emergency diet right away: about 2
+        cups of fluid a day and no high-potassium foods (bananas, oranges, potatoes, salt
+        substitutes).
+    - text: Keep a 3-day supply of your medicines and your dialysis info with you.
+    - text: Call the KCER hotline (1-866-901-3773) or your center.
+  caregiver: []
+
+escalation:
+  - signs: Missed ≥1 scheduled session with no rescheduled slot
+    response: null
+    emergency: false
+  - signs: >-
+      Fluid overload (severe shortness of breath, can't lie flat, rapid weight
+      gain/swelling)
+    response: emergency
+    emergency: true
+  - signs: Hyperkalemia (muscle weakness, palpitations, chest pain)
+    response: emergency
+    emergency: true
+  - signs: Confusion
+    response: null
+    emergency: false
+
+evidence_tier: strong
+evidence:
+  mechanism: >-
+    Disasters cut transportation, power, and water, forcing missed sessions → fluid
+    overload, hyperkalemia, and uremia that can be fatal.
+  claims:
+    - text: >-
+        Post-Katrina: ~44% of New Orleans HD patients missed ≥1 session, ~17% missed ≥3;
+        missing ≥3 sessions carried adjusted OR 2.16 (95% CI 1.05–4.43) for
+        hospitalization.
+      tier: strong
+      source_ids: [anderson-2009]
+    - text: >-
+        Post-Sandy (13,264 ESRD patients): ED visits, hospitalizations, and 30-day
+        mortality all elevated; early dialysis before landfall was associated with lower
+        adjusted odds of ED visits (OR 0.80), hospitalization (OR 0.79), and 30-day
+        mortality (OR ~0.72).
+      tier: strong
+      source_ids: [kelman-lurie-2015]
+    - text: >-
+        VA precedent: essentially all Manhattan VA ESRD patients missed ≥1 treatment
+        during Sandy; hemodialysis was re-established at Brooklyn VAMC once transport
+        resumed.
+      tier: inferential
+      source_ids: [va-sandy-dialysis-study]
+  caveats: []
+
+sources:
+  - id: anderson-2009
+    citation: Anderson et al., Kidney International 2009
+    year: 2009
+  - id: kelman-lurie-2015
+    citation: Kelman/Lurie et al., AJKD 2015
+    url: https://www.sciencedirect.com/science/article/abs/pii/S0272638614010592
+    year: 2015
+  - id: va-sandy-dialysis-study
+    citation: VA Sandy dialysis access study
+  - id: cms-kcer-emergency-diet
+    citation: CMS/KCER 3-Day Emergency Diet and facility preparedness
+  - id: hhs-empower
+    citation: HHS emPOWER
+    url: https://empowerprogram.hhs.gov/about.html
+  - id: va-ohe-esrd-2022
+    citation: VA Office of Health Equity ESRD data (2022)
+    year: 2022
+
+window_days: {min: 3, max: 7}
+safety:
+  do_not_stop_medication: false
+acuity_class: dialysis
+care_system_hooks: [kcer_hotline, empower]

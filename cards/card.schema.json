@@ -1,0 +1,691 @@
+{
+  "$defs": {
+    "Action": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "phase": {
+          "$ref": "#/$defs/Phase",
+          "default": "any"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "Action",
+      "type": "object"
+    },
+    "Actions": {
+      "additionalProperties": false,
+      "properties": {
+        "care_team": {
+          "items": {
+            "$ref": "#/$defs/Action"
+          },
+          "minItems": 1,
+          "title": "Care Team",
+          "type": "array"
+        },
+        "patient": {
+          "description": "Verbatim patient-facing sentences from the reviewed card.",
+          "items": {
+            "$ref": "#/$defs/Action"
+          },
+          "minItems": 1,
+          "title": "Patient",
+          "type": "array"
+        },
+        "caregiver": {
+          "description": "Caregiver-addressed items. Empty until reviewed content exists.",
+          "items": {
+            "$ref": "#/$defs/Action"
+          },
+          "title": "Caregiver",
+          "type": "array"
+        }
+      },
+      "required": [
+        "care_team",
+        "patient"
+      ],
+      "title": "Actions",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "tier": {
+          "$ref": "#/$defs/EvidenceTier"
+        },
+        "source_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "tier",
+        "source_ids"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "CodeSystem": {
+      "enum": [
+        "icd10cm",
+        "snomed",
+        "atc",
+        "rxnorm",
+        "va_drug_class",
+        "empower",
+        "local"
+      ],
+      "title": "CodeSystem",
+      "type": "string"
+    },
+    "Coding": {
+      "additionalProperties": false,
+      "properties": {
+        "system": {
+          "$ref": "#/$defs/CodeSystem"
+        },
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "display": {
+          "minLength": 1,
+          "title": "Display",
+          "type": "string"
+        },
+        "qualifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-text narrowing, e.g. 'long-acting injectable formulation'.",
+          "title": "Qualifier"
+        }
+      },
+      "required": [
+        "system",
+        "code",
+        "display"
+      ],
+      "title": "Coding",
+      "type": "object"
+    },
+    "Escalation": {
+      "additionalProperties": false,
+      "properties": {
+        "signs": {
+          "minLength": 1,
+          "title": "Signs",
+          "type": "string"
+        },
+        "response": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Verbatim response from the card; None means the profile's templated 'contact your care team' escalation applies.",
+          "title": "Response"
+        },
+        "emergency": {
+          "default": false,
+          "description": "True when the card says 911/ED.",
+          "title": "Emergency",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "signs"
+      ],
+      "title": "Escalation",
+      "type": "object"
+    },
+    "EventTrigger": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/EventType"
+        },
+        "conditions": {
+          "$ref": "#/$defs/TriggerConditions"
+        }
+      },
+      "required": [
+        "type",
+        "conditions"
+      ],
+      "title": "EventTrigger",
+      "type": "object"
+    },
+    "EventType": {
+      "enum": [
+        "heat",
+        "hurricane_flood",
+        "power_outage",
+        "wildfire_smoke",
+        "air_pollution"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "mechanism": {
+          "minLength": 1,
+          "title": "Mechanism",
+          "type": "string"
+        },
+        "claims": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "minItems": 1,
+          "title": "Claims",
+          "type": "array"
+        },
+        "caveats": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mechanism",
+        "claims"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "EvidenceTier": {
+      "description": "Requirements \u00a78 tiers. 'weak' is deliberately absent: weak/folklore claims are\nnot representable and therefore cannot be published.",
+      "enum": [
+        "strong",
+        "inferential",
+        "expert_guidance"
+      ],
+      "title": "EvidenceTier",
+      "type": "string"
+    },
+    "HeatRiskLevel": {
+      "description": "NWS HeatRisk categories, in increasing severity.",
+      "enum": [
+        "yellow",
+        "orange",
+        "red",
+        "magenta"
+      ],
+      "title": "HeatRiskLevel",
+      "type": "string"
+    },
+    "Phase": {
+      "enum": [
+        "pre_event",
+        "during_event",
+        "any"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "PopulationSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "condition_codes": {
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "minItems": 1,
+          "title": "Condition Codes",
+          "type": "array"
+        },
+        "med_classes": {
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Med Classes",
+          "type": "array"
+        },
+        "device_classes": {
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Device Classes",
+          "type": "array"
+        },
+        "flags": {
+          "description": "Risk-amplifier flags, e.g. 'homeless', 'prior_aki'.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Flags",
+          "type": "array"
+        },
+        "denominator_key": {
+          "description": "Key into the profile's denominator table (profiles/*.yaml).",
+          "minLength": 1,
+          "title": "Denominator Key",
+          "type": "string"
+        },
+        "denominator_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Verbatim anchor text from the card library, for provenance.",
+          "title": "Denominator Note"
+        },
+        "sub_panels": {
+          "items": {
+            "$ref": "#/$defs/SubPanel"
+          },
+          "title": "Sub Panels",
+          "type": "array"
+        }
+      },
+      "required": [
+        "condition_codes",
+        "denominator_key"
+      ],
+      "title": "PopulationSelector",
+      "type": "object"
+    },
+    "Safety": {
+      "additionalProperties": false,
+      "properties": {
+        "do_not_stop_medication": {
+          "description": "Required True for any card with medication classes: the templated 'don't stop your medication \u2014 contact your care team' message is attached.",
+          "title": "Do Not Stop Medication",
+          "type": "boolean"
+        },
+        "notes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "do_not_stop_medication"
+      ],
+      "title": "Safety",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "citation": {
+          "minLength": 1,
+          "title": "Citation",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "maximum": 2100,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "id",
+        "citation"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "SubPanel": {
+      "additionalProperties": false,
+      "description": "A named sub-population within a card (e.g. Card 3's clozapine / LAI / methadone).",
+      "properties": {
+        "key": {
+          "pattern": "^[a-z0-9_]+$",
+          "title": "Key",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "condition_codes": {
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Condition Codes",
+          "type": "array"
+        },
+        "med_classes": {
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Med Classes",
+          "type": "array"
+        },
+        "device_classes": {
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Device Classes",
+          "type": "array"
+        },
+        "flags": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Flags",
+          "type": "array"
+        },
+        "denominator_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Key into the profile's denominator table for this sub-panel.",
+          "title": "Denominator Key"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "key",
+        "label"
+      ],
+      "title": "SubPanel",
+      "type": "object"
+    },
+    "TriggerConditions": {
+      "additionalProperties": false,
+      "description": "Threshold conditions for one trigger. All set fields must hold (AND);\na card lists several ``event_triggers`` when any one of them should fire (OR).",
+      "properties": {
+        "nws_events": {
+          "description": "Exact NWS CAP `event` values, e.g. 'Heat Advisory'. Any listed value matches.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Nws Events",
+          "type": "array"
+        },
+        "heatrisk_min": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HeatRiskLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fire when NWS HeatRisk is at or above this level."
+        },
+        "aqi_min": {
+          "anyOf": [
+            {
+              "maximum": 500,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "AirNow AQI at or above.",
+          "title": "Aqi Min"
+        },
+        "fema_declared": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Require an OpenFEMA disaster declaration for the county.",
+          "title": "Fema Declared"
+        },
+        "outage_forecast": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Require a forecast/declared power outage for the geography.",
+          "title": "Outage Forecast"
+        }
+      },
+      "title": "TriggerConditions",
+      "type": "object"
+    },
+    "WindowDays": {
+      "additionalProperties": false,
+      "description": "Actionability window: how many days before event onset the card fires.",
+      "properties": {
+        "min": {
+          "minimum": 0,
+          "title": "Min",
+          "type": "integer"
+        },
+        "max": {
+          "minimum": 0,
+          "title": "Max",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "WindowDays",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "title": "Id",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Version",
+      "type": "string"
+    },
+    "number": {
+      "description": "Card number in docs/card-library.md.",
+      "minimum": 1,
+      "title": "Number",
+      "type": "integer"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "event_triggers": {
+      "items": {
+        "$ref": "#/$defs/EventTrigger"
+      },
+      "minItems": 1,
+      "title": "Event Triggers",
+      "type": "array"
+    },
+    "population_selector": {
+      "$ref": "#/$defs/PopulationSelector"
+    },
+    "actions": {
+      "$ref": "#/$defs/Actions"
+    },
+    "escalation": {
+      "items": {
+        "$ref": "#/$defs/Escalation"
+      },
+      "minItems": 1,
+      "title": "Escalation",
+      "type": "array"
+    },
+    "evidence_tier": {
+      "$ref": "#/$defs/EvidenceTier"
+    },
+    "evidence": {
+      "$ref": "#/$defs/Evidence"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    },
+    "window_days": {
+      "$ref": "#/$defs/WindowDays"
+    },
+    "safety": {
+      "$ref": "#/$defs/Safety"
+    },
+    "acuity_class": {
+      "description": "Key into the profile's acuity ordering.",
+      "pattern": "^[a-z0-9_]+$",
+      "title": "Acuity Class",
+      "type": "string"
+    },
+    "care_system_hooks": {
+      "description": "Keys into the profile's care-system hooks.",
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Care System Hooks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "number",
+    "title",
+    "summary",
+    "event_triggers",
+    "population_selector",
+    "actions",
+    "escalation",
+    "evidence_tier",
+    "evidence",
+    "sources",
+    "window_days",
+    "safety",
+    "acuity_class"
+  ],
+  "title": "VA extreme-event playbook card",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/shlyakhter1/med-extreme-events/cards/card.schema.json"
+}

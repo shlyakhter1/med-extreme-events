@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=card.schema.json
+# Transcribed from docs/card-library.md — Card 3. Clinical strings are verbatim; do not edit in code.
+id: hurricane-delivery-interruption
+version: 1.0.0
+number: 3
+title: "Hurricane/Flood × Delivery Interruption: Clozapine, LAIs, Methadone"
+summary: >-
+  Disasters close pharmacies, clinics, labs, and transport; abrupt loss of clozapine,
+  long-acting injectable antipsychotics, or methadone produces rebound psychosis,
+  relapse, or withdrawal within days.
+
+event_triggers:
+  - type: hurricane_flood
+    conditions:
+      nws_events:
+        - Hurricane Watch
+        - Hurricane Warning
+        - Tropical Storm Watch
+        - Tropical Storm Warning
+        - Storm Surge Watch
+        - Storm Surge Warning
+        - Flood Watch
+        - Flood Warning
+        - Flash Flood Warning
+
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: F20, display: Schizophrenia}
+    - {system: icd10cm, code: F25, display: Schizoaffective disorders}
+    - {system: icd10cm, code: F11, display: Opioid related disorders}
+  flags:
+    - short_half_life_antidepressant
+    - benzodiazepine
+  denominator_key: schizophrenia
+  denominator_note: >-
+    Three sub-panels; clozapine ≈ 4% of VHA schizophrenia patients, as low as ≈ 1.3% in
+    younger cohorts — small, highest acuity; identifiable via the VA National Clozapine
+    Coordinating Center.
+  sub_panels:
+    - key: clozapine
+      label: Clozapine patients
+      med_classes:
+        - {system: atc, code: N05AH02, display: Clozapine}
+      denominator_key: clozapine_share_of_schizophrenia
+      note: Identifiable via the VA National Clozapine Coordinating Center.
+    - key: lai_antipsychotic
+      label: LAI antipsychotic patients with injections due in the event window
+      med_classes:
+        - {system: atc, code: N05A, display: Antipsychotics, qualifier: long-acting injectable formulation}
+    - key: methadone_buprenorphine
+      label: OUD patients on methadone (daily OTP dispensing) or buprenorphine
+      condition_codes:
+        - {system: icd10cm, code: F11, display: Opioid related disorders}
+      med_classes:
+        - {system: atc, code: N07BC02, display: Methadone}
+        - {system: atc, code: N07BC01, display: Buprenorphine}
+
+actions:
+  care_team:
+    - phase: pre_event
+      text: >-
+        Activate the VA Pharmacy Disaster Relief Plan; push emergency refills (10-day
+        supply at in-network retail for maintenance meds; controlled substances via VA) by
+        phone/mail/My HealtheVet.
+    - phase: pre_event
+      text: >-
+        Clozapine: ensure on-hand supply; dispense without gating on a current ANC
+        (post-2025) while continuing monitoring.
+    - phase: pre_event
+      text: "LAIs due soon: early re-injection or pre-event conversion."
+    - phase: pre_event
+      text: >-
+        Coordinate with OTPs on pre-dispensed methadone take-homes and guest dosing per
+        SAMHSA guidance.
+    - phase: pre_event
+      text: Front-load short-half-life antidepressants and benzodiazepines.
+    - phase: during_event
+      text: Track flagged patients via the Clinical Contact Center.
+    - phase: during_event
+      text: Enable guest dosing and alternate-pharmacy fills.
+    - phase: during_event
+      text: >-
+        Clozapine gaps >48 h → plan re-titration from 12.5 mg (ANC restart per labeling
+        after ≥30-day gaps).
+    - phase: during_event
+      text: Substitute oral antipsychotic if an LAI cannot be given.
+    - phase: during_event
+      text: Treat withdrawal symptomatically.
+  patient:
+    - text: >-
+        Before the storm, get an emergency refill — some psychiatric medicines and
+        methadone are dangerous to stop suddenly.
+    - text: If you can't reach your clinic or pharmacy, call the VA 24/7 line.
+    - text: On methadone? Ask your program about take-home doses now.
+  caregiver: []
+
+escalation:
+  - signs: >-
+      Clozapine: return of hallucinations/paranoia, agitation, severe
+      nausea/vomiting/sweating, fever, new confusion
+    response: urgent VA contact / ED
+    emergency: true
+  - signs: "Methadone: withdrawal signs"
+    response: urgent VA contact / ED
+    emergency: true
+  - signs: 'Antidepressant/benzodiazepine: severe dizziness, "brain zaps," or seizure'
+    response: urgent VA contact / ED
+    emergency: true
+
+evidence_tier: inferential
+evidence:
+  mechanism: >-
+    Disasters close pharmacies, clinics, labs, and transport. Abrupt clozapine loss →
+    cholinergic rebound, rebound psychosis within 24–48 h, catatonia, rarely seizure.
+    Missed LAI → relapse as plasma levels fall. Missed methadone → withdrawal within a
+    day. Short-half-life antidepressant/benzodiazepine gaps → discontinuation syndrome or
+    withdrawal seizures.
+  claims:
+    - text: >-
+        LAI buffer after discontinuation: 50% relapse-free at ~2 mo (oral), ~6 mo (PP1M),
+        ~13 mo (PP3M).
+      tier: strong
+      source_ids: [morris-paliperidone]
+    - text: >-
+        Post-Katrina/Sandy OTP dose-verification failures and unsafe ED dosing documented.
+      tier: inferential
+      source_ids: [katrina-sandy-otp-studies]
+    - text: >-
+        Puerto Rico post-Maria: most pharmacies closed; 84% of hospitals without generator
+        power on day 6.
+      tier: strong
+      source_ids: [cdc-mmwr-puerto-rico]
+    - text: >-
+        Abrupt clozapine loss → cholinergic rebound, rebound psychosis within 24–48 h,
+        catatonia, rarely seizure.
+      tier: inferential
+      source_ids: [clozapine-withdrawal-literature]
+    - text: >-
+        FDA eliminated the clozapine REMS on June 13, 2025 — ANC lab access is no longer a
+        legal barrier to dispensing. Priority shifts to drug-supply continuity plus
+        clinically appropriate ANC monitoring per labeling.
+      tier: strong
+      source_ids: [fda-clozapine-rems-elimination]
+  caveats:
+    - >-
+      No peer-reviewed report directly ties a named clozapine patient's relapse to
+      Katrina/Maria access loss — the pathway is inferred from infrastructure collapse
+      plus withdrawal-syndrome case reports.
+    - Clozapine content reflects the post-June-2025 REMS-eliminated regime — re-verify.
+
+sources:
+  - id: fda-clozapine-rems-elimination
+    citation: FDA clozapine REMS elimination (June 13, 2025)
+    year: 2025
+  - id: clozapine-withdrawal-literature
+    citation: Clozapine withdrawal-syndrome case literature
+  - id: morris-paliperidone
+    citation: Morris et al. (paliperidone relapse timing)
+  - id: samhsa-otp-disaster-guidance
+    citation: SAMHSA OTP disaster take-home/guest-dosing guidance
+    url: https://www.pew.org/en/research-and-analysis/articles/2025/02/25/how-states-can-ensure-addiction-treatment-access-during-natural-disasters
+  - id: katrina-sandy-otp-studies
+    citation: Post-Katrina/Sandy OTP studies
+  - id: cdc-mmwr-puerto-rico
+    citation: CDC MMWR Puerto Rico data
+  - id: va-pharmacy-disaster-relief-plan
+    citation: VA Pharmacy Disaster Relief Plan
+    url: https://www.va.gov/fayetteville-coastal-health-care/programs/pharmacy-disaster-relief-plan/
+
+window_days: {min: 3, max: 7}
+safety:
+  do_not_stop_medication: true
+acuity_class: clozapine_lai_methadone
+care_system_hooks: [pharmacy_disaster_relief_plan, nccc, otp_samhsa, clinical_contact_center, my_healthevet]

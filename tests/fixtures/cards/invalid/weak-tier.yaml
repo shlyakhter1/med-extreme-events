@@ -1,0 +1,28 @@
+# Malformed on purpose: 'weak' is not a publishable evidence tier.
+id: bad-weak
+version: 1.0.0
+number: 8
+title: Malformed card — weak tier
+summary: Used by tests.
+event_triggers:
+  - type: heat
+    conditions: {nws_events: [Heat Advisory]}
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: F31, display: Bipolar disorder}
+  denominator_key: bipolar
+actions:
+  care_team: [{text: Do something}]
+  patient: [{text: Call us.}]
+escalation:
+  - {signs: Confusion}
+evidence_tier: weak
+evidence:
+  mechanism: Folklore.
+  claims:
+    - {text: Levels rise 3% per degree., tier: weak, source_ids: [blog]}
+sources:
+  - {id: blog, citation: A blog post}
+window_days: {min: 3, max: 7}
+safety: {do_not_stop_medication: false}
+acuity_class: lithium

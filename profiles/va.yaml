@@ -1,0 +1,89 @@
+# VA population profile — the only place VA-specific facts live outside cards/*.yaml.
+# Numbers are planning estimates (literature multipliers), not counts. See docs/card-library.md.
+profile: va
+version: 1.0.0
+population_label: Veterans enrolled in VHA care
+
+denominators:
+  bipolar:
+    rate: 0.030
+    basis: share of VHA enrollees
+    source: docs/card-library.md Card 1 (VHA literature multiplier)
+  schizophrenia:
+    rate: 0.036
+    basis: share of VHA enrollees
+    source: docs/card-library.md Card 2 (VHA literature multiplier)
+  clozapine_share_of_schizophrenia:
+    rate: 0.04
+    basis: share of VHA schizophrenia patients on clozapine
+    source: docs/card-library.md Card 3
+    note: As low as ≈ 1.3% in younger cohorts.
+  heart_failure:
+    rate: 0.05
+    basis: share of veterans in VA care
+    source: docs/card-library.md Card 4 (JAMA Network Open VA cohort; ~510,000 VHA HF patients 2016–2020)
+  hfref_ace_arb_arni_share:
+    rate: 0.62
+    basis: share of VA HFrEF cohort prescribed ACE/ARB/ARNI
+    source: docs/card-library.md Card 4
+    note: Reported range ~60–64%.
+  hfref_beta_blocker_share:
+    rate: 0.62
+    basis: share of VA HFrEF cohort prescribed a beta-blocker
+    source: docs/card-library.md Card 4
+    note: Reported range ~60–64%.
+  diabetes:
+    rate: 0.25
+    basis: share of VA patients
+    source: docs/card-library.md Card 5 (VA Office of Health Equity; Liu et al., Prev Chronic Dis)
+  dialysis:
+    count: 52000
+    basis: veterans on maintenance dialysis, national
+    source: docs/card-library.md Card 6 (VA Office of Health Equity ESRD data, 2022)
+    note: ~13,000 new kidney-failure cases/year; VA finances ~60%, mostly in community units.
+
+# Highest acuity first (docs/implementation-plan.md M4: dialysis > clozapine > insulin > …).
+acuity_order:
+  - dialysis
+  - clozapine_lai_methadone
+  - insulin
+  - lithium
+  - antipsychotic_heat
+  - heart_failure
+
+# Notification channels in escalation order (requirements §6).
+channels:
+  - my_healthevet_secure_message
+  - vetext
+  - clinical_contact_center
+
+escalation_default: "Contact your care team."
+
+hooks:
+  pharmacy_disaster_relief_plan:
+    name: VA Pharmacy Disaster Relief Plan
+    description: Emergency 10-day supply at in-network retail pharmacies for maintenance medications; controlled substances via VA.
+    url: https://www.va.gov/fayetteville-coastal-health-care/programs/pharmacy-disaster-relief-plan/
+  nccc:
+    name: VA National Clozapine Coordinating Center
+    description: Registry identifying VA clozapine patients.
+  otp_samhsa:
+    name: OTP coordination per SAMHSA disaster guidance
+    description: Pre-dispensed methadone take-homes and guest dosing.
+  clinical_contact_center:
+    name: VA Clinical Contact Center
+    description: 24/7 clinical line used to track flagged patients during an event.
+  my_healthevet:
+    name: My HealtheVet
+    description: Secure messaging and refill channel.
+  homeless_pact:
+    name: Homeless PACT teams
+    description: Homeless Patient Aligned Care Teams coordinating with shelters.
+  kcer_hotline:
+    name: KCER hotline
+    description: Kidney Community Emergency Response hotline / ESRD-network coordination.
+    phone: 1-866-901-3773
+  empower:
+    name: HHS emPOWER
+    description: ZIP-level counts of electricity-dependent Medicare beneficiaries; utility priority-restoration lists.
+    url: https://empowerprogram.hhs.gov/about.html

@@ -1,0 +1,28 @@
+# Malformed on purpose: claim cites a source id that is not in sources[].
+id: bad-unknown-source
+version: 1.0.0
+number: 9
+title: Malformed card — unknown source id
+summary: Used by tests.
+event_triggers:
+  - type: heat
+    conditions: {nws_events: [Heat Advisory]}
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: F31, display: Bipolar disorder}
+  denominator_key: bipolar
+actions:
+  care_team: [{text: Do something}]
+  patient: [{text: Call us.}]
+escalation:
+  - {signs: Confusion}
+evidence_tier: strong
+evidence:
+  mechanism: Something.
+  claims:
+    - {text: A claim., tier: strong, source_ids: [does-not-exist]}
+sources:
+  - {id: src, citation: A source}
+window_days: {min: 3, max: 7}
+safety: {do_not_stop_medication: false}
+acuity_class: lithium

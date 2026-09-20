@@ -1,0 +1,29 @@
+# Malformed on purpose: the second claim has no evidence tier.
+id: bad-untiered
+version: 1.0.0
+number: 7
+title: Malformed card — untiered claim
+summary: Used by tests to prove the loader rejects untiered claims.
+event_triggers:
+  - type: heat
+    conditions: {nws_events: [Heat Advisory]}
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: F31, display: Bipolar disorder}
+  denominator_key: bipolar
+actions:
+  care_team: [{text: Do something, phase: pre_event}]
+  patient: [{text: Call us.}]
+escalation:
+  - {signs: Confusion, response: null}
+evidence_tier: strong
+evidence:
+  mechanism: Something plausible.
+  claims:
+    - {text: A tiered claim., tier: strong, source_ids: [src]}
+    - {text: An untiered claim., source_ids: [src]}
+sources:
+  - {id: src, citation: A source}
+window_days: {min: 3, max: 7}
+safety: {do_not_stop_medication: false}
+acuity_class: lithium

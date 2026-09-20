@@ -1,0 +1,30 @@
+# Malformed on purpose: selects on a medication class but does not set do_not_stop_medication.
+id: bad-med-safety
+version: 1.0.0
+number: 10
+title: Malformed card — medication card without safety flag
+summary: Used by tests.
+event_triggers:
+  - type: heat
+    conditions: {nws_events: [Heat Advisory]}
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: F31, display: Bipolar disorder}
+  med_classes:
+    - {system: atc, code: N05AN01, display: Lithium}
+  denominator_key: bipolar
+actions:
+  care_team: [{text: Do something}]
+  patient: [{text: Call us.}]
+escalation:
+  - {signs: Confusion}
+evidence_tier: strong
+evidence:
+  mechanism: Something.
+  claims:
+    - {text: A claim., tier: strong, source_ids: [src]}
+sources:
+  - {id: src, citation: A source}
+window_days: {min: 3, max: 7}
+safety: {do_not_stop_medication: false}
+acuity_class: lithium

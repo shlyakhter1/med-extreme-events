@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=card.schema.json
+# Transcribed from docs/card-library.md — Card 1. Clinical strings are verbatim; do not edit in code.
+id: heat-lithium
+version: 1.0.0
+number: 1
+title: Extreme Heat × Bipolar Disorder on Lithium
+summary: >-
+  Sweating and reduced fluid/salt intake during extreme heat push lithium, a
+  narrow-therapeutic-index drug, toward toxicity in patients with bipolar disorder
+  (or other indication) on active lithium prescriptions.
+
+event_triggers:
+  - type: heat
+    conditions:
+      nws_events:
+        - Heat Advisory
+        - Excessive Heat Warning
+        - Extreme Heat Warning
+  - type: heat
+    conditions:
+      heatrisk_min: orange
+
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: F31, display: Bipolar disorder}
+  med_classes:
+    - {system: atc, code: N05AN01, display: Lithium}
+  flags:
+    - coprescribed_ace_arb
+    - coprescribed_thiazide
+    - coprescribed_nsaid
+    - ckd
+    - prior_lithium_toxicity
+    - homeless_or_isolated
+  denominator_key: bipolar
+  denominator_note: "Denominator anchor: bipolar ≈ 3.0% of VHA enrollees."
+
+actions:
+  care_team:
+    - phase: pre_event
+      text: Generate the lithium roster; auto-message hydration and salt-consistency guidance.
+    - phase: pre_event
+      text: Review co-prescribed NSAIDs/diuretics/ACE-ARBs; counsel against new NSAIDs.
+    - phase: pre_event
+      text: >-
+        Ensure a recent lithium level for higher-risk patients; confirm emergency-refill
+        pathway and supply.
+    - phase: pre_event
+      text: >-
+        Prioritize cooling-center access and a check-in contact for isolated or homeless
+        patients.
+    - phase: during_event
+      text: >-
+        Low-threshold level checks for anyone with vomiting, diarrhea, fever, or reduced
+        intake.
+    - phase: during_event
+      text: Steady fluids toward 2.5–3 L/day unless contraindicated.
+    - phase: during_event
+      text: Hold NSAIDs.
+    - phase: during_event
+      text: Clinician-directed dose changes only with level guidance — no self-adjustment.
+  patient:
+    - text: Heat can push your lithium to a dangerous level.
+    - text: >-
+        Drink water steadily, keep salt intake about the same, don't start ibuprofen or
+        naproxen, and stay cool.
+    - text: If you get a stomach bug or fever, call us — you may need a quick blood test.
+  caregiver: []
+
+escalation:
+  - signs: >-
+      New/worsening tremor, nausea/vomiting, diarrhea, drowsiness, confusion, slurred
+      speech, unsteadiness
+    response: urgent contact / same-day level / ED
+    emergency: true
+  - signs: Inability to stay hydrated during heat
+    response: null
+    emergency: false
+
+evidence_tier: strong
+evidence:
+  mechanism: >-
+    Sweating and reduced fluid/salt intake deplete volume; the kidney reabsorbs lithium
+    with sodium, pushing a narrow-therapeutic-index drug toward toxicity. The FDA label
+    warns of decreased heat tolerance from protracted sweating.
+  claims:
+    - text: >-
+        FDA-labeled interaction: the lithium label warns of decreased heat tolerance from
+        protracted sweating.
+      tier: strong
+      source_ids: [fda-lithium-label]
+    - text: >-
+        A 2025 BJPsych Open case: serum lithium 3.4 mEq/L with AKI after
+        fever/vomiting/diarrhea on only 400 mg/day, requiring hemodialysis.
+      tier: inferential
+      source_ids: [ali-dogar-2025]
+    - text: >-
+        NSAIDs raise mean minimum lithium ~15% and cut renal clearance ~20%; ACE
+        inhibitors/ARBs also elevate levels.
+      tier: strong
+      source_ids: [lithium-interaction-pharmacology, fda-lithium-label]
+  caveats:
+    - >-
+      The CDC heat-and-medications page was archived in early 2025; citations reflect
+      the June 2024 version — re-verify against the live page.
+
+sources:
+  - id: cdc-heat-medications-2024
+    citation: CDC "Heat and Medications — Guidance for Clinicians" (2024)
+    url: https://restoredcdc.org/www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html
+    year: 2024
+    note: June 2024 version; page archived early 2025.
+  - id: fda-lithium-label
+    citation: FDA lithium prescribing information
+  - id: ali-dogar-2025
+    citation: Ali & Dogar 2025 (BJPsych Open)
+    year: 2025
+  - id: lithium-interaction-pharmacology
+    citation: NSAID/ACE-ARB lithium interaction pharmacology
+
+window_days: {min: 3, max: 7}
+safety:
+  do_not_stop_medication: true
+acuity_class: lithium
+care_system_hooks: [pharmacy_disaster_relief_plan]

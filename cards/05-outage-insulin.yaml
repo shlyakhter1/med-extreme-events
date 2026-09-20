@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=card.schema.json
+# Transcribed from docs/card-library.md — Card 5. Clinical strings are verbatim; do not edit in code.
+id: outage-insulin
+version: 1.0.0
+number: 5
+title: Hurricane/Power Outage × Insulin-Dependent Diabetes
+summary: >-
+  Outages break the insulin cold chain while the disaster interrupts pharmacy access,
+  mail delivery, routine care, and diet — compounding loss of glycemic control in
+  insulin-dependent diabetes.
+
+event_triggers:
+  - type: hurricane_flood
+    conditions:
+      nws_events:
+        - Hurricane Watch
+        - Hurricane Warning
+        - Tropical Storm Watch
+        - Tropical Storm Warning
+  - type: power_outage
+    conditions:
+      outage_forecast: true
+
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: E10, display: Type 1 diabetes mellitus}
+    - {system: icd10cm, code: E11, display: Type 2 diabetes mellitus, qualifier: insulin-treated}
+  med_classes:
+    - {system: atc, code: A10A, display: Insulins and analogues}
+    - {system: atc, code: A10BJ, display: Glucagon-like peptide-1 (GLP-1) analogues, qualifier: refrigeration-sensitive injectable}
+  device_classes:
+    - {system: local, code: insulin_pump, display: Insulin pump}
+  flags:
+    - pump_user
+    - mail_order_refrigerated_supply
+  denominator_key: diabetes
+  denominator_note: >-
+    Denominator anchor: diabetes ≈ 25% of VA patients — the largest at-risk pool in the
+    library.
+
+actions:
+  care_team:
+    - phase: pre_event
+      text: >-
+        Query the insulin registry; push emergency refills toward a 7–14-day cushion
+        before the storm/outage window.
+    - phase: pre_event
+      text: >-
+        Confirm a cool-storage plan per patient: insulated cooler + ice packs (no direct
+        contact/freezing), thermometer, the FDA 28-day/59–86°F rule.
+    - phase: pre_event
+      text: >-
+        Pump users: explicit backup basal via pen/syringe plus the 48-hour reservoir rule.
+    - phase: pre_event
+      text: >-
+        Provide glucometer + strips (not power-dependent), sick-day carbohydrate/hydration
+        guidance, and FDA switching-in-emergency guidance.
+    - phase: during_event
+      text: Keep insulin as cool as possible without freezing.
+    - phase: during_event
+      text: >-
+        When power returns, discard vials kept in extreme conditions and replace once
+        properly stored insulin is available.
+    - phase: during_event
+      text: Monitor glucose more often.
+    - phase: during_event
+      text: >-
+        Use alternative insulin only with FDA switching guidance and clinician contact
+        where possible.
+  patient:
+    - text: Your insulin can be ruined by heat or freezing.
+    - text: >-
+        In an outage, keep it in a cooler with ice packs — but don't let it touch the ice.
+    - text: Most insulin is still OK at room temperature (up to 86°F) for 28 days.
+    - text: >-
+        Never use insulin that was frozen or looks clumpy, cloudy when it should be clear,
+        or discolored.
+    - text: If your pump stops, use your backup pen.
+    - text: Check your sugar often and don't skip insulin unless told to.
+  caregiver: []
+
+escalation:
+  - signs: Glucose persistently >300 mg/dL despite dosing
+    response: null
+    emergency: false
+  - signs: >-
+      DKA symptoms (nausea/vomiting, deep rapid breathing, fruity breath, confusion,
+      abdominal pain)
+    response: emergency
+    emergency: true
+  - signs: Severe hypoglycemia
+    response: emergency
+    emergency: true
+  - signs: No usable insulin and no pharmacy access
+    response: null
+    emergency: false
+
+evidence_tier: strong
+evidence:
+  mechanism: >-
+    Insulin degrades with heat and freezing ("unopened insulin loses potency within
+    months at 37°C"); outages break the cold chain while the disaster simultaneously
+    interrupts pharmacy access, mail delivery, routine care, and diet — compounding loss
+    of glycemic control.
+  claims:
+    - text: >-
+        FDA emergency thresholds: insulin in vials/cartridges may stay unrefrigerated at
+        59–86°F for up to 28 days; discard pump-reservoir insulin after 48 h or if exposed
+        above 98.6°F; never use frozen insulin.
+      tier: strong
+      source_ids: [fda-insulin-emergency]
+    - text: >-
+        Post-Katrina cohort (n=1,795 across private, state, and VA systems): marked HbA1c
+        deterioration concentrated in the safety-net system (7.7% → 8.3%, p<0.001), with
+        less change among VA patients — continuity of supply buffers the harm.
+      tier: strong
+      source_ids: [fonseca-2009]
+  caveats:
+    - Insulin shelf-life numbers beyond FDA figures are not to be used.
+
+sources:
+  - id: fda-insulin-emergency
+    citation: FDA "Information Regarding Insulin Storage and Switching Between Products in an Emergency"
+    url: https://www.fda.gov/drugs/emergency-preparedness-drugs/information-regarding-insulin-storage-and-switching-between-products-emergency
+  - id: fonseca-2009
+    citation: Fonseca et al., Diabetes Care 2009
+    url: https://pubmed.ncbi.nlm.nih.gov/19542210/
+    year: 2009
+  - id: setoguchi-hennessy-2026
+    citation: Setoguchi & Hennessy 2026
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13427620/
+    year: 2026
+  - id: va-diabetes-prevalence
+    citation: VA diabetes prevalence (VA Office of Health Equity; Liu et al., Prev Chronic Dis)
+  - id: cdc-ada-diabetes-disaster
+    citation: CDC/ADA diabetes disaster preparedness
+
+window_days: {min: 3, max: 7}
+safety:
+  do_not_stop_medication: true
+acuity_class: insulin
+care_system_hooks: [pharmacy_disaster_relief_plan]
