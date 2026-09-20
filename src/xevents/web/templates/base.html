@@ -35,7 +35,10 @@
   ul.actions { margin:6px 0 0 18px; padding:0; } ul.actions li { margin:3px 0; }
   .status { font-size:11px; padding:1px 6px; border-radius:10px; border:1px solid var(--line); }
   .status.issued { color:#ffcf6b; border-color:#7a5b12; } .status.acknowledged, .status.completed, .status.delivered { color:#7bd88f; border-color:#2f6b3d; }
-  #map { height:420px; border:1px solid var(--line); border-radius:8px; }
+  #map { height:460px; border:1px solid var(--line); border-radius:8px; background:#0b1015; }
+  .leaflet-container { background:#0b1015; }
+  .leaflet-tooltip { background:#161d26; border:1px solid var(--line); color:var(--ink); }
+  .leaflet-tooltip::before { border-top-color:var(--line); }
   .patient { max-width:720px; font-size:16px; line-height:1.55; }
   .patient p.big { font-size:18px; }
 </style>
@@ -50,12 +53,13 @@
         {% for s in scenarios %}<option value="{{ s.id }}" {% if scenario == s.id %}selected{% endif %}>{{ s.id }} — replay</option>{% endfor %}
       </select>
     </label>
-    <label>As of <input type="text" name="at" value="{{ as_of_iso }}" size="26"></label>
+    <label>As of <input type="datetime-local" name="at" value="{{ as_of_input }}" step="3600"></label>
     <button type="submit">Go</button>
     {% for k, v in request.query_params.items() if k not in ('scenario', 'at') %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
   </form>
   <nav style="margin-left:auto">
-    <a href="/?scenario={{ scenario or 'live' }}&at={{ as_of_iso }}">Dashboard</a>
+    <a href="/?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">Dashboard</a>
+    <a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">Events</a>
     <a href="/playback">Playback</a>
     <a href="/docs">API</a>
   </nav>
@@ -63,12 +67,12 @@
 <main>
 {% if mode == 'live' %}
   <div class="banner {{ 'stale' if any_stale else 'ok' }}">
-    <b>Live mode</b> · as of {{ as_of_iso }} ·
+    <b>Live mode</b> · as of {{ as_of_iso }} (all times UTC) ·
     {% if feeds %}{% for f in feeds %}{{ f.source }}: {{ f.events }} events, last ingest {{ f.last_ingested_at or 'never' }}{% if f.stale %} <b>(stale)</b>{% endif %}{{ ' · ' if not loop.last }}{% endfor %}{% else %}no live events ingested yet — run <code>EVENT_MODE=live make ingest match</code>{% endif %}
     · absence of items is not an all-clear when a feed is stale.
   </div>
 {% else %}
-  <div class="banner ok"><b>Replay</b> · {{ scenario }} · as of {{ as_of_iso }} (default is the scenario's peak hour; change it above or use <a href="/playback">Playback</a>)</div>
+  <div class="banner ok"><b>Replay</b> · {{ scenario }} · as of {{ as_of_iso }} (all times UTC) (default is the scenario's peak hour; change it above or use <a href="/playback">Playback</a>)</div>
 {% endif %}
 {% block content %}{% endblock %}
 </main>

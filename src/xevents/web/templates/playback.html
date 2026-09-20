@@ -3,66 +3,81 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Extreme-event playback</title>
+<title>Playback · med-extreme-events</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="/static/map.js"></script>
 <style>
-  :root { --bg:#0f1419; --panel:#161d26; --ink:#e6edf3; --muted:#8b98a5; --line:#2a3440;
+  :root { --bg:#0f1419; --panel:#161d26; --ink:#e6edf3; --muted:#8b98a5; --line:#2a3440; --accent:#4c8dff;
           --heat:#e4572e; --flood:#3d7fdc; --smoke:#8c6d3f; --air:#a05cd6; --outage:#d9a41a; --idle:#5b6673; }
-  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui, sans-serif; }
-  #app { display:grid; grid-template-rows:auto 1fr auto; grid-template-columns:1fr 380px; height:100vh; }
-  header { grid-column:1/3; display:flex; gap:12px; align-items:center; padding:8px 14px; border-bottom:1px solid var(--line); background:var(--panel); }
-  header h1 { font-size:15px; margin:0 12px 0 0; font-weight:600; }
-  header select, header button { background:#0f1419; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:5px 8px; font:inherit; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui, sans-serif; overflow:hidden; }
+  a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+  #app { display:grid; grid-template-rows:auto 1fr auto; grid-template-columns:1fr 400px; height:100vh; }
+  header { grid-column:1/3; display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:8px 14px; border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { font-size:15px; margin:0 8px 0 0; font-weight:600; }
+  select, button, input { background:#0f1419; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:5px 9px; font:inherit; }
+  button { cursor:pointer; } button:hover { border-color:#4c5d70; }
+  button.primary { border-color:var(--accent); color:var(--accent); min-width:104px; }
   #map { grid-row:2; grid-column:1; }
+  .leaflet-container { background:#0b1015; }
+  .leaflet-tooltip { background:#161d26; border:1px solid var(--line); color:var(--ink); }
   aside { grid-row:2; grid-column:2; overflow:auto; border-left:1px solid var(--line); background:var(--panel); padding:12px 14px; }
-  footer { grid-column:1/3; display:flex; gap:10px; align-items:center; padding:8px 14px; border-top:1px solid var(--line); background:var(--panel); }
-  footer input[type=range] { flex:1; }
-  #t { font-variant-numeric:tabular-nums; min-width:210px; }
+  footer { grid-column:1/3; border-top:1px solid var(--line); background:var(--panel); padding:4px 14px 8px; }
   .muted { color:var(--muted); }
-  .legend span { display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 4px 0 10px; vertical-align:-1px; }
+  .legend span.sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 4px 0 10px; vertical-align:-1px; }
   .row { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); cursor:pointer; }
-  .row:hover { background:#1c2531; }
-  .row b { font-weight:600; }
-  .tag { font-size:11px; padding:1px 6px; border-radius:10px; border:1px solid var(--line); color:var(--muted); }
-  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:14px 0 6px; }
+  .row:hover { background:#1c2531; } .row.on { background:#1c2531; outline:1px solid #37506f; }
+  .tag { font-size:11px; padding:1px 6px; border-radius:10px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; }
+  .tag.sev-4 { border-color:#c0392b; color:#ff8a80; } .tag.sev-3 { border-color:#b9770e; color:#ffcf6b; }
+  h2 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:16px 0 6px; }
+  h2:first-child { margin-top:0; }
   .card { border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin:8px 0; }
   .card h3 { margin:0 0 4px; font-size:14px; }
-  .card ul { margin:4px 0 0 18px; padding:0; }
-  .card li { margin:2px 0; }
+  .card ul { margin:4px 0 0 18px; padding:0; } .card li { margin:2px 0; }
   .prov { font-size:12px; color:var(--muted); }
-  .role { display:inline-flex; gap:4px; margin:6px 0; }
-  .role button { background:#0f1419; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:3px 8px; font:inherit; cursor:pointer; }
-  .role button.on { color:var(--ink); border-color:#4c5d70; }
+  .roles { display:inline-flex; gap:4px; margin:6px 0; }
+  .roles button { padding:3px 8px; color:var(--muted); } .roles button.on { color:var(--ink); border-color:#4c5d70; }
   details summary { cursor:pointer; color:var(--muted); font-size:12px; }
   .warn { background:#3a2a12; border:1px solid #6b4d1c; border-radius:6px; padding:6px 8px; font-size:12px; margin-top:8px; }
+  #timeline { width:100%; display:block; user-select:none; cursor:crosshair; }
+  #timeline text { font:10px system-ui, sans-serif; fill:#8b98a5; }
+  #timeline .lane-label { font-size:10px; }
+  #timeline rect.bar { cursor:pointer; }
+  #timeline rect.bar:hover { stroke:#fff; stroke-width:1; }
+  .clock { font-variant-numeric:tabular-nums; font-size:15px; font-weight:600; }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <h1>med-extreme-events · playback</h1>
+    <h1>playback</h1>
     <label>Scenario <select id="scenario"></select></label>
-    <button id="play">▶ Play</button>
-    <label>Speed <select id="speed"><option value="1">1 h/tick</option><option value="3" selected>3 h/tick</option><option value="6">6 h/tick</option><option value="24">1 day/tick</option></select></label>
+    <button id="play" class="primary">▶ Play</button>
+    <button id="step-back" title="back one step (←)">◀</button>
+    <button id="step-fwd" title="forward one step (→)">▶</button>
+    <label>Step <select id="speed">
+      <option value="1">1 h</option><option value="3" selected>3 h</option>
+      <option value="6">6 h</option><option value="12">12 h</option><option value="24">1 day</option>
+    </select></label>
+    <span class="clock" id="clock">—</span>
     <span class="legend muted">
-      <span style="background:var(--heat)"></span>heat
-      <span style="background:var(--flood)"></span>hurricane/flood
-      <span style="background:var(--smoke)"></span>smoke
-      <span style="background:var(--air)"></span>air
-      <span style="background:var(--idle)"></span>facility idle
+      <span class="sw" style="background:var(--heat)"></span>heat
+      <span class="sw" style="background:var(--flood)"></span>hurricane/flood
+      <span class="sw" style="background:var(--smoke)"></span>smoke
+      <span class="sw" style="background:var(--air)"></span>air
+      <span class="sw" style="background:var(--idle)"></span>idle facility
     </span>
-    <span id="status" class="muted" style="margin-left:auto"></span>
+    <span style="margin-left:auto"><a href="/">← Dashboard</a> <span id="status" class="muted"></span></span>
   </header>
   <div id="map"></div>
-  <aside id="side">
-    <div id="summary" class="muted">Loading…</div>
-    <div id="detail"></div>
-  </aside>
+  <aside id="side"><div class="muted">Loading…</div></aside>
   <footer>
-    <span id="t">—</span>
-    <input type="range" id="slider" min="0" max="0" value="0" step="1">
-    <span id="tend" class="muted">—</span>
+    <div class="muted" style="display:flex; justify-content:space-between; font-size:12px; padding:2px 0">
+      <span id="t-start">—</span>
+      <span>Timeline — each bar is an event's active window (UTC). Click to jump; click a bar to inspect that event.</span>
+      <span id="t-end">—</span>
+    </div>
+    <svg id="timeline" height="150" role="img" aria-label="event timeline"></svg>
   </footer>
 </div>
 <script src="/static/playback.js"></script>

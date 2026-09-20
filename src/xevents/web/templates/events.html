@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Events · med-extreme-events{% endblock %}
+{% block content %}
+<h2 style="margin:0 0 4px">Events <span class="muted" style="font-weight:normal">— {{ total }} {{ 'active at ' ~ as_of_iso if window == 'active' else 'in this ' ~ mode ~ ' feed (whole window)' }}</span></h2>
+<p class="muted" style="margin-top:0">
+  {% if window == 'active' %}<a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}&window=all">Show every event in the window →</a>
+  {% else %}<a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}&window=active">Show only events active at the as-of time →</a>{% endif %}
+  · times are UTC · click an event for its counties, metrics and the action items it produced
+</p>
+<table>
+  <thead><tr><th>Event</th><th>Severity</th><th>Onset (UTC)</th><th>Expires (UTC)</th><th>Counties</th><th>Facilities</th><th>Source</th></tr></thead>
+  <tbody>
+  {% for r in rows %}{% set e = r.event %}
+    <tr>
+      <td><a href="/dashboard/events/{{ e.event_key }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">{{ e.event_name }}</a>
+        {% if e.headline %}<div class="muted" style="font-size:12px">{{ e.headline[:110] }}</div>{% endif %}</td>
+      <td><span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[e.severity.value] }}">{{ e.severity.value }}</span>
+        <span class="tag">{{ e.urgency.value }}</span></td>
+      <td>{{ e.onset.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ e.expires.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ r.counties }}</td>
+      <td>{{ r.facilities }}</td>
+      <td><span class="tag">{{ e.source.value }}</span></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" class="muted">No events{{ ' active at ' ~ as_of_iso if window == 'active' }}.
+      {% if mode == 'live' %} Run <code>EVENT_MODE=live make ingest match</code> to pull current feeds.{% endif %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

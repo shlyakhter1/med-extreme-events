@@ -9,6 +9,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy import Engine
 
@@ -24,6 +25,7 @@ from xevents.store import (
     catchment_map,
     feed_status,
     get_action_item,
+    get_event,
     get_facility,
     list_action_items,
     list_events,
@@ -32,6 +34,7 @@ from xevents.store import (
     station_map,
     transition_action_item,
 )
+from xevents.timeparse import BadTimestamp, parse_at
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 COUNTIES_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "counties.geojson"
@@ -70,13 +73,10 @@ def scenario_summary(name: str) -> dict[str, Any]:
 
 
 def _parse_at(value: str | None) -> datetime | None:
-    if value is None:
-        return None
     try:
-        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=f"bad timestamp {value!r}") from exc
-    return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
+        return parse_at(value)
+    except BadTimestamp as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 def create_app(engine: Engine | None = None) -> FastAPI:
@@ -182,6 +182,14 @@ def create_app(engine: Engine | None = None) -> FastAPI:
             "count": len(rows),
             "events": [e.model_dump(mode="json", exclude=exclude) for e in rows],
         }
+
+    @app.get("/events/detail")
+    def event_detail(request: Request, key: str = Query(...)) -> dict[str, Any]:
+        """One stored event by its natural key (``source:source_id``), polygon included."""
+        ev = get_event(_engine(request), key)
+        if ev is None:
+            raise HTTPException(status_code=404, detail=f"unknown event {key}")
+        return ev.model_dump(mode="json")
 
     @app.get("/events/active")
     def events_active(request: Request, county: str | None = Query(default=None)) -> dict[str, Any]:
@@ -306,9 +314,7 @@ def create_app(engine: Engine | None = None) -> FastAPI:
 
     app.include_router(web_router)
 
-    @app.get("/static/playback.js")
-    def playback_js() -> FileResponse:
-        return FileResponse(WEB_DIR / "static" / "playback.js", media_type="application/javascript")
+    app.mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static")
 
     return app
 

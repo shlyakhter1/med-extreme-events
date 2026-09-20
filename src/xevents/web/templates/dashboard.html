@@ -3,6 +3,7 @@
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="/static/map.js"></script>
 {% endblock %}
 {% block content %}
 <div class="grid">
@@ -16,39 +17,73 @@
       {% for row in board %}
         <tr>
           <td class="muted">{{ loop.index }}</td>
-          <td><a href="/dashboard/facilities/{{ row.facility.id }}?scenario={{ scenario or 'live' }}&at={{ as_of_iso }}">{{ row.facility.name if row.facility else '?' }}</a> <span class="muted">{{ row.facility.state if row.facility else '' }} · VISN {{ row.facility.visn if row.facility else '?' }}</span></td>
+          <td><a href="/dashboard/facilities/{{ row.facility.id }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">{{ row.facility.name if row.facility else '?' }}</a> <span class="muted">{{ row.facility.state if row.facility else '' }} · VISN {{ row.facility.visn if row.facility else '?' }}</span></td>
           <td><span class="tag">rank {{ row.acuity_rank }}</span></td>
           <td>{{ row.cards|length }}: {{ row.cards.values()|join(' · ') }}</td>
           <td title="largest affected panel across fired cards">≈ {{ '{:,.0f}'.format(row.panel) }}</td>
           <td><span class="tag sev-{{ row.severity }}">{{ ['—','Minor','Moderate','Severe','Extreme'][row.severity] }}</span></td>
         </tr>
       {% else %}
-        <tr><td colspan="6" class="muted">No action items active at {{ as_of_iso }}.</td></tr>
+        <tr><td colspan="6" class="muted">No action items active at {{ as_of_iso }}.
+          {% if mode == 'live' %}Ingest current feeds with <code>EVENT_MODE=live make ingest match</code>, or switch to a replay scenario above.{% endif %}</td></tr>
       {% endfor %}
       </tbody>
     </table>
   </section>
   <section>
-    <h2 style="margin:0 0 6px">Facilities <span class="muted" style="font-weight:normal">— colored by active event</span></h2>
+    <h2 style="margin:0 0 6px">Facilities <span class="muted" style="font-weight:normal">— colored by active event, sized by affected panel</span></h2>
     <div id="map"></div>
-    <div class="muted" style="margin-top:6px">Click a facility for its fired cards. Every number links to its formula and sources on the facility page.</div>
+    <div class="muted" style="margin-top:6px">Counties under an active event are shaded. Click a facility for its fired cards; every number links to its formula and sources.</div>
   </section>
 </div>
+
+<h2 style="margin:22px 0 6px">Active events <span class="muted" style="font-weight:normal">— {{ events_total }} at {{ as_of_iso }} (UTC)</span>
+  <a style="font-size:13px; font-weight:normal" href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">explore all events →</a></h2>
+<table>
+  <thead><tr><th>Event</th><th>Severity</th><th>Onset (UTC)</th><th>Expires (UTC)</th><th>Counties</th><th>Source</th></tr></thead>
+  <tbody>
+  {% for e in events %}
+    <tr>
+      <td><a href="/dashboard/events/{{ e.event_key }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">{{ e.event_name }}</a>
+        {% if e.geography.area_desc %}<div class="muted" style="font-size:12px">{{ e.geography.area_desc[:110] }}</div>{% endif %}</td>
+      <td><span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[e.severity.value] }}">{{ e.severity.value }}</span></td>
+      <td>{{ e.onset.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ e.expires.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ e.geography.county_fips|length }}</td>
+      <td><span class="tag">{{ e.source.value }}</span></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="muted">No events active at this time.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if events_total > events|length %}<div class="muted" style="margin-top:6px">… {{ events_total - events|length }} more · <a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">see all</a></div>{% endif %}
+
 <script>
 (async () => {
   const COLORS = { heat: "#e4572e", hurricane_flood: "#3d7fdc", wildfire_smoke: "#8c6d3f", air_pollution: "#a05cd6", power_outage: "#d9a41a" };
-  const scenario = {{ (scenario or '')|tojson }}, at = {{ as_of_iso|tojson }};
-  const map = L.map("map").setView([38.5, -96], 4);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", { attribution: "© OpenStreetMap © CARTO" }).addTo(map);
+  const SEV = { Extreme: 4, Severe: 3, Moderate: 2, Minor: 1, Unknown: 0 };
+  const scenario = {{ (scenario or '')|tojson }}, at = {{ as_of_iso|tojson }}, atInput = {{ as_of_input|tojson }};
   const qs = (scenario ? `scenario=${scenario}&` : "") + `at=${encodeURIComponent(at)}`;
-  const [facilities, items] = await Promise.all([fetch("/facilities").then((r) => r.json()), fetch(`/action-items?${qs}`).then((r) => r.json())]);
+  const ctx = await XMap.create("map");
+  const [facilities, items, events] = await Promise.all([
+    fetch("/facilities").then((r) => r.json()),
+    fetch(`/action-items?${qs}`).then((r) => r.json()),
+    fetch(`/events?${qs}`).then((r) => r.json()),
+  ]);
+  const paint = new Map();
+  for (const e of events.events) for (const c of e.geography.county_fips) {
+    const cur = paint.get(c), sev = SEV[e.severity] || 0;
+    if (!cur || sev > cur.sev) paint.set(c, { color: COLORS[e.event_type] || "#4c8dff", opacity: 0.2 + 0.1 * sev, sev });
+  }
+  XMap.paintCounties(ctx, paint);
   const byFacility = new Map();
   for (const i of items.items) { const a = byFacility.get(i.facility_id) || []; a.push(i); byFacility.set(i.facility_id, a); }
   const bounds = [];
   L.geoJSON(facilities, {
     pointToLayer: (f, ll) => {
       const its = byFacility.get(f.properties.id);
-      if (!its) return L.circleMarker(ll, { radius: 3, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.9, weight: 1 });
+      if (!its) return L.circleMarker(ll, { radius: 2.5, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.85, weight: 1 });
       const top = its.reduce((b, i) => (i.acuity_rank < b.acuity_rank ? i : b), its[0]);
       const panel = Math.max(...its.map((i) => i.panel || 0));
       bounds.push(ll);
@@ -57,10 +92,10 @@
     onEachFeature: (f, layer) => {
       const its = byFacility.get(f.properties.id);
       layer.bindTooltip(`${f.properties.name}${its ? ` — ${new Set(its.map((i) => i.card_id)).size} card(s)` : ""}`);
-      layer.on("click", () => { window.location = `/dashboard/facilities/${f.properties.id}?scenario=${scenario || "live"}&at=${encodeURIComponent(at)}`; });
+      layer.on("click", () => { window.location = `/dashboard/facilities/${f.properties.id}?scenario=${scenario || "live"}&at=${encodeURIComponent(atInput)}`; });
     },
-  }).addTo(map);
-  if (bounds.length) map.fitBounds(L.latLngBounds(bounds).pad(0.3));
+  }).addTo(ctx.map);
+  if (bounds.length) ctx.map.fitBounds(L.latLngBounds(bounds).pad(0.3));
 })();
 </script>
 {% endblock %}

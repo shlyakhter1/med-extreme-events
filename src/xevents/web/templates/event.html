@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ event.event_name }} · med-extreme-events{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="/static/map.js"></script>
+{% endblock %}
+{% block content %}
+<p><a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">← All events</a></p>
+<h2 style="margin:0">{{ event.event_name }}
+  <span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[event.severity.value] }}">{{ event.severity.value }}</span>
+  <span class="tag">{{ event.urgency.value }}</span><span class="tag">{{ event.certainty.value }}</span></h2>
+{% if event.headline %}<p>{{ event.headline }}</p>{% endif %}
+<table style="max-width:820px">
+  <tr><th>Key</th><td><code>{{ event.event_key }}</code></td></tr>
+  <tr><th>Window (UTC)</th><td>{{ event.onset.strftime('%Y-%m-%d %H:%M') }} → {{ event.expires.strftime('%Y-%m-%d %H:%M') }}
+    ({{ ((event.expires - event.onset).total_seconds() / 3600) | round(1) }} h){% if event.sent %} · sent {{ event.sent.strftime('%Y-%m-%d %H:%M') }}{% endif %}</td></tr>
+  <tr><th>Source</th><td>{{ event.source.value }} · type {{ event.event_type.value }}{% if event.scenario %} · replay <code>{{ event.scenario }}</code>{% else %} · live{% endif %}</td></tr>
+  <tr><th>Geography</th><td>{{ counties|length }} counties{% if event.geography.states %} in {{ event.geography.states|join(', ') }}{% endif %}
+    {% if event.geography.ugc %}<div class="muted" style="font-size:12px">UGC: {{ event.geography.ugc|join(' ') }}</div>{% endif %}
+    {% if event.geography.note %}<div class="muted" style="font-size:12px">{{ event.geography.note }}</div>{% endif %}
+    {% if event.geography.area_desc %}<div class="muted" style="font-size:12px">{{ event.geography.area_desc }}</div>{% endif %}</td></tr>
+  {% if event.metrics %}<tr><th>Metrics</th><td>{% for k, v in event.metrics.items() %}<span class="tag">{{ k }}={{ v }}</span> {% endfor %}</td></tr>{% endif %}
+  {% if event.raw_ref %}<tr><th>Raw payload</th><td><code>{{ event.raw_ref }}</code></td></tr>{% endif %}
+</table>
+<div class="grid" style="margin-top:16px">
+  <section>
+    <h3 style="margin:0 0 6px">Affected counties</h3>
+    <div id="map" style="height:360px"></div>
+    <details style="margin-top:8px"><summary>list all {{ counties|length }}</summary>
+      <div class="muted" style="font-size:12px">{% for fips, name in counties %}{{ name }} ({{ fips }}){{ ' · ' if not loop.last }}{% endfor %}</div></details>
+  </section>
+  <section>
+    <h3 style="margin:0 0 6px">Action items produced <span class="muted" style="font-weight:normal">— {{ item_count }} items ({{ superseded }} superseded) at {{ facilities|length }} facilities</span></h3>
+    <table><thead><tr><th>Facility</th><th>Cards</th></tr></thead><tbody>
+    {% for row in facilities[:40] %}
+      <tr><td><a href="/dashboard/facilities/{{ row.facility.id }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">{{ row.facility.name if row.facility else '?' }}</a>
+        <span class="muted">{{ row.facility.state if row.facility else '' }}</span></td>
+        <td>{{ row.cards.values()|join(' · ') }}</td></tr>
+    {% else %}<tr><td colspan="2" class="muted">No action items: no card's trigger matches this event, or no facility sits in its counties.</td></tr>{% endfor %}
+    </tbody></table>
+    {% if facilities|length > 40 %}<div class="muted">… {{ facilities|length - 40 }} more</div>{% endif %}
+  </section>
+</div>
+<script>
+(async () => {
+  const fips = {{ counties | map(attribute=0) | list | tojson }};
+  const color = {{ {'heat':'#e4572e','hurricane_flood':'#3d7fdc','wildfire_smoke':'#8c6d3f','air_pollution':'#a05cd6','power_outage':'#d9a41a'}.get(event.event_type.value, '#4c8dff') | tojson }};
+  const ctx = await XMap.create("map");
+  const paint = new Map(fips.map((f) => [f, { color, opacity: 0.6 }]));
+  XMap.paintCounties(ctx, paint);
+  const bounds = [];
+  ctx.byFips.forEach((layer, f) => { if (paint.has(f)) bounds.push(layer.getBounds()); });
+  if (bounds.length) ctx.map.fitBounds(bounds.reduce((a, b) => a.extend(b)).pad(0.15));
+})();
+</script>
+{% endblock %}

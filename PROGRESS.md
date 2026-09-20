@@ -2,6 +2,42 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — demo feedback round: run/host docs, event exploration, timeline, key-free map
+
+Four issues raised after walking through M5, all fixed and covered by tests.
+
+- **"bad timestamp" on every page.** The header form submitted `+00:00`, and `+` is the URL
+  encoding for a space, so the app rejected the as-of value it had just rendered. The control
+  is now `<input type="datetime-local">` (no offset, so no `+`), and `timeparse.parse_at`
+  accepts the space-for-plus form, a trailing `Z`, minute precision and a bare date. Naive
+  values are read as UTC. Regression test covers all five spellings.
+- **Events were not explorable.** New `/dashboard/events` (window, severity, county and
+  facility counts, active-vs-all toggle) and `/dashboard/events/{key}` (counties on a map,
+  UGC codes, CAP metrics, raw payload path, the action items it produced). The dashboard
+  gained an active-events table, and both banners now state that times are UTC and whether
+  the feed is live or replayed. API gained `GET /events/detail?key=`.
+- **Playback had no timeline and pause did not hold.** Rewritten: an SVG timeline with one
+  lane per event type, a bar per event across its active window, day gridlines, a playhead,
+  click/drag to seek and click-a-bar to inspect. Transport uses an explicit `playing` flag
+  with step buttons, spacebar and arrow keys. The old version refetched facility detail on
+  every tick, which is what made it look like it resumed on its own; nothing fetches during
+  playback now and county/facility repaints are diffed.
+- **Map demanded an API key.** Both maps used CARTO raster tiles, which watermark
+  unregistered use. `web/static/map.js` now draws the county polygons the app already serves
+  at `/reference/counties`. No third-party tile request, no key, works offline.
+
+**Packaging and hosting** (the other half of the feedback): `requirements.txt` generated from
+the lockfile with pinned hashes for pip users; `Dockerfile` that bakes the demo database at
+build time (verified: 381 MB image, serves every page with no key, no database server and no
+network); `fly.toml`; `docs/deploy.md` covering local, container, Fly/Render/Cloud Run, live
+mode with a writable volume and a refresh schedule; README rewritten to lead with how to run
+it. `make lint test`: 107 passed.
+
+**Incident note.** The first Docker build filled the host disk, which wedged the Docker
+daemon (a stale `com.docker.backend` from Sep 10 survived restarts and had to be killed).
+Pruning images and build cache reclaimed 55 GB inside Docker; its virtual disk shrank from
+83 GB to 1.5 GB and the host went from 5.7 GB to 87 GB free.
+
 ## 2026-09-20 — M5: API + UI (done)
 
 **Done.**

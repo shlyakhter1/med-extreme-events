@@ -257,6 +257,12 @@ def feed_status(engine: Engine) -> list[dict[str, Any]]:
     ]
 
 
+def get_event(engine: Engine, event_key: str) -> Event | None:
+    with Session(engine) as s:
+        row = s.get(EventRow, event_key)
+        return row.to_model() if row else None
+
+
 def delete_scenario_events(engine: Engine, scenario: str) -> int:
     with session_scope(engine) as s:
         rows = list(s.scalars(select(EventRow).where(EventRow.scenario == scenario)))

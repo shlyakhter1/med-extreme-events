@@ -1,87 +1,286 @@
-/* Playback: scrub a scenario window; counties and facilities recolor by the events and
-   action items active at t. Data: /scenarios, /facilities, /reference/counties (once),
-   /events?scenario= and /action-items?scenario= (per scenario, filtered client-side). */
+/* Playback: scrub a scenario's window and watch counties, facilities and action items change.
+   Everything for the chosen scenario is loaded once, so scrubbing never waits on the network;
+   only the per-facility card text is fetched on demand (and cached). */
 (() => {
   const COLORS = { heat: "#e4572e", hurricane_flood: "#3d7fdc", wildfire_smoke: "#8c6d3f", air_pollution: "#a05cd6", power_outage: "#d9a41a" };
   const SEV = { Extreme: 4, Severe: 3, Moderate: 2, Minor: 1, Unknown: 0 };
-  const TYPE_PRIORITY = ["hurricane_flood", "heat", "power_outage", "air_pollution", "wildfire_smoke"];
+  const TYPE_ORDER = ["hurricane_flood", "heat", "power_outage", "air_pollution", "wildfire_smoke"];
+  const HOUR = 3600e3;
   const $ = (id) => document.getElementById(id);
-  const state = { scenarios: [], facilities: null, counties: null, events: [], items: [], t0: 0, t1: 0, t: 0, timer: null, selected: null, role: "care_team" };
 
-  const map = L.map("map", { zoomControl: true }).setView([38.5, -96], 4);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", { attribution: "© OpenStreetMap © CARTO", maxZoom: 12 }).addTo(map);
-  let countyLayer = null, facilityLayer = null;
+  const state = {
+    scenarios: [], facilities: null, events: [], items: [], t0: 0, t1: 0, t: 0,
+    playing: false, timer: null, selectedFacility: null, selectedEvent: null,
+    role: "care_team", detailCache: new Map(), lastCountyPaint: new Map(), lastFacilityPaint: new Map(),
+  };
+  let ctx = null, facilityLayer = null, facilityById = new Map();
 
   const fmt = (ms) => new Date(ms).toISOString().replace("T", " ").slice(0, 16) + "Z";
+  const fmtShort = (ms) => new Date(ms).toISOString().slice(5, 16).replace("T", " ");
   const parse = (s) => Date.parse(s);
-  const activeEvents = (t) => state.events.filter((e) => parse(e.onset) <= t && t <= parse(e.expires));
-  const activeItems = (t) => state.items.filter((i) => i.status !== "superseded" && parse(i.window_start) <= t && t <= parse(i.window_end));
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const activeEvents = (t) => state.events.filter((e) => e._t0 <= t && t <= e._t1);
+  const activeItems = (t) => state.items.filter((i) => i.status !== "superseded" && i._t0 <= t && t <= i._t1);
 
-  async function getJSON(url) { const r = await fetch(url); if (!r.ok) throw new Error(url + " → " + r.status); return r.json(); }
+  const getJSON = async (url) => {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`${url} → ${r.status}`);
+    return r.json();
+  };
+
+  // ------------------------------------------------------------------ boot
 
   async function init() {
-    $("status").textContent = "loading reference data…";
-    const [scenarios, facilities, counties] = await Promise.all([getJSON("/scenarios"), getJSON("/facilities"), getJSON("/reference/counties")]);
-    state.scenarios = scenarios; state.facilities = facilities; state.counties = counties;
-    countyLayer = L.geoJSON(counties, { style: () => ({ weight: 0.3, color: "#2a3440", fillColor: "#131a22", fillOpacity: 0.6 }), interactive: false }).addTo(map);
+    $("status").textContent = "loading map and facilities…";
+    const [scenarios, facilities, mapCtx] = await Promise.all([
+      getJSON("/scenarios"), getJSON("/facilities"), XMap.create("map"),
+    ]);
+    state.scenarios = scenarios;
+    state.facilities = facilities;
+    ctx = mapCtx;
     facilityLayer = L.geoJSON(facilities, {
-      pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 3, weight: 1, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.9 }),
-      onEachFeature: (f, layer) => layer.on("click", () => selectFacility(f.properties.id)),
-    }).addTo(map);
+      pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 2.5, weight: 1, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.85 }),
+      onEachFeature: (f, layer) => {
+        facilityById.set(f.properties.id, layer);
+        layer.on("click", () => selectFacility(f.properties.id));
+      },
+    }).addTo(ctx.map);
+
     const sel = $("scenario");
-    for (const s of scenarios) { const o = document.createElement("option"); o.value = s.id; o.textContent = `${s.id} (${s.events} events)`; sel.appendChild(o); }
+    sel.innerHTML = scenarios.map((s) => `<option value="${s.id}">${s.id} — ${s.events} events</option>`).join("");
     sel.addEventListener("change", () => loadScenario(sel.value));
-    $("slider").addEventListener("input", (e) => { setT(state.t0 + Number(e.target.value) * 3600e3); });
     $("play").addEventListener("click", togglePlay);
+    $("step-back").addEventListener("click", () => { pause(); step(-1); });
+    $("step-fwd").addEventListener("click", () => { pause(); step(1); });
+    window.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "SELECT" || e.target.tagName === "INPUT") return;
+      if (e.code === "Space") { e.preventDefault(); togglePlay(); }
+      if (e.code === "ArrowLeft") { pause(); step(-1); }
+      if (e.code === "ArrowRight") { pause(); step(1); }
+    });
+    window.addEventListener("resize", drawTimeline);
+    initTimelineInput();
     if (scenarios.length) await loadScenario(scenarios[0].id);
   }
 
   async function loadScenario(id) {
-    stop();
+    pause();
     $("status").textContent = `loading ${id}…`;
-    const [ev, it] = await Promise.all([getJSON(`/events?scenario=${id}`), getJSON(`/action-items?scenario=${id}&include_superseded=true`)]);
-    state.events = ev.events; state.items = it.items; state.selected = null;
-    const s = state.scenarios.find((x) => x.id === id);
-    state.t0 = parse(s.window_start); state.t1 = parse(s.window_end);
-    // clamp very long tails (e.g. FEMA incident periods) to 10 days past the last alert onset
-    const lastOnset = Math.max(...state.events.map((e) => parse(e.onset)));
-    state.t1 = Math.min(state.t1, lastOnset + 10 * 86400e3);
-    const hours = Math.ceil((state.t1 - state.t0) / 3600e3);
-    $("slider").max = hours; $("slider").value = 0; $("tend").textContent = fmt(state.t1);
-    const view = { heat_dome_2021: [[45.8, -121.5], 6], ian_2022: [[27.8, -82.0], 6], smoke_nyc_2023: [[40.8, -75.5], 6] }[id];
-    if (view) map.setView(view[0], view[1]);
-    $("status").textContent = `${state.events.length} events · ${state.items.length} action items (${state.items.filter((i) => i.status === "superseded").length} superseded)`;
-    setT(state.t0);
+    const [ev, it] = await Promise.all([
+      getJSON(`/events?scenario=${encodeURIComponent(id)}`),
+      getJSON(`/action-items?scenario=${encodeURIComponent(id)}&include_superseded=true`),
+    ]);
+    state.events = ev.events.map((e) => ({ ...e, _t0: parse(e.onset), _t1: parse(e.expires) }));
+    state.items = it.items.map((i) => ({ ...i, _t0: parse(i.window_start), _t1: parse(i.window_end) }));
+    state.selectedFacility = null;
+    state.selectedEvent = null;
+    state.detailCache.clear();
+    state.lastCountyPaint = new Map();
+    state.lastFacilityPaint = new Map();
+
+    // Focus the timeline on the alert window: a single long-running context event (a FEMA
+    // incident period runs for weeks) should not squash the storm into a few pixels.
+    const onsets = state.events.map((e) => e._t0);
+    const shortEnds = state.events.filter((e) => e._t1 - e._t0 <= 14 * 24 * HOUR).map((e) => e._t1);
+    state.t0 = Math.min(...onsets);
+    state.t1 = Math.max(shortEnds.length ? Math.max(...shortEnds) : 0, Math.max(...onsets) + 24 * HOUR);
+    $("t-start").textContent = fmt(state.t0);
+    $("t-end").textContent = fmt(state.t1);
+
+    const superseded = state.items.filter((i) => i.status === "superseded").length;
+    $("status").textContent = `${state.events.length} events · ${state.items.length} items (${superseded} superseded)`;
+    drawTimeline();
+    // Start at the busiest hour so the first frame is not an empty map.
+    const peak = state.scenarios.find((s) => s.id === id)?.peak_at;
+    setT(peak ? clamp(parse(peak), state.t0, state.t1) : state.t0);
+    fitToEvents();
   }
+
+  function fitToEvents() {
+    const fips = new Set();
+    for (const e of state.events) for (const c of e.geography.county_fips) fips.add(c);
+    const bounds = [];
+    ctx.byFips.forEach((layer, f) => { if (fips.has(f)) bounds.push(layer.getBounds()); });
+    if (bounds.length) ctx.map.fitBounds(bounds.reduce((a, b) => a.extend(b)).pad(0.1));
+  }
+
+  // ------------------------------------------------------------------ transport
 
   function setT(t) {
-    state.t = Math.max(state.t0, Math.min(state.t1, t));
-    $("t").textContent = fmt(state.t);
-    $("slider").value = Math.round((state.t - state.t0) / 3600e3);
+    state.t = clamp(t, state.t0, state.t1);
+    $("clock").textContent = fmt(state.t);
     render();
   }
+  const stepMs = () => Number($("speed").value) * HOUR;
+  function step(dir) { setT(state.t + dir * stepMs()); }
+
+  function syncPlayButton() { $("play").textContent = state.playing ? "❚❚ Pause" : "▶ Play"; }
+  function play() {
+    if (state.playing) return;
+    if (state.t >= state.t1) setT(state.t0);
+    state.playing = true;
+    syncPlayButton();
+    state.timer = setInterval(() => {
+      if (!state.playing) return;
+      if (state.t + stepMs() >= state.t1) { setT(state.t1); pause(); return; }
+      step(1);
+    }, 300);
+  }
+  function pause() {
+    state.playing = false;
+    if (state.timer) { clearInterval(state.timer); state.timer = null; }
+    syncPlayButton();
+  }
+  function togglePlay() { state.playing ? pause() : play(); }
+
+  // ------------------------------------------------------------------ timeline
+
+  const TL = { margin: 8, labelW: 132, laneH: 13, axisH: 18, maxLanes: 9 };
+
+  function lanes() {
+    const byName = new Map();
+    for (const e of state.events) {
+      const key = e.event_name;
+      if (!byName.has(key)) byName.set(key, { name: key, type: e.event_type, events: [], first: e._t0 });
+      const lane = byName.get(key);
+      lane.events.push(e);
+      lane.first = Math.min(lane.first, e._t0);
+    }
+    const all = [...byName.values()].sort((a, b) => a.first - b.first || a.name.localeCompare(b.name));
+    if (all.length <= TL.maxLanes) return all;
+    const head = all.slice(0, TL.maxLanes - 1);
+    const rest = all.slice(TL.maxLanes - 1);
+    head.push({
+      name: `+${rest.length} more event types`, type: rest[0].type,
+      events: rest.flatMap((l) => l.events), first: rest[0].first, grouped: true,
+    });
+    return head;
+  }
+
+  const xOf = (t, w) => TL.labelW + ((clamp(t, state.t0, state.t1) - state.t0) / (state.t1 - state.t0 || 1)) * (w - TL.labelW - TL.margin);
+  const tOf = (x, w) => state.t0 + ((x - TL.labelW) / (w - TL.labelW - TL.margin)) * (state.t1 - state.t0);
+
+  function drawTimeline() {
+    const svg = $("timeline");
+    if (!state.events.length) { svg.innerHTML = ""; return; }
+    const w = svg.clientWidth || svg.parentElement.clientWidth;
+    const ls = lanes();
+    const h = TL.axisH + ls.length * TL.laneH + 10;
+    svg.setAttribute("height", h);
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    const parts = [];
+
+    // day gridlines + labels
+    const days = Math.max(1, Math.round((state.t1 - state.t0) / (24 * HOUR)));
+    const stepDays = days > 20 ? Math.ceil(days / 10) : 1;
+    for (let d = new Date(state.t0); d <= state.t1; d = new Date(d.getTime() + stepDays * 24 * HOUR)) {
+      const day = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+      if (day < state.t0) continue;
+      const x = xOf(day, w);
+      parts.push(`<line x1="${x}" y1="${TL.axisH - 4}" x2="${x}" y2="${h - 6}" stroke="#222c38" stroke-width="1"/>`);
+      parts.push(`<text x="${x + 3}" y="12">${new Date(day).toISOString().slice(5, 10)}</text>`);
+    }
+
+    ls.forEach((lane, i) => {
+      const y = TL.axisH + i * TL.laneH;
+      const color = COLORS[lane.type] || "#4c8dff";
+      parts.push(`<text class="lane-label" x="0" y="${y + 9}">${esc(lane.name.length > 24 ? lane.name.slice(0, 23) + "…" : lane.name)}</text>`);
+      for (const e of lane.events) {
+        const x1 = xOf(e._t0, w), x2 = xOf(e._t1, w);
+        const sev = SEV[e.severity] || 0;
+        const on = state.selectedEvent === e.event_key;
+        parts.push(
+          `<rect class="bar" data-key="${esc(e.event_key)}" x="${x1}" y="${y + 1.5}" width="${Math.max(2, x2 - x1)}" height="${TL.laneH - 4}" rx="2"` +
+          ` fill="${color}" fill-opacity="${0.35 + 0.15 * sev}" stroke="${on ? "#fff" : "none"}" stroke-width="${on ? 1.2 : 0}">` +
+          `<title>${esc(e.event_name)} · ${esc(e.severity)}\n${fmt(e._t0)} → ${fmt(e._t1)}\n${e.geography.county_fips.length} counties</title></rect>`
+        );
+      }
+    });
+
+    const px = xOf(state.t, w);
+    parts.push(`<line x1="${px}" y1="${TL.axisH - 6}" x2="${px}" y2="${h - 4}" stroke="#fff" stroke-width="1.5"/>`);
+    parts.push(`<polygon points="${px - 5},${TL.axisH - 10} ${px + 5},${TL.axisH - 10} ${px},${TL.axisH - 3}" fill="#fff"/>`);
+    svg.innerHTML = parts.join("");
+  }
+
+  function initTimelineInput() {
+    const svg = $("timeline");
+    let dragging = false;
+    const seek = (evt) => {
+      const rect = svg.getBoundingClientRect();
+      setT(tOf(evt.clientX - rect.left, rect.width));
+    };
+    svg.addEventListener("mousedown", (evt) => {
+      pause();
+      dragging = true;
+      const key = evt.target && evt.target.dataset ? evt.target.dataset.key : null;
+      if (key) selectEvent(key);
+      seek(evt);
+    });
+    window.addEventListener("mousemove", (evt) => { if (dragging) seek(evt); });
+    window.addEventListener("mouseup", () => { dragging = false; });
+  }
+
+  // ------------------------------------------------------------------ map + panel
 
   function render() {
-    const evs = activeEvents(state.t), items = activeItems(state.t);
-    const county = new Map(); // fips → {type, sev}
-    for (const e of evs) for (const c of e.geography.county_fips) {
-      const cur = county.get(c), sev = SEV[e.severity] || 0;
-      if (!cur || sev > cur.sev || (sev === cur.sev && TYPE_PRIORITY.indexOf(e.event_type) < TYPE_PRIORITY.indexOf(cur.type))) county.set(c, { type: e.event_type, sev });
+    const evs = activeEvents(state.t);
+    const items = activeItems(state.t);
+
+    const paint = new Map();
+    for (const e of evs) {
+      for (const c of e.geography.county_fips) {
+        const cur = paint.get(c), sev = SEV[e.severity] || 0;
+        const better = !cur || sev > cur.sev || (sev === cur.sev && TYPE_ORDER.indexOf(e.event_type) < TYPE_ORDER.indexOf(cur.type));
+        if (better) paint.set(c, { color: COLORS[e.event_type] || "#4c8dff", opacity: 0.22 + 0.13 * sev, sev, type: e.event_type });
+      }
     }
-    countyLayer.eachLayer((l) => {
-      const hit = county.get(l.feature.id);
-      l.setStyle(hit ? { fillColor: COLORS[hit.type], fillOpacity: 0.25 + 0.15 * hit.sev, color: COLORS[hit.type], weight: 0.5 } : { fillColor: "#131a22", fillOpacity: 0.6, color: "#2a3440", weight: 0.3 });
+    if (state.selectedEvent) {
+      const sel = state.events.find((e) => e.event_key === state.selectedEvent);
+      if (sel) for (const c of sel.geography.county_fips) paint.set(c, { color: "#ffffff", opacity: 0.45, sev: 9, type: sel.event_type });
+    }
+    // repaint only what changed
+    const seen = new Set();
+    paint.forEach((v, fips) => {
+      seen.add(fips);
+      const prev = state.lastCountyPaint.get(fips);
+      if (!prev || prev.color !== v.color || prev.opacity !== v.opacity) {
+        const layer = ctx.byFips.get(fips);
+        if (layer) layer.setStyle({ ...ctx.baseStyle, fillColor: v.color, fillOpacity: v.opacity, color: v.color, weight: 0.5 });
+      }
     });
+    state.lastCountyPaint.forEach((_, fips) => {
+      if (!seen.has(fips)) { const layer = ctx.byFips.get(fips); if (layer) layer.setStyle(ctx.baseStyle); }
+    });
+    state.lastCountyPaint = paint;
+
     const byFacility = new Map();
     for (const i of items) { const a = byFacility.get(i.facility_id) || []; a.push(i); byFacility.set(i.facility_id, a); }
-    facilityLayer.eachLayer((l) => {
-      const its = byFacility.get(l.feature.properties.id);
-      if (!its) { l.setStyle({ radius: 3, color: "#5b6673", fillColor: "#5b6673" }); return; }
+    const fseen = new Set();
+    byFacility.forEach((its, fid) => {
+      fseen.add(fid);
       const top = its.reduce((b, i) => (i.acuity_rank < b.acuity_rank ? i : b), its[0]);
       const panel = Math.max(...its.map((i) => i.panel || 0));
-      l.setStyle({ radius: 5 + Math.min(10, Math.sqrt(panel) / 8), color: "#fff", fillColor: COLORS[top.event_type], fillOpacity: 0.95, weight: 1 });
-      l.bringToFront();
+      const key = `${top.event_type}|${Math.round(panel)}`;
+      if (state.lastFacilityPaint.get(fid) !== key) {
+        const layer = facilityById.get(fid);
+        if (layer) {
+          layer.setStyle({ radius: 5 + Math.min(10, Math.sqrt(panel) / 8), color: "#fff", fillColor: COLORS[top.event_type] || "#fff", fillOpacity: 0.95, weight: 1 });
+          layer.bringToFront();
+        }
+      }
+      state.lastFacilityPaint.set(fid, key);
     });
+    state.lastFacilityPaint.forEach((_, fid) => {
+      if (!fseen.has(fid)) {
+        const layer = facilityById.get(fid);
+        if (layer) layer.setStyle({ radius: 2.5, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.85, weight: 1 });
+        state.lastFacilityPaint.delete(fid);
+      }
+    });
+
+    drawTimeline();
     renderSide(evs, items, byFacility);
   }
 
@@ -91,67 +290,114 @@
       const top = its.reduce((b, i) => (i.acuity_rank < b.acuity_rank ? i : b), its[0]);
       const panel = Math.max(...its.map((i) => i.panel || 0));
       const sev = Math.max(...its.map((i) => SEV[i.event_severity] || 0));
-      return { fid, name: f ? f.properties.name : fid, state: f ? f.properties.state : "", cards: new Set(its.map((i) => i.card_id)).size, top, panel, sev, score: sev * panel };
-    }).sort((a, b) => a.top.acuity_rank - b.top.acuity_rank || b.score - a.score);
-    const names = {};
-    for (const e of evs) names[e.event_name] = (names[e.event_name] || 0) + 1;
-    $("summary").innerHTML = `<div><b>${evs.length}</b> active events · <b>${board.length}</b> facilities with action items · <b>${items.length}</b> items</div>
-      <div class="muted" style="margin-top:4px">${Object.entries(names).map(([n, c]) => `${n} ×${c}`).join(" · ") || "no active events at this time"}</div>
-      <h2>Event board (acuity, then severity × panel)</h2>
-      ${board.slice(0, 40).map((b) => `<div class="row" data-fid="${b.fid}"><span><b>${b.name}</b> <span class="muted">${b.state}</span></span><span><span class="tag">${b.top.acuity_class}</span> <span class="tag">${b.cards} card${b.cards > 1 ? "s" : ""}</span> <span class="tag">≈${b.panel.toLocaleString()}</span></span></div>`).join("")}
-      ${board.length > 40 ? `<div class="muted">… ${board.length - 40} more</div>` : ""}`;
-    $("summary").querySelectorAll(".row").forEach((r) => r.addEventListener("click", () => selectFacility(r.dataset.fid)));
-    if (state.selected) renderDetail();
-    else $("detail").innerHTML = `<div class="muted" style="margin-top:12px">Click a facility on the map or in the board to see its fired cards, sized panels and the patient-facing text.</div>`;
+      return { fid, name: f ? f.properties.name : fid, state: f ? f.properties.state : "", cards: new Set(its.map((i) => i.card_id)).size, top, panel, sev };
+    }).sort((a, b) => a.top.acuity_rank - b.top.acuity_rank || b.sev * b.panel - a.sev * a.panel);
+
+    const evList = [...evs].sort((a, b) => (SEV[b.severity] || 0) - (SEV[a.severity] || 0) || a.event_name.localeCompare(b.event_name));
+    const html = [
+      `<h2>At ${fmt(state.t)}</h2>`,
+      `<div><b>${evs.length}</b> active events · <b>${board.length}</b> facilities · <b>${items.length}</b> action items</div>`,
+      `<h2>Events now (${evList.length})</h2>`,
+      evList.slice(0, 25).map((e) => {
+        const on = state.selectedEvent === e.event_key ? " on" : "";
+        return `<div class="row${on}" data-event="${esc(e.event_key)}">
+          <span><b>${esc(e.event_name)}</b><div class="prov">${fmtShort(e._t0)} → ${fmtShort(e._t1)} · ${e.geography.county_fips.length} counties</div></span>
+          <span><span class="tag sev-${SEV[e.severity] || 0}">${esc(e.severity)}</span></span></div>`;
+      }).join("") || `<div class="muted">No events active at this time.</div>`,
+      evList.length > 25 ? `<div class="muted">… ${evList.length - 25} more</div>` : "",
+      `<h2>Facilities by acuity (${board.length})</h2>`,
+      board.slice(0, 30).map((b) => {
+        const on = state.selectedFacility === b.fid ? " on" : "";
+        return `<div class="row${on}" data-fid="${esc(b.fid)}">
+          <span><b>${esc(b.name)}</b> <span class="muted">${esc(b.state)}</span></span>
+          <span><span class="tag">${esc(b.top.acuity_class)}</span> <span class="tag">${b.cards} card${b.cards > 1 ? "s" : ""}</span> <span class="tag">≈${b.panel.toLocaleString()}</span></span></div>`;
+      }).join("") || `<div class="muted">No action items at this time.</div>`,
+      board.length > 30 ? `<div class="muted">… ${board.length - 30} more</div>` : "",
+      `<div id="detail"></div>`,
+    ].join("");
+    $("side").innerHTML = html;
+    $("side").querySelectorAll("[data-fid]").forEach((r) => r.addEventListener("click", () => selectFacility(r.dataset.fid)));
+    $("side").querySelectorAll("[data-event]").forEach((r) => r.addEventListener("click", () => selectEvent(r.dataset.event)));
+    if (state.selectedEvent) renderEventDetail();
+    if (state.selectedFacility) renderFacilityDetail();
+  }
+
+  // ------------------------------------------------------------------ selection
+
+  function selectEvent(key) {
+    state.selectedEvent = state.selectedEvent === key ? null : key;
+    state.selectedFacility = null;
+    render();
   }
 
   async function selectFacility(fid) {
-    state.selected = fid;
-    await renderDetail();
+    state.selectedFacility = state.selectedFacility === fid ? null : fid;
+    state.selectedEvent = null;
+    if (state.selectedFacility && !state.detailCache.has(fid)) {
+      const scenario = $("scenario").value;
+      const doc = await getJSON(`/facilities/${encodeURIComponent(fid)}/action-items?scenario=${encodeURIComponent(scenario)}`);
+      state.detailCache.set(fid, doc.items.map((i) => ({ ...i, _t0: parse(i.window_start), _t1: parse(i.window_end) })));
+    }
+    render();
   }
 
-  async function renderDetail() {
-    const fid = state.selected;
+  function renderEventDetail() {
+    const e = state.events.find((x) => x.event_key === state.selectedEvent);
+    if (!e) return;
+    const mine = state.items.filter((i) => i.event_key === e.event_key);
+    const facs = new Set(mine.map((i) => i.facility_id));
+    const cards = new Set(mine.map((i) => i.card_title));
+    $("detail").innerHTML = `<h2>Selected event</h2><div class="card">
+      <h3>${esc(e.event_name)} <span class="tag sev-${SEV[e.severity] || 0}">${esc(e.severity)}</span></h3>
+      <div class="prov">${esc(e.event_key)}</div>
+      <div class="prov">Window ${fmt(e._t0)} → ${fmt(e._t1)} · urgency ${esc(e.urgency)} · certainty ${esc(e.certainty)}</div>
+      <div class="prov">${e.geography.county_fips.length} counties${e.geography.states?.length ? ` in ${esc(e.geography.states.join(", "))}` : ""} · source ${esc(e.source)}</div>
+      ${e.geography.area_desc ? `<div class="prov">${esc(e.geography.area_desc)}</div>` : ""}
+      ${e.geography.note ? `<div class="prov">${esc(e.geography.note)}</div>` : ""}
+      <div style="margin-top:6px">Produced <b>${mine.length}</b> action items at <b>${facs.size}</b> facilities: ${esc([...cards].join(" · ")) || "none (no card trigger matches)"}</div>
+      <div class="prov" style="margin-top:6px"><a href="/dashboard/events/${encodeURIComponent(e.event_key)}?scenario=${encodeURIComponent($("scenario").value)}">open full event page →</a></div>
+    </div>`;
+  }
+
+  function renderFacilityDetail() {
+    const fid = state.selectedFacility;
     const f = state.facilities.features.find((x) => x.properties.id === fid);
-    const items = activeItems(state.t).filter((i) => i.facility_id === fid);
-    const at = new Date(state.t).toISOString();
-    const scenario = $("scenario").value;
-    const full = await getJSON(`/facilities/${fid}/action-items?scenario=${scenario}&at=${encodeURIComponent(at)}`);
+    const all = state.detailCache.get(fid) || [];
+    const live = all.filter((i) => i.status !== "superseded" && i._t0 <= state.t && state.t <= i._t1);
     const byCard = new Map();
-    for (const i of full.items) { if (i.status === "superseded") continue; const a = byCard.get(i.card_id) || {}; a[i.role] = i; byCard.set(i.card_id, a); }
+    for (const i of live) {
+      const entry = byCard.get(i.card_id) || { title: i.card_title, acuity: i.acuity_rank, roles: {} };
+      const cur = entry.roles[i.role];
+      if (!cur || (SEV[i.event_severity] || 0) > (SEV[cur.event_severity] || 0)) entry.roles[i.role] = i;
+      byCard.set(i.card_id, entry);
+    }
+    const p = f ? f.properties : {};
     const roles = ["care_team", "patient", "caregiver"];
-    let html = `<h2>${f ? f.properties.name : fid} <span class="muted">${f ? f.properties.state : ""} · VISN ${f ? f.properties.visn : "?"}</span></h2>
-      <div class="role">${roles.map((r) => `<button data-role="${r}" class="${state.role === r ? "on" : ""}">${r.replace("_", " ")}</button>`).join("")}</div>`;
+    let html = `<h2>${esc(p.name || fid)}</h2>
+      <div class="prov">${esc(p.classification || "")} · ${esc(p.city || "")}, ${esc(p.state || "")} · VISN ${esc(p.visn || "?")}</div>
+      <div class="roles">${roles.map((r) => `<button data-role="${r}" class="${state.role === r ? "on" : ""}">${r.replace("_", " ")}</button>`).join("")}</div>`;
     if (!byCard.size) html += `<div class="muted">No action items active at ${fmt(state.t)}.</div>`;
-    for (const [cardId, byRole] of [...byCard.entries()].sort((a, b) => (Object.values(a[1])[0].acuity_rank - Object.values(b[1])[0].acuity_rank))) {
-      const any = Object.values(byRole)[0];
-      const it = byRole[state.role];
-      html += `<div class="card"><h3>${any.card_title}</h3>
-        <div class="prov">${any.event_name} · ${any.event_severity} · window ${fmt(Date.parse(any.window_start))} → ${fmt(Date.parse(any.window_end))}</div>
-        ${any.panel ? `<div class="prov">Affected panel ≈ <b>${Math.round(any.panel.value).toLocaleString()}</b> <details><summary>how was this computed?</summary><div>${escapeHtml(any.panel.formula)}</div><div>${(any.panel.caveats || []).map(escapeHtml).join("<br>")}</div><div class="muted">Sources: ${(any.panel.sources || []).map(escapeHtml).join("; ")}</div></details></div>` : ""}`;
-      if (!it) { html += `<div class="muted">No ${state.role.replace("_", " ")} content for this card.</div></div>`; continue; }
-      if (it.message) html += `<p>${escapeHtml(it.message)}</p>`;
-      else html += `<ul>${it.actions.map((a) => `<li><span class="tag">${a.phase.replace("_", " ")}</span> ${escapeHtml(a.text)}</li>`).join("")}</ul>`;
-      if (it.safety_message) html += `<div class="warn">${escapeHtml(it.safety_message)}</div>`;
-      html += `<details><summary>escalation (${it.escalation.length})</summary><ul>${it.escalation.map((e) => `<li>${escapeHtml(e.signs)} → <b>${escapeHtml(e.response || "")}</b>${e.emergency ? " 🚨" : ""}</li>`).join("")}</ul></details>
-        <div class="prov">Evidence: ${it.evidence_tier} · <span class="tag">${it.status}</span></div></div>`;
+    for (const [cardId, entry] of [...byCard.entries()].sort((a, b) => a[1].acuity - b[1].acuity)) {
+      const any = Object.values(entry.roles)[0];
+      const it = entry.roles[state.role];
+      html += `<div class="card"><h3>${esc(entry.title)}</h3>
+        <div class="prov">${esc(any.event_name)} · ${esc(any.event_severity)} · until ${fmtShort(parse(any.window_end))}</div>`;
+      if (any.panel) {
+        html += `<div class="prov">Affected panel ≈ <b style="color:var(--ink)">${Math.round(any.panel.value).toLocaleString()}</b>
+          <details><summary>how was this computed?</summary><div>${esc(any.panel.formula)}</div>
+          <div>${(any.panel.caveats || []).map(esc).join("<br>")}</div>
+          <div class="muted">Sources: ${(any.panel.sources || []).map(esc).join("; ")}</div></details></div>`;
+      }
+      if (!it) { html += `<div class="muted">No ${state.role.replace("_", " ")} content on this card.</div></div>`; continue; }
+      if (it.message) html += `<p>${esc(it.message)}</p>`;
+      else html += `<ul>${it.actions.map((a) => `<li><span class="tag">${esc(a.phase.replace("_", " "))}</span> ${esc(a.text)}</li>`).join("")}</ul>`;
+      if (it.safety_message) html += `<div class="warn">${esc(it.safety_message)}</div>`;
+      html += `<details><summary>escalation (${it.escalation.length})</summary><ul>${it.escalation.map((x) => `<li>${esc(x.signs)} → <b>${esc(x.response || "")}</b>${x.emergency ? " 🚨" : ""}</li>`).join("")}</ul></details>
+        <div class="prov">Evidence: ${esc(it.evidence_tier)} · <span class="tag">${esc(it.status)}</span> · <a href="/dashboard/facilities/${encodeURIComponent(fid)}?scenario=${encodeURIComponent($("scenario").value)}">full page →</a></div></div>`;
     }
     $("detail").innerHTML = html;
-    $("detail").querySelectorAll(".role button").forEach((b) => b.addEventListener("click", () => { state.role = b.dataset.role; renderDetail(); }));
+    $("detail").querySelectorAll(".roles button").forEach((b) => b.addEventListener("click", () => { state.role = b.dataset.role; renderFacilityDetail(); }));
   }
-
-  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
-
-  function togglePlay() { if (state.timer) stop(); else play(); }
-  function play() {
-    $("play").textContent = "❚❚ Pause";
-    state.timer = setInterval(() => {
-      const step = Number($("speed").value) * 3600e3;
-      if (state.t + step > state.t1) { stop(); return; }
-      setT(state.t + step);
-    }, 250);
-  }
-  function stop() { if (state.timer) clearInterval(state.timer); state.timer = null; $("play").textContent = "▶ Play"; }
 
   init().catch((e) => { $("status").textContent = String(e); console.error(e); });
 })();

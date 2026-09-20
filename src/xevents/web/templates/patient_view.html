@@ -2,7 +2,7 @@
 {% block title %}Your alerts · {{ facility.name }}{% endblock %}
 {% block content %}
 <div class="patient">
-  <p class="muted">Read-only preview of what a {{ role }} at <b>{{ facility.name }}</b> would receive (rendered from the same action items as the care-team dashboard). <a href="/demo/patient-view?facility={{ facility.id }}&role={{ 'caregiver' if role == 'patient' else 'patient' }}&scenario={{ scenario or 'live' }}&at={{ as_of_iso }}">Switch to {{ 'caregiver' if role == 'patient' else 'patient' }} view</a>.</p>
+  <p class="muted">Read-only preview of what a {{ role }} at <b>{{ facility.name }}</b> would receive (rendered from the same action items as the care-team dashboard). <a href="/demo/patient-view?facility={{ facility.id }}&role={{ 'caregiver' if role == 'patient' else 'patient' }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}">Switch to {{ 'caregiver' if role == 'patient' else 'patient' }} view</a>.</p>
   {% if not cards %}<p class="big">No active alerts for you right now.</p>{% endif %}
   {% for c in cards %}{% set it = c.item %}{% set any = c.any %}
     <div class="card">

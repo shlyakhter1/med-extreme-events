@@ -152,6 +152,39 @@ def test_patient_view(client: TestClient) -> None:
     assert client.get("/demo/patient-view", params={"facility": "vha_nope"}).status_code == 404
 
 
+def test_form_submitted_timestamp_is_accepted(client: TestClient) -> None:
+    """A browser GET form encodes '+' as a space, so the page used to reject its own
+    as-of value with 'bad timestamp'. Every accepted spelling must round-trip."""
+    for value in (
+        "2021-06-28T00:00:00 00:00",  # what the form actually submits
+        "2021-06-28T00:00:00+00:00",
+        "2021-06-28T00:00:00Z",
+        "2021-06-28T00:00",  # datetime-local
+        "2021-06-28",
+    ):
+        r = client.get("/", params={"scenario": "heat_dome_2021", "at": value})
+        assert r.status_code == 200, f"{value!r} → {r.status_code} {r.text[:120]}"
+    assert client.get("/", params={"at": "nonsense"}).status_code == 422
+    # the header control must emit a value the form can submit back unchanged
+    html = client.get("/", params={"scenario": "heat_dome_2021", "at": "2021-06-28T00:00"}).text
+    assert 'type="datetime-local" name="at" value="2021-06-28T00:00"' in html
+
+
+def test_events_pages(client: TestClient) -> None:
+    base = {"scenario": "heat_dome_2021", "at": AT}
+    r = client.get("/dashboard/events", params=base)
+    assert r.status_code == 200
+    assert "Excessive Heat Warning" in r.text
+    assert "2021-06-2" in r.text, "events must show their timestamps"
+    all_events = client.get("/dashboard/events", params={**base, "window": "all"})
+    assert all_events.text.count("<tr>") > r.text.count("<tr>")
+    key = r.text.split("/dashboard/events/")[1].split("?")[0]
+    detail = client.get(f"/dashboard/events/{key}", params=base)
+    assert detail.status_code == 200
+    assert "Affected counties" in detail.text and "Action items produced" in detail.text
+    assert client.get("/dashboard/events/nws:nope", params=base).status_code == 404
+
+
 def test_feeds_and_scenario_peak(client: TestClient) -> None:
     feeds = client.get("/feeds").json()
     assert feeds["feeds"] == [] and feeds["stale_after_hours"] == 6.0

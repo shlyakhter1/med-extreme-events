@@ -17,17 +17,20 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import Engine
 
 from xevents.cards import load_cards
-from xevents.models import ActionItem, ActionItemStatus, Role
+from xevents.geography.counties import CountyIndex
+from xevents.models import ActionItem, ActionItemStatus, Event, Role
 from xevents.providers.replay import list_scenarios
 from xevents.store import (
     TransitionError,
     feed_status,
+    get_event,
     get_facility,
     list_action_items,
     list_events,
     list_facilities,
     transition_action_item,
 )
+from xevents.timeparse import BadTimestamp, parse_at, to_input_value
 
 router = APIRouter(include_in_schema=False)
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
@@ -40,14 +43,25 @@ def _engine(request: Request) -> Engine:
     return eng
 
 
+_COUNTY_NAMES: dict[str, str] | None = None
+
+
+def county_names() -> dict[str, str]:
+    """FIPS → 'Name, ST', loaded once."""
+    global _COUNTY_NAMES
+    if _COUNTY_NAMES is None:
+        index = CountyIndex.load()
+        _COUNTY_NAMES = {
+            sh.county.geoid: f"{sh.county.name}, {sh.county.state}" for sh in index.shapes()
+        }
+    return _COUNTY_NAMES
+
+
 def _parse_at(value: str | None) -> datetime | None:
-    if not value:
-        return None
     try:
-        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=f"bad timestamp {value!r}") from exc
-    return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
+        return parse_at(value)
+    except BadTimestamp as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 def _context(request: Request, scenario: str | None, at: str | None) -> dict[str, Any]:
@@ -77,6 +91,7 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
         "mode": "replay" if chosen else "live",
         "as_of": as_of,
         "as_of_iso": as_of.isoformat(),
+        "as_of_input": to_input_value(as_of),
         "feeds": feeds,
         "any_stale": any(f["stale"] for f in feeds) if feeds else chosen is None,
     }
@@ -135,6 +150,8 @@ def dashboard(
         event_counts[e.event_name] = event_counts.get(e.event_name, 0) + 1
     ctx.update(
         board=ranked,
+        events=sorted(events, key=lambda e: (e.onset, e.event_key))[:25],
+        events_total=len(events),
         item_count=len(items),
         event_count=len(events),
         event_counts=sorted(event_counts.items(), key=lambda kv: -kv[1]),
@@ -246,3 +263,70 @@ def patient_view(
             raise HTTPException(status_code=404, detail=f"unknown card {card}")
     ctx.update(facility=fac, cards=cards, role=role_enum.value, card=card)
     return templates.TemplateResponse(request, "patient_view.html", ctx)
+
+
+def _event_rows(events: list[Event], items: list[ActionItem]) -> list[dict[str, Any]]:
+    by_event: dict[str, set[str]] = {}
+    for it in items:
+        by_event.setdefault(it.event_key, set()).add(it.scope_id)
+    return [
+        {
+            "event": e,
+            "facilities": len(by_event.get(e.event_key, ())),
+            "counties": len(e.geography.county_fips),
+        }
+        for e in events
+    ]
+
+
+@router.get("/dashboard/events", response_class=HTMLResponse)
+def events_page(
+    request: Request,
+    scenario: str | None = None,
+    at: str | None = None,
+    window: str = Query(default="active", pattern="^(active|all)$"),
+) -> HTMLResponse:
+    """Explorable event list: everything stored for the scenario, or only what is active."""
+    ctx = _context(request, scenario, at)
+    engine = _engine(request)
+    active_at = ctx["as_of"] if window == "active" else None
+    events = list_events(engine, scenario=ctx["scenario"], active_at=active_at)
+    if ctx["scenario"] is None:
+        events = [e for e in events if e.scenario is None]
+    items = _items_at(request, ctx["scenario"], ctx["as_of"])
+    rows = _event_rows(sorted(events, key=lambda e: (e.onset, e.event_key)), items)
+    ctx.update(rows=rows, window=window, total=len(rows))
+    return templates.TemplateResponse(request, "events.html", ctx)
+
+
+@router.get("/dashboard/events/{event_key:path}", response_class=HTMLResponse)
+def event_page(
+    request: Request, event_key: str, scenario: str | None = None, at: str | None = None
+) -> HTMLResponse:
+    ctx = _context(request, scenario, at)
+    engine = _engine(request)
+    event = get_event(engine, event_key)
+    if event is None:
+        raise HTTPException(status_code=404, detail=f"unknown event {event_key}")
+    items = list_action_items(engine, scenario=event.scenario, include_superseded=True)
+    mine = [i for i in items if i.event_key == event_key]
+    facilities = {f.id: f for f in list_facilities(engine)}
+    by_facility: dict[str, dict[str, Any]] = {}
+    for it in mine:
+        row = by_facility.setdefault(
+            it.scope_id,
+            {"facility": facilities.get(it.scope_id), "cards": {}, "status": it.status.value},
+        )
+        row["cards"].setdefault(it.card_id, it.card_title)
+    names = county_names()
+    counties = [(f, names.get(f, f)) for f in event.geography.county_fips]
+    ctx.update(
+        event=event,
+        counties=sorted(counties, key=lambda c: c[1]),
+        facilities=sorted(
+            by_facility.values(), key=lambda r: r["facility"].name if r["facility"] else ""
+        ),
+        item_count=len(mine),
+        superseded=sum(1 for i in mine if i.status is ActionItemStatus.SUPERSEDED),
+    )
+    return templates.TemplateResponse(request, "event.html", ctx)

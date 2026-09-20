@@ -138,6 +138,9 @@ def test_cards_reference_and_playback(client: TestClient) -> None:
     r = client.get("/reference/counties")
     assert r.status_code == 200 and r.json()["type"] == "FeatureCollection"
     page = client.get("/playback")
-    assert page.status_code == 200 and "<title>Extreme-event playback</title>" in page.text
+    assert page.status_code == 200
+    assert "<title>Playback · med-extreme-events</title>" in page.text
+    assert 'id="timeline"' in page.text, "the scrubbable timeline is the point of the page"
     js = client.get("/static/playback.js")
     assert js.status_code == 200 and "activeItems" in js.text
+    assert client.get("/static/map.js").status_code == 200
