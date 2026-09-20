@@ -12,7 +12,7 @@
     scenarios: [], facilities: null, events: [], items: [], t0: 0, t1: 0, t: 0,
     playing: false, timer: null, selectedFacility: null, selectedEvent: null, selectedCard: null,
     role: "care_team", detailCache: new Map(), lastCountyPaint: new Map(), lastFacilityPaint: new Map(),
-    cards: new Map(), cardSample: new Map(), lastBadges: new Map(),
+    cards: new Map(), cardSample: new Map(), lastBadges: new Map(), carbon: null,
   };
   let ctx = null, facilityLayer = null, facilityById = new Map(), facilityProps = new Map();
   let badgeLayer = null;
@@ -70,9 +70,11 @@
       throw new Error(msg);
     }
     $("status").textContent = "loading map and facilities…";
-    const [scenarios, facilities, mapCtx, cardDefs] = await Promise.all([
+    const [scenarios, facilities, mapCtx, cardDefs, carbon] = await Promise.all([
       getJSON("/scenarios"), getJSON("/facilities"), XMap.create("map"), getJSON("/cards"),
+      getJSON("/carbon").catch(() => null),
     ]);
+    state.carbon = carbon;
     state.scenarios = scenarios;
     state.facilities = facilities;
     ctx = mapCtx;
@@ -385,6 +387,79 @@
     renderSide(evs, items, byFacility);
   }
 
+  /* Two audiences, not three. Caregiver wording is the same guidance addressed to whoever
+     is helping, so it belongs beside the patient text rather than behind a third tab. */
+  const ROLES = [
+    { id: "care_team", label: "care team" },
+    { id: "patient", label: "patient & caregiver" },
+  ];
+  const roleOf = () => (state.role === "care_team" ? "care_team" : "patient");
+
+  function roleToggle() {
+    return `<div class="roles">${ROLES.map(
+      (r) => `<button data-role="${r.id}" class="${roleOf() === r.id ? "on" : ""}">${r.label}</button>`
+    ).join("")}</div>`;
+  }
+
+  function roleContent(def) {
+    if (roleOf() === "care_team") {
+      const acts = def.actions.care_team || [];
+      if (!acts.length) return `<div class="muted">No care-team content on this card.</div>`;
+      let out = "";
+      for (const phase of ["pre_event", "during_event", "any"]) {
+        const list = acts.filter((a) => a.phase === phase);
+        if (!list.length) continue;
+        const label = { pre_event: "Pre-event (3–7 days out)", during_event: "During event", any: "Actions" }[phase];
+        out += `<div class="prov" style="margin-top:6px">${label}</div><ul>${list.map((a) => `<li>${esc(a.text)}</li>`).join("")}</ul>`;
+      }
+      return out;
+    }
+    const patient = def.actions.patient || [];
+    const caregiver = def.actions.caregiver || [];
+    let out = patient.length
+      ? `<p>${esc(patient.map((a) => a.text).join(" "))}</p>`
+      : `<div class="muted">No patient wording on this card yet.</div>`;
+    out += caregiver.length
+      ? `<div class="prov" style="margin-top:6px">For a caregiver</div><p>${esc(caregiver.map((a) => a.text).join(" "))}</p>`
+      : `<div class="prov" style="margin-top:6px">Caregiver wording is not yet written for this card; the patient guidance above is what a caregiver would be given.</div>`;
+    return out;
+  }
+
+  /* Carbon is display-only context: order-of-magnitude estimates from published LCAs.
+     Drugs within a card are alternatives a patient takes one of, so they are shown as
+     separate scenarios and never summed. */
+  function carbonBlock(def, panelValue) {
+    const table = state.carbon;
+    if (!table) return "";
+    const entries = (table.by_card || {})[String(def.number)] || [];
+    if (!entries.length) return "";
+    const patients = Math.round(panelValue || 0);
+    const rows = entries
+      .map((e) => {
+        const [lo, hi] = e.kg_co2e_per_patient_year;
+        const tLo = (patients * lo) / 1000;
+        const tHi = (patients * hi) / 1000;
+        const perDose = e.g_co2e_per_daily_dose
+          ? `${e.g_co2e_per_daily_dose[0]}–${e.g_co2e_per_daily_dose[1]} g/dose`
+          : e.kg_co2e_per_session
+            ? `${e.kg_co2e_per_session[0]}–${e.kg_co2e_per_session[1]} kg/session`
+            : "—";
+        const fmtT = (v) => (v >= 100 ? Math.round(v).toLocaleString() : v.toFixed(v < 10 ? 1 : 0));
+        return `<tr><td>${esc(e.drug)}<div class="prov">${esc(e.assumed_dose)} · ${esc(e.basis.replace("_", " "))} · confidence ${esc(e.confidence.replace("_", "–"))}</div>${
+          e.note ? `<div class="prov">${esc(e.note)}</div>` : ""
+        }</td><td>${perDose}</td><td>${lo}–${hi} kg</td><td>${e.km_driven_equivalent_per_year[0].toLocaleString()}–${e.km_driven_equivalent_per_year[1].toLocaleString()} km</td><td><b>${fmtT(tLo)}–${fmtT(tHi)} t</b></td></tr>`;
+      })
+      .join("");
+    return `<details style="margin-top:8px"><summary>carbon footprint of this card's therapies (${entries.length})</summary>
+      <div class="prov" style="margin:4px 0">Scaled to this facility's estimated panel of <b>${patients.toLocaleString()}</b> patients.
+        Drugs on a card are alternatives, so rows are separate scenarios and must not be added together.</div>
+      <table class="carbon"><thead><tr><th>Therapy</th><th>Per dose</th><th>Per patient-year</th><th>≈ car km/yr</th><th>Panel t CO2e/yr</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+      <div class="warn" style="margin-top:6px">${esc(table.ui_disclaimer)}</div>
+      <div class="prov">Scope: ${esc(table.assumptions.scope)}. Car equivalent at ${table.assumptions.car_kg_co2e_per_km} kg CO2e/km.</div>
+      </details>`;
+  }
+
   function cardsAt(items) {
     const byCard = new Map();
     for (const i of items) {
@@ -478,6 +553,7 @@
       `<h2>At ${fmt(state.t)}</h2>`,
       `<div><b>${evs.length}</b> active events · <b>${cards.length}</b> cards firing · <b>${board.length}</b> facilities · <b>${items.length}</b> action items</div>`,
 
+      `<div id="detail"></div>`,
       `<h2>Cards firing now (${cards.length}) ${filterNote}</h2>`,
       cards.map((c) => {
         const on = state.selectedCard === c.id ? " on" : "";
@@ -508,7 +584,6 @@
           <span><span class="tag">${esc(b.top.acuity_class)}</span> <span class="tag">${b.cards} card${b.cards > 1 ? "s" : ""}</span> <span class="tag">≈${b.panel.toLocaleString()}</span></span></div>`;
       }).join("") || `<div class="muted">No action items at this time.</div>`,
       board.length > 30 ? `<div class="muted">… ${board.length - 30} more</div>` : "",
-      `<div id="detail"></div>`,
     ].join("");
     $("side").innerHTML = html;
     $("side").querySelectorAll("[data-fid]").forEach((r) => r.addEventListener("click", () => selectFacility(r.dataset.fid)));
@@ -544,6 +619,11 @@
 
   // ------------------------------------------------------------------ selection
 
+  function focusDetail() {
+    const side = $("side");
+    if (side && typeof side.scrollTop === "number") side.scrollTop = 0;
+  }
+
   async function selectCard(id) {
     state.selectedCard = state.selectedCard === id ? null : id;
     state.selectedEvent = null;
@@ -557,6 +637,7 @@
       if (firing) await loadCardSample(state.selectedCard, firing.facility_id);
     }
     render();
+    focusDetail();
   }
 
   function selectEvent(key) {
@@ -580,6 +661,7 @@
       state.detailCache.set(fid, doc.items.map((i) => ({ ...i, _t0: parse(i.window_start), _t1: parse(i.window_end) })));
     }
     render();
+    focusDetail();
   }
 
   async function loadCardSample(cardId, facilityId) {
@@ -609,9 +691,7 @@
       return;
     }
     const sample = state.cardSample.get(state.selectedCard) || {};
-    const roles = ["care_team", "patient", "caregiver"];
     const it = sample[state.role];
-    const actions = (def.actions[state.role] || []);
     const facs = [...summary.facilities]
       .map((fid) => ({ fid, p: facilityProps.get(fid), panel: Math.max(...state.items.filter((i) => i.facility_id === fid && i.card_id === def.id).map((i) => i.panel || 0)) }))
       .sort((a, b) => b.panel - a.panel);
@@ -624,21 +704,10 @@
       <div class="prov"><b>Where now:</b> ${facs.length} facilit${facs.length === 1 ? "y" : "ies"} · triggered by ${esc([...summary.events].join(", "))}</div>
       <div class="prov"><b>Estimated panel across those facilities:</b> ≈ ${Math.round(totalPanel).toLocaleString()} veterans</div>
       <p>${esc(def.summary)}</p>
-      <div class="roles">${roles.map((r) => `<button data-role="${r}" class="${state.role === r ? "on" : ""}">${r.replace("_", " ")}</button>`).join("")}</div>`;
-
-    if (!actions.length) {
-      html += `<div class="muted">No ${state.role.replace("_", " ")} content on this card (reviewed content pending).</div>`;
-    } else if (state.role === "patient" || state.role === "caregiver") {
-      html += `<p>${esc(actions.map((a) => a.text).join(" "))}</p>`;
-    } else {
-      for (const phase of ["pre_event", "during_event", "any"]) {
-        const acts = actions.filter((a) => a.phase === phase);
-        if (!acts.length) continue;
-        const label = { pre_event: "Pre-event (3–7 days out)", during_event: "During event", any: "Actions" }[phase];
-        html += `<div class="prov" style="margin-top:6px">${label}</div><ul>${acts.map((a) => `<li>${esc(a.text)}</li>`).join("")}</ul>`;
-      }
-    }
+      ${roleToggle()}`;
+    html += roleContent(def);
     if (it && it.safety_message) html += `<div class="warn">${esc(it.safety_message)}</div>`;
+    html += carbonBlock(def, facs.length ? Math.max(...facs.map((f) => f.panel || 0)) : 0);
     const esc_list = (it ? it.escalation : def.escalation) || [];
     html += `<details><summary>escalation triggers (${esc_list.length})</summary><ul>${esc_list
       .map((e) => `<li>${esc(e.signs)}${e.response ? ` → <b>${esc(e.response)}</b>` : ""}${e.emergency ? " 🚨" : ""}</li>`)
@@ -698,11 +767,10 @@
       byCard.set(i.card_id, entry);
     }
     const p = f ? f.properties : {};
-    const roles = ["care_team", "patient", "caregiver"];
     let html = `<h2>${esc(p.name || fid)}</h2>
       <div class="prov"><b>Where:</b> ${esc(p.city || "")}, ${esc(p.state || "")} · VISN ${esc(p.visn || "?")} · county ${esc(p.county_fips || "?")}</div>
       <div class="prov">${esc(p.classification || "")} · as of ${fmt(state.t)} UTC</div>
-      <div class="roles">${roles.map((r) => `<button data-role="${r}" class="${state.role === r ? "on" : ""}">${r.replace("_", " ")}</button>`).join("")}</div>`;
+      ${roleToggle()}`;
     if (!byCard.size) html += `<div class="muted">No action items active at ${fmt(state.t)}.</div>`;
     for (const [cardId, entry] of [...byCard.entries()].sort((a, b) => a[1].acuity - b[1].acuity)) {
       const any = Object.values(entry.roles)[0];
@@ -716,10 +784,11 @@
           <div>${(any.panel.caveats || []).map(esc).join("<br>")}</div>
           <div class="muted">Sources: ${(any.panel.sources || []).map(esc).join("; ")}</div></details></div>`;
       }
-      if (!it) { html += `<div class="muted">No ${state.role.replace("_", " ")} content on this card.</div></div>`; continue; }
-      if (it.message) html += `<p>${esc(it.message)}</p>`;
-      else html += `<ul>${it.actions.map((a) => `<li><span class="tag">${esc(a.phase.replace("_", " "))}</span> ${esc(a.text)}</li>`).join("")}</ul>`;
-      if (it.safety_message) html += `<div class="warn">${esc(it.safety_message)}</div>`;
+      const def = state.cards.get(cardId);
+      if (def) html += roleContent(def);
+      if (it && it.safety_message) html += `<div class="warn">${esc(it.safety_message)}</div>`;
+      if (def) html += carbonBlock(def, any.panel ? any.panel.value : 0);
+      if (!it) { html += `</div>`; continue; }
       html += `<details><summary>escalation (${it.escalation.length})</summary><ul>${it.escalation.map((x) => `<li>${esc(x.signs)} → <b>${esc(x.response || "")}</b>${x.emergency ? " 🚨" : ""}</li>`).join("")}</ul></details>
         <div class="prov">Evidence: ${esc(it.evidence_tier)} · <span class="tag">${esc(it.status)}</span> · <a href="/dashboard/facilities/${encodeURIComponent(fid)}?scenario=${encodeURIComponent($("scenario").value)}">full page →</a></div></div>`;
     }

@@ -2,6 +2,41 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — feedback round 5: honest panels, card detail visible, carbon panel
+
+- **Cards were firing at every facility in a county, inflating the panels several-fold.**
+  Panels live at the station that owns a catchment and clinics inherit that estimate for
+  display, but action items were being issued at the clinics too, so the same estimated
+  patients were counted once per facility. In the heat-dome replay that produced 70
+  facilities holding only **14 distinct panel values**, summing to 102,791 estimated
+  lithium patients. Action items are now scoped to the 183 panel-owning stations
+  (`PanelEstimator.owns_panel`), so every panel is counted once: 11 stations, 11 distinct
+  values, 13,956. Ian's dialysis panel now sums to 3,872 of the 52,000 national count,
+  which is a plausible Florida share. Replay items fell from 1,608 to 240 (heat dome) and
+  3,122 to 352 (Ian); live from 10,352 to 1,232. Golden files regenerated, and a new test
+  asserts no two facilities report the same panel for the same card.
+- **A card must imply at least one patient.** `profile.min_panel_patients` (1.0) stops a
+  card firing where the estimate is a fraction of a person; the engine logs the skip with
+  the computed panel so the decision is auditable.
+- **Card detail was rendering where nobody would find it.** The detail panel sat at the
+  bottom of a 21,000-character side panel, below roughly 60 rows — the content was always
+  there, just past the fold. It now renders directly under the "as of" summary at the top,
+  and selecting anything scrolls the panel to the top.
+- **Patient and caregiver are one audience.** The three-way role toggle became two:
+  *care team* and *patient & caregiver*, with caregiver wording shown beside the patient
+  text (and a note where it has not been written yet). The data model still carries all
+  three roles; this is presentation only.
+- **Carbon panel.** `docs/carbon.yaml` (schema and loader in `src/xevents/carbon.py`,
+  methods in `docs/carbon-footprint.md`) is exposed at `GET /carbon` and rendered per card
+  in both the facility page and playback: assumed dose, per-dose and per-patient-year
+  ranges, a car-kilometre equivalent, basis and confidence, and the range scaled to that
+  facility's estimated panel. Drugs on a card are alternatives a patient takes one of, so
+  rows are shown as separate scenarios and never summed, and the file's own disclaimer
+  travels with every rendering. Carbon is display-only: it does not touch triggering,
+  acuity or any clinical content.
+
+`make lint test`: 125 passed. Image 349 MB.
+
 ## 2026-09-20 — feedback round 4: card detail and card symbols in playback
 
 - **Selecting a card now shows the card.** Previously it only filtered the map. The panel

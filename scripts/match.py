@@ -46,14 +46,20 @@ def main() -> int:
     init_db(engine)
     profile = load_profile(PROFILES_DIR / "va.yaml")
     cards = load_cards()
-    facilities = list_facilities(engine)
-    if not facilities:
+    all_facilities = list_facilities(engine)
+    if not all_facilities:
         print("no facilities loaded — run `make load` first", file=sys.stderr)
         return 1
+    catchments = catchment_map(engine)
+    # Panels live at the station that owns a catchment; clinics inherit that estimate for
+    # display only. Issuing items at every clinic as well would count the same estimated
+    # patients once per facility, so action items are scoped to the stations.
+    facilities = [f for f in all_facilities if f.id in catchments]
+    print(f"scoping to {len(facilities)} panel-owning stations of {len(all_facilities)} facilities")
     tables = ReferenceTables.load(
         profile.catchment.projection_year, county_ids=CountyIndex.load().ids()
     )
-    estimator = PanelEstimator(profile, tables, catchment_map(engine), station_map(engine))
+    estimator = PanelEstimator(profile, tables, catchments, station_map(engine))
 
     def panels(facility_id: str, card: Card) -> Estimate | None:
         return estimator.card_panel(facility_id, card)

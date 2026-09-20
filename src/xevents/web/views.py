@@ -16,6 +16,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import Engine
 
+from xevents.carbon import CarbonTable, load_carbon
 from xevents.cards import load_cards
 from xevents.geography.counties import CountyIndex
 from xevents.models import ActionItem, ActionItemStatus, Event, Role
@@ -49,6 +50,31 @@ def asset_version() -> str:
 
 
 ASSET_V = asset_version()
+
+# Two audiences, not three: caregiver wording is the same guidance addressed to whoever is
+# helping, so it is shown beside the patient text rather than behind a third tab.
+DISPLAY_ROLES: list[tuple[str, str]] = [
+    ("care_team", "care team"),
+    ("patient", "patient & caregiver"),
+]
+_CARBON: CarbonTable | None = None
+
+
+def carbon_table() -> CarbonTable:
+    global _CARBON
+    if _CARBON is None:
+        _CARBON = load_carbon()
+    return _CARBON
+
+
+def carbon_for(number: int) -> list[dict[str, object]]:
+    table = carbon_table()
+    return [
+        {**e.model_dump(mode="json"), "citations": table.citations(e)}
+        for e in table.for_card_number(number)
+    ]
+
+
 SEVERITY_RANK = {"Extreme": 4, "Severe": 3, "Moderate": 2, "Minor": 1, "Unknown": 0}
 STALE_AFTER_HOURS = 6.0
 
@@ -178,6 +204,11 @@ def dashboard(
     return templates.TemplateResponse(request, "dashboard.html", ctx)
 
 
+def _display_role(role: str) -> Role:
+    """The page offers care team and patient & caregiver; the data keeps all three."""
+    return Role.CARE_TEAM if role == "care_team" else Role.PATIENT
+
+
 def _facility_cards(
     request: Request, facility_id: str, scenario: str | None, as_of: datetime, role: Role
 ) -> list[dict[str, Any]]:
@@ -201,9 +232,12 @@ def _facility_cards(
         ):
             entry["roles"][it.role.value] = it
     cards = sorted(by_card.values(), key=lambda c: c["acuity_rank"])
+    numbers = {card.id: card.number for card in load_cards()}
     for c in cards:
         c["item"] = c["roles"].get(role.value)
+        c["caregiver"] = c["roles"].get(Role.CAREGIVER.value) if role is Role.PATIENT else None
         c["any"] = next(iter(c["roles"].values()))
+        c["carbon"] = carbon_for(numbers.get(str(c["card_id"]), 0))
     return cards
 
 
@@ -219,12 +253,17 @@ def facility_page(
     facility = get_facility(_engine(request), facility_id)
     if facility is None:
         raise HTTPException(status_code=404, detail=f"unknown facility {facility_id}")
-    try:
-        role_enum = Role(role)
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=f"unknown role {role}") from exc
+    if role not in {r for r, _ in DISPLAY_ROLES}:
+        raise HTTPException(status_code=422, detail=f"unknown role {role}")
+    role_enum = _display_role(role)
     cards = _facility_cards(request, facility_id, ctx["scenario"], ctx["as_of"], role_enum)
-    ctx.update(facility=facility, cards=cards, role=role_enum.value, roles=[r.value for r in Role])
+    ctx.update(
+        facility=facility,
+        cards=cards,
+        role=role,
+        roles=DISPLAY_ROLES,
+        carbon_disclaimer=carbon_table().ui_disclaimer,
+    )
     return templates.TemplateResponse(request, "facility.html", ctx)
 
 
@@ -271,13 +310,19 @@ def patient_view(
     fac = get_facility(_engine(request), facility)
     if fac is None:
         raise HTTPException(status_code=404, detail=f"unknown facility {facility}")
-    role_enum = Role(role) if role in ("patient", "caregiver") else Role.PATIENT
+    role_enum = Role.PATIENT
     cards = _facility_cards(request, facility, ctx["scenario"], ctx["as_of"], role_enum)
     if card:
         cards = [c for c in cards if c["card_id"] == card]
         if not cards and card not in {c.id for c in load_cards()}:
             raise HTTPException(status_code=404, detail=f"unknown card {card}")
-    ctx.update(facility=fac, cards=cards, role=role_enum.value, card=card)
+    ctx.update(
+        facility=fac,
+        cards=cards,
+        role=role_enum.value,
+        card=card,
+        carbon_disclaimer=carbon_table().ui_disclaimer,
+    )
     return templates.TemplateResponse(request, "patient_view.html", ctx)
 
 

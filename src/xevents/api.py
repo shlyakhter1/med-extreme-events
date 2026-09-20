@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from sqlalchemy import Engine
 
 from xevents import __version__
+from xevents.carbon import load_carbon
 from xevents.cards import load_cards
 from xevents.denominators import PanelEstimator, ReferenceTables
 from xevents.models import ActionItemStatus, Event
@@ -309,6 +310,24 @@ def create_app(engine: Engine | None = None) -> FastAPI:
     @app.get("/cards")
     def cards() -> list[dict[str, Any]]:
         return [c.model_dump(mode="json") for c in load_cards()]
+
+    @app.get("/carbon")
+    def carbon() -> dict[str, Any]:
+        """Display-only medication carbon-footprint estimates, grouped by card number.
+
+        Order-of-magnitude figures from published life-cycle assessments; the table's own
+        ``ui_disclaimer`` travels with the data so no caller can render a number without it.
+        """
+        table = load_carbon()
+        doc = table.model_dump(mode="json")
+        doc["by_card"] = {
+            str(n): [
+                {**e.model_dump(mode="json"), "citations": table.citations(e)}
+                for e in table.for_card_number(n)
+            ]
+            for n in sorted({e.card for e in table.entries})
+        }
+        return doc
 
     @app.get("/reference/counties")
     def counties() -> FileResponse:

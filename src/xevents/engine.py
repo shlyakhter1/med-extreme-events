@@ -156,7 +156,13 @@ def match(
 ) -> MatchResult:
     """Produce one ActionItem per (event, card, facility, role), acuity-ranked, with
     weaker overlapping items of the same (card, facility, role, event type) marked
-    superseded by the strongest."""
+    superseded by the strongest.
+
+    A card is only issued where its estimated panel reaches ``profile.min_panel_patients``:
+    an aggregate estimate below one patient does not describe anybody to act on. Callers
+    pass the facilities that own a panel (the stations), so the same estimated patients
+    are not counted again at every clinic in the catchment.
+    """
     by_county: dict[str, list[Facility]] = {}
     for f in facilities:
         if f.county_fips:
@@ -180,6 +186,13 @@ def match(
                 if key not in panel_cache:
                     panel_cache[key] = panels(fid, card)
                 panel = panel_cache[key]
+                if panel is not None and panel.value < profile.min_panel_patients:
+                    reason = (
+                        f"panel {panel.value:.2f} < min_panel_patients "
+                        f"{profile.min_panel_patients} at {fid}"
+                    )
+                    log.append(TriggerEvaluation(event.event_key, card.id, False, reason))
+                    continue
                 for role in Role:
                     if role is Role.CAREGIVER and not card.actions.caregiver:
                         continue

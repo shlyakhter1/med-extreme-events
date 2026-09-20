@@ -15,6 +15,8 @@ COPY cards/ ./cards/
 COPY profiles/ ./profiles/
 COPY scripts/ ./scripts/
 COPY fixtures/ ./fixtures/
+# The carbon table is display data read at runtime (docs/carbon-footprint.md has the methods).
+COPY docs/carbon.yaml ./docs/carbon.yaml
 
 # Build the demo database at image build time: facilities + catchments, the three replay
 # scenarios, and the action items the engine derives from them.

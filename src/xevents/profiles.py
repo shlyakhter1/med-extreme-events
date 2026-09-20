@@ -95,6 +95,12 @@ class Profile(_Strict):
         description="Templated escalation used when a card's escalation.response is null."
     )
     catchment: Catchment
+    min_panel_patients: float = Field(
+        default=1.0,
+        ge=0,
+        description="A card is not issued where the estimated panel falls below this. "
+        "An estimate of half a patient is not a patient.",
+    )
     scopes: dict[str, PopulationScope] = Field(default_factory=dict)
     panel_multipliers: dict[str, PanelMultiplier] = Field(
         default_factory=dict, description="card id → medication-class share multiplier"

@@ -94,6 +94,10 @@ escalation_default: "Contact your care team."
 
 # Mode A catchment: each county is assigned to its nearest anchor facility (great-circle
 # distance to the county's representative point); veterans counted once, at that facility.
+# A card only fires where the estimate implies at least one patient with that condition
+# and medication/device class. Panels are estimates; a fraction of a patient is nobody.
+min_panel_patients: 1.0
+
 catchment:
   anchor_classifications:
     - VA Medical Center (VAMC)

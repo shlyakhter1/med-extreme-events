@@ -137,11 +137,10 @@ def test_patient_view(client: TestClient) -> None:
     assert "Call right away if you notice" in r.text
     assert "Generate the lithium roster" not in r.text, "no clinician text in the patient view"
     assert "decision support for contacting your care team" in r.text
-    cg = client.get(
-        "/demo/patient-view",
-        params={"facility": "vha_648", "scenario": "heat_dome_2021", "at": AT, "role": "caregiver"},
-    )
-    assert cg.status_code == 200 and "No caregiver guidance" in cg.text
+    # Patient and caregiver are one audience: the caregiver note sits with the patient text
+    # rather than behind a separate view.
+    assert "whoever is helping them" in r.text
+    assert "Switch to caregiver" not in r.text
     assert (
         client.get(
             "/demo/patient-view",
@@ -233,6 +232,35 @@ def test_card_definitions_available_for_the_playback_panel(client: TestClient) -
     assert lithium["sources"] and lithium["evidence_tier"]
     assert lithium["window_days"] == {"min": 3, "max": 7}
     assert {c["number"] for c in cards} == set(range(1, 7)), "stable colours key off card number"
+
+
+def test_carbon_panel_on_the_facility_page(client: TestClient) -> None:
+    base = {"scenario": "heat_dome_2021", "at": AT}
+    html = client.get("/dashboard/facilities/vha_648", params=base).text
+    assert "carbon footprint of this card's therapies" in html
+    assert "Lithium carbonate" in html and "900 mg/day PO" in html
+    assert "never for clinical decisions" in html, "the disclaimer travels with the numbers"
+    assert "must not be added together" in html, "alternatives are scenarios, not a sum"
+    assert "Panel t CO₂e/yr" in html
+
+    doc = client.get("/carbon").json()
+    assert len(doc["entries"]) >= 12
+    assert set(doc["by_card"]) == {"1", "2", "3", "4", "5", "6"}
+    assert doc["by_card"]["6"][0]["citations"], "API rows carry their citations"
+    assert "ui_disclaimer" in doc
+
+
+def test_playback_carbon_and_two_audiences(client: TestClient) -> None:
+    js = client.get("/static/playback.js").text
+    assert "carbonBlock" in js and "ui_disclaimer" in js
+    assert "must not be added together" in js
+    assert 'label: "patient & caregiver"' in js, "patient and caregiver are one audience"
+    assert '"/carbon"' in js
+    # the detail panel must sit above the long lists or a selection is never seen
+    detail = js.index('`<div id="detail"></div>`')
+    cards_heading = js.index("Cards firing now")
+    facilities_heading = js.index("Facilities by acuity")
+    assert detail < cards_heading < facilities_heading
 
 
 def test_feeds_and_scenario_peak(client: TestClient) -> None:

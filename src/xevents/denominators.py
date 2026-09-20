@@ -109,6 +109,13 @@ class PanelEstimator:
         self.catchment = catchment  # station id → county FIPS list
         self.stations = stations or {}  # facility id → (station id, method)
 
+    def owns_panel(self, facility_id: str) -> bool:
+        """True for a station: a facility with its own catchment, and so its own panel.
+        Clinics inherit their station's estimate for display, but must not be issued
+        action items of their own or the same estimated patients are counted twice.
+        """
+        return facility_id in self.catchment
+
     def station_for(self, facility_id: str) -> tuple[str, str]:
         if facility_id in self.catchment:
             return facility_id, "self"

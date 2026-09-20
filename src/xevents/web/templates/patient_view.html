@@ -2,7 +2,7 @@
 {% block title %}Your alerts · {{ facility.name }}{% endblock %}
 {% block content %}
 <div class="patient">
-  <p class="muted">Read-only preview of what a {{ role }} at <b>{{ facility.name }}</b> would receive (rendered from the same action items as the care-team dashboard). <a href="/demo/patient-view?facility={{ facility.id }}&role={{ 'caregiver' if role == 'patient' else 'patient' }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}">Switch to {{ 'caregiver' if role == 'patient' else 'patient' }} view</a>.</p>
+  <p class="muted">Read-only preview of what a patient — or whoever is helping them — at <b>{{ facility.name }}</b> would receive, rendered from the same action items as the care-team dashboard.</p>
   {% if not cards %}<p class="big">No active alerts for you right now.</p>{% endif %}
   {% for c in cards %}{% set it = c.item %}{% set any = c.any %}
     <div class="card">
@@ -10,6 +10,10 @@
       <div class="prov">{{ any.event_name }} · until {{ any.window_end.strftime('%b %d, %H:%MZ') }}</div>
       {% if it and it.message %}
         <p class="big">{{ it.message }}</p>
+        {% if c.caregiver and c.caregiver.message %}
+          <p class="muted" style="margin-bottom:2px">If you are helping someone with this:</p>
+          <p class="big">{{ c.caregiver.message }}</p>
+        {% endif %}
         {% if it.safety_message %}<div class="warn">{{ it.safety_message }}</div>{% endif %}
         <p><b>Call right away if you notice:</b></p>
         <ul class="actions">{% for e in it.escalation %}<li>{{ e.signs }} → {{ e.response }}{% if e.emergency %} — <b>this is an emergency (911)</b>{% endif %}</li>{% endfor %}</ul>

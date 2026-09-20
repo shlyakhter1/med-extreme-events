@@ -11,3 +11,5 @@ fixtures/live/
 fixtures/reference/raw/
 tests/golden/
 docs/
+# carbon.yaml is display data read at runtime, not documentation
+!docs/carbon.yaml

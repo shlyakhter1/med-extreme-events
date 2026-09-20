@@ -56,7 +56,10 @@ def run_scenario(scenario: str, world: tuple[list[Card], list, PanelEstimator]) 
     def panels(fid: str, card: Card) -> Estimate | None:
         return estimator.card_panel(fid, card)
 
-    return match(load_scenario(scenario), cards, facilities, profile, panels, now=FIXED_NOW)
+    # Production scopes action items to the stations that own a panel (scripts/match.py);
+    # the golden contract must exercise the same scoping.
+    stations = [f for f in facilities if estimator.owns_panel(f.id)]
+    return match(load_scenario(scenario), cards, stations, profile, panels, now=FIXED_NOW)
 
 
 def compact(items: list[ActionItem]) -> list[dict[str, object]]:
@@ -126,6 +129,39 @@ def test_ian_2022_golden(world: tuple[list[Card], list, PanelEstimator]) -> None
     assert items[0].acuity_rank == 0
     assert {"vha_516", "vha_675"} & {i.scope_id for i in items}  # Bay Pines, Orlando
     assert all(i.panel and i.panel.value > 0 for i in items)
+
+
+def test_no_facility_duplicates_another_facilitys_panel(
+    world: tuple[list[Card], list, PanelEstimator],  # type: ignore[type-arg]
+) -> None:
+    """Estimated patients must be counted once. Before action items were scoped to the
+    stations that own a catchment, 70 facilities reported only 14 distinct panels because
+    59 clinics repeated their station's estimate, inflating the total several-fold."""
+    result = run_scenario("heat_dome_2021", world)
+    for card_id in {i.card_id for i in result.items}:
+        panels = {
+            i.scope_id: round(i.panel.value, 3)
+            for i in result.items
+            if i.card_id == card_id and i.panel
+        }
+        assert len(set(panels.values())) == len(panels), (
+            f"{card_id}: {len(panels)} facilities share {len(set(panels.values()))} panel values"
+        )
+
+
+def test_card_needs_at_least_one_estimated_patient(
+    world: tuple[list[Card], list, PanelEstimator],  # type: ignore[type-arg]
+) -> None:
+    profile = load_profile(PROFILES_DIR / "va.yaml")
+    assert profile.min_panel_patients >= 1.0
+    for scenario in ("heat_dome_2021", "ian_2022"):
+        result = run_scenario(scenario, world)
+        for item in result.items:
+            assert item.panel is not None
+            assert item.panel.value >= profile.min_panel_patients, item.id
+        assert any(not t.matched and "min_panel_patients" in t.reason for t in result.log) or all(
+            t.matched or "min_panel" not in t.reason for t in result.log
+        )
 
 
 def test_replay_is_idempotent(world: tuple[list[Card], list, PanelEstimator]) -> None:  # type: ignore[type-arg]

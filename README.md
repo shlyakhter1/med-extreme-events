@@ -64,6 +64,7 @@ produce the same action items, which two golden tests pin exactly.
 
 ```
 cards/            six reviewed playbook cards as YAML + generated JSON Schema
+docs/carbon.yaml  display-only medication carbon estimates (methods in carbon-footprint.md)
 profiles/va.yaml  VA denominators, acuity order, channels, care-system hooks
 fixtures/         replay scenarios (events/) and cached reference data (reference/)
 src/xevents/      models · providers · geography · denominators · engine · store · api · web
