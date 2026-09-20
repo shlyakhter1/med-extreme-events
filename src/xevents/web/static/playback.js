@@ -31,7 +31,21 @@
 
   // ------------------------------------------------------------------ boot
 
+  function missingDependency() {
+    if (typeof L === "undefined") return "Leaflet (/static/vendor/leaflet.js)";
+    if (typeof XMap === "undefined") return "the map helper (/static/map.js)";
+    return null;
+  }
+
   async function init() {
+    // Fail loudly: a script that 404s (or a stale cached 404) used to leave a blank page.
+    const missing = missingDependency();
+    if (missing) {
+      const msg = `Could not load ${missing}. Reload the page; if it persists, do a hard reload.`;
+      $("status").textContent = msg;
+      $("side").innerHTML = `<div class="muted">${msg}</div>`;
+      throw new Error(msg);
+    }
     $("status").textContent = "loading map and facilities…";
     const [scenarios, facilities, mapCtx] = await Promise.all([
       getJSON("/scenarios"), getJSON("/facilities"), XMap.create("map"),
@@ -399,5 +413,12 @@
     $("detail").querySelectorAll(".roles button").forEach((b) => b.addEventListener("click", () => { state.role = b.dataset.role; renderFacilityDetail(); }));
   }
 
-  init().catch((e) => { $("status").textContent = String(e); console.error(e); });
+  init().catch((e) => {
+    console.error(e);
+    $("status").textContent = String(e && e.message ? e.message : e);
+    const side = $("side");
+    if (side && !side.innerHTML.includes("Could not load")) {
+      side.innerHTML = `<div class="muted">Failed to load playback: ${String(e && e.message ? e.message : e)}</div>`;
+    }
+  });
 })();

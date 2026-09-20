@@ -132,6 +132,35 @@ def test_facility_action_items_and_status_machine(client: TestClient) -> None:
     assert client.post("/action-items/nope/status", json={"status": "delivered"}).status_code == 404
 
 
+def test_events_carry_event_key(client: TestClient) -> None:
+    """event_key is a Python property, so model_dump() drops it; clients key on it."""
+    doc = client.get("/events", params={"scenario": "heat_dome_2021"}).json()
+    assert doc["count"] > 0
+    keys = [e.get("event_key") for e in doc["events"]]
+    assert all(k and k.startswith("nws:") for k in keys), keys[:3]
+    detail = client.get("/events/detail", params={"key": keys[0]}).json()
+    assert detail["event_key"] == keys[0]
+    assert "polygon" in detail["geography"], "the detail view keeps the polygon"
+    assert client.get("/events/detail", params={"key": "nws:nope"}).status_code == 404
+
+
+def test_pages_have_no_external_asset_dependencies(client: TestClient) -> None:
+    """The demo must render with no CDN: assets are vendored and cache-busted."""
+    for path in ("/", "/playback"):
+        html = client.get(path).text
+        assert "unpkg.com" not in html and "cartocdn" not in html, path
+        assert "/static/vendor/leaflet.js?v=" in html, path
+    for asset in (
+        "/static/vendor/leaflet.js",
+        "/static/vendor/leaflet.css",
+        "/static/vendor/htmx.min.js",
+        "/static/map.js",
+        "/static/playback.js",
+    ):
+        r = client.get(asset)
+        assert r.status_code == 200 and len(r.content) > 1000, asset
+
+
 def test_cards_reference_and_playback(client: TestClient) -> None:
     cards = client.get("/cards").json()
     assert len(cards) == 6 and cards[0]["id"] == "heat-lithium"

@@ -2,6 +2,34 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — follow-up: "no events, live or playback"
+
+Three separate causes, all fixed.
+
+- **Live mode was genuinely empty.** The demo container ships with the replay scenarios
+  only; the live events previously seen lived in a Postgres database that was removed during
+  the Docker cleanup. Live ingestion now runs inside the container
+  (`docker exec -e EVENT_MODE=live mee python scripts/ingest.py --mode live`, then `match.py`),
+  giving 87 real events and 664 action items alongside the replays. `docs/deploy.md` §4
+  covers doing this on a schedule when hosted.
+- **A stale cached 404 could blank the playback page.** `/static/map.js` 404'd in the window
+  before `StaticFiles` was mounted; a browser that cached that leaves `XMap` undefined and the
+  page silently empty. Static URLs now carry `?v=<asset mtime>`, `playback.js` checks its
+  dependencies and prints a plain-language error instead of rendering nothing, and the whole
+  page is rendered through Jinja so the version reaches the template.
+- **`event_key` was missing from the events API.** It is a Python `@property`, so
+  `model_dump()` drops it, which broke event selection and the "open full event page" link in
+  playback (the server-rendered pages were fine because Jinja reads the property directly). A
+  Pydantic `computed_field` would have been the obvious fix but breaks round-trip validation
+  under `extra="forbid"`, which the replay fixtures and the event store both rely on, so the
+  key is re-attached at the API edge in `event_json()`.
+
+**Also:** Leaflet and htmx are now vendored under `web/static/vendor/` instead of loaded from
+unpkg.com, so the demo has no external runtime dependency at all — it renders offline, behind
+a firewall and in an air-gapped container. A test asserts no page references a CDN.
+
+`make lint test`: 109 passed. Image rebuilt at 382 MB and verified serving live + replay.
+
 ## 2026-09-20 — demo feedback round: run/host docs, event exploration, timeline, key-free map
 
 Four issues raised after walking through M5, all fixed and covered by tests.

@@ -8,7 +8,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy import Engine
@@ -16,7 +16,7 @@ from sqlalchemy import Engine
 from xevents import __version__
 from xevents.cards import load_cards
 from xevents.denominators import PanelEstimator, ReferenceTables
-from xevents.models import ActionItemStatus
+from xevents.models import ActionItemStatus, Event
 from xevents.profiles import PROFILES_DIR, load_profile
 from xevents.providers.replay import list_scenarios, load_scenario
 from xevents.providers.va_facilities import to_geojson
@@ -46,6 +46,15 @@ STALE_AFTER_HOURS = 6.0
 
 class StatusChange(BaseModel):
     status: ActionItemStatus
+
+
+def event_json(event: Event, *, include_polygon: bool = False) -> dict[str, Any]:
+    """Serialize an event for the API. ``event_key`` is a Python property, so it is absent
+    from ``model_dump()``; clients key on it, so put it back."""
+    exclude = None if include_polygon else {"geography": {"polygon"}}
+    doc = event.model_dump(mode="json", exclude=exclude)
+    doc["event_key"] = event.event_key
+    return doc
 
 
 def scenario_summary(name: str) -> dict[str, Any]:
@@ -177,10 +186,9 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         )
         if scenario is None:
             rows = [e for e in rows if e.scenario is None]
-        exclude = None if include_polygons else {"geography": {"polygon"}}
         return {
             "count": len(rows),
-            "events": [e.model_dump(mode="json", exclude=exclude) for e in rows],
+            "events": [event_json(e, include_polygon=include_polygons) for e in rows],
         }
 
     @app.get("/events/detail")
@@ -189,7 +197,7 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         ev = get_event(_engine(request), key)
         if ev is None:
             raise HTTPException(status_code=404, detail=f"unknown event {key}")
-        return ev.model_dump(mode="json")
+        return event_json(ev, include_polygon=True)
 
     @app.get("/events/active")
     def events_active(request: Request, county: str | None = Query(default=None)) -> dict[str, Any]:
@@ -203,7 +211,7 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         return {
             "as_of": now.isoformat(),
             "count": len(rows),
-            "events": [e.model_dump(mode="json", exclude={"geography": {"polygon"}}) for e in rows],
+            "events": [event_json(e) for e in rows],
         }
 
     # ------------------------------------------------------------------ action items
@@ -305,10 +313,6 @@ def create_app(engine: Engine | None = None) -> FastAPI:
     @app.get("/reference/counties")
     def counties() -> FileResponse:
         return FileResponse(COUNTIES_GEOJSON, media_type="application/geo+json")
-
-    @app.get("/playback", response_class=HTMLResponse)
-    def playback() -> str:
-        return (WEB_DIR / "templates" / "playback.html").read_text(encoding="utf-8")
 
     from xevents.web.views import router as web_router
 

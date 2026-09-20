@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Playback · med-extreme-events</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="/static/map.js"></script>
+<link rel="stylesheet" href="/static/vendor/leaflet.css?v={{ asset_v }}">
+<script src="/static/vendor/leaflet.js?v={{ asset_v }}"></script>
+<script src="/static/map.js?v={{ asset_v }}"></script>
 <style>
   :root { --bg:#0f1419; --panel:#161d26; --ink:#e6edf3; --muted:#8b98a5; --line:#2a3440; --accent:#4c8dff;
           --heat:#e4572e; --flood:#3d7fdc; --smoke:#8c6d3f; --air:#a05cd6; --outage:#d9a41a; --idle:#5b6673; }
@@ -80,6 +80,6 @@
     <svg id="timeline" height="150" role="img" aria-label="event timeline"></svg>
   </footer>
 </div>
-<script src="/static/playback.js"></script>
+<script src="/static/playback.js?v={{ asset_v }}"></script>
 </body>
 </html>

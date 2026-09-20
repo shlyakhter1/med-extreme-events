@@ -33,7 +33,22 @@ from xevents.store import (
 from xevents.timeparse import BadTimestamp, parse_at, to_input_value
 
 router = APIRouter(include_in_schema=False)
-templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
+WEB_DIR = Path(__file__).resolve().parent
+templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
+
+
+def asset_version() -> str:
+    """Newest mtime across the static assets, used to bust browser caches. A stale cached
+    copy of a script (or of a 404 for one) otherwise leaves a page silently broken."""
+    static = WEB_DIR / "static"
+    try:
+        newest = max(f.stat().st_mtime for f in static.rglob("*") if f.is_file())
+    except ValueError:
+        return "0"
+    return str(int(newest))
+
+
+ASSET_V = asset_version()
 SEVERITY_RANK = {"Extreme": 4, "Severe": 3, "Moderate": 2, "Minor": 1, "Unknown": 0}
 STALE_AFTER_HOURS = 6.0
 
@@ -86,6 +101,7 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
         feeds = []
     return {
         "request": request,
+        "asset_v": ASSET_V,
         "scenarios": scenarios,
         "scenario": chosen,
         "mode": "replay" if chosen else "live",
@@ -330,3 +346,11 @@ def event_page(
         superseded=sum(1 for i in mine if i.status is ActionItemStatus.SUPERSEDED),
     )
     return templates.TemplateResponse(request, "event.html", ctx)
+
+
+@router.get("/playback", response_class=HTMLResponse)
+def playback(request: Request) -> HTMLResponse:
+    """The time-scrubbed map view. Rendered through Jinja only so it picks up ``asset_v``."""
+    return templates.TemplateResponse(
+        request, "playback.html", {"request": request, "asset_v": ASSET_V}
+    )
