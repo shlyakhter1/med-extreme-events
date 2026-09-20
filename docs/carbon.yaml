@@ -1,0 +1,193 @@
+# carbon.yaml — display-only carbon-footprint estimates for demo UI
+# Order-of-magnitude figures; see docs/carbon-footprint.md for methods, ranges rationale, and full references.
+# assumed_dose is a display parameter (surface it next to the number); confidence: high|medium|low.
+# ui_disclaimer must be shown wherever these numbers render.
+
+ui_disclaimer: >
+  Carbon estimates are order-of-magnitude, derived from published pharmaceutical
+  life-cycle assessments and analogues - for awareness, never for clinical decisions.
+
+assumptions:
+  manufacturing_location: "API production China/India; formulation, packaging, transport to US"
+  cn_in_api_multiplier: [1.2, 1.5]   # applied to API portion of EU-baseline process estimates only
+  car_kg_co2e_per_km: 0.25           # EPA typical passenger vehicle (~400 g CO2/mile) [ref: epa]
+  scope: "cradle-to-pharmacy; excludes patient home refrigeration and clinic travel unless noted"
+
+entries:
+  - card: 1
+    key: lithium_carbonate
+    drug: "Lithium carbonate"
+    assumed_dose: "900 mg/day PO"
+    api_g_per_patient_year: 329
+    basis: "analogue"          # Piffoux high-API-mass generic + Li2CO3 industrial LCA
+    g_co2e_per_daily_dose: [20, 60]
+    kg_co2e_per_patient_year: [7, 22]
+    km_driven_equivalent_per_year: [30, 90]
+    confidence: medium
+    sources: [piffoux2024, parvatker2019, ember]
+  - card: 2
+    key: clozapine
+    drug: "Clozapine"
+    assumed_dose: "350 mg/day PO"
+    api_g_per_patient_year: 128
+    basis: "analogue"          # Parvatker class-median API + Piffoux per-pill overhead
+    g_co2e_per_daily_dose: [50, 110]
+    kg_co2e_per_patient_year: [15, 40]
+    km_driven_equivalent_per_year: [60, 160]
+    confidence: low
+    sources: [parvatker2019, piffoux2024, ember]
+  - card: 2
+    key: olanzapine
+    drug: "Olanzapine"
+    assumed_dose: "15 mg/day PO"
+    api_g_per_patient_year: 5.5
+    basis: "analogue"          # Piffoux cheap-generic pill, packaging-dominated
+    g_co2e_per_daily_dose: [15, 30]
+    kg_co2e_per_patient_year: [5, 11]
+    km_driven_equivalent_per_year: [20, 45]
+    confidence: medium
+    sources: [piffoux2024]
+  - card: 2
+    key: haloperidol
+    drug: "Haloperidol"
+    assumed_dose: "10 mg/day PO"
+    api_g_per_patient_year: 3.7
+    basis: "analogue"
+    g_co2e_per_daily_dose: [15, 30]
+    kg_co2e_per_patient_year: [5, 11]
+    km_driven_equivalent_per_year: [20, 45]
+    confidence: medium
+    sources: [piffoux2024]
+  - card: 3
+    key: paliperidone_lai
+    drug: "Paliperidone palmitate LAI"
+    assumed_dose: "156 mg IM monthly"
+    api_g_per_patient_year: 1.9
+    basis: "analogue"          # sterile prefilled syringe via IV-vs-oral formulation ratios
+    g_co2e_per_injection: [200, 600]
+    g_co2e_per_daily_dose: [7, 20]
+    kg_co2e_per_patient_year: [2.4, 7]
+    km_driven_equivalent_per_year: [10, 30]
+    confidence: low
+    sources: [davies_formulation, piffoux2024]
+  - card: 3
+    key: methadone_liquid
+    drug: "Methadone (oral liquid)"
+    assumed_dose: "90 mg/day oral liquid"
+    api_g_per_patient_year: 33
+    basis: "analogue"          # oral liquid ~4x tablet
+    g_co2e_per_daily_dose: [30, 60]
+    kg_co2e_per_patient_year: [11, 22]
+    km_driven_equivalent_per_year: [45, 90]
+    confidence: low
+    note: >
+      Drug footprint is dwarfed by daily OTP dispensing travel (~750 kg CO2e/yr at a
+      10 km round trip x ~300 trips); take-home dosing is also the low-carbon option.
+    sources: [davies_formulation, epa]
+  - card: 3
+    key: venlafaxine_er
+    drug: "Venlafaxine ER"
+    assumed_dose: "150 mg/day PO"
+    api_g_per_patient_year: 55
+    basis: "analogue"
+    g_co2e_per_daily_dose: [15, 35]
+    kg_co2e_per_patient_year: [5, 13]
+    km_driven_equivalent_per_year: [20, 50]
+    confidence: medium
+    sources: [piffoux2024]
+  - card: 4
+    key: furosemide
+    drug: "Furosemide"
+    assumed_dose: "40 mg/day PO"
+    api_g_per_patient_year: 14.6
+    basis: "analogue"
+    g_co2e_per_daily_dose: [10, 25]
+    kg_co2e_per_patient_year: [4, 9]
+    km_driven_equivalent_per_year: [15, 35]
+    confidence: medium
+    sources: [piffoux2024]
+  - card: 4
+    key: lisinopril
+    drug: "Lisinopril"
+    assumed_dose: "20 mg/day PO"
+    api_g_per_patient_year: 7.3
+    basis: "measured_analogue" # Piffoux ramipril 10 mg = 24.7 g/pill, same class & scale
+    g_co2e_per_daily_dose: [15, 30]
+    kg_co2e_per_patient_year: [5, 11]
+    km_driven_equivalent_per_year: [20, 45]
+    confidence: medium_high
+    sources: [piffoux2024]
+  - card: 4
+    key: metoprolol_er
+    drug: "Metoprolol succinate ER"
+    assumed_dose: "100 mg/day PO"
+    api_g_per_patient_year: 36.5
+    basis: "analogue"
+    g_co2e_per_daily_dose: [15, 30]
+    kg_co2e_per_patient_year: [5, 11]
+    km_driven_equivalent_per_year: [20, 45]
+    confidence: medium
+    sources: [piffoux2024]
+  - card: 5
+    key: insulin_glargine
+    drug: "Insulin glargine (pens; vials similar order)"
+    assumed_dose: "40 units/day SC"
+    api_g_per_patient_year: 0.5
+    basis: "manufacturer"      # ~0.7 kg CO2e/pen; 15 kg/pt-yr at ~22 pens, scaled to ~49 pens/yr
+    g_co2e_per_daily_dose: [40, 110]
+    kg_co2e_per_patient_year: [15, 40]
+    km_driven_equivalent_per_year: [60, 160]
+    confidence: medium
+    note: "Cold-chain freight adds a minor increment; home refrigeration excluded. Reusable pens cut device footprint ~40%."
+    sources: [novo_susqi, ispor2024_pens, nhs_devon]
+  - card: 6
+    key: hemodialysis_incenter
+    drug: "In-center hemodialysis (therapy)"
+    assumed_dose: "3 sessions/week"
+    api_g_per_patient_year: null
+    basis: "measured"          # published LCAs
+    kg_co2e_per_session: [57, 59]
+    kg_co2e_per_session_literature_range: [24.5, 65.1]
+    kg_co2e_per_patient_year: [3800, 4800]
+    km_driven_equivalent_per_year: [15000, 19000]
+    confidence: high
+    note: "Home HD ~-41%, CAPD ~-59% vs in-center (Melbourne LCA). Travel, energy, consumables dominate."
+    sources: [sehgal2022, connor2011, barraclough2025]
+
+sources:
+  piffoux2024:
+    ref: "Piffoux M et al. Carbon footprint of oral medicines using hybrid life cycle assessment. J Cleaner Production 2024."
+    url: "https://www.sciencedirect.com/science/article/pii/S0959652624030257"
+  parvatker2019:
+    ref: "Parvatker AG et al. Cradle-to-Gate GHG Emissions for Twenty Anesthetic APIs. ACS Sustain Chem Eng 2019;7:6580-91 (11-3,000 kg CO2e/kg API)."
+    url: "https://pubs.acs.org/doi/10.1021/acssuschemeng.8b05473"
+  davies_formulation:
+    ref: "Davies et al., paracetamol formulation LCA (38 g tablet / 151 g liquid / 310-628 g IV per 1 g dose), via Kidney Int eco-prescription review 2026."
+    url: "https://www.sciencedirect.com/science/article/pii/S0085253826002279"
+  sehgal2022:
+    ref: "Sehgal AR et al. Sources of Variation in the Carbon Footprint of Hemodialysis Treatment. JASN 2022 (58.9 kg CO2e/treatment, US)."
+    url: "https://pubmed.ncbi.nlm.nih.gov/35654600/"
+  connor2011:
+    ref: "Connor A et al. Carbon footprints of home and in-center maintenance hemodialysis, UK (3.8 t CO2e/pt-yr)."
+    url: "https://pubmed.ncbi.nlm.nih.gov/21231998/"
+  barraclough2025:
+    ref: "Carbon Emissions From Different Dialysis Modalities: A Life Cycle Assessment. AJKD 2025 (in-center 4,814 kg/pt-yr)."
+    url: "https://www.ajkd.org/article/S0272-6386(25)00920-5/fulltext"
+  novo_susqi:
+    ref: "Novo Nordisk pen carbon data via Sustainable Healthcare Coalition SusQI report (disposable ~15 kg CO2e/pt-yr; durable ~8.2)."
+    url: "https://production.networks.sustainablehealthcare.org.uk/sites/default/files/2023-10/Diabetes%20-%20SusQI%20Project%20Report_0.pdf"
+  ispor2024_pens:
+    ref: "ISPOR Europe 2024, France daily-to-weekly basal insulin switch (22 vs 5 pens/yr; 1.7 kt CO2e per 100k patients)."
+    url: "https://www.ispor.org/heor-resources/presentations-database/presentation/euro2024-4014/145501"
+  nhs_devon:
+    ref: "Royal Devon NHS sustainable diabetes guideline (reusable pens: -40% carbon footprint)."
+    url: "https://www.royaldevon.nhs.uk/media/wapfftc5/rd-e-diabetes-sustainable-diabetes-care-pens-and-cgm.pdf"
+  setoguchi2026:
+    ref: "Setoguchi S, Hennessy S. Climate Change and Medications. Pharmacoepidemiol Drug Saf 2026 (upstream framing)."
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC13427620/"
+  ember:
+    ref: "Ember Global Electricity Review (annual): grid intensity ~0.56-0.60 (CN), ~0.71 (IN), ~0.21-0.25 (EU), ~0.37 (US) kg CO2/kWh - verify current year."
+    url: "https://ember-climate.org/"
+  epa:
+    ref: "US EPA typical passenger vehicle: ~400 g CO2/mile (~0.25 kg CO2e/km)."
+    url: "https://www.epa.gov/greenvehicles/greenhouse-gas-emissions-typical-passenger-vehicle"

@@ -2,6 +2,31 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — feedback round 4: card detail and card symbols in playback
+
+- **Selecting a card now shows the card.** Previously it only filtered the map. The panel
+  now renders the card itself: summary, acuity class, evidence tier, the 3–7 day window, a
+  care team / patient / caregiver toggle with the reviewed text, the profile-templated
+  safety line and escalation triggers, the citations, and the facilities it is firing at
+  with their locations and panel sizes. Card text is read from `GET /cards` (the card
+  library) and the templated escalation/safety line from one sampled action item, so no
+  clinical or profile wording is duplicated in JavaScript (CLAUDE.md constraint 4).
+- **Cards have their own map symbol.** Facilities stay circles (a place); cards are drawn as
+  a small fanned stack of coloured chips above the facility, one chip per card, which reads
+  as a playbook card and cannot be confused with the facility dot or the weather shading.
+  Selecting a card enlarges its chip and hides the rest. Colours key off the card's number
+  in the library, so a card keeps its colour across views. A clickable legend sits on the
+  map, and badges are diffed per facility so playback stays smooth.
+- Panel precedence: clicking a facility while a card filter is on keeps the filter but shows
+  the facility; clicking it again returns to the card.
+
+**Process note.** Two template edits failed silently because their anchor text had already
+changed, so the badge CSS shipped missing and the badges rendered invisible. Anchored edits
+now assert; the headless harness (`node` + a DOM stub) was extended to click a card and
+assert the detail panel and the badge markers actually render, which is what caught it.
+
+`make lint test`: 115 passed.
+
 ## 2026-09-20 — feedback round 3: cards everywhere, live window, locations, navigation
 
 - **Live is now the trailing two weeks, not just this instant.** `api.weather.gov/alerts/active`

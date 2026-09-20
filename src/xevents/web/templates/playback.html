@@ -27,6 +27,23 @@
   .legend span.sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 4px 0 10px; vertical-align:-1px; }
   .row { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); cursor:pointer; }
   .row:hover { background:#1c2531; } .row.on { background:#1c2531; outline:1px solid #37506f; }
+  .row .loc { display:block; font-size:11px; color:var(--muted); }
+  .swatch { display:inline-block; width:9px; height:12px; border-radius:2px; margin-right:5px; vertical-align:-1px;
+            border:1px solid rgba(0,0,0,.6); }
+  .clear { font-size:11px; margin-left:8px; font-weight:normal; text-transform:none; letter-spacing:0; }
+  /* Card badge: a small fanned stack of chips above the facility dot, so a card reads as a
+     card and is never confused with the circular facility marker or the weather shading. */
+  .card-badge { background:none; border:none; }
+  .card-badge .cards { display:flex; align-items:flex-end; justify-content:center; line-height:0; }
+  .card-badge .cards i { display:block; width:8px; height:12px; border-radius:2px; margin-right:-1px;
+    border:1px solid rgba(0,0,0,.7); box-shadow:0 1px 2px rgba(0,0,0,.55); transform-origin:50% 100%; }
+  .card-badge .cards.one i { width:11px; height:15px; border-color:#fff; }
+  .card-badge .cards b { color:#e6edf3; font-size:9px; margin-left:2px; text-shadow:0 1px 2px #000; }
+  #card-legend { position:absolute; right:10px; bottom:10px; z-index:500; background:rgba(22,29,38,.94);
+    border:1px solid var(--line); border-radius:8px; padding:7px 9px; font-size:11px; max-width:270px; }
+  #card-legend div { display:flex; align-items:center; gap:6px; margin:2px 0; cursor:pointer; }
+  #card-legend i { width:9px; height:12px; border-radius:2px; border:1px solid rgba(0,0,0,.6); flex:none; }
+  #card-legend .hdr { color:var(--muted); cursor:default; margin-bottom:4px; }
   .tag { font-size:11px; padding:1px 6px; border-radius:10px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; }
   .tag.sev-4 { border-color:#c0392b; color:#ff8a80; } .tag.sev-3 { border-color:#b9770e; color:#ffcf6b; }
   h2 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:16px 0 6px; }
@@ -74,7 +91,7 @@
       <span id="status" class="muted" style="margin-left:10px"></span>
     </span>
   </header>
-  <div id="map"></div>
+  <div id="map" style="position:relative"><div id="card-legend" hidden></div></div>
   <aside id="side"><div class="muted">Loading…</div></aside>
   <footer>
     <div class="muted" style="display:flex; justify-content:space-between; font-size:12px; padding:2px 0">

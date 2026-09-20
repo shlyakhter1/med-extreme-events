@@ -207,6 +207,34 @@ def test_playback_offers_live_and_navigation(client: TestClient) -> None:
     assert client.get("/playback", params={"scenario": "ian_2022"}).status_code == 200
 
 
+def test_playback_shows_card_content_and_map_symbols(client: TestClient) -> None:
+    """Selecting a card must show the card itself, and cards need their own map symbol —
+    a fanned chip stack — so they are not confused with the circular facility markers."""
+    js = client.get("/static/playback.js").text
+    for piece in ("renderCardDetail", "loadCardSample", "drawBadges", "badgeHtml", "renderLegend"):
+        assert piece in js, piece
+    assert "facilities firing this card" in js, "card detail lists where it is firing"
+    assert "escalation triggers" in js and "sources (" in js, "card detail carries provenance"
+    assert 'data-role="' in js, "card detail has the care team / patient / caregiver toggle"
+    assert "/cards" in js, "card text comes from the card library, not from strings in JS"
+
+    page = client.get("/playback").text
+    assert 'id="card-legend"' in page, "the map needs a card legend"
+    for rule in (".card-badge .cards i", ".card-badge .cards.one i", "#card-legend"):
+        assert rule in page, rule
+
+
+def test_card_definitions_available_for_the_playback_panel(client: TestClient) -> None:
+    cards = client.get("/cards").json()
+    assert len(cards) == 6
+    by_id = {c["id"]: c for c in cards}
+    lithium = by_id["heat-lithium"]
+    assert lithium["actions"]["patient"][0]["text"].startswith("Heat can push your lithium")
+    assert lithium["sources"] and lithium["evidence_tier"]
+    assert lithium["window_days"] == {"min": 3, "max": 7}
+    assert {c["number"] for c in cards} == set(range(1, 7)), "stable colours key off card number"
+
+
 def test_feeds_and_scenario_peak(client: TestClient) -> None:
     feeds = client.get("/feeds").json()
     assert feeds["feeds"] == [] and feeds["stale_after_hours"] == 6.0

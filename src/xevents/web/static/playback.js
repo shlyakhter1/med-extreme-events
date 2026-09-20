@@ -12,8 +12,11 @@
     scenarios: [], facilities: null, events: [], items: [], t0: 0, t1: 0, t: 0,
     playing: false, timer: null, selectedFacility: null, selectedEvent: null, selectedCard: null,
     role: "care_team", detailCache: new Map(), lastCountyPaint: new Map(), lastFacilityPaint: new Map(),
+    cards: new Map(), cardSample: new Map(), lastBadges: new Map(),
   };
   let ctx = null, facilityLayer = null, facilityById = new Map(), facilityProps = new Map();
+  let badgeLayer = null;
+  const cardMarkers = new Map();
 
   const fmt = (ms) => new Date(ms).toISOString().replace("T", " ").slice(0, 16) + "Z";
   const fmtShort = (ms) => new Date(ms).toISOString().slice(5, 16).replace("T", " ");
@@ -22,8 +25,9 @@
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   const CARD_COLORS = ["#4c8dff", "#e4572e", "#2fb37a", "#d9a41a", "#a05cd6", "#e06c9f"];
   const cardColor = (id) => {
-    const list = [...new Set(state.items.map((i) => i.card_id))].sort();
-    return CARD_COLORS[Math.max(0, list.indexOf(id)) % CARD_COLORS.length];
+    const card = state.cards.get(id);
+    const n = card ? card.number - 1 : [...state.cards.keys()].indexOf(id);
+    return CARD_COLORS[Math.max(0, n) % CARD_COLORS.length];
   };
   const placeOf = (e) => {
     if (e.geography.area_desc) {
@@ -66,12 +70,13 @@
       throw new Error(msg);
     }
     $("status").textContent = "loading map and facilities…";
-    const [scenarios, facilities, mapCtx] = await Promise.all([
-      getJSON("/scenarios"), getJSON("/facilities"), XMap.create("map"),
+    const [scenarios, facilities, mapCtx, cardDefs] = await Promise.all([
+      getJSON("/scenarios"), getJSON("/facilities"), XMap.create("map"), getJSON("/cards"),
     ]);
     state.scenarios = scenarios;
     state.facilities = facilities;
     ctx = mapCtx;
+    for (const c of cardDefs) state.cards.set(c.id, c);
     facilityLayer = L.geoJSON(facilities, {
       pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 2.5, weight: 1, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.85 }),
       onEachFeature: (f, layer) => {
@@ -80,6 +85,7 @@
         layer.on("click", () => selectFacility(f.properties.id));
       },
     }).addTo(ctx.map);
+    badgeLayer = L.layerGroup().addTo(ctx.map);
 
     const sel = $("scenario");
     sel.innerHTML =
@@ -374,6 +380,7 @@
       }
     });
 
+    drawBadges(byFacility);
     drawTimeline(false);
     renderSide(evs, items, byFacility);
   }
@@ -393,6 +400,64 @@
       byCard.set(i.card_id, c);
     }
     return [...byCard.values()].sort((a, b) => a.acuity - b.acuity);
+  }
+
+  /* Facilities are circles (a place). Cards are a small fanned stack of coloured chips
+     above the circle (a playbook card), so "where is this card firing" is readable at a
+     glance and never confused with the weather shading underneath. */
+  function badgeHtml(cardIds, selected) {
+    const shown = selected ? cardIds.filter((c) => c === selected) : cardIds.slice(0, 4);
+    const extra = !selected && cardIds.length > 4 ? cardIds.length - 4 : 0;
+    const chips = shown
+      .map((id, n) => {
+        const tilt = shown.length === 1 ? 0 : -10 + (20 / Math.max(1, shown.length - 1)) * n;
+        return `<i style="background:${cardColor(id)};transform:rotate(${tilt}deg)"></i>`;
+      })
+      .join("");
+    return `<span class="cards${selected ? " one" : ""}">${chips}${extra ? `<b>+${extra}</b>` : ""}</span>`;
+  }
+
+  function drawBadges(byFacility) {
+    const want = new Map();
+    byFacility.forEach((its, fid) => {
+      const ids = [...new Set(its.map((i) => i.card_id))].sort(
+        (a, b) => (state.cards.get(a)?.number || 0) - (state.cards.get(b)?.number || 0)
+      );
+      want.set(fid, ids);
+    });
+    // remove badges that are no longer wanted
+    cardMarkers.forEach((marker, fid) => {
+      if (!want.has(fid)) { badgeLayer.removeLayer(marker); cardMarkers.delete(fid); state.lastBadges.delete(fid); }
+    });
+    want.forEach((ids, fid) => {
+      const sig = `${ids.join(",")}|${state.selectedCard || ""}`;
+      if (state.lastBadges.get(fid) === sig) return;
+      state.lastBadges.set(fid, sig);
+      const old = cardMarkers.get(fid);
+      if (old) badgeLayer.removeLayer(old);
+      const f = state.facilities.features.find((x) => x.properties.id === fid);
+      if (!f) return;
+      const [lon, lat] = f.geometry.coordinates;
+      const width = 9 + Math.max(0, (state.selectedCard ? 1 : Math.min(4, ids.length)) - 1) * 7;
+      const marker = L.marker([lat, lon], {
+        icon: L.divIcon({
+          className: "card-badge",
+          html: badgeHtml(ids, state.selectedCard),
+          iconSize: [width, 14],
+          iconAnchor: [width / 2, 20],
+        }),
+        interactive: true,
+        keyboard: false,
+      });
+      const titles = ids.map((id) => state.cards.get(id)?.title || id);
+      marker.bindTooltip(
+        `<b>${esc(facilityProps.get(fid)?.name || fid)}</b><br>${esc(facilityPlace(fid))}<br>${esc(titles.join("<br>"))}`,
+        { direction: "top" }
+      );
+      marker.on("click", () => selectFacility(fid));
+      marker.addTo(badgeLayer);
+      cardMarkers.set(fid, marker);
+    });
   }
 
   function renderSide(evs, items, byFacility) {
@@ -451,15 +516,46 @@
     $("side").querySelectorAll("[data-card]").forEach((r) => r.addEventListener("click", () => selectCard(r.dataset.card)));
     const clear = document.getElementById("clear-card");
     if (clear) clear.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); state.selectedCard = null; render(); });
-    if (state.selectedEvent) renderEventDetail();
+    renderLegend(cards);
     if (state.selectedFacility) renderFacilityDetail();
+    else if (state.selectedEvent) renderEventDetail();
+    else if (state.selectedCard) renderCardDetail(cards);
+  }
+
+  function renderLegend(cards) {
+    const el = document.getElementById("card-legend");
+    if (!el) return;
+    if (!cards.length) { el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML =
+      `<div class="hdr">Cards firing — click to isolate</div>` +
+      cards
+        .map((c) => {
+          const dim = state.selectedCard && state.selectedCard !== c.id ? "opacity:.45;" : "";
+          return `<div data-legend="${esc(c.id)}" style="${dim}"><i style="background:${cardColor(c.id)}"></i>
+            <span>${esc(c.title.length > 34 ? c.title.slice(0, 33) + "…" : c.title)}</span>
+            <span class="muted">${c.facilities.size}</span></div>`;
+        })
+        .join("");
+    el.querySelectorAll("[data-legend]").forEach((r) =>
+      r.addEventListener("click", () => selectCard(r.dataset.legend))
+    );
   }
 
   // ------------------------------------------------------------------ selection
 
-  function selectCard(id) {
+  async function selectCard(id) {
     state.selectedCard = state.selectedCard === id ? null : id;
+    state.selectedEvent = null;
+    state.selectedFacility = null;
     state.lastFacilityPaint = new Map();  // force a repaint: colours change with the filter
+    state.lastBadges = new Map();
+    if (state.selectedCard) {
+      const firing = state.items.find(
+        (i) => i.card_id === state.selectedCard && i.status !== "superseded" && i._t0 <= state.t && state.t <= i._t1
+      );
+      if (firing) await loadCardSample(state.selectedCard, firing.facility_id);
+    }
     render();
   }
 
@@ -467,6 +563,8 @@
     state.selectedEvent = state.selectedEvent === key ? null : key;
     drawTimeline(true);
     state.selectedFacility = null;
+    state.selectedCard = null;
+    state.lastBadges = new Map();
     state.lastFacilityPaint = new Map();
     render();
   }
@@ -475,12 +573,89 @@
     state.selectedFacility = state.selectedFacility === fid ? null : fid;
     state.selectedEvent = null;
     state.lastFacilityPaint = new Map();
+    state.lastBadges = new Map();
     if (state.selectedFacility && !state.detailCache.has(fid)) {
       const scenario = $("scenario").value;
       const doc = await getJSON(`/facilities/${encodeURIComponent(fid)}/action-items?scenario=${encodeURIComponent(scenario)}`);
       state.detailCache.set(fid, doc.items.map((i) => ({ ...i, _t0: parse(i.window_start), _t1: parse(i.window_end) })));
     }
     render();
+  }
+
+  async function loadCardSample(cardId, facilityId) {
+    /* The card definition holds the reviewed text; the action item holds the profile's
+       templated escalation and safety line. Pull one item so we never invent either. */
+    if (state.cardSample.has(cardId)) return state.cardSample.get(cardId);
+    try {
+      const view = $("scenario").value;
+      const q = view === "live" ? "" : `scenario=${encodeURIComponent(view)}&`;
+      const doc = await getJSON(`/facilities/${encodeURIComponent(facilityId)}/action-items?${q}`.replace(/[?&]$/, ""));
+      const items = doc.items.filter((i) => i.card_id === cardId);
+      const byRole = {};
+      for (const i of items) byRole[i.role] = i;
+      state.cardSample.set(cardId, byRole);
+      return byRole;
+    } catch {
+      state.cardSample.set(cardId, {});
+      return {};
+    }
+  }
+
+  function renderCardDetail(cards) {
+    const summary = cards.find((c) => c.id === state.selectedCard);
+    const def = state.cards.get(state.selectedCard);
+    if (!summary || !def) {
+      $("detail").innerHTML = `<h2>Selected card</h2><div class="muted">This card is not firing at ${fmt(state.t)}.</div>`;
+      return;
+    }
+    const sample = state.cardSample.get(state.selectedCard) || {};
+    const roles = ["care_team", "patient", "caregiver"];
+    const it = sample[state.role];
+    const actions = (def.actions[state.role] || []);
+    const facs = [...summary.facilities]
+      .map((fid) => ({ fid, p: facilityProps.get(fid), panel: Math.max(...state.items.filter((i) => i.facility_id === fid && i.card_id === def.id).map((i) => i.panel || 0)) }))
+      .sort((a, b) => b.panel - a.panel);
+    const totalPanel = facs.reduce((sum, f) => sum + (f.panel || 0), 0);
+
+    let html = `<h2>Selected card</h2><div class="card">
+      <h3><span class="swatch" style="background:${cardColor(def.id)}"></span>${esc(def.title)}</h3>
+      <div class="prov">${esc(def.id)} v${esc(def.version)} · acuity ${esc(def.acuity_class)} · evidence ${esc(def.evidence_tier)}</div>
+      <div class="prov"><b>When:</b> fires ${def.window_days.min}–${def.window_days.max} days ahead · active at ${fmt(state.t)} UTC</div>
+      <div class="prov"><b>Where now:</b> ${facs.length} facilit${facs.length === 1 ? "y" : "ies"} · triggered by ${esc([...summary.events].join(", "))}</div>
+      <div class="prov"><b>Estimated panel across those facilities:</b> ≈ ${Math.round(totalPanel).toLocaleString()} veterans</div>
+      <p>${esc(def.summary)}</p>
+      <div class="roles">${roles.map((r) => `<button data-role="${r}" class="${state.role === r ? "on" : ""}">${r.replace("_", " ")}</button>`).join("")}</div>`;
+
+    if (!actions.length) {
+      html += `<div class="muted">No ${state.role.replace("_", " ")} content on this card (reviewed content pending).</div>`;
+    } else if (state.role === "patient" || state.role === "caregiver") {
+      html += `<p>${esc(actions.map((a) => a.text).join(" "))}</p>`;
+    } else {
+      for (const phase of ["pre_event", "during_event", "any"]) {
+        const acts = actions.filter((a) => a.phase === phase);
+        if (!acts.length) continue;
+        const label = { pre_event: "Pre-event (3–7 days out)", during_event: "During event", any: "Actions" }[phase];
+        html += `<div class="prov" style="margin-top:6px">${label}</div><ul>${acts.map((a) => `<li>${esc(a.text)}</li>`).join("")}</ul>`;
+      }
+    }
+    if (it && it.safety_message) html += `<div class="warn">${esc(it.safety_message)}</div>`;
+    const esc_list = (it ? it.escalation : def.escalation) || [];
+    html += `<details><summary>escalation triggers (${esc_list.length})</summary><ul>${esc_list
+      .map((e) => `<li>${esc(e.signs)}${e.response ? ` → <b>${esc(e.response)}</b>` : ""}${e.emergency ? " 🚨" : ""}</li>`)
+      .join("")}</ul></details>`;
+    html += `<details><summary>sources (${def.sources.length})</summary><ul>${def.sources.map((x) => `<li>${esc(x.citation)}</li>`).join("")}</ul></details>`;
+    html += `<details open><summary>facilities firing this card (${facs.length})</summary><ul>${facs
+      .slice(0, 25)
+      .map((f) => `<li><a href="#" data-goto="${esc(f.fid)}">${esc(f.p ? f.p.name : f.fid)}</a> <span class="muted">${esc(f.p ? [f.p.city, f.p.state].filter(Boolean).join(", ") : "")} · ≈${Math.round(f.panel).toLocaleString()}</span></li>`)
+      .join("")}</ul>${facs.length > 25 ? `<div class="muted">… ${facs.length - 25} more</div>` : ""}</details>`;
+    html += `<div class="prov" style="margin-top:6px">Patient-facing wording is reviewed clinical content, shown verbatim from the card library.</div></div>`;
+    $("detail").innerHTML = html;
+    $("detail").querySelectorAll(".roles button").forEach((b) =>
+      b.addEventListener("click", () => { state.role = b.dataset.role; renderCardDetail(cards); })
+    );
+    $("detail").querySelectorAll("[data-goto]").forEach((a) =>
+      a.addEventListener("click", (e) => { e.preventDefault(); selectFacility(a.dataset.goto); })
+    );
   }
 
   function renderEventDetail() {
