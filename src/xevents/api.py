@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +22,7 @@ from xevents.providers.va_facilities import to_geojson
 from xevents.store import (
     TransitionError,
     catchment_map,
+    feed_status,
     get_action_item,
     get_facility,
     list_action_items,
@@ -37,8 +38,35 @@ COUNTIES_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "counties.geojson"
 WEB_DIR = Path(__file__).resolve().parent / "web"
 
 
+STALE_AFTER_HOURS = 6.0
+
+
 class StatusChange(BaseModel):
     status: ActionItemStatus
+
+
+def scenario_summary(name: str) -> dict[str, Any]:
+    """Window plus ``peak_at``: the hour with the most simultaneously active events, which
+    the dashboard uses as its default "as of" moment for a replay."""
+    evs = load_scenario(name)
+    start = min(e.onset for e in evs)
+    end = max(e.expires for e in evs)
+    last_onset = max(e.onset for e in evs)
+    best_t, best_n = start, -1
+    t = start
+    while t <= min(end, last_onset + timedelta(days=3)):
+        n = sum(1 for e in evs if e.onset <= t <= e.expires)
+        if n > best_n:
+            best_t, best_n = t, n
+        t += timedelta(hours=1)
+    return {
+        "id": name,
+        "events": len(evs),
+        "window_start": start.isoformat(),
+        "window_end": end.isoformat(),
+        "peak_at": best_t.isoformat(),
+        "event_types": sorted({e.event_type.value for e in evs}),
+    }
 
 
 def _parse_at(value: str | None) -> datetime | None:
@@ -122,19 +150,19 @@ def create_app(engine: Engine | None = None) -> FastAPI:
     @app.get("/scenarios")
     def scenarios() -> list[dict[str, Any]]:
         """Replay scenarios with their time extent (from the fixture, not the store)."""
-        out = []
-        for name in list_scenarios():
-            evs = load_scenario(name)
-            out.append(
-                {
-                    "id": name,
-                    "events": len(evs),
-                    "window_start": min(e.onset for e in evs).isoformat(),
-                    "window_end": max(e.expires for e in evs).isoformat(),
-                    "event_types": sorted({e.event_type.value for e in evs}),
-                }
-            )
-        return out
+        return [scenario_summary(name) for name in list_scenarios()]
+
+    @app.get("/feeds")
+    def feeds(request: Request) -> dict[str, Any]:
+        """Live feed freshness: per-source counts and last ingestion (for the banner)."""
+        now = datetime.now(UTC)
+        rows = feed_status(_engine(request))
+        for r in rows:
+            last = r["last_ingested_at"]
+            age_h = (now - datetime.fromisoformat(last)).total_seconds() / 3600 if last else None
+            r["age_hours"] = round(age_h, 1) if age_h is not None else None
+            r["stale"] = age_h is None or age_h > STALE_AFTER_HOURS
+        return {"as_of": now.isoformat(), "stale_after_hours": STALE_AFTER_HOURS, "feeds": rows}
 
     @app.get("/events")
     def events(
@@ -273,6 +301,10 @@ def create_app(engine: Engine | None = None) -> FastAPI:
     @app.get("/playback", response_class=HTMLResponse)
     def playback() -> str:
         return (WEB_DIR / "templates" / "playback.html").read_text(encoding="utf-8")
+
+    from xevents.web.views import router as web_router
+
+    app.include_router(web_router)
 
     @app.get("/static/playback.js")
     def playback_js() -> FileResponse:

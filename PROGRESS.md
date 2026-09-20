@@ -2,6 +2,45 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-20 — M5: API + UI (done)
+
+**Done.**
+- Server-rendered pages (Jinja2 + htmx, `src/xevents/web/views.py` + `templates/`):
+  - `/` **dashboard**: header with scenario switcher (three replays + **live (now)**) and an
+    "as of" time; replay defaults to the scenario's peak hour (`/scenarios` → `peak_at`);
+    event board ranked by acuity, then severity × panel (stations before clinics on ties);
+    outreach queue count for unacknowledged high-acuity items; Leaflet map of facilities
+    colored by active event and sized by panel; live mode shows a **feed-freshness banner**
+    (`/feeds`: per-source count, last ingest, stale > 6 h) and never renders an empty board
+    as an all-clear.
+  - `/dashboard/facilities/{id}` **drill-down**: fired cards (strongest event per role),
+    clinician checklist grouped pre-event / during, panel with expandable "how was this
+    number computed?" (formula, components, caveats, sources), role toggle via htmx
+    (care team / patient / caregiver), event id + card version + evidence tier + citations
+    on every card, **Acknowledge / Mark completed** buttons posting to the status machine.
+  - `/demo/patient-view?facility=&card=&role=` read-only patient/caregiver rendering of the
+    same action items (verbatim card text, safety line, escalation triggers, disclaimer).
+- `make demo`: fresh SQLite DB → reference + catchments → three replays → action items →
+  serves the dashboard and opens it (no network needed; ~1 minute).
+- Live mode verified end to end on the Postgres DB: `EVENT_MODE=live make ingest match`
+  ingested real NWS/OpenFEMA/HMS events and the dashboard rendered them with the banner.
+- `make lint test`: green.
+
+**Success criteria (docs/implementation-plan.md §1), as verified through the pages.**
+1. Heat dome replay: Cards 1/2/4 for WA/OR facilities with sized panels and clinician +
+   patient content — dashboard at the peak hour lists 68 facilities / 708 open items;
+   Portland VAMC page shows all three cards. ✔
+2. Ian replay: Cards 3/5/6 for Florida; dialysis ranked first (acuity rank 0). ✔
+3. `EVENT_MODE=live` ingests real feeds with no code change and the live dashboard renders
+   whatever is active, with freshness. ✔ (AirNow still needs a key.)
+4. Traceability: every panel number expands to its formula/inputs/sources; every card shows
+   its event id, card id + version, evidence tier and citations. ✔
+5. `make demo` rebuilds from empty in one command. ✔
+
+**Not done / next.** Notification channel adapters remain stubs (out of scope). Caregiver
+content is empty pending reviewed text. AirNow response shape unverified without a key.
+Recorded run-through of the demo script is the user's to do.
+
 ## 2026-09-20 — M4: matching engine + action-item store (done) + playback view
 
 **Done.**

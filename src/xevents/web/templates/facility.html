@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ facility.name }} · med-extreme-events{% endblock %}
+{% block content %}
+<p><a href="/?scenario={{ scenario or 'live' }}&at={{ as_of_iso }}">← Event board</a></p>
+<h2 style="margin:0">{{ facility.name }} <span class="muted" style="font-weight:normal">{{ facility.classification or '' }} · {{ facility.city }}, {{ facility.state }} · VISN {{ facility.visn }} · county {{ facility.county_fips }} · status {{ facility.operating_status }}</span></h2>
+<p class="prov">{{ facility.county_source }}</p>
+<div class="roles" style="margin:12px 0">
+  {% for r in roles %}
+    {% if r == role %}<span class="on">{{ r.replace('_',' ') }}</span>{% else %}<a href="#" hx-get="/dashboard/facilities/{{ facility.id }}/cards?role={{ r }}&scenario={{ scenario or 'live' }}&at={{ as_of_iso }}" hx-target="#cards" hx-push-url="/dashboard/facilities/{{ facility.id }}?role={{ r }}&scenario={{ scenario or 'live' }}&at={{ as_of_iso }}">{{ r.replace('_',' ') }}</a>{% endif %}
+  {% endfor %}
+  <a href="/demo/patient-view?facility={{ facility.id }}&scenario={{ scenario or 'live' }}&at={{ as_of_iso }}" style="border:none">open patient view ↗</a>
+</div>
+<div id="cards">{% include "cards_partial.html" %}</div>
+{% endblock %}

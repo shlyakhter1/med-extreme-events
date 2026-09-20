@@ -23,6 +23,7 @@ from xevents.profiles import PROFILES_DIR, load_profile
 from xevents.providers.replay import list_scenarios
 from xevents.store import (
     catchment_map,
+    delete_scenario_action_items,
     expire_action_items,
     init_db,
     list_events,
@@ -70,6 +71,8 @@ def main() -> int:
             else [e for e in list_events(engine) if e.scenario is None]
         )
         result = match(events, cards, facilities, profile, panels, now=now)
+        if scenario:  # replays are rebuilt deterministically; live mode upserts
+            delete_scenario_action_items(engine, scenario)
         counts = upsert_action_items(engine, result.items)
         matched = sum(1 for t in result.log if t.matched)
         label = scenario or "live"

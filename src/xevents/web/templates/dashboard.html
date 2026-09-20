@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · med-extreme-events{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+{% endblock %}
+{% block content %}
+<div class="grid">
+  <section>
+    <h2 style="margin:0 0 6px">Event board <span class="muted" style="font-weight:normal">— {{ board|length }} facilities · {{ item_count }} open action items · {{ event_count }} active events</span></h2>
+    <div class="muted" style="margin-bottom:8px">{% for name, n in event_counts %}{{ name }} ×{{ n }}{{ ' · ' if not loop.last }}{% else %}No active events at this moment.{% endfor %}</div>
+    {% if open_queue %}<div class="banner stale">Outreach queue: <b>{{ open_queue }}</b> high-acuity (dialysis / clozapine) items not yet acknowledged.</div>{% endif %}
+    <table>
+      <thead><tr><th>#</th><th>Facility</th><th>Top acuity</th><th>Cards</th><th>Max panel</th><th>Severity</th></tr></thead>
+      <tbody>
+      {% for row in board %}
+        <tr>
+          <td class="muted">{{ loop.index }}</td>
+          <td><a href="/dashboard/facilities/{{ row.facility.id }}?scenario={{ scenario or 'live' }}&at={{ as_of_iso }}">{{ row.facility.name if row.facility else '?' }}</a> <span class="muted">{{ row.facility.state if row.facility else '' }} · VISN {{ row.facility.visn if row.facility else '?' }}</span></td>
+          <td><span class="tag">rank {{ row.acuity_rank }}</span></td>
+          <td>{{ row.cards|length }}: {{ row.cards.values()|join(' · ') }}</td>
+          <td title="largest affected panel across fired cards">≈ {{ '{:,.0f}'.format(row.panel) }}</td>
+          <td><span class="tag sev-{{ row.severity }}">{{ ['—','Minor','Moderate','Severe','Extreme'][row.severity] }}</span></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6" class="muted">No action items active at {{ as_of_iso }}.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  <section>
+    <h2 style="margin:0 0 6px">Facilities <span class="muted" style="font-weight:normal">— colored by active event</span></h2>
+    <div id="map"></div>
+    <div class="muted" style="margin-top:6px">Click a facility for its fired cards. Every number links to its formula and sources on the facility page.</div>
+  </section>
+</div>
+<script>
+(async () => {
+  const COLORS = { heat: "#e4572e", hurricane_flood: "#3d7fdc", wildfire_smoke: "#8c6d3f", air_pollution: "#a05cd6", power_outage: "#d9a41a" };
+  const scenario = {{ (scenario or '')|tojson }}, at = {{ as_of_iso|tojson }};
+  const map = L.map("map").setView([38.5, -96], 4);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", { attribution: "© OpenStreetMap © CARTO" }).addTo(map);
+  const qs = (scenario ? `scenario=${scenario}&` : "") + `at=${encodeURIComponent(at)}`;
+  const [facilities, items] = await Promise.all([fetch("/facilities").then((r) => r.json()), fetch(`/action-items?${qs}`).then((r) => r.json())]);
+  const byFacility = new Map();
+  for (const i of items.items) { const a = byFacility.get(i.facility_id) || []; a.push(i); byFacility.set(i.facility_id, a); }
+  const bounds = [];
+  L.geoJSON(facilities, {
+    pointToLayer: (f, ll) => {
+      const its = byFacility.get(f.properties.id);
+      if (!its) return L.circleMarker(ll, { radius: 3, color: "#5b6673", fillColor: "#5b6673", fillOpacity: 0.9, weight: 1 });
+      const top = its.reduce((b, i) => (i.acuity_rank < b.acuity_rank ? i : b), its[0]);
+      const panel = Math.max(...its.map((i) => i.panel || 0));
+      bounds.push(ll);
+      return L.circleMarker(ll, { radius: 5 + Math.min(10, Math.sqrt(panel) / 8), color: "#fff", fillColor: COLORS[top.event_type] || "#fff", fillOpacity: 0.95, weight: 1 });
+    },
+    onEachFeature: (f, layer) => {
+      const its = byFacility.get(f.properties.id);
+      layer.bindTooltip(`${f.properties.name}${its ? ` — ${new Set(its.map((i) => i.card_id)).size} card(s)` : ""}`);
+      layer.on("click", () => { window.location = `/dashboard/facilities/${f.properties.id}?scenario=${scenario || "live"}&at=${encodeURIComponent(at)}`; });
+    },
+  }).addTo(map);
+  if (bounds.length) map.fitBounds(L.latLngBounds(bounds).pad(0.3));
+})();
+</script>
+{% endblock %}

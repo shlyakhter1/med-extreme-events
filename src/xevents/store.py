@@ -235,6 +235,28 @@ def list_events(
     return events
 
 
+def feed_status(engine: Engine) -> list[dict[str, Any]]:
+    """Per source: live (scenario-less) event count and last ingestion time."""
+    from sqlalchemy import func
+
+    stmt = (
+        select(EventRow.source, func.count(), func.max(EventRow.ingested_at))
+        .where(EventRow.scenario.is_(None))
+        .group_by(EventRow.source)
+        .order_by(EventRow.source)
+    )
+    with Session(engine) as s:
+        rows = s.execute(stmt).all()
+    return [
+        {
+            "source": src,
+            "events": int(n),
+            "last_ingested_at": _aware(last).isoformat() if last else None,
+        }
+        for src, n, last in rows
+    ]
+
+
 def delete_scenario_events(engine: Engine, scenario: str) -> int:
     with session_scope(engine) as s:
         rows = list(s.scalars(select(EventRow).where(EventRow.scenario == scenario)))
@@ -434,7 +456,7 @@ def transition_action_item(
 
 
 def expire_action_items(engine: Engine, now: datetime) -> int:
-    """Auto-expire open items whose window has ended."""
+    """Auto-expire open *live* items whose window has ended (replay items never expire)."""
     n = 0
     with session_scope(engine) as s:
         stmt = select(ActionItemRow).where(
@@ -449,6 +471,7 @@ def expire_action_items(engine: Engine, now: datetime) -> int:
                     )
                 ]
             ),
+            ActionItemRow.scenario.is_(None),  # replay items keep their scenario time frame
         )
         for row in s.scalars(stmt):
             row.status = ActionItemStatus.EXPIRED.value

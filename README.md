@@ -18,7 +18,8 @@ make reference    # build cached reference data (facilities needs VA_FACILITIES_
 make load         # facilities + catchments into the DB
 make ingest       # events: EVENT_MODE=replay (three scenarios) or live
 make match        # action items from stored events
-make serve        # API + playback view at http://localhost:8000/playback
+make serve        # dashboard http://localhost:8000/ · playback /playback · API docs /docs
+make demo         # everything above from an empty SQLite DB, then serve
 ```
 
 ## Layout

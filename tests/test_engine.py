@@ -82,7 +82,7 @@ def _event(
         onset=onset,
         expires=onset + timedelta(hours=hours),
         geography=EventGeography(county_fips=counties),
-        scenario="unit",
+        scenario=None,
     )
 
 
@@ -273,9 +273,9 @@ def test_store_upsert_idempotent_and_keeps_progress(
     upsert_action_items(engine, both)
     assert get_action_item(engine, first).status is ActionItemStatus.SUPERSEDED  # type: ignore[union-attr]
     assert (
-        list_action_items(
-            engine, scenario="unit", facility_id="vha_648", role="patient", card_id="heat-lithium"
-        )[0].event_key
+        list_action_items(engine, facility_id="vha_648", role="patient", card_id="heat-lithium")[
+            0
+        ].event_key
         == "nws:w"
     )
     upsert_action_items(
@@ -285,8 +285,7 @@ def test_store_upsert_idempotent_and_keeps_progress(
     # expiry
     assert expire_action_items(engine, NOW + timedelta(days=30)) > 0
     assert all(
-        i.status is ActionItemStatus.EXPIRED
-        for i in list_action_items(engine, scenario="unit", status="expired")
+        i.status is ActionItemStatus.EXPIRED for i in list_action_items(engine, status="expired")
     )
 
 

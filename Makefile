@@ -64,8 +64,16 @@ scenarios: ## rebuild fixtures/events/*/events.json from their raw archived sour
 	$(RUN) python fixtures/events/ian_2022/build.py
 	$(RUN) python fixtures/events/smoke_nyc_2023/build.py
 
-demo: ## (M5) fresh DB, reference data, cards, heat-dome replay, dashboard
-	@echo "demo: not implemented until M5" && exit 1
+DEMO_DB ?= sqlite:///demo.db
+
+demo: ## fresh SQLite DB → reference data + catchments → replay scenarios → action items → dashboard
+	rm -f demo.db
+	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/load_reference.py
+	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/ingest.py --mode replay
+	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/match.py --mode replay
+	@echo "open http://localhost:8000/?scenario=heat_dome_2021  (and /playback)"
+	-open "http://localhost:8000/?scenario=heat_dome_2021" 2>/dev/null || true
+	DATABASE_URL=$(DEMO_DB) $(RUN) uvicorn xevents.api:app --port 8000
 
 clean: ## remove caches
 	rm -rf .venv .pytest_cache .mypy_cache .ruff_cache

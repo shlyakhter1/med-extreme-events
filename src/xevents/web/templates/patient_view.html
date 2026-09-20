@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Your alerts · {{ facility.name }}{% endblock %}
+{% block content %}
+<div class="patient">
+  <p class="muted">Read-only preview of what a {{ role }} at <b>{{ facility.name }}</b> would receive (rendered from the same action items as the care-team dashboard). <a href="/demo/patient-view?facility={{ facility.id }}&role={{ 'caregiver' if role == 'patient' else 'patient' }}&scenario={{ scenario or 'live' }}&at={{ as_of_iso }}">Switch to {{ 'caregiver' if role == 'patient' else 'patient' }} view</a>.</p>
+  {% if not cards %}<p class="big">No active alerts for you right now.</p>{% endif %}
+  {% for c in cards %}{% set it = c.item %}{% set any = c.any %}
+    <div class="card">
+      <h3>{{ c.title }}</h3>
+      <div class="prov">{{ any.event_name }} · until {{ any.window_end.strftime('%b %d, %H:%MZ') }}</div>
+      {% if it and it.message %}
+        <p class="big">{{ it.message }}</p>
+        {% if it.safety_message %}<div class="warn">{{ it.safety_message }}</div>{% endif %}
+        <p><b>Call right away if you notice:</b></p>
+        <ul class="actions">{% for e in it.escalation %}<li>{{ e.signs }} → {{ e.response }}{% if e.emergency %} — <b>this is an emergency (911)</b>{% endif %}</li>{% endfor %}</ul>
+      {% else %}
+        <p class="muted">No {{ role }} guidance has been written for this card yet. Please contact your care team.</p>
+      {% endif %}
+      <p class="prov">This is decision support for contacting your care team, not a diagnosis. Guidance text is reviewed clinical content ({{ any.card_id }} v{{ any.card_version }}).</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
