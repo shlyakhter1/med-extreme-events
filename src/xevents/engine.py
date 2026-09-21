@@ -25,6 +25,7 @@ from xevents.models import (
     HeatRiskLevel,
     Phase,
     Role,
+    SmokeDensity,
     Temporality,
 )
 from xevents.profiles import Profile
@@ -54,6 +55,7 @@ HEATRISK_RANK = {
     HeatRiskLevel.RED: 3,
     HeatRiskLevel.MAGENTA: 4,
 }
+SMOKE_RANK = {SmokeDensity.LIGHT: 1, SmokeDensity.MEDIUM: 2, SmokeDensity.HEAVY: 3}
 
 
 @dataclass(frozen=True)
@@ -97,6 +99,14 @@ def _thresholds_hold(trigger: EventTrigger, event: Event) -> tuple[bool, str]:
         aqi = event.metrics.get("aqi")
         if not isinstance(aqi, int | float) or aqi < c.aqi_min:
             return False, f"aqi {aqi} < {c.aqi_min}"
+    if c.smoke_density_min is not None:
+        density = event.metrics.get("smoke_density")
+        try:
+            rank = SMOKE_RANK[SmokeDensity(str(density))]
+        except (ValueError, KeyError):
+            return False, "no smoke_density metric"
+        if rank < SMOKE_RANK[c.smoke_density_min]:
+            return False, f"smoke_density {density} < {c.smoke_density_min}"
     if c.outage_pct_min is not None:
         pct = event.metrics.get("outage_pct")
         if not isinstance(pct, int | float) or pct < c.outage_pct_min:
@@ -270,6 +280,8 @@ def match(
             by_county.setdefault(f.county_fips, []).append(f)
     log: list[TriggerEvaluation] = []
     items: list[ActionItem] = []
+    by_key = {e.event_key: e for e in events}
+    facility_county = {f.id: f.county_fips for f in facilities}
     panel_cache: dict[tuple[str, str], Estimate | None] = {}
     exposure_cache: dict[str, Estimate | None] = {}
     histories = poll_histories(events)
@@ -311,8 +323,72 @@ def match(
                         )
                     )
     _apply_supersession(items)
+    _apply_co_occurrence_boost(items, by_key, facility_county, log, profile)
     items.sort(key=_rank_key)
     return MatchResult(items=items, log=log)
+
+
+def _apply_co_occurrence_boost(
+    items: list[ActionItem],
+    events: dict[str, Event],
+    facility_county: dict[str, str | None],
+    log: list[TriggerEvaluation],
+    profile: Profile,
+) -> None:
+    """Requirements v2 §4: for each active item of a *primary* family (heat, cold) whose
+    county also has a *compounding* event (an observed outage that cleared some card's
+    threshold and debounce — i.e. matched in the log) overlapping its event window, raise
+    the item ``steps`` profile classes in acuity and stamp ``compounding_events``. The
+    compounding event's own items in that county get the annotation only. Pure and
+    deterministic; no trigger grammar.
+    """
+    cfg = profile.co_occurrence_boost
+    if cfg is None:
+        return
+    pairs = {(EventType(p.primary), EventType(p.compounding)) for p in cfg.pairs}
+    primary_types = {p for p, _ in pairs}
+    compounding_types = {c for _, c in pairs}
+    qualifying = {t.event_key for t in log if t.matched}
+    by_county: dict[str, list[Event]] = {}  # county → compounding events that cleared a card
+    for e in events.values():
+        if e.event_type in compounding_types and e.event_key in qualifying:
+            for fips in e.geography.county_fips:
+                by_county.setdefault(fips, []).append(e)
+
+    def overlaps(a: Event, b: Event) -> bool:
+        return a.onset <= b.expires and b.onset <= a.expires
+
+    active = [it for it in items if it.status is not ActionItemStatus.SUPERSEDED]
+    boosted: dict[tuple[str, EventType], set[str]] = {}  # (county, primary type) → event keys
+    for it in active:
+        county = facility_county.get(it.scope_id)
+        if county is None or it.event_type not in primary_types:
+            continue
+        own = events[it.event_key]
+        hits = sorted(
+            e.event_key
+            for e in by_county.get(county, [])
+            if (it.event_type, e.event_type) in pairs and overlaps(own, e)
+        )
+        if not hits:
+            continue
+        it.compounding_events = hits
+        it.acuity_rank = max(0, it.acuity_rank - cfg.steps)
+        boosted.setdefault((county, it.event_type), set()).add(own.event_key)
+    for it in active:  # symmetric annotation on the compounding events' own items
+        county = facility_county.get(it.scope_id)
+        if county is None or it.event_type not in compounding_types:
+            continue
+        own = events[it.event_key]
+        hits = sorted(
+            key
+            for (c, primary), keys in boosted.items()
+            if c == county and (primary, it.event_type) in pairs
+            for key in keys
+            if overlaps(own, events[key])
+        )
+        if hits:
+            it.compounding_events = hits
 
 
 def _rank_key(item: ActionItem) -> tuple[int, int, float, str]:

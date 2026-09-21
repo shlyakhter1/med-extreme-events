@@ -297,13 +297,10 @@ def test_live_alerts_carry_temporality(resolver: UgcResolver) -> None:
     assert ev.metrics["temporality_basis"] == "cap certainty=Observed"
 
 
-def test_legacy_cold_product_names_are_normalized(
-    resolver: UgcResolver, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_legacy_cold_product_names_are_normalized(resolver: UgcResolver) -> None:
     """NWS SCN23-44 renamed the cold products; archived alerts carry the old names. The
-    provider normalizes before matching and keeps the raw name. The cold products join the
-    tracked set with Card 7 (M9); until then the normalized name is exercised by mapping it
-    onto an existing type for this test only."""
+    provider normalizes before matching and keeps the raw name; the current names are the
+    tracked ones (Card 7)."""
     assert normalize_nws_event("Wind Chill Warning") == (
         "Extreme Cold Warning",
         "Wind Chill Warning",
@@ -320,13 +317,15 @@ def test_legacy_cold_product_names_are_normalized(
         json.dumps(next(f for f in doc["features"] if f["properties"]["event"] == "Heat Advisory"))
     )
     feature["properties"]["event"] = "Wind Chill Warning"
-    assert parse_alert(feature, resolver) is None, "cold products are not tracked before M9"
-    monkeypatch.setitem(NWS_EVENT_TYPES, "Extreme Cold Warning", EventType.HEAT)
     ev = parse_alert(feature, resolver)
     assert ev is not None
-    assert ev.event_name == "Extreme Cold Warning"
+    assert ev.event_type is EventType.EXTREME_COLD
+    assert ev.event_name == "Extreme Cold Warning", "matched under the current name"
     assert ev.metrics["raw_nws_event"] == "Wind Chill Warning"
     assert ev.temporality is Temporality.IMMINENT
+    feature["properties"]["event"] = "Hard Freeze Warning"
+    assert parse_alert(feature, resolver) is None, "Freeze Warning is normalized but not tracked"
+    assert "Wind Chill Warning" not in NWS_EVENT_TYPES
 
 
 def test_other_providers_map_temporality(counties: CountyIndex) -> None:

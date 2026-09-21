@@ -324,13 +324,16 @@ def test_map_legend_explains_the_colours(client: TestClient) -> None:
 
 def test_card_definitions_available_for_the_playback_panel(client: TestClient) -> None:
     cards = client.get("/cards").json()
-    assert len(cards) == 6
+    assert len(cards) == 8
     by_id = {c["id"]: c for c in cards}
     lithium = by_id["heat-lithium"]
     assert lithium["actions"]["patient"][0]["text"].startswith("Heat can push your lithium")
     assert lithium["sources"] and lithium["evidence_tier"]
     assert lithium["window_days"] == {"min": 3, "max": 7}
-    assert {c["number"] for c in cards} == set(range(1, 7)), "stable colours key off card number"
+    assert {c["number"] for c in cards} == set(range(1, 9)), "stable colours key off card number"
+    js = client.get("/static/playback.js").text
+    palette = js.split("const CARD_COLORS = [")[1].split("]")[0]
+    assert palette.count("#") == 8, "one stable colour per card number"
 
 
 def test_carbon_panel_on_the_facility_page(client: TestClient) -> None:
@@ -344,7 +347,7 @@ def test_carbon_panel_on_the_facility_page(client: TestClient) -> None:
 
     doc = client.get("/carbon").json()
     assert len(doc["entries"]) >= 12
-    assert set(doc["by_card"]) == {"1", "2", "3", "4", "5", "6"}
+    assert set(doc["by_card"]) == {str(n) for n in range(1, 9)}
     assert doc["by_card"]["6"][0]["citations"], "API rows carry their citations"
     assert "ui_disclaimer" in doc
 

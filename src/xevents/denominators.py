@@ -383,9 +383,19 @@ class PanelEstimator:
                         }
                     )
                 )
-            elif sp.denominator_key:
+            elif sp.denominator_key and self.profile.denominators[sp.denominator_key].share:
                 panel.components.append(
                     self._share_estimate(sub_label, base, sp.denominator_key, [sp.note])
+                )
+            elif sp.denominator_key:  # a population panel of its own (rate, count or PLACES)
+                own = self.condition_panel(facility_id, sp.denominator_key)
+                panel.components.append(
+                    own.model_copy(
+                        update={
+                            "label": f"{sub_label}: {own.label}",
+                            "caveats": [c for c in [sp.note] if c] + own.caveats,
+                        }
+                    )
                 )
             else:
                 panel.components.append(self._upper_bound(sub_label, base, [sp.note]))

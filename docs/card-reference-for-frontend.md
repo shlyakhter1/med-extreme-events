@@ -98,6 +98,8 @@ Every card currently has `window_days` of **3–7 days** and `version` `1.0.0`.
 | 3 | `hurricane-delivery-interruption` | Hurricane/Flood × Delivery Interruption: Clozapine, LAIs, Methadone | hurricane, tropical storm, storm surge, flood, flash flood, observed outage ≥ 25% | 1 | inferential |
 | 5 | `outage-insulin` | Hurricane/Power Outage × Insulin-Dependent Diabetes | hurricane, tropical storm, observed outage ≥ 10% | 2 | strong |
 | 1 | `heat-lithium` | Extreme Heat × Bipolar Disorder on Lithium | heat advisory/watch/warning, HeatRisk ≥ orange | 3 | strong |
+| 7 | `cold-cardio-respiratory` | Extreme Cold / Winter Storm × Cardiovascular & Respiratory Disease | Extreme Cold Watch/Warning, Cold Weather Advisory, Winter Storm Watch/Warning, Ice Storm Warning, Blizzard Warning (current NWS names; legacy Wind Chill names normalized) | 6 (boosted to 5 by a co-occurring outage) | strong |
+| 8 | `smoke-copd-asthma` | Wildfire Smoke × COPD / Asthma on Inhaled Therapies | AirNow AQI ≥ 101; HMS smoke density Medium/Heavy (observed) | 7 | strong |
 | 2 | `heat-antipsychotics` | Extreme Heat × Schizophrenia on Antipsychotics | same heat triggers | 4 | strong |
 | 4 | `heat-heart-failure` | Extreme Heat × Heart Failure on Diuretics / ACE-ARB-ARNI / Beta-blockers | same heat triggers | 5 | strong |
 
@@ -265,6 +267,11 @@ Base URL is the app itself. Full interactive reference at `/docs`.
 ```
 
 In compact rows `panel` is a **rounded number**. In full items it is an object.
+
+`compounding_events` (full items; empty list by default) names co-occurring events in the
+same county: on heat and cold items, the observed outage that raised the item one acuity
+class (`acuity_rank` is already the boosted value; `acuity_class` is unchanged); on outage
+items, the concurrent heat or cold event, as an annotation only. Render it as a chip.
 
 `exposure` is set only on power-outage items: the emPOWER count of electricity-dependent
 Medicare beneficiaries in the station's catchment (a full `Estimate` object in full items).

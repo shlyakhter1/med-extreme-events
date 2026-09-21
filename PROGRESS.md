@@ -2,6 +2,56 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-21 — M9: Cards 7 & 8, cold taxonomy, co-occurrence boost
+
+- **Cards transcribed** from `docs/card-library-additions.md`, clinical strings verbatim:
+  `cards/07-cold-cardio-respiratory.yaml` (`extreme_cold` trigger on the seven current
+  NWS cold/winter products; PLACES CHD panel with heart-failure, COPD and asthma
+  sub-panels; five escalations incl. hypothermia and CO; four tiered claims + the
+  medication-evidence caveat) and `cards/08-smoke-copd-asthma.yaml` (AirNow `aqi_min: 101`
+  and HMS `smoke_density_min: Medium` observed; PLACES asthma panel with a COPD sub-panel;
+  SABA/ICS/ICS-LABA classes so the do-not-stop line attaches; three tiered claims). The
+  verbatim test reads both reviewed documents. Sentences of the patient-facing paragraphs
+  are split one per action, as cards 1–6 do.
+- **Event taxonomy:** `EventType.EXTREME_COLD` (cold and winter-storm products as one
+  family, per requirements §4 "cold, Card 7"); `SmokeDensity` enum and
+  `TriggerConditions.smoke_density_min` (counts as a metric threshold); schema regenerated.
+  NWS provider tracks the seven current cold products (legacy Wind Chill names normalize
+  first, never listed in cards); the IEM archive maps EC/CW/WS/IS/BZ and legacy WC codes and
+  backfills them live.
+- **Profile:** acuity classes `cold_cardio_respiratory` and `smoke_copd_asthma` appended
+  after `heart_failure` (decision: cold sits one class below heart failure so one boost step
+  lifts a compounded cold item into that class; smoke below cold — neither is specified in
+  the docs, both are profile data); `co_occurrence_boost: {steps: 1, pairs: [heat→
+  power_outage, extreme_cold→power_outage]}`. `Denominator.share: true` now marks the three
+  share-of-condition keys explicitly, so a sub-panel keyed to a population denominator (rate,
+  count, PLACES) is sized as its own panel rather than as a share — Cards 7/8 need that.
+- **Engine boost** (`_apply_co_occurrence_boost`, pure): after supersession, every active
+  heat/cold item whose facility county has a *qualifying* outage event (one that matched a
+  card in this run, i.e. cleared threshold and the two-poll debounce) overlapping the
+  item's event window moves up `steps` acuity classes (floor 0) and gets
+  `compounding_events` = the outage keys; outage items in that county get the primary
+  event's key as annotation only. `ActionItem.compounding_events` persists in the payload;
+  the store now refreshes `acuity_rank` and the annotation on re-runs.
+- **Goldens:** heat dome and Ian unchanged; `tests/golden/smoke_nyc_2023.json` added
+  (848 Card 8 items; the scenario used to fire nothing).
+- **Tests:** `tests/test_boost.py` — profile config, cold+outage (rank −1, class label
+  unchanged, only the debounce-clearing poll is stamped, symmetric annotation without a
+  bump), heat+outage, no boost below threshold / single poll / non-overlapping / non-pair
+  families, determinism and the rank floor, cold products tracked under current names only.
+  The untiered-claim rejection test (M0) still guards the evidence discipline for the new
+  cards' schema.
+- **Carbon and UI follow-through:** every card needs a costed row, so `docs/carbon.yaml`
+  gains Card 7 (home oxygen concentrator electricity, derived from rated draw × US grid
+  intensity, low confidence) and Card 8 (salbutamol pMDI and ICS/LABA pMDI-vs-DPI from the
+  Wilkinson 2019 / Janson 2020 inhaler LCAs, propellant-dominated); the methods doc table
+  matches and the card-number bound in `carbon.py` is lifted. The playback palette grows to
+  eight stable card colours (cold cyan, smoke brown) so 7/8 no longer wrap onto 1/2. Cards
+  7/8 are in the frontend reference table; `compounding_events` is documented there.
+- **Next (M10):** Uri 2021 and Ian outage fixtures (ORNL slices), Canadian smoke July 2026
+  fixture, golden tests, catalogs, dashboard polish (temporality badge, outage layer,
+  compounding chip, scenario switcher).
+
 ## 2026-09-21 — M8: emPOWER reference layer + Card 6 sub-panel
 
 - **Source verified:** the HHS emPOWER public REST service is `HHS_emPOWER_REST_Service_Public`

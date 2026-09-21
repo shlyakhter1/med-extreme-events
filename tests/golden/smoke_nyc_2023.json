@@ -1,0 +1,7634 @@
+[
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_405",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6104
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_405",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6104
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3641
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3641
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5008
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5008
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10421
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10421
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7370
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7370
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5597
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5597
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4206
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4206
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_518",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12315
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_518",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12315
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 1901
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 1901
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 2355
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 2355
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4661
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4661
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4210
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4210
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7180
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7180
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4363
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4363
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 1537
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 1537
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A6",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3182
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A6",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3182
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A7",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10963
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A7",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10963
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A8",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6750
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A8",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6750
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8298
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8298
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5476
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5476
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 2094
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 2094
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 18402
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 18402
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12965
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12965
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3843
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3843
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7049
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7049
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4138
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4138
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 23727
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 23727
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7408
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7408
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 27716
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 27716
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 13684
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 13684
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_608",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9401
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_608",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9401
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11097
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11097
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4020
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4020
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4443
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4443
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3339
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3339
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9277
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9277
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5832
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5832
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_631",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9847
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_631",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9847
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 20965
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 20965
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10124
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10124
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 2604
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 2604
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11909
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11909
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 13335
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 13335
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12199
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12199
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7131
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7131
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BY",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7777
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BY",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7777
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 33160
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 33160
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11001
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11001
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8581
+},
+{
+"event": "hms:2023-06-06:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8581
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_405",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_405|care_team",
+"panel": 6104
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_405",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_405|patient",
+"panel": 6104
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_460|care_team",
+"panel": 3641
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_460|patient",
+"panel": 3641
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_503|care_team",
+"panel": 5008
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_503|patient",
+"panel": 5008
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_506",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_506|care_team",
+"panel": 9403
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_506",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_506|patient",
+"panel": 9403
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 25936
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 25936
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GA",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7009
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GA",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7009
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GK",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6401
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GK",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6401
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5223
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5223
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509A0",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3063
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509A0",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3063
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512|care_team",
+"panel": 10421
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512|patient",
+"panel": 10421
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512A5|care_team",
+"panel": 7370
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512A5|patient",
+"panel": 7370
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512GD|care_team",
+"panel": 5597
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512GD|patient",
+"panel": 5597
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_515",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_515|care_team",
+"panel": 13931
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_515",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_515|patient",
+"panel": 13931
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_517|care_team",
+"panel": 4206
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_517|patient",
+"panel": 4206
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_518",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_518|care_team",
+"panel": 12315
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_518",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_518|patient",
+"panel": 12315
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_521",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9143
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_521",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9143
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523|care_team",
+"panel": 1901
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523|patient",
+"panel": 1901
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A4|care_team",
+"panel": 2355
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A4|patient",
+"panel": 2355
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A5|care_team",
+"panel": 4661
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A5|patient",
+"panel": 4661
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_526|care_team",
+"panel": 4210
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_526|patient",
+"panel": 4210
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528|care_team",
+"panel": 7180
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528|patient",
+"panel": 7180
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A4|care_team",
+"panel": 4363
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A4|patient",
+"panel": 4363
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A5|care_team",
+"panel": 1537
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A5|patient",
+"panel": 1537
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A6",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A6|care_team",
+"panel": 3182
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A6",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A6|patient",
+"panel": 3182
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A7",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A7|care_team",
+"panel": 10963
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A7",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A7|patient",
+"panel": 10963
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A8",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A8|care_team",
+"panel": 6750
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A8",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A8|patient",
+"panel": 6750
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_529A4|care_team",
+"panel": 8298
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_529A4|patient",
+"panel": 8298
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_534",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 13281
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_534",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 13281
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_537",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_537|care_team",
+"panel": 5669
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_537",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_537|patient",
+"panel": 5669
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_538",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_538|care_team",
+"panel": 2701
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_538",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_538|patient",
+"panel": 2701
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_539",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_539|care_team",
+"panel": 11022
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_539",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_539|patient",
+"panel": 11022
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_540|care_team",
+"panel": 5476
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_540|patient",
+"panel": 5476
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_541",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_541|care_team",
+"panel": 20140
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_541",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_541|patient",
+"panel": 20140
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_542|care_team",
+"panel": 2094
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_542|patient",
+"panel": 2094
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_544",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10870
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_544",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10870
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_550",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_550|care_team",
+"panel": 7884
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_550",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_550|patient",
+"panel": 7884
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_552",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_552|care_team",
+"panel": 11944
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_552",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_552|patient",
+"panel": 11944
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_553|care_team",
+"panel": 18402
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_553|patient",
+"panel": 18402
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_556",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_556|care_team",
+"panel": 12613
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_556",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_556|patient",
+"panel": 12613
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_557",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9863
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_557",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9863
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_558|care_team",
+"panel": 12965
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_558|patient",
+"panel": 12965
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561|care_team",
+"panel": 3843
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561|patient",
+"panel": 3843
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561A4|care_team",
+"panel": 7049
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561A4|patient",
+"panel": 7049
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_562|care_team",
+"panel": 4138
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_562|patient",
+"panel": 4138
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_564",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12711
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_564",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12711
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565|care_team",
+"panel": 23727
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565|patient",
+"panel": 23727
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565GL|care_team",
+"panel": 7408
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565GL|patient",
+"panel": 7408
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_578",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_578|care_team",
+"panel": 21845
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_578",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_578|patient",
+"panel": 21845
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_581",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4943
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_581",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4943
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_583",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_583|care_team",
+"panel": 12975
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_583",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_583|patient",
+"panel": 12975
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_585",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_585|care_team",
+"panel": 4878
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_585",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_585|patient",
+"panel": 4878
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11538
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11538
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7946
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7946
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_590|care_team",
+"panel": 27716
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_590|patient",
+"panel": 27716
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_595|care_team",
+"panel": 13684
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_595|patient",
+"panel": 13684
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 1259
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 1259
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5858
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5858
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_598",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6888
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_598",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6888
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_598A0",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3601
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_598A0",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3601
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_603",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11670
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_603",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11670
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_607",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_607|care_team",
+"panel": 8325
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_607",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_607|patient",
+"panel": 8325
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_608",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_608|care_team",
+"panel": 9401
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_608",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_608|patient",
+"panel": 9401
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610|care_team",
+"panel": 4992
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610|patient",
+"panel": 4992
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610A4|care_team",
+"panel": 6341
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610A4|patient",
+"panel": 6341
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_613|care_team",
+"panel": 11097
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_613|patient",
+"panel": 11097
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_614",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12963
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_614",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12963
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620|care_team",
+"panel": 4020
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620|patient",
+"panel": 4020
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620A4|care_team",
+"panel": 4443
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620A4|patient",
+"panel": 4443
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_621",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9412
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_621",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9412
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 16261
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 16261
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 16664
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 16664
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630|care_team",
+"panel": 3339
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630|patient",
+"panel": 3339
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A4|care_team",
+"panel": 9277
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A4|patient",
+"panel": 9277
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A5|care_team",
+"panel": 5832
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A5|patient",
+"panel": 5832
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_631",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_631|care_team",
+"panel": 9847
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_631",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_631|patient",
+"panel": 9847
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636A8",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10777
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636A8",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10777
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_637",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 18962
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_637",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 18962
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_642|care_team",
+"panel": 20965
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_642|patient",
+"panel": 20965
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646|care_team",
+"panel": 10124
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646|patient",
+"panel": 10124
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646A4|care_team",
+"panel": 2604
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646A4|patient",
+"panel": 2604
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_650|care_team",
+"panel": 11909
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_650|patient",
+"panel": 11909
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_652|care_team",
+"panel": 13335
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_652|patient",
+"panel": 13335
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_655|care_team",
+"panel": 12199
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_655|patient",
+"panel": 12199
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 17343
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 17343
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A0",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3692
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A0",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3692
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3722
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3722
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4525
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4525
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657GJ",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5373
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657GJ",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5373
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_658|care_team",
+"panel": 7131
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_658|patient",
+"panel": 7131
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4532
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4532
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BY",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_659BY|care_team",
+"panel": 7777
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BY",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_659BY|patient",
+"panel": 7777
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BZ",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 14001
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BZ",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 14001
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_679",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4042
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_679",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4042
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_688|care_team",
+"panel": 33160
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_688|patient",
+"panel": 33160
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_689|care_team",
+"panel": 11001
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_689|patient",
+"panel": 11001
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_693|care_team",
+"panel": 8581
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_693|patient",
+"panel": 8581
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695|care_team",
+"panel": 10049
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695|patient",
+"panel": 10049
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695GD",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695GD|care_team",
+"panel": 6962
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695GD",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695GD|patient",
+"panel": 6962
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_757",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_757|care_team",
+"panel": 14252
+},
+{
+"event": "hms:2023-06-06:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_757",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_757|patient",
+"panel": 14252
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3641
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3641
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5008
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5008
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_506",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9403
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_506",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9403
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10421
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10421
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7370
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7370
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5597
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5597
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_515",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 13931
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_515",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 13931
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4661
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4661
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4210
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4210
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7180
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7180
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4363
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4363
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 1537
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 1537
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A6",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3182
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A6",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3182
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A7",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10963
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A7",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10963
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A8",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6750
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A8",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6750
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8298
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8298
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_537",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5669
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_537",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5669
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_538",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 2701
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_538",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 2701
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_539",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11022
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_539",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11022
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5476
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5476
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_541",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 20140
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_541",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 20140
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 2094
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 2094
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_550",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7884
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_550",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7884
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_552",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11944
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_552",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11944
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 18402
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 18402
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_556",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12613
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_556",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12613
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3843
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3843
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7049
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7049
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4138
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4138
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_578",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 21845
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_578",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 21845
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_583",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12975
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_583",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12975
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_585",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4878
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_585",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4878
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 13684
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 13684
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_607",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8325
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_607",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8325
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_610",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4992
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_610",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4992
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_610A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6341
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_610A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6341
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11097
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11097
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4020
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4020
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4443
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4443
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3339
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3339
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9277
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9277
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5832
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5832
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_631",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9847
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_631",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9847
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 20965
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 20965
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10124
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10124
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 2604
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 2604
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11909
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11909
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12199
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12199
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_676",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6721
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_676",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6721
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 33160
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 33160
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11001
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11001
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8581
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8581
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_695",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10049
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_695",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10049
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_695GD",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6962
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_695GD",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6962
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_757",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 14252
+},
+{
+"event": "hms:2023-06-07:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_757",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 14252
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_405",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_405|care_team",
+"panel": 6104
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_405",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_405|patient",
+"panel": 6104
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_437",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6220
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_437",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6220
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_438",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5368
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_438",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5368
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_460|care_team",
+"panel": 3641
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_460|patient",
+"panel": 3641
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_503|care_team",
+"panel": 5008
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_503|patient",
+"panel": 5008
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_506",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_506|care_team",
+"panel": 9403
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_506",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_506|patient",
+"panel": 9403
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 25936
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 25936
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GA",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7009
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GA",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7009
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GK",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6401
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GK",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6401
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5223
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5223
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509A0",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3063
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509A0",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3063
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512|care_team",
+"panel": 10421
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512|patient",
+"panel": 10421
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512A5|care_team",
+"panel": 7370
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512A5|patient",
+"panel": 7370
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512GD|care_team",
+"panel": 5597
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512GD|patient",
+"panel": 5597
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_515",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_515|care_team",
+"panel": 13931
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_515",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_515|patient",
+"panel": 13931
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_517|care_team",
+"panel": 4206
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_517|patient",
+"panel": 4206
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_518",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_518|care_team",
+"panel": 12315
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_518",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_518|patient",
+"panel": 12315
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_521",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9143
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_521",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9143
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523|care_team",
+"panel": 1901
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523|patient",
+"panel": 1901
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A4|care_team",
+"panel": 2355
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A4|patient",
+"panel": 2355
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A5|care_team",
+"panel": 4661
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A5|patient",
+"panel": 4661
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_526|care_team",
+"panel": 4210
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_526|patient",
+"panel": 4210
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528|care_team",
+"panel": 7180
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528|patient",
+"panel": 7180
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A4|care_team",
+"panel": 4363
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A4|patient",
+"panel": 4363
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A5|care_team",
+"panel": 1537
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A5|patient",
+"panel": 1537
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A6",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A6|care_team",
+"panel": 3182
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A6",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A6|patient",
+"panel": 3182
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A7",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A7|care_team",
+"panel": 10963
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A7",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A7|patient",
+"panel": 10963
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A8",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A8|care_team",
+"panel": 6750
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_528A8",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_528A8|patient",
+"panel": 6750
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_529A4|care_team",
+"panel": 8298
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_529A4|patient",
+"panel": 8298
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_534",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 13281
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_534",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 13281
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_537",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_537|care_team",
+"panel": 5669
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_537",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_537|patient",
+"panel": 5669
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_538",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_538|care_team",
+"panel": 2701
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_538",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_538|patient",
+"panel": 2701
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_539",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_539|care_team",
+"panel": 11022
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_539",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_539|patient",
+"panel": 11022
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_540|care_team",
+"panel": 5476
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_540|patient",
+"panel": 5476
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_541",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_541|care_team",
+"panel": 20140
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_541",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_541|patient",
+"panel": 20140
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_542|care_team",
+"panel": 2094
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_542|patient",
+"panel": 2094
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_544",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10870
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_544",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10870
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_548",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9471
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_548",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9471
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_550",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_550|care_team",
+"panel": 7884
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_550",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_550|patient",
+"panel": 7884
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_552",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_552|care_team",
+"panel": 11944
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_552",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_552|patient",
+"panel": 11944
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_553|care_team",
+"panel": 18402
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_553|patient",
+"panel": 18402
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_556",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_556|care_team",
+"panel": 12613
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_556",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_556|patient",
+"panel": 12613
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_558|care_team",
+"panel": 12965
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_558|patient",
+"panel": 12965
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561|care_team",
+"panel": 3843
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561|patient",
+"panel": 3843
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561A4|care_team",
+"panel": 7049
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561A4|patient",
+"panel": 7049
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_562|care_team",
+"panel": 4138
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_562|patient",
+"panel": 4138
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_564",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12711
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_564",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12711
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565|care_team",
+"panel": 23727
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565|patient",
+"panel": 23727
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565GL|care_team",
+"panel": 7408
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565GL|patient",
+"panel": 7408
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_578",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_578|care_team",
+"panel": 21845
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_578",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_578|patient",
+"panel": 21845
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_581",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4943
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_581",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4943
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_583",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_583|care_team",
+"panel": 12975
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_583",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_583|patient",
+"panel": 12975
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_585",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_585|care_team",
+"panel": 4878
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_585",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_585|patient",
+"panel": 4878
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11538
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11538
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7946
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7946
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4826
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4826
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589A6",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3200
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_589A6",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3200
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_590|care_team",
+"panel": 27716
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_590|patient",
+"panel": 27716
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_595|care_team",
+"panel": 13684
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_595|patient",
+"panel": 13684
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 1259
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 1259
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5858
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5858
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_598",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6888
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_598",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6888
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_598A0",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3601
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_598A0",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3601
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_603",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11670
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_603",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11670
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_607",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_607|care_team",
+"panel": 8325
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_607",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_607|patient",
+"panel": 8325
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_608",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_608|care_team",
+"panel": 9401
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_608",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_608|patient",
+"panel": 9401
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610|care_team",
+"panel": 4992
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610|patient",
+"panel": 4992
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610A4|care_team",
+"panel": 6341
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610A4|patient",
+"panel": 6341
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_613|care_team",
+"panel": 11097
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_613|patient",
+"panel": 11097
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_614",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12963
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_614",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12963
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_618",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 18736
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_618",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 18736
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_619",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12742
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_619",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12742
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_619A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8663
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_619A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8663
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620|care_team",
+"panel": 4020
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620|patient",
+"panel": 4020
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620A4|care_team",
+"panel": 4443
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620A4|patient",
+"panel": 4443
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_621",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9412
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_621",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9412
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_623",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4169
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_623",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4169
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 16261
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 16261
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 16664
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 16664
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630|care_team",
+"panel": 3339
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630|patient",
+"panel": 3339
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A4|care_team",
+"panel": 9277
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A4|patient",
+"panel": 9277
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A5|care_team",
+"panel": 5832
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A5|patient",
+"panel": 5832
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_631",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_631|care_team",
+"panel": 9847
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_631",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_631|patient",
+"panel": 9847
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8675
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8675
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636A6",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6463
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636A6",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6463
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636A8",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10777
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636A8",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10777
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_637",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 18962
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_637",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 18962
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_642|care_team",
+"panel": 20965
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_642|patient",
+"panel": 20965
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646|care_team",
+"panel": 10124
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646|patient",
+"panel": 10124
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646A4|care_team",
+"panel": 2604
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646A4|patient",
+"panel": 2604
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_650|care_team",
+"panel": 11909
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_650|patient",
+"panel": 11909
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_652|care_team",
+"panel": 13335
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_652|patient",
+"panel": 13335
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_655|care_team",
+"panel": 12199
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_655|patient",
+"panel": 12199
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_656",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7579
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_656",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7579
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 17343
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 17343
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A0",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3692
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A0",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3692
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3722
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3722
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4525
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4525
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657GJ",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5373
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657GJ",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5373
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_658|care_team",
+"panel": 7131
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_658|patient",
+"panel": 7131
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4532
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4532
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BY",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_659BY|care_team",
+"panel": 7777
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BY",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_659BY|patient",
+"panel": 7777
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BZ",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 14001
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BZ",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 14001
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_676",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_676|care_team",
+"panel": 6721
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_676",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_676|patient",
+"panel": 6721
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_679",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4042
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_679",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4042
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_688|care_team",
+"panel": 33160
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_688|patient",
+"panel": 33160
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_689|care_team",
+"panel": 11001
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_689|patient",
+"panel": 11001
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_693|care_team",
+"panel": 8581
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_693|patient",
+"panel": 8581
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695|care_team",
+"panel": 10049
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695|patient",
+"panel": 10049
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695GD",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695GD|care_team",
+"panel": 6962
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695GD",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695GD|patient",
+"panel": 6962
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_757",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_757|care_team",
+"panel": 14252
+},
+{
+"event": "hms:2023-06-07:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_757",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_757|patient",
+"panel": 14252
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3641
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3641
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10421
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10421
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7370
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7370
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5597
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5597
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4206
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4206
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4661
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4661
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4210
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4210
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 2094
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 2094
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12965
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12965
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3843
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3843
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7049
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7049
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 23727
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 23727
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7408
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7408
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 27716
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 27716
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 13684
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 13684
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11097
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11097
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4020
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4020
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3339
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3339
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9277
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9277
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5832
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5832
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 20965
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 20965
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11909
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11909
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 13335
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 13335
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7131
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7131
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 33160
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 33160
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11001
+},
+{
+"event": "hms:2023-06-08:heavy",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11001
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_460|care_team",
+"panel": 3641
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_460",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_460|patient",
+"panel": 3641
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_502",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8560
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_502",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8560
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_503|care_team",
+"panel": 5008
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_503",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_503|patient",
+"panel": 5008
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_506",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_506|care_team",
+"panel": 9403
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_506",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_506|patient",
+"panel": 9403
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 25936
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 25936
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GA",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7009
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_508GA",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7009
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5223
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5223
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509A0",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3063
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_509A0",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3063
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512|care_team",
+"panel": 10421
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512|patient",
+"panel": 10421
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512A5|care_team",
+"panel": 7370
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512A5|patient",
+"panel": 7370
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512GD|care_team",
+"panel": 5597
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_512GD",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_512GD|patient",
+"panel": 5597
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_515",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_515|care_team",
+"panel": 13931
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_515",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_515|patient",
+"panel": 13931
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_517|care_team",
+"panel": 4206
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_517",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_517|patient",
+"panel": 4206
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A5|care_team",
+"panel": 4661
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_523A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_523A5|patient",
+"panel": 4661
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_526|care_team",
+"panel": 4210
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_526",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_526|patient",
+"panel": 4210
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_529A4|care_team",
+"panel": 8298
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_529A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_529A4|patient",
+"panel": 8298
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_537",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_537|care_team",
+"panel": 5669
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_537",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_537|patient",
+"panel": 5669
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_538",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_538|care_team",
+"panel": 2701
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_538",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_538|patient",
+"panel": 2701
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_539",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_539|care_team",
+"panel": 11022
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_539",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_539|patient",
+"panel": 11022
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_540|care_team",
+"panel": 5476
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_540",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_540|patient",
+"panel": 5476
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_541",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_541|care_team",
+"panel": 20140
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_541",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_541|patient",
+"panel": 20140
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_542|care_team",
+"panel": 2094
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_542",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_542|patient",
+"panel": 2094
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_544",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10870
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_544",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10870
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_550",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_550|care_team",
+"panel": 7884
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_550",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_550|patient",
+"panel": 7884
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_552",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_552|care_team",
+"panel": 11944
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_552",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_552|patient",
+"panel": 11944
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_553|care_team",
+"panel": 18402
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_553",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_553|patient",
+"panel": 18402
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_556",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_556|care_team",
+"panel": 12613
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_556",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_556|patient",
+"panel": 12613
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_557",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9863
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_557",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9863
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_558|care_team",
+"panel": 12965
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_558",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_558|patient",
+"panel": 12965
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561|care_team",
+"panel": 3843
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561|patient",
+"panel": 3843
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561A4|care_team",
+"panel": 7049
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_561A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_561A4|patient",
+"panel": 7049
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_562|care_team",
+"panel": 4138
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_562",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_562|patient",
+"panel": 4138
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565|care_team",
+"panel": 23727
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565|patient",
+"panel": 23727
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565GL|care_team",
+"panel": 7408
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_565GL",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_565GL|patient",
+"panel": 7408
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_573QG",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 18201
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_573QG",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 18201
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_578",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_578|care_team",
+"panel": 21845
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_578",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_578|patient",
+"panel": 21845
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_581",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4943
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_581",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4943
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_583",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_583|care_team",
+"panel": 12975
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_583",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_583|patient",
+"panel": 12975
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_585",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_585|care_team",
+"panel": 4878
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_585",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_585|patient",
+"panel": 4878
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_586",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 6136
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_586",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 6136
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_590|care_team",
+"panel": 27716
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_590",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_590|patient",
+"panel": 27716
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_595|care_team",
+"panel": 13684
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_595",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_595|patient",
+"panel": 13684
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 1259
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 1259
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5858
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_596A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5858
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_603",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 11670
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_603",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 11670
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_607",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_607|care_team",
+"panel": 8325
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_607",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_607|patient",
+"panel": 8325
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610|care_team",
+"panel": 4992
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610|patient",
+"panel": 4992
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610A4|care_team",
+"panel": 6341
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_610A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_610A4|patient",
+"panel": 6341
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_613|care_team",
+"panel": 11097
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_613",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_613|patient",
+"panel": 11097
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_618",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 18736
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_618",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 18736
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_619",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 12742
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_619",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 12742
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_619A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 8663
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_619A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 8663
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620|care_team",
+"panel": 4020
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_620",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_620|patient",
+"panel": 4020
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_621",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9412
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_621",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9412
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 16261
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 16261
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626A4",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 16664
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_626A4",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 16664
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630|care_team",
+"panel": 3339
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630|patient",
+"panel": 3339
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A4|care_team",
+"panel": 9277
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A4|patient",
+"panel": 9277
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A5|care_team",
+"panel": 5832
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_630A5",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_630A5|patient",
+"panel": 5832
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636A8",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 10777
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_636A8",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 10777
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_637",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 18962
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_637",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 18962
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_642|care_team",
+"panel": 20965
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_642",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_642|patient",
+"panel": 20965
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646|care_team",
+"panel": 10124
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646|patient",
+"panel": 10124
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646A4|care_team",
+"panel": 2604
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_646A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_646A4|patient",
+"panel": 2604
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_650|care_team",
+"panel": 11909
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_650",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_650|patient",
+"panel": 11909
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_652|care_team",
+"panel": 13335
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_652",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_652|patient",
+"panel": 13335
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_655|care_team",
+"panel": 12199
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_655",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_655|patient",
+"panel": 12199
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_656",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 7579
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_656",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 7579
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 17343
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 17343
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A0",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3692
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A0",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3692
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A5",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4525
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657A5",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4525
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657GJ",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 5373
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_657GJ",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 5373
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_658|care_team",
+"panel": 7131
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_658",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_658|patient",
+"panel": 7131
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 4532
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 4532
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BY",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_659BY|care_team",
+"panel": 7777
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BY",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_659BY|patient",
+"panel": 7777
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BZ",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 14001
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_659BZ",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 14001
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_667",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 9361
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_667",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 9361
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_676",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_676|care_team",
+"panel": 6721
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_676",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_676|patient",
+"panel": 6721
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_688|care_team",
+"panel": 33160
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_688",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_688|patient",
+"panel": 33160
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_689|care_team",
+"panel": 11001
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_689",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_689|patient",
+"panel": 11001
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_693|care_team",
+"panel": 8581
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_693",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-06:heavy|smoke-copd-asthma|vha_693|patient",
+"panel": 8581
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695|care_team",
+"panel": 10049
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695|patient",
+"panel": 10049
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695GD",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695GD|care_team",
+"panel": 6962
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_695GD",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_695GD|patient",
+"panel": 6962
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_757",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_757|care_team",
+"panel": 14252
+},
+{
+"event": "hms:2023-06-08:medium",
+"card": "smoke-copd-asthma",
+"facility": "vha_757",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "hms:2023-06-07:heavy|smoke-copd-asthma|vha_757|patient",
+"panel": 14252
+}
+]

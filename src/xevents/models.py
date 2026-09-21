@@ -28,10 +28,19 @@ class StrictModel(BaseModel):
 
 class EventType(StrEnum):
     HEAT = "heat"
+    EXTREME_COLD = "extreme_cold"  # cold and winter-storm products (post-2024 NWS taxonomy)
     HURRICANE_FLOOD = "hurricane_flood"
     POWER_OUTAGE = "power_outage"
     WILDFIRE_SMOKE = "wildfire_smoke"
     AIR_POLLUTION = "air_pollution"
+
+
+class SmokeDensity(StrEnum):
+    """NOAA HMS smoke-analysis density classes, in increasing order."""
+
+    LIGHT = "Light"
+    MEDIUM = "Medium"
+    HEAVY = "Heavy"
 
 
 class HeatRiskLevel(StrEnum):
@@ -65,6 +74,9 @@ class TriggerConditions(StrictModel):
         default=None, description="Fire when NWS HeatRisk is at or above this level."
     )
     aqi_min: int | None = Field(default=None, ge=0, le=500, description="AirNow AQI at or above.")
+    smoke_density_min: SmokeDensity | None = Field(
+        default=None, description="Fire when NOAA HMS smoke density over the county is at or above."
+    )
     fema_declared: bool | None = Field(
         default=None, description="Require an OpenFEMA disaster declaration for the county."
     )
@@ -87,7 +99,10 @@ class TriggerConditions(StrictModel):
 
     @property
     def has_metric_threshold(self) -> bool:
-        return any(v is not None for v in (self.heatrisk_min, self.aqi_min, self.outage_pct_min))
+        return any(
+            v is not None
+            for v in (self.heatrisk_min, self.aqi_min, self.smoke_density_min, self.outage_pct_min)
+        )
 
     @model_validator(mode="after")
     def at_least_one_condition(self) -> Self:
@@ -103,7 +118,7 @@ class TriggerConditions(StrictModel):
         if self.sustained_polls_min is not None and not self.has_metric_threshold:
             raise ValueError(
                 "sustained_polls_min needs a metric threshold to sustain "
-                "(heatrisk_min, aqi_min or outage_pct_min)"
+                "(heatrisk_min, aqi_min, smoke_density_min or outage_pct_min)"
             )
         return self
 
@@ -571,6 +586,12 @@ class ActionItem(StrictModel):
     rank_formula: str = Field(default="panel", description="How rank_score was computed.")
     acuity_class: NonEmptyStr
     acuity_rank: int = Field(ge=0)
+    compounding_events: list[NonEmptyStr] = Field(
+        default_factory=list,
+        description="Event keys of co-occurring events in the same county (requirements v2 "
+        "§4): on heat/cold items the observed outage that raised their acuity by the "
+        "profile's boost step; on outage items the concurrent heat/cold event (annotation only).",
+    )
     window_start: datetime
     window_end: datetime
     status: ActionItemStatus = ActionItemStatus.ISSUED

@@ -189,6 +189,7 @@
     "EventType": {
       "enum": [
         "heat",
+        "extreme_cold",
         "hurricane_flood",
         "power_outage",
         "wildfire_smoke",
@@ -349,6 +350,16 @@
       ],
       "title": "Safety",
       "type": "object"
+    },
+    "SmokeDensity": {
+      "description": "NOAA HMS smoke-analysis density classes, in increasing order.",
+      "enum": [
+        "Light",
+        "Medium",
+        "Heavy"
+      ],
+      "title": "SmokeDensity",
+      "type": "string"
     },
     "Source": {
       "additionalProperties": false,
@@ -537,6 +548,18 @@
           "default": null,
           "description": "AirNow AQI at or above.",
           "title": "Aqi Min"
+        },
+        "smoke_density_min": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SmokeDensity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fire when NOAA HMS smoke density over the county is at or above."
         },
         "fema_declared": {
           "anyOf": [

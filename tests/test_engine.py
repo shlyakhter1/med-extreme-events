@@ -135,8 +135,22 @@ def test_trigger_matching(cards: list[Card]) -> None:
         onset=NOW,
         event_type=EventType.WILDFIRE_SMOKE,
         source=EventSource.HMS,
+        temporality=Temporality.OBSERVED,
+    ).model_copy(update={"metrics": {"smoke_density": "Heavy"}})
+    assert {c.id for c in cards if card_matches(c, smoke)[0]} == {"smoke-copd-asthma"}, (
+        "Card 8 is the only card that fires on heavy HMS smoke"
     )
-    assert not any(card_matches(c, smoke)[0] for c in cards), "no v1 card fires on smoke"
+    light = smoke.model_copy(update={"metrics": {"smoke_density": "Light"}})
+    assert not any(card_matches(c, light)[0] for c in cards), "light smoke is below Card 8"
+    cold = _event(
+        "Extreme Cold Warning",
+        ["41051"],
+        severity=CapSeverity.SEVERE,
+        source_id="c",
+        onset=NOW,
+        event_type=EventType.EXTREME_COLD,
+    )
+    assert {c.id for c in cards if card_matches(c, cold)[0]} == {"cold-cardio-respiratory"}
 
 
 def test_match_produces_items_per_facility_card_role(cards: list[Card], profile: Profile) -> None:

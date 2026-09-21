@@ -162,7 +162,7 @@ def test_card_needs_at_least_one_estimated_patient(
 ) -> None:
     profile = load_profile(PROFILES_DIR / "va.yaml")
     assert profile.min_panel_patients >= 1.0
-    for scenario in ("heat_dome_2021", "ian_2022"):
+    for scenario in ("heat_dome_2021", "ian_2022", "smoke_nyc_2023"):
         result = run_scenario(scenario, world)
         for item in result.items:
             assert item.panel is not None
@@ -178,7 +178,14 @@ def test_replay_is_idempotent(world: tuple[list[Card], list, PanelEstimator]) ->
     assert a == b
 
 
-def test_smoke_scenario_fires_no_v1_card(world: tuple[list[Card], list, PanelEstimator]) -> None:  # type: ignore[type-arg]
+def test_smoke_nyc_2023_golden(world: tuple[list[Card], list, PanelEstimator]) -> None:  # type: ignore[type-arg]
+    """Card 8 (M9) fires on Medium/Heavy HMS smoke; before it, this scenario fired nothing."""
     result = run_scenario("smoke_nyc_2023", world)
-    assert result.items == []
-    assert result.log and not any(t.matched for t in result.log)
+    check_golden("smoke_nyc_2023", result)
+    items = result.items
+    assert items and {i.card_id for i in items} == {"smoke-copd-asthma"}
+    assert {i.event_name for i in items} <= {"HMS smoke (Medium)", "HMS smoke (Heavy)"}
+    assert "vha_630" in {i.scope_id for i in items}, "New York Harbor VAMC"
+    assert all(i.phase.value == "during_event" for i in items), "HMS is observed"
+    assert all(i.panel and i.panel.value > 0 for i in items)
+    assert all(i.compounding_events == [] for i in items), "no outage in this fixture"

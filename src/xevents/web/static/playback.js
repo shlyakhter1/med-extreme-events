@@ -23,7 +23,9 @@
   const parse = (s) => Date.parse(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-  const CARD_COLORS = ["#4c8dff", "#e4572e", "#2fb37a", "#d9a41a", "#a05cd6", "#e06c9f"];
+  // one stable colour per card number (index = number - 1): 1 lithium, 2 antipsychotics,
+  // 3 delivery, 4 heart failure, 5 insulin, 6 dialysis, 7 cold, 8 smoke
+  const CARD_COLORS = ["#4c8dff", "#e4572e", "#2fb37a", "#d9a41a", "#a05cd6", "#e06c9f", "#5fc9e8", "#8c6d3f"];
   const cardColor = (id) => {
     const card = state.cards.get(id);
     const n = card ? card.number - 1 : [...state.cards.keys()].indexOf(id);

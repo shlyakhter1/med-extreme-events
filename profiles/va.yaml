@@ -24,6 +24,7 @@ denominators:
     basis: share of VHA enrollees
     source: docs/card-library.md Card 2 (VHA literature multiplier)
   clozapine_share_of_schizophrenia:
+    share: true
     rate: 0.04
     basis: share of VHA schizophrenia patients on clozapine
     source: docs/card-library.md Card 3
@@ -34,11 +35,13 @@ denominators:
     basis: share of veterans in VA care
     source: docs/card-library.md Card 4 (JAMA Network Open VA cohort; ~510,000 VHA HF patients 2016–2020)
   hfref_ace_arb_arni_share:
+    share: true
     rate: 0.62
     basis: share of VA HFrEF cohort prescribed ACE/ARB/ARNI
     source: docs/card-library.md Card 4
     note: Reported range ~60–64%.
   hfref_beta_blocker_share:
+    share: true
     rate: 0.62
     basis: share of VA HFrEF cohort prescribed a beta-blocker
     source: docs/card-library.md Card 4
@@ -90,6 +93,19 @@ acuity_order:
   - lithium
   - antipsychotic_heat
   - heart_failure
+  - cold_cardio_respiratory   # Card 7; one step below heart_failure, one boost step raises it to that class
+  - smoke_copd_asthma         # Card 8
+
+# Requirements v2 §4: engine co-occurrence boost (no compound trigger grammar). Heat or cold
+# items in a county with an observed outage that cleared a card's threshold and debounce move
+# up `steps` acuity classes and are stamped with the outage's event key; the outage's own
+# items in that county get the annotation only.
+co_occurrence_boost:
+  steps: 1
+  pairs:
+    - {primary: heat, compounding: power_outage}
+    - {primary: extreme_cold, compounding: power_outage}
+  note: One class per compounding outage; never below rank 0.
 
 # Notification channels in escalation order (requirements §6).
 channels:

@@ -430,6 +430,9 @@ def upsert_action_items(engine: Engine, items: list[ActionItem]) -> dict[str, in
                 or _aware(existing.window_end) != item.window_end
                 or existing.panel_value != fresh.panel_value
                 or existing.rank_score != fresh.rank_score
+                or existing.payload.get("compounding_events", [])
+                != fresh.payload.get("compounding_events", [])
+                or existing.acuity_rank != item.acuity_rank
                 or new_status is not current
                 or existing.superseded_by != item.superseded_by
             )
@@ -443,6 +446,7 @@ def upsert_action_items(engine: Engine, items: list[ActionItem]) -> dict[str, in
             existing.window_end = item.window_end
             existing.panel_value = fresh.panel_value
             existing.rank_score = fresh.rank_score
+            existing.acuity_rank = item.acuity_rank
             existing.status = new_status.value
             existing.superseded_by = (
                 item.superseded_by if new_status is ActionItemStatus.SUPERSEDED else None

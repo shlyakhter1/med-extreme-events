@@ -153,6 +153,48 @@ entries:
     confidence: high
     note: "Home HD ~-41%, CAPD ~-59% vs in-center (Melbourne LCA). Travel, energy, consumables dominate."
     sources: [sehgal2022, connor2011, barraclough2025]
+  - card: 7
+    key: home_oxygen_concentrator
+    drug: "Home oxygen concentrator (device electricity; Card 6 DME sub-panel overlap)"
+    assumed_dose: "~300 W continuous, 24 h/day"
+    api_g_per_patient_year: null
+    basis: "derived"           # rated draw x hours x US grid intensity (Ember ~0.37 kg/kWh); device manufacture excluded
+    kg_co2e_per_patient_year: [600, 1100]
+    km_driven_equivalent_per_year: [2400, 4400]
+    confidence: low
+    note: >
+      Stationary concentrators draw ~250-350 W (~2,200-3,100 kWh/yr); the footprint is the
+      home electricity, which an outage removes entirely - the same dependency the card acts on.
+      Backup cylinders and portable concentrators are not costed.
+    sources: [ember, epa]
+  - card: 8
+    key: salbutamol_pmdi
+    drug: "Salbutamol (albuterol) pressurised MDI, HFA-134a propellant"
+    assumed_dose: "200-dose inhaler; ~4 inhalers/yr rescue use"
+    api_g_per_patient_year: 0.08
+    basis: "measured"          # published inhaler LCAs: ~28 kg CO2e per Ventolin Evohaler (propellant-dominated)
+    g_co2e_per_daily_dose: [200, 400]
+    kg_co2e_per_patient_year: [60, 130]
+    km_driven_equivalent_per_year: [240, 520]
+    confidence: medium_high
+    note: >
+      The propellant is >95% of a pMDI's footprint; a dry-powder or soft-mist alternative is
+      ~1 kg CO2e/inhaler. Higher rescue use during smoke days raises this row directly.
+    sources: [wilkinson2019, janson2020]
+  - card: 8
+    key: ics_laba_pmdi
+    drug: "ICS/LABA controller, pMDI (HFA) vs dry-powder inhaler"
+    assumed_dose: "1 inhaler/month (120 doses, 2 puffs BID)"
+    api_g_per_patient_year: null
+    basis: "measured"          # Wilkinson 2019 / Janson 2020 per-inhaler ranges; pMDI 10-37 kg, DPI ~1 kg
+    g_co2e_per_daily_dose: [300, 1200]
+    kg_co2e_per_patient_year: [120, 450]
+    km_driven_equivalent_per_year: [480, 1800]
+    confidence: medium
+    note: >
+      Lower bound is a low-propellant pMDI, upper bound a high-propellant one; the same
+      controller as a DPI is ~12 kg CO2e/yr. Inhaler choice is a clinical decision - display only.
+    sources: [wilkinson2019, janson2020]
 
 sources:
   piffoux2024:
@@ -185,6 +227,12 @@ sources:
   setoguchi2026:
     ref: "Setoguchi S, Hennessy S. Climate Change and Medications. Pharmacoepidemiol Drug Saf 2026 (upstream framing)."
     url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC13427620/"
+  wilkinson2019:
+    ref: "Wilkinson AJK et al. Costs of switching to low global warming potential inhalers. An economic and carbon footprint analysis of NHS prescription data in England. BMJ Open 2019;9:e028763 (pMDI 10-37 kg CO2e/inhaler; DPI ~1 kg)."
+    url: "https://bmjopen.bmj.com/content/9/10/e028763"
+  janson2020:
+    ref: "Janson C et al. Carbon footprint impact of the choice of inhalers for asthma and COPD. Thorax 2020;75:82-84."
+    url: "https://thorax.bmj.com/content/75/1/82"
   ember:
     ref: "Ember Global Electricity Review (annual): grid intensity ~0.56-0.60 (CN), ~0.71 (IN), ~0.21-0.25 (EU), ~0.37 (US) kg CO2/kWh - verify current year."
     url: "https://ember-climate.org/"

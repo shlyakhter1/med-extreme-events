@@ -19,11 +19,13 @@ EXPECTED = {
     4: ("heat-heart-failure", {EventType.HEAT}),
     5: ("outage-insulin", {EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE}),
     6: ("outage-dialysis", {EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE}),
+    7: ("cold-cardio-respiratory", {EventType.EXTREME_COLD}),
+    8: ("smoke-copd-asthma", {EventType.AIR_POLLUTION, EventType.WILDFIRE_SMOKE}),
 }
 
 
-def test_six_cards_load(cards: list[Card]) -> None:
-    assert len(cards) == 6
+def test_eight_cards_load(cards: list[Card]) -> None:
+    assert len(cards) == 8
     assert {c.number for c in cards} == set(EXPECTED)
     for card in cards:
         card_id, event_types = EXPECTED[card.number]
@@ -32,8 +34,8 @@ def test_six_cards_load(cards: list[Card]) -> None:
 
 
 def test_card_ids_and_numbers_unique(cards: list[Card]) -> None:
-    assert len({c.id for c in cards}) == 6
-    assert len({c.number for c in cards}) == 6
+    assert len({c.id for c in cards}) == 8
+    assert len({c.number for c in cards}) == 8
 
 
 def test_every_claim_is_tiered_and_sourced(cards: list[Card]) -> None:
@@ -117,7 +119,7 @@ def test_seventh_malformed_card_poisons_directory_load(tmp_path: Path) -> None:
     """A directory with the six good cards plus one malformed card must fail to load."""
     for src in CARDS_DIR.glob("*.yaml"):
         shutil.copy(src, tmp_path / src.name)
-    assert len(load_cards(tmp_path)) == 6
+    assert len(load_cards(tmp_path)) == 8
     shutil.copy(INVALID_CARDS / "untiered-claim.yaml", tmp_path / "07-malformed.yaml")
     with pytest.raises(CardValidationError, match=re.escape("07-malformed.yaml")):
         load_cards(tmp_path)

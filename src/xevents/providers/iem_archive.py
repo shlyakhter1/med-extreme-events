@@ -52,6 +52,18 @@ VTEC_NAMES: dict[str, str] = {
     "FA.A": "Flood Watch",
     "FA.W": "Flood Warning",
     "AQ.Y": "Air Quality Alert",
+    # cold / winter products (current codes) and the legacy Wind Chill codes, which the NWS
+    # provider's normalization table maps to the current names
+    "EC.W": "Extreme Cold Warning",
+    "EC.A": "Extreme Cold Watch",
+    "CW.Y": "Cold Weather Advisory",
+    "WS.W": "Winter Storm Warning",
+    "WS.A": "Winter Storm Watch",
+    "IS.W": "Ice Storm Warning",
+    "BZ.W": "Blizzard Warning",
+    "WC.W": "Wind Chill Warning",
+    "WC.A": "Wind Chill Watch",
+    "WC.Y": "Wind Chill Advisory",
 }
 SEVERITY: dict[str, CapSeverity] = {
     "W": CapSeverity.SEVERE,
@@ -177,7 +189,7 @@ class IEMArchiveProvider(EventProvider):
     """
 
     source = EventSource.NWS
-    PHENOMENA = "EH,XH,HT,HU,TR,SS,FF,FA"
+    PHENOMENA = "EH,XH,HT,HU,TR,SS,FF,FA,EC,CW,WS,IS,BZ,WC"
     SIGNIFICANCE = "W,A,Y"
 
     def __init__(

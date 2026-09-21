@@ -1,0 +1,188 @@
+# yaml-language-server: $schema=card.schema.json
+# Transcribed from docs/card-library-additions.md — Card 7. Clinical strings are verbatim; do not edit in code.
+# Triggers list the post-Oct-2024 NWS product names only; legacy names (Wind Chill …) are
+# normalized in the NWS provider (SCN23-44), never here.
+id: cold-cardio-respiratory
+version: 1.0.0
+number: 7
+title: Extreme Cold / Winter Storm × Cardiovascular & Respiratory Disease
+summary: >-
+  Cold exposure raises blood pressure and cardiac workload and shifts hemostasis toward
+  thrombosis, precipitating MI and stroke; cold, dry air worsens COPD/asthma; storm
+  conditions add hypothermia and carbon-monoxide poisoning from improvised heating.
+
+event_triggers:
+  - type: extreme_cold
+    conditions:
+      nws_events:
+        - Extreme Cold Warning
+        - Extreme Cold Watch
+        - Cold Weather Advisory
+        - Winter Storm Warning
+        - Winter Storm Watch
+        - Ice Storm Warning
+        - Blizzard Warning
+
+population_selector:
+  condition_codes:
+    - {system: icd10cm, code: I25, display: Chronic ischemic heart disease}
+    - {system: icd10cm, code: I50, display: Heart failure}
+    - {system: icd10cm, code: I10, display: Essential hypertension}
+    - {system: icd10cm, code: Z86.73, display: Personal history of stroke/TIA}
+    - {system: icd10cm, code: J44, display: Chronic obstructive pulmonary disease}
+    - {system: icd10cm, code: J45, display: Asthma}
+  flags:
+    - age_65_plus
+    - homeless_or_unstably_housed
+    - home_oxygen_or_electricity_dependent_dme
+    - prior_mi_stroke
+    - outdoor_worker
+  denominator_key: coronary_heart_disease
+  denominator_note: >-
+    Denominator anchors: CHD/COPD/asthma county rates from CDC PLACES × catchment veteran
+    counts (existing M3 machinery); CHF ≈ 5% of VHA enrollees.
+  sub_panels:
+    - key: heart_failure
+      label: Heart failure
+      condition_codes:
+        - {system: icd10cm, code: I50, display: Heart failure}
+      denominator_key: heart_failure
+    - key: copd
+      label: COPD
+      condition_codes:
+        - {system: icd10cm, code: J44, display: Chronic obstructive pulmonary disease}
+      denominator_key: copd
+    - key: asthma
+      label: Asthma
+      condition_codes:
+        - {system: icd10cm, code: J45, display: Asthma}
+      denominator_key: asthma
+
+actions:
+  care_team:
+    - phase: pre_event
+      text: >-
+        Generate rosters: cardiovascular and respiratory panels, flagging home-oxygen/DME,
+        homeless, and age ≥65 patients.
+    - phase: pre_event
+      text: >-
+        Verify heating adequacy and a warm-place plan for flagged patients; coordinate with
+        homeless PACT teams and warming centers; arrange transportation.
+    - phase: pre_event
+      text: >-
+        Counsel against strenuous cold exertion (snow shoveling) for cardiac patients; review
+        inhaler supply and cold-air pre-medication plans for asthma/COPD per their action
+        plans.
+    - phase: pre_event
+      text: >-
+        Push CO-safety messaging: never run generators, grills, or vehicles indoors or in
+        garages; check smoke/CO detectors.
+    - phase: pre_event
+      text: >-
+        Confirm emergency refills and oxygen backup (ties to Card 6 DME sub-panel when
+        outages threaten).
+    - phase: during_event
+      text: Wellness checks on flagged patients (isolation + cold is the lethal combination).
+    - phase: during_event
+      text: Monitor for hypothermia and CO-poisoning presentations.
+    - phase: during_event
+      text: Low threshold to relocate patients in unheated homes.
+    - phase: during_event
+      text: >-
+        If outages co-occur, the boost elevates these items — treat as the compounded
+        emergency it is.
+  patient:
+    - text: Cold weather is hard on your heart and lungs.
+    - text: >-
+        Stay warm and dry, dress in layers, and avoid heavy outdoor work like shoveling snow.
+    - text: Cover your nose and mouth with a scarf so you breathe warmer air.
+    - text: >-
+        Never use a generator, grill, or your car to heat your home — the fumes can kill
+        without warning.
+    - text: If your heat goes out, go somewhere warm and tell us.
+    - text: Keep taking your medicines.
+  caregiver: []
+
+escalation:
+  - signs: Chest pain or pressure, one-sided weakness or trouble speaking (stroke signs)
+    response: emergency
+    emergency: true
+  - signs: Severe shortness of breath or blue lips
+    response: emergency
+    emergency: true
+  - signs: >-
+      Confusion, intense shivering or shivering that stops, slurred speech (hypothermia)
+    response: 911 and rewarm
+    emergency: true
+  - signs: Headache/dizziness/nausea in a heated space (possible CO)
+    response: fresh air immediately and call
+    emergency: false
+  - signs: No heat at home during an Extreme Cold Warning
+    response: call the care team same-day
+    emergency: false
+
+evidence_tier: strong
+evidence:
+  mechanism: >-
+    Cold exposure causes peripheral vasoconstriction, raising blood pressure and cardiac
+    workload, and shifts hemostatic factors toward thrombosis — precipitating MI and stroke;
+    cold, dry air triggers bronchoconstriction and worsens COPD/asthma, and winter
+    respiratory infections compound it. Storm conditions add hypothermia risk (especially
+    with power loss) and carbon-monoxide poisoning from improvised indoor heating
+    (generators, grills, vehicles).
+  claims:
+    - text: >-
+        Cold is responsible for far more temperature-attributable mortality than heat: in
+        the 74-million-death multi-country analysis, ~7.3% of deaths were attributable to
+        cold vs ~0.4% to heat.
+      tier: strong
+      source_ids: [gasparrini-2015]
+    - text: >-
+        Winter Storm Uri (Feb 2021, TX): 246 storm-related deaths in the state's final
+        tally, the majority from hypothermia; a concurrent surge of carbon-monoxide
+        poisonings produced over a thousand ED visits.
+      tier: strong
+      source_ids: [texas-dshs-uri-2021, cdc-co-texas-2021]
+    - text: >-
+        Cold spells are associated with increased MI and cardiovascular mortality; risk
+        rises as temperature falls, with effects lagged over days.
+      tier: strong
+      source_ids: [aha-cold-weather]
+    - text: >-
+        CDC/NWS extreme-cold guidance: indoor heating safety (CO), layered clothing,
+        limiting exertion (esp. snow shoveling for cardiac patients), checking on isolated
+        adults.
+      tier: expert_guidance
+      source_ids: [cdc-extreme-cold]
+  caveats:
+    - >-
+      Medication-specific cold interactions are weakly evidenced compared with heat; do not
+      present drug-level cold claims beyond expert guidance (beta-blocker/peripheral-
+      circulation notes are expert_guidance at most).
+
+sources:
+  - id: gasparrini-2015
+    citation: Gasparrini et al., Lancet 2015 (mortality attributable to cold vs heat, 384 locations)
+    year: 2015
+  - id: texas-dshs-uri-2021
+    citation: Texas DSHS Winter Storm Uri mortality report (2021)
+    year: 2021
+  - id: cdc-co-texas-2021
+    citation: CDC carbon monoxide poisoning surveillance, Feb 2021 Texas
+    year: 2021
+  - id: cdc-extreme-cold
+    citation: CDC extreme-cold clinical and public guidance
+  - id: aha-cold-weather
+    citation: AHA cold-weather cardiovascular guidance
+  - id: nws-scn23-44
+    citation: NWS SCN23-44 (cold-product taxonomy, Oct 2024)
+    year: 2024
+    note: Source of the current product names listed in event_triggers.
+
+window_days: {min: 1, max: 3}
+safety:
+  do_not_stop_medication: false
+  notes:
+    - No medication classes are selected; the card's patient text still says to keep taking medicines.
+acuity_class: cold_cardio_respiratory
+care_system_hooks: [homeless_pact, clinical_contact_center, my_healthevet, empower]

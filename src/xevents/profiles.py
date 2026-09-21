@@ -37,6 +37,12 @@ class Denominator(_Strict):
     count: int | None = Field(default=None, ge=0)
     places_measure: str | None = Field(default=None, pattern=r"^[a-z]+$")
     empower_measure: str | None = Field(default=None, pattern=r"^[a-z_]+$")
+    share: bool = Field(
+        default=False,
+        description="True for a rate that is a share of a card's condition panel (e.g. the "
+        "clozapine share of schizophrenia) rather than a population panel of its own. "
+        "Decides how a sub-panel keyed to it is sized.",
+    )
     scope: Annotated[str, Field(pattern=r"^[a-z_]+$")] = Field(
         default="veterans",
         description="Population a rate applies to: 'veterans' (VetPop) or a key in "
@@ -54,6 +60,32 @@ class Denominator(_Strict):
         ]
         if sum(set_) != 1:
             raise ValueError("set exactly one of rate, count, places_measure or empower_measure")
+        if self.share and self.rate is None:
+            raise ValueError("share: true needs a rate")
+        return self
+
+
+class BoostPair(_Strict):
+    primary: Annotated[str, Field(pattern=r"^[a-z_]+$")]
+    compounding: Annotated[str, Field(pattern=r"^[a-z_]+$")]
+
+
+class CoOccurrenceBoost(_Strict):
+    """Requirements v2 §4: items of a primary event family (heat, cold) in a county with an
+    active, threshold-clearing compounding event (outage) move up ``steps`` acuity classes."""
+
+    steps: int = Field(default=1, ge=1)
+    pairs: list[BoostPair] = Field(min_length=1)
+    note: str | None = None
+
+    @model_validator(mode="after")
+    def known_event_types(self) -> Self:
+        from xevents.models import EventType
+
+        for pair in self.pairs:
+            for value in (pair.primary, pair.compounding):
+                if value not in {t.value for t in EventType}:
+                    raise ValueError(f"co_occurrence_boost: unknown event type '{value}'")
         return self
 
 
@@ -112,6 +144,7 @@ class Profile(_Strict):
         default_factory=dict, description="card id → medication-class share multiplier"
     )
     national_anchors: dict[str, NationalAnchor] = Field(default_factory=dict)
+    co_occurrence_boost: CoOccurrenceBoost | None = None
 
     @model_validator(mode="after")
     def unique_acuity(self) -> Self:

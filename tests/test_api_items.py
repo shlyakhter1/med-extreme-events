@@ -163,7 +163,7 @@ def test_pages_have_no_external_asset_dependencies(client: TestClient) -> None:
 
 def test_cards_reference_and_playback(client: TestClient) -> None:
     cards = client.get("/cards").json()
-    assert len(cards) == 6 and cards[0]["id"] == "heat-lithium"
+    assert len(cards) == 8 and cards[0]["id"] == "heat-lithium"
     r = client.get("/reference/counties")
     assert r.status_code == 200 and r.json()["type"] == "FeatureCollection"
     page = client.get("/playback")

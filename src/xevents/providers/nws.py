@@ -92,6 +92,15 @@ NWS_EVENT_TYPES: dict[str, EventType] = {
     "Flash Flood Warning": EventType.HURRICANE_FLOOD,
     "Flash Flood Watch": EventType.HURRICANE_FLOOD,
     "Air Quality Alert": EventType.AIR_POLLUTION,
+    # Cold and winter-storm products, current (post-Oct-2024) names only; legacy names are
+    # normalized through LEGACY_NWS_EVENT_NAMES before this lookup (Card 7).
+    "Extreme Cold Warning": EventType.EXTREME_COLD,
+    "Extreme Cold Watch": EventType.EXTREME_COLD,
+    "Cold Weather Advisory": EventType.EXTREME_COLD,
+    "Winter Storm Warning": EventType.EXTREME_COLD,
+    "Winter Storm Watch": EventType.EXTREME_COLD,
+    "Ice Storm Warning": EventType.EXTREME_COLD,
+    "Blizzard Warning": EventType.EXTREME_COLD,
 }
 
 

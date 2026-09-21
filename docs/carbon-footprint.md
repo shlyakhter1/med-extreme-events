@@ -1,10 +1,10 @@
 # Medication Carbon-Footprint Table — Demo Display Data v1
 
-*As of 2026-09-20. Estimates for UI display in the VA extreme-event demo. These are order-of-magnitude planning figures, not product-specific LCAs.*
+*As of 2026-09-21 (Cards 7–8 rows added). Estimates for UI display in the VA extreme-event demo. These are order-of-magnitude planning figures, not product-specific LCAs.*
 
 ## Methods (read before using the numbers)
 
-**Approach.** For each medication in the six playbook cards, we estimate cradle-to-pharmacy greenhouse-gas emissions per assumed daily dose and per patient-year, assuming API (active pharmaceutical ingredient) production in China/India with formulation, packaging, and transport to the US. Three estimation bases are used and labeled per row:
+**Approach.** For each medication or therapy in the eight playbook cards, we estimate cradle-to-pharmacy greenhouse-gas emissions per assumed daily dose and per patient-year, assuming API (active pharmaceutical ingredient) production in China/India with formulation, packaging, and transport to the US. Three estimation bases are used and labeled per row:
 
 1. **Measured/hybrid-LCA anchor** — Piffoux et al. 2024 (J. Cleaner Production) computed cradle-to-pharmacy footprints for 12,316 oral medicines via hybrid LCA (API + excipients + packaging + transport + manufacturing + corporate overhead). Key anchors: generic paracetamol 1,000 mg tablet ≈ 48 g CO2e/pill (387.8 g/box of 8); generic ramipril 10 mg ≈ 25 g CO2e/pill (740.7 g/box of 30); oral treatments average 14.1 kg CO2e/month across the pharmacopeia (heavily skewed by expensive drugs). Central lesson: for cheap small-molecule generics, **excipients + packaging + manufacturing overhead dominate; API mass is a minor driver**, and footprint correlates with price more than mass. Cheap generic pills land at roughly **10–50 g CO2e per pill** full cradle-to-pharmacy.
 2. **API process estimate** — Parvatker et al. 2019 (ACS Sustain. Chem. Eng.): cradle-to-gate API factors for 20 drugs span **11–3,000 kg CO2e per kg API**, correlated with synthesis-step count. Used for API-mass sanity checks (matters only for high-mass APIs like lithium carbonate and clozapine).
@@ -32,6 +32,9 @@
 | 4 | Metoprolol succinate ER | 100 mg/day PO | 36.5 | Analogue: Piffoux cheap-generic ER tablet | 15–30 | 5–11 | 20–45 | Medium |
 | 5 | Insulin glargine (pens; vial similar order) | ~40 U/day SC | ~0.5 (protein) | Manufacturer-disclosed pen footprints (~0.7 kg CO2e/pen; 15 kg/pt-yr at ~22 pens) scaled to 40 U/day ≈ 49 × 3 mL pens/yr; cold-chain freight adds a minor increment (home refrigeration excluded) | 40–110 | 15–40 | 60–160 | Medium |
 | 6 | In-center hemodialysis (therapy, not a drug) | 3 sessions/week | n/a | **Measured LCAs**: 58.9 kg/session (US, 15 facilities); literature 24.5–65.1/session; 3.8–4.8 t/pt-yr | 57–59 kg **per session** | 3,800–4,800 | 15,000–19,000 | High |
+| 7 | Home oxygen concentrator (device electricity; overlaps the Card 6 DME sub-panel) | ~300 W continuous, 24 h/day | n/a | **Derived**: rated draw × hours × US grid intensity (~0.37 kg CO2e/kWh); device manufacture excluded | ~1.6–3 kg **per day** | 600–1,100 | 2,400–4,400 | Low |
+| 8 | Salbutamol (albuterol) pMDI, HFA-134a | 200-dose inhaler; ~4/yr rescue | ~0.08 | **Measured inhaler LCAs** (Wilkinson 2019, Janson 2020): ~28 kg CO2e per Ventolin Evohaler; propellant >95% of the footprint; DPI/soft-mist ≈ 1 kg | 200–400 | 60–130 | 240–520 | Med–High |
+| 8 | ICS/LABA controller, pMDI (HFA) vs DPI | 1 inhaler/month | n/a | **Measured inhaler LCAs**: pMDI 10–37 kg/inhaler (lower bound low-propellant, upper high-propellant); same controller as DPI ≈ 12 kg/yr | 300–1,200 | 120–450 | 480–1,800 | Medium |
 
 ¹ Methadone drug footprint is dwarfed by **daily OTP dispensing travel**: a 10 km round trip × ~300 trips/yr ≈ 750 kg CO2e/yr — the same travel-dominance pattern as in-center dialysis. Display this note with the row; take-home dosing (the Card 3 disaster action) is also the low-carbon option.
 
