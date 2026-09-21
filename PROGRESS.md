@@ -2,6 +2,57 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-21 — M7: EAGLE-I outage provider (live + replay) + customer denominators
+
+- **`providers/eagle_i.py`** with one core (`OutagePoll` → `polls_to_events`) fed by two
+  paths. Events: one observed `power_outage` per (county, poll) at or above the lowest
+  `outage_pct_min` any card asks for (`min_outage_pct(cards)` = 10 %), metrics
+  `customers_out, county_customers, outage_pct, poll_streak, poll_minutes` (+ `feed_*`
+  coverage fields from the live feed), `expires` = next poll so the engine's debounce chain
+  follows consecutive polls, severity buckets by percent out (10/25/50), headline with the
+  numbers, `EventSource.EAGLE_I`.
+- **Live:** paged ArcGIS FeatureServer query against the EAGLE-I API fields
+  (`currentOutage`, `currentOutageRunStartTime` epoch-ms, `countyFIPSCode` int → zero-padded,
+  `coveredCustomers`, `modelCount`), raw snapshot cached under `fixtures/live/raw/`.
+  **Finding:** FEMA's partner service `Partner/PowerOutages_EAGLE_I` returns *Token
+  Required* (ArcGIS error 499) on every endpoint as of 2026-09-21 — the "no key" in the plan
+  is wrong today. The client sends `EAGLEI_TOKEN` when set and raises a `ProviderError`
+  that says so otherwise; `EAGLEI_FEATURE_URL` points it at any public mirror with the same
+  fields. The schema was verified on two public state-EMA mirrors (Ohio watch office,
+  Georgia GEMA); a 6-row sample from the Ohio one is the parser fixture. Live ingest adds
+  `eagle_i` after HMS; it fails soft like the other providers and shows in the banner.
+- **Replay:** streaming ORNL yearly CSV loader (`fips_code,county,state,customers_out,
+  run_start_time`; early years call the count `sum` — both accepted), sliced by state /
+  county / time, `resample_polls` to hourly maxima (fixture default; native 15-minute cadence
+  on request), and `slice_ornl_csv` so a scenario keeps a small raw slice instead of the
+  1.1–1.4 GB yearly file. The 2021 and 2025 headers were checked with range requests; no
+  yearly file was downloaded (that is M10's Uri/Ian work).
+- **Denominator:** `scripts/build_eaglei_customers.py` → `fixtures/reference/
+  eaglei_customers.csv` (Moehl et al. MCC 2022, 3,233 counties, FIPS zero-padded, 'Grand
+  Total' row dropped; 154.5 M customers) and `eaglei_state_coverage.csv` (latest EAGLE-I
+  coverage share per state, 2022-01-01). Raw files (< 50 KB) are kept in git; `make
+  reference` rebuilds them. `outage_pct = customers_out / customers × 100`.
+- **Decision — threshold source:** the emit threshold is derived from the cards rather than
+  a new `profiles/va.yaml` section; a second copy of the same number would drift. The
+  profile is unchanged this milestone.
+- **UI:** the event page shows customers out / county customers / percent with a "how was
+  this number computed?" popover (formula, denominator source, customers≠people, ~8 %
+  coverage gap) and the DOE attribution; the dashboard and events lists carry the footnote
+  whenever an EAGLE-I row is shown; outage-triggered items in the facility card list carry
+  the attribution and the customers≠people line, and every item now states
+  `<temporality> → <phase> actions`; the playback event panel shows the outage numbers and
+  attribution; `/events` JSON adds `attribution` and `caveats` to EAGLE-I events. The
+  freshness banner covers the feed like every other source.
+- **Tests:** `tests/test_eagle_i.py` — customer table, threshold derivation, threshold /
+  metrics / streak / severity, the two-poll debounce end to end through the engine (Cards
+  5/6 on the second 10 % poll, Card 3 only after two 25 % polls), FeatureServer parsing,
+  paging + token + raw cache with a mock transport, the token-gated error text, ORNL slicing /
+  resampling / column variants, replay events, and the rendered pages. A network-marked
+  contract test (`RUN_NETWORK_TESTS=1`) parses the configured layer or the public mirror.
+- **Next (M8):** emPOWER reference layer (`scripts/build_empower.py`), `empower_dme`
+  denominator with county/ZIP → catchment rollup, dual-denominator display and
+  `outage_pct × empower_dme_count` ranking, Card 6 `electricity_dependent_dme` sub-panel.
+
 ## 2026-09-21 — M6: temporality axis + trigger schema v2
 
 - **`Temporality` enum** (`forecast | imminent | observed`) and a **required**

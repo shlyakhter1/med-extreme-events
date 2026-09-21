@@ -20,6 +20,15 @@
     {% if event.geography.ugc %}<div class="muted" style="font-size:12px">UGC: {{ event.geography.ugc|join(' ') }}</div>{% endif %}
     {% if event.geography.note %}<div class="muted" style="font-size:12px">{{ event.geography.note }}</div>{% endif %}
     {% if event.geography.area_desc %}<div class="muted" style="font-size:12px">{{ event.geography.area_desc }}</div>{% endif %}</td></tr>
+  {% if event.source.value == 'eagle_i' %}
+  <tr><th>Outage</th><td><b style="color:var(--ink)">{{ '{:,}'.format(event.metrics.customers_out) }}</b> of {{ '{:,}'.format(event.metrics.county_customers) }} electric customers out
+    (<b style="color:var(--ink)">{{ event.metrics.outage_pct }}%</b>){% if event.metrics.poll_streak %} · sustained {{ event.metrics.poll_streak }} poll(s) of {{ event.metrics.poll_minutes }} min{% endif %}
+    <details><summary>how was this number computed?</summary>
+      <div>outage_pct = customers_out ÷ county_customers × 100; county_customers from {{ eaglei.denominator }}.</div>
+      {% for c in eaglei.caveats %}<div>{{ c }}</div>{% endfor %}
+    </details>
+    <div class="muted" style="font-size:12px">{{ eaglei.attribution }}</div></td></tr>
+  {% endif %}
   {% if event.metrics %}<tr><th>Metrics</th><td>{% for k, v in event.metrics.items() %}<span class="tag">{{ k }}={{ v }}</span> {% endfor %}</td></tr>{% endif %}
   {% if event.raw_ref %}<tr><th>Raw payload</th><td><code>{{ event.raw_ref }}</code></td></tr>{% endif %}
 </table>

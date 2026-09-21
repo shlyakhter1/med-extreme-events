@@ -29,4 +29,5 @@
   {% endfor %}
   </tbody>
 </table>
+{% if rows|map(attribute='event')|selectattr('source.value', 'equalto', 'eagle_i')|list %}<div class="muted" style="font-size:12px">{{ eaglei.attribution }} {{ eaglei.caveats|join(' ') }}</div>{% endif %}
 {% endblock %}

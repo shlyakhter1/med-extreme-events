@@ -1,0 +1,298 @@
+{
+  "objectIdFieldName" : "OBJECTID", 
+  "uniqueIdField" : 
+  {
+    "name" : "OBJECTID", 
+    "isSystemMaintained" : true
+  }, 
+  "globalIdFieldName" : "", 
+  "fields" : [
+    {
+      "name" : "OBJECTID", 
+      "type" : "esriFieldTypeOID", 
+      "alias" : "OBJECTID", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "currentOutage", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "currentOutage", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "currentOutageRunStartTime", 
+      "type" : "esriFieldTypeDate", 
+      "alias" : "currentOutageRunStartTime", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 8, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "maxOutage1", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "maxOutage1", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "maxOutage1RunStartTime", 
+      "type" : "esriFieldTypeDate", 
+      "alias" : "maxOutage1RunStartTime", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 8, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "maxOutage24", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "maxOutage24", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "maxOutage24RunStartTime", 
+      "type" : "esriFieldTypeDate", 
+      "alias" : "maxOutage24RunStartTime", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 8, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "countyName", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "countyName", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 255, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "stateId", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "stateId", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "countyFIPSCode", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "countyFIPSCode", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "currentOutageHasOverrideData", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "currentOutageHasOverrideData", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 255, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "maxOutage24HasOverrideData", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "maxOutage24HasOverrideData", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 255, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "maxOutage1HasOverrideData", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "maxOutage1HasOverrideData", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 255, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "stateName", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "stateName", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 25, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "coveredCustomers", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "coveredCustomers", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "actualCustomers", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "actualCustomers", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "modelCount", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "modelCount", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "collectedCount", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "collectedCount", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }
+  ], 
+  "exceededTransferLimit" : true, 
+  "features" : [
+    {
+      "attributes" : {
+        "OBJECTID" : 1, 
+        "currentOutage" : 1298, 
+        "currentOutageRunStartTime" : 1790024400000, 
+        "maxOutage1" : 1502, 
+        "maxOutage1RunStartTime" : 1790021700000, 
+        "maxOutage24" : 14470, 
+        "maxOutage24RunStartTime" : 1789952400000, 
+        "countyName" : "Montgomery", 
+        "stateId" : 19, 
+        "countyFIPSCode" : 39113, 
+        "currentOutageHasOverrideData" : "0", 
+        "maxOutage24HasOverrideData" : "0", 
+        "maxOutage1HasOverrideData" : "0", 
+        "stateName" : "OH", 
+        "coveredCustomers" : 290690, 
+        "actualCustomers" : 290690, 
+        "modelCount" : 290692, 
+        "collectedCount" : 651
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 2, 
+        "currentOutage" : 624, 
+        "currentOutageRunStartTime" : 1790024400000, 
+        "maxOutage1" : 635, 
+        "maxOutage1RunStartTime" : 1790021700000, 
+        "maxOutage24" : 680, 
+        "maxOutage24RunStartTime" : 1790011800000, 
+        "countyName" : "Athens", 
+        "stateId" : 19, 
+        "countyFIPSCode" : 39009, 
+        "currentOutageHasOverrideData" : "0", 
+        "maxOutage24HasOverrideData" : "0", 
+        "maxOutage1HasOverrideData" : "0", 
+        "stateName" : "OH", 
+        "coveredCustomers" : 29045, 
+        "actualCustomers" : 29045, 
+        "modelCount" : 29009, 
+        "collectedCount" : 29045
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 3, 
+        "currentOutage" : 292, 
+        "currentOutageRunStartTime" : 1790024400000, 
+        "maxOutage1" : 330, 
+        "maxOutage1RunStartTime" : 1790022600000, 
+        "maxOutage24" : 2380, 
+        "maxOutage24RunStartTime" : 1789969500000, 
+        "countyName" : "Meigs", 
+        "stateId" : 19, 
+        "countyFIPSCode" : 39105, 
+        "currentOutageHasOverrideData" : "0", 
+        "maxOutage24HasOverrideData" : "0", 
+        "maxOutage1HasOverrideData" : "0", 
+        "stateName" : "OH", 
+        "coveredCustomers" : 12558, 
+        "actualCustomers" : 12558, 
+        "modelCount" : 12548, 
+        "collectedCount" : 12558
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 4, 
+        "currentOutage" : 245, 
+        "currentOutageRunStartTime" : 1790024400000, 
+        "maxOutage1" : 288, 
+        "maxOutage1RunStartTime" : 1790023500000, 
+        "maxOutage24" : 1174, 
+        "maxOutage24RunStartTime" : 1789971300000, 
+        "countyName" : "Vinton", 
+        "stateId" : 19, 
+        "countyFIPSCode" : 39163, 
+        "currentOutageHasOverrideData" : "0", 
+        "maxOutage24HasOverrideData" : "0", 
+        "maxOutage1HasOverrideData" : "0", 
+        "stateName" : "OH", 
+        "coveredCustomers" : 7526, 
+        "actualCustomers" : 7526, 
+        "modelCount" : 7484, 
+        "collectedCount" : 7526
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 5, 
+        "currentOutage" : 235, 
+        "currentOutageRunStartTime" : 1790024400000, 
+        "maxOutage1" : 500, 
+        "maxOutage1RunStartTime" : 1790021700000, 
+        "maxOutage24" : 3293, 
+        "maxOutage24RunStartTime" : 1789959600000, 
+        "countyName" : "Greene", 
+        "stateId" : 19, 
+        "countyFIPSCode" : 39057, 
+        "currentOutageHasOverrideData" : "0", 
+        "maxOutage24HasOverrideData" : "0", 
+        "maxOutage1HasOverrideData" : "0", 
+        "stateName" : "OH", 
+        "coveredCustomers" : 88294, 
+        "actualCustomers" : 90499, 
+        "modelCount" : 88299, 
+        "collectedCount" : 1736
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 6, 
+        "currentOutage" : 174, 
+        "currentOutageRunStartTime" : 1790024400000, 
+        "maxOutage1" : 334, 
+        "maxOutage1RunStartTime" : 1790022600000, 
+        "maxOutage24" : 1211, 
+        "maxOutage24RunStartTime" : 1789969500000, 
+        "countyName" : "Franklin", 
+        "stateId" : 19, 
+        "countyFIPSCode" : 39049, 
+        "currentOutageHasOverrideData" : "0", 
+        "maxOutage24HasOverrideData" : "0", 
+        "maxOutage1HasOverrideData" : "0", 
+        "stateName" : "OH", 
+        "coveredCustomers" : 560233, 
+        "actualCustomers" : 590147, 
+        "modelCount" : 561883, 
+        "collectedCount" : 559679
+      }
+    }
+  ]
+}

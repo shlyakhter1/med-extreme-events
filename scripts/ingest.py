@@ -2,9 +2,11 @@
 
 ``EVENT_MODE=replay`` (default): load every scenario under ``fixtures/events/`` (or
 ``--scenario NAME``), replacing that scenario's rows. ``EVENT_MODE=live``: pull current NWS
-alerts, OpenFEMA declarations, HMS smoke (last 2 days) and, when ``AIRNOW_API_KEY`` is set,
-AirNow observations for the next 7 days' window; upsert by natural key.
-Both modes land in the same ``events`` table.
+alerts, OpenFEMA declarations, HMS smoke (last 2 days), the EAGLE-I county outage snapshot
+(threshold = the lowest ``outage_pct_min`` any card asks for; needs ``EAGLEI_TOKEN`` for the
+FEMA partner service or a public mirror in ``EAGLEI_FEATURE_URL``) and, when
+``AIRNOW_API_KEY`` is set, AirNow observations for the next 7 days' window; upsert by natural
+key. Both modes land in the same ``events`` table.
 """
 
 from __future__ import annotations
@@ -16,11 +18,13 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from xevents.cards import load_cards
 from xevents.geography.counties import CountyIndex
 from xevents.geography.nws_zones import UgcResolver
 from xevents.models import Event, TimeWindow
 from xevents.providers.airnow import AirNowProvider
 from xevents.providers.base import ProviderError
+from xevents.providers.eagle_i import EagleIProvider, load_customers, min_outage_pct
 from xevents.providers.hms import HMSSmokeProvider
 from xevents.providers.iem_archive import IEMArchiveProvider
 from xevents.providers.nws import NWSAlertsProvider
@@ -94,6 +98,17 @@ def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
             TimeWindow(start=now - timedelta(days=2), end=now),
         ),
     ]
+    outage_threshold = min_outage_pct(load_cards())
+    if outage_threshold is not None:
+        providers.append(
+            (
+                "eagle_i",
+                lambda: EagleIProvider(
+                    load_customers(), threshold_pct=outage_threshold, raw_dir=LIVE_RAW
+                ),
+                window,
+            )
+        )
     if os.environ.get("AIRNOW_API_KEY"):
         providers.append(
             (

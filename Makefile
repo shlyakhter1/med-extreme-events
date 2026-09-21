@@ -46,6 +46,7 @@ reference: ## rebuild cached reference data (county boundaries, ZIP↔county; fa
 	$(RUN) python scripts/build_nws_zones.py
 	$(RUN) python scripts/build_ct_crosswalk.py
 	$(RUN) python scripts/build_zip_county.py
+	$(RUN) python scripts/build_eaglei_customers.py
 	$(RUN) python scripts/build_facilities.py
 
 load: ## load cached reference data into DATABASE_URL (SQLite fallback) with county/VISN attribution

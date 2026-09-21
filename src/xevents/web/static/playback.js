@@ -857,6 +857,8 @@
       <div class="prov"><b>When:</b> ${fmt(e._t0)} → ${fmt(e._t1)} UTC (${Math.round((e._t1 - e._t0) / 36e5)} h)</div>
       <div class="prov">Urgency ${esc(e.urgency)} · certainty ${esc(e.certainty)} · source ${esc(e.source)}</div>
       ${e.geography.note ? `<div class="prov">${esc(e.geography.note)}</div>` : ""}
+      ${e.metrics && e.metrics.outage_pct !== undefined ? `<div class="prov"><b>Outage:</b> ${Number(e.metrics.customers_out).toLocaleString()} of ${Number(e.metrics.county_customers).toLocaleString()} customers out (${esc(e.metrics.outage_pct)}%)</div>` : ""}
+      ${e.attribution ? `<div class="prov">${esc(e.attribution)} ${(e.caveats || []).map(esc).join(" ")}</div>` : ""}
       <div style="margin-top:6px"><b>Cards fired:</b> ${byCard.size ? `${mine.length} action items at ${facs.size} facilities` : "none — no card trigger matches this event"}</div>
       ${cardList ? `<ul>${cardList}</ul>` : ""}
       <div class="prov" style="margin-top:6px"><a href="/dashboard/events/${encodeURIComponent(e.event_key)}?scenario=${encodeURIComponent($("scenario").value)}">open full event page →</a></div>

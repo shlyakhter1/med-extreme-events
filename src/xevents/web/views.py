@@ -20,6 +20,8 @@ from xevents.carbon import CarbonTable, load_carbon
 from xevents.cards import load_cards
 from xevents.geography.counties import CountyIndex
 from xevents.models import ActionItem, ActionItemStatus, Event, Role
+from xevents.providers.eagle_i import ATTRIBUTION as EAGLEI_ATTRIBUTION
+from xevents.providers.eagle_i import COVERAGE_CAVEAT, CUSTOMERS_CAVEAT, DENOMINATOR_SOURCE
 from xevents.providers.replay import list_scenarios
 from xevents.store import (
     TransitionError,
@@ -136,6 +138,11 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
         "as_of_input": to_input_value(as_of),
         "feeds": feeds,
         "any_stale": any(f["stale"] for f in feeds) if feeds else chosen is None,
+        "eaglei": {
+            "attribution": EAGLEI_ATTRIBUTION,
+            "caveats": [CUSTOMERS_CAVEAT, COVERAGE_CAVEAT],
+            "denominator": DENOMINATOR_SOURCE,
+        },
     }
 
 
@@ -169,6 +176,7 @@ def dashboard(
                 "facility": facilities.get(it.scope_id),
                 "cards": {},
                 "panel": 0.0,
+                "rank_score": 0.0,
                 "severity": 0,
                 "acuity_rank": 99,
                 "events": set(),
@@ -176,6 +184,7 @@ def dashboard(
         )
         row["cards"].setdefault(it.card_id, it.card_title)
         row["panel"] = max(row["panel"], it.panel.value if it.panel else 0.0)
+        row["rank_score"] = max(row["rank_score"], it.rank_score)
         row["severity"] = max(row["severity"], SEVERITY_RANK[it.event_severity.value])
         row["acuity_rank"] = min(row["acuity_rank"], it.acuity_rank)
         row["events"].add(it.event_name)
@@ -184,7 +193,12 @@ def dashboard(
         f = r["facility"]
         cls = (f.classification or "") if f else ""
         station_first = 0 if cls.startswith(("VA Medical Center", "Health Care Center")) else 1
-        return (r["acuity_rank"], -(r["severity"] * r["panel"]), station_first, f.name if f else "")
+        return (
+            r["acuity_rank"],
+            -(r["severity"] * r["rank_score"]),
+            station_first,
+            f.name if f else "",
+        )
 
     ranked = sorted(board.values(), key=board_key)
     event_counts: dict[str, int] = {}
