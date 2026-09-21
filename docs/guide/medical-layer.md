@@ -183,7 +183,8 @@ accounts.
 Clicking a card filters the map to where that card fires and opens the card itself: its
 summary, acuity, evidence tier, window, role text, safety line, escalation signs, citations,
 the facilities with their panels, and the carbon panel. Card text is fetched from `/cards`,
-so no clinical wording is duplicated in JavaScript.
+so no clinical wording is duplicated in JavaScript. For a screenshot of a selected card, see
+[events-and-playback.md §5](events-and-playback.md#5-using-the-playback-view).
 
 ## 7. Carbon panel (display only)
 

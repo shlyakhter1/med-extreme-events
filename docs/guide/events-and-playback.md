@@ -114,6 +114,14 @@ archive and HMS providers (see `_common.py`) and writes `events.json` with
 `/playback` is the layer's main screen: a US map, a side panel and a timeline, all driven by
 one time cursor *t*.
 
+![Playback of the 2021 heat dome at 2021-07-02 03:00Z, with the lithium card selected](images/playback-heat-dome-card.png)
+
+*The `heat_dome_2021` replay at 2021-07-02 03:00Z, the peak of the Excessive Heat
+Warnings. Heat-shaded counties cover WA and OR. The card legend at the lower right has
+isolated Card 1 (heat × lithium). Its chips mark the 7 stations where it fires, and the side
+panel shows the card's care-team text and safety line. The timeline at the bottom has one
+lane per NWS product, and the playhead is at t.*
+
 **Choosing what to watch.** Use the **View** selector to pick a replay scenario, or
 **live (now) — last 2 weeks**. The URL parameter `?scenario=` selects it directly, and the
 Dashboard and Events links in the header keep the same view.
