@@ -65,6 +65,8 @@ scenarios: ## rebuild fixtures/events/*/events.json from their raw archived sour
 	$(RUN) python fixtures/events/heat_dome_2021/build.py
 	$(RUN) python fixtures/events/ian_2022/build.py
 	$(RUN) python fixtures/events/smoke_nyc_2023/build.py
+	$(RUN) python fixtures/events/uri_2021/build.py
+	$(RUN) python fixtures/events/smoke_canada_2026/build.py
 
 DEMO_DB ?= sqlite:///demo.db
 

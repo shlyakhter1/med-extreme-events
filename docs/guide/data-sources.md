@@ -99,6 +99,11 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
   response.
 - **Used for:** air-pollution events. Monitors are mapped to counties by point-in-polygon.
   Live mode only, and skipped when there is no key.
+- **Historical route (no key):** the AirNow public file archive
+  `https://files.airnowtech.org/airnow/<yyyy>/<yyyymmdd>/daily_data_v2.dat` gives one daily
+  AQI per site and parameter (PM2.5 24-h, ozone 8-h) with coordinates;
+  `parse_daily_data_v2` maps it onto the same observation rows, so replay fixtures
+  (`smoke_canada_2026`) carry AirNow events without a key.
 - **Code:** `src/xevents/providers/airnow.py`.
 - **Limits:** the **response shape has not been verified against a real key**. Check the
   first live pull in `fixtures/live/raw/airnow_data_*.json`. None of the scenarios contain

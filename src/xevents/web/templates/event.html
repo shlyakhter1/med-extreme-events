@@ -9,6 +9,7 @@
 <p><a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">← All events</a></p>
 <h2 style="margin:0">{{ event.event_name }}
   <span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[event.severity.value] }}">{{ event.severity.value }}</span>
+  <span class="tag temporality {{ event.temporality.value }}">{{ event.temporality.value }}</span>
   <span class="tag">{{ event.urgency.value }}</span><span class="tag">{{ event.certainty.value }}</span></h2>
 {% if event.headline %}<p>{{ event.headline }}</p>{% endif %}
 <table style="max-width:820px">
@@ -26,6 +27,7 @@
     <details><summary>how was this number computed?</summary>
       <div>outage_pct = customers_out ÷ county_customers × 100; county_customers from {{ eaglei.denominator }}.</div>
       {% for c in eaglei.caveats %}<div>{{ c }}</div>{% endfor %}
+      {% if event.metrics.outage_pct_raw %}<div><b>Data-quality flag:</b> raw value {{ event.metrics.outage_pct_raw }}% — {{ eaglei.overcount }}</div>{% endif %}
     </details>
     <div class="muted" style="font-size:12px">{{ eaglei.attribution }}</div></td></tr>
   {% endif %}
@@ -54,9 +56,10 @@
 <script>
 (async () => {
   const fips = {{ counties | map(attribute=0) | list | tojson }};
-  const color = {{ {'heat':'#e4572e','hurricane_flood':'#3d7fdc','wildfire_smoke':'#8c6d3f','air_pollution':'#a05cd6','power_outage':'#d9a41a'}.get(event.event_type.value, '#4c8dff') | tojson }};
+  const color = XMap.EVENT_COLORS[{{ event.event_type.value | tojson }}] || "#4c8dff";
+  const ev = {{ {'event_type': event.event_type.value, 'metrics': event.metrics} | tojson }};
   const ctx = await XMap.create("map");
-  const paint = new Map(fips.map((f) => [f, { color, opacity: 0.6 }]));
+  const paint = new Map(fips.map((f) => [f, { color, opacity: XMap.eventOpacity(ev, {{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[event.severity.value] }}) }]));
   XMap.paintCounties(ctx, paint);
   const bounds = [];
   ctx.byFips.forEach((layer, f) => { if (paint.has(f)) bounds.push(layer.getBounds()); });

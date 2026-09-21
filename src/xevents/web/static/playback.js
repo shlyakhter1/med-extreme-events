@@ -4,7 +4,7 @@
 (() => {
   const COLORS = XMap.EVENT_COLORS;
   const SEV = XMap.SEVERITY_RANK;
-  const TYPE_ORDER = ["hurricane_flood", "heat", "power_outage", "air_pollution", "wildfire_smoke"];
+  const TYPE_ORDER = ["hurricane_flood", "heat", "extreme_cold", "power_outage", "air_pollution", "wildfire_smoke"];
   const HOUR = 3600e3;
   const $ = (id) => document.getElementById(id);
 
@@ -316,7 +316,7 @@
         if (better) {
           paint.set(c, {
             color: COLORS[e.event_type] || "#4c8dff",
-            opacity: XMap.fillOpacity(sev),
+            opacity: XMap.eventOpacity(e, sev),
             sev,
             type: e.event_type,
           });
@@ -853,7 +853,7 @@
       .map(([id, c]) => `<li><span class="swatch" style="background:${cardColor(id)}"></span>${esc(c.title)} — ${c.facilities.size} facilities</li>`)
       .join("");
     $("detail").innerHTML = detailHeader() + `<h2>Selected event</h2><div class="card">
-      <h3>${esc(e.event_name)} <span class="tag sev-${SEV[e.severity] || 0}">${esc(e.severity)}</span></h3>
+      <h3>${esc(e.event_name)} <span class="tag sev-${SEV[e.severity] || 0}">${esc(e.severity)}</span> ${XMap.temporalityBadge(e.temporality)}</h3>
       <div class="prov">${esc(e.event_key)}</div>
       <div class="prov"><b>Where:</b> ${esc(placeOf(e))}${e.geography.states?.length ? ` (${esc(e.geography.states.join(", "))})` : ""}</div>
       <div class="prov"><b>When:</b> ${fmt(e._t0)} → ${fmt(e._t1)} UTC (${Math.round((e._t1 - e._t0) / 36e5)} h)</div>
@@ -890,7 +890,7 @@
       const any = Object.values(entry.roles)[0];
       const it = entry.roles[state.role];
       html += `<div class="card"><h3>${esc(entry.title)}</h3>
-        <div class="prov">${esc(any.event_name)} · ${esc(any.event_severity)}</div>
+        <div class="prov">${esc(any.event_name)} · ${esc(any.event_severity)} ${XMap.temporalityBadge(any.event_temporality)}${any.compounding_events && any.compounding_events.length ? ` <span class="tag compounding">compounding${any.event_type !== "power_outage" ? " · acuity +1" : ""}</span> ${any.compounding_events.map(esc).join(" ")}` : ""}</div>
         <div class="prov"><b>Window:</b> ${fmtShort(parse(any.window_start))} → ${fmtShort(parse(any.window_end))} UTC</div>`;
       if (any.panel) {
         html += `<div class="prov">Affected panel ≈ <b style="color:var(--ink)">${Math.round(any.panel.value).toLocaleString()}</b>

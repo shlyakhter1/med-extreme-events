@@ -5,6 +5,8 @@
     <h3>{{ c.title }} <span class="tag">{{ any.acuity_class }}</span> <span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[any.event_severity.value] }}">{{ any.event_name }} · {{ any.event_severity.value }}</span></h3>
     <div class="prov">Event <code>{{ any.event_key }}</code> · window {{ any.window_start.strftime('%Y-%m-%d %H:%MZ') }} → {{ any.window_end.strftime('%Y-%m-%d %H:%MZ') }} · card {{ any.card_id }} v{{ any.card_version }} · evidence: {{ any.evidence_tier.value }} · {{ any.event_temporality.value }} → {{ any.phase.value }} actions</div>
     {% if any.event_type.value == 'power_outage' %}<div class="prov">{{ eaglei.attribution }} {{ eaglei.caveats[0] }}</div>{% endif %}
+    {% if any.compounding_events %}<div class="prov"><span class="tag compounding" title="co-occurring event in this county (requirements v2 §4)">compounding{% if any.event_type.value != 'power_outage' %} · acuity +1{% endif %}</span>
+      {% for k in any.compounding_events %}<a href="/dashboard/events/{{ k }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}"><code>{{ k }}</code></a>{{ ' ' if not loop.last }}{% endfor %}</div>{% endif %}
     {% if any.panel %}
       <div class="prov">Affected panel ≈ <b style="color:var(--ink)">{{ '{:,.0f}'.format(any.panel.value) }}</b> {{ any.panel.unit }}
         <details><summary>how was this number computed?</summary>

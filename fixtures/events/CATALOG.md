@@ -1,14 +1,14 @@
 # Replay Scenario Catalog
 
-*As of 2026-09-21. Scenarios the system can (or could) replay. Status: `built` = fixture exists; `this_iteration` = built in M10; `cataloged` = feasible, sources identified, not yet built; `partial` = some layers unavailable. EAGLE-I outage data exists only from 2014 onward; pre-2014 events can never carry a real outage layer.*
+*As of 2026-09-21 (M10 done). Scenarios the system can (or could) replay. Status: `built` = fixture exists; `cataloged` = feasible, sources identified, not yet built; `partial` = some layers unavailable. EAGLE-I outage data exists only from 2014 onward; pre-2014 events can never carry a real outage layer.*
 
 | Scenario | Dates / Region | Hazards exercised | Cards | Fixture sources | Status |
 | --- | --- | --- | --- | --- | --- |
 | PNW Heat Dome | Jun 25–Jul 1 2021, WA/OR | Extreme heat | 1, 2, 4 | IEM CAP archive | **built** |
-| Hurricane Ian | Sep 23–30 2022, FL | Hurricane → observed outage (supersede path) | 3, 5, 6 | IEM CAP + ORNL EAGLE-I 2022 FL | **built → upgraded (M10)** |
-| Canadian smoke NYC | Jun 6–8 2023, NY/Northeast | Wildfire smoke / AQI | 8 | HMS + AirNow archive | **built** (card lands M9) |
-| **Winter Storm Uri** | Feb 10–20 2021, TX | Extreme cold + largest US outage in EAGLE-I record + cold×outage boost; legacy CAP names test | 7 + 3/5/6 | IEM CAP (legacy Wind Chill products) + ORNL EAGLE-I 2021 TX | **this_iteration (headline golden test)** |
-| **Canadian smoke, July 2026** | Jul 14–20 2026, Upper Midwest/Great Lakes → Northeast | Wildfire smoke (PM2.5 ~200 µg/m³ Baltimore–DC Jul 17; AQI >200 Midwest; >100M under alerts) + concurrent central-US heat dome | 8 (+1/2/4 heat narrative) | HMS + AirNow (post-migration endpoints; AQS fallback) + IEM CAP heat alerts | **this_iteration** |
+| Hurricane Ian | Sep 23–30 2022, FL | Hurricane → observed outage (supersede path) | 3, 5, 6 | IEM CAP + ORNL EAGLE-I 2022 FL | **built + upgraded** (EAGLE-I FL layer, supersede golden) |
+| Canadian smoke NYC | Jun 6–8 2023, NY/Northeast | Wildfire smoke / AQI | 8 | HMS + AirNow archive | **built** (Card 8 from M9) |
+| **Winter Storm Uri** | Feb 10–20 2021, TX | Extreme cold + largest US outage in EAGLE-I record + cold×outage boost; legacy CAP names test | 7 + 3/5/6 | IEM CAP (legacy Wind Chill products) + ORNL EAGLE-I 2021 TX | **built** (headline golden test) |
+| **Canadian smoke, July 2026** | Jul 14–20 2026, Upper Midwest/Great Lakes → Northeast | Wildfire smoke (PM2.5 ~200 µg/m³ Baltimore–DC Jul 17; AQI >200 Midwest; >100M under alerts) + concurrent central-US heat dome | 8 (+1/2/4 heat narrative) | HMS + AirNow public file archive (keyless daily AQI) + IEM CAP heat alerts | **built** |
 | Hurricane Ida | Aug 26–Sep 2 2021, LA (+ Northeast flooding) | Hurricane + near-total New Orleans outage + post-landfall heat-during-outage | 3, 5, 6 + boost showcase | IEM CAP + ORNL EAGLE-I 2021 LA | cataloged |
 | Hurricane Helene | Sep 24–30 2024, FL/GA/NC | Hurricane + Appalachian outage + IV-fluid supply-chain narrative (Baxter plant) | 3, 5, 6 | IEM CAP + ORNL EAGLE-I 2024 | cataloged |
 | Winter Storm Elliott | Dec 21–26 2022, Central/East | Extreme cold, grid stress, holiday travel | 7 | IEM CAP + EAGLE-I 2022 | cataloged |

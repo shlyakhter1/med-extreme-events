@@ -21,7 +21,12 @@ from xevents.cards import load_cards
 from xevents.geography.counties import CountyIndex
 from xevents.models import ActionItem, ActionItemStatus, Event, Role
 from xevents.providers.eagle_i import ATTRIBUTION as EAGLEI_ATTRIBUTION
-from xevents.providers.eagle_i import COVERAGE_CAVEAT, CUSTOMERS_CAVEAT, DENOMINATOR_SOURCE
+from xevents.providers.eagle_i import (
+    COVERAGE_CAVEAT,
+    CUSTOMERS_CAVEAT,
+    DENOMINATOR_SOURCE,
+    OVERCOUNT_CAVEAT,
+)
 from xevents.providers.replay import list_scenarios
 from xevents.store import (
     TransitionError,
@@ -142,6 +147,7 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
             "attribution": EAGLEI_ATTRIBUTION,
             "caveats": [CUSTOMERS_CAVEAT, COVERAGE_CAVEAT],
             "denominator": DENOMINATOR_SOURCE,
+            "overcount": OVERCOUNT_CAVEAT,
         },
     }
 

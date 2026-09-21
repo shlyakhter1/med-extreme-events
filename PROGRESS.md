@@ -2,6 +2,58 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-21 — M10: fixtures, catalogs, dashboard polish — iteration v2 complete
+
+- **Uri 2021 (headline):** `fixtures/events/uri_2021/` — IEM VTEC archive Feb 10–21 2021
+  (EC/CW/WS/IS/BZ/WC), TX zone geometries valid 2021-02-15, and the Texas window of the
+  ORNL EAGLE-I 2021 county CSV sliced into `raw/` (6.6 MB, 15-minute rows; the 1.1 GB
+  yearly file stays out of the repo, `build.py --slice-from` re-slices it). 78 cold events
+  (35 arrived as legacy Wind Chill products and carry `raw_nws_event`) + 12,900 hourly
+  outage events ≥ 10 % across 211 counties. Golden asserts success criterion 1 exactly:
+  Card 7 from normalized legacy products, Cards 3/5/6 from observed thresholds, boosted
+  Card 7 items (rank 5) with the outage keys, outage items annotated with the cold event.
+- **Ian upgrade:** Florida window of ORNL 2022 sliced into `raw/` (1.4 MB); 1,756 hourly
+  outage events. Golden asserts criterion 2: hurricane-watch items on Cards 5/6 are
+  SUPERSEDED by observed-outage items that carry during-event actions and the emPOWER line;
+  one current outage item per card/facility/role.
+- **Canadian smoke July 2026:** HMS shapefiles Jul 14–20 + **AirNow public file archive**
+  (`files.airnowtech.org/airnow/<yyyy>/<yyyymmdd>/daily_data_v2.dat`, keyless daily site AQI —
+  the historical route the plan flagged as a risk; `parse_daily_data_v2` maps it onto the
+  observation-row shape) + IEM heat products Jul 13–21, filtered to 27 corridor states.
+  818 events (21 HMS, 715 county-day AQI ≥ 101 in 19 states, max AQI 934; 82 heat — the
+  nationwide IEM pull also carries flood products, which the builder drops).
+  Golden asserts criterion 3: Card 8 from AirNow and HMS for Milwaukee/Detroit/Baltimore/DC
+  stations, heat cards where the heat dome co-occurs.
+- **Engine fixes the fixtures forced:** (1) consecutive polls of one county outage no longer
+  pile up active items — for observed `power_outage` the newer poll supersedes the older,
+  whatever its severity (requirements §1 "never duplicate"); (2) `outage_pct` is clamped
+  at 100 with `outage_pct_raw` + `data_quality_flag` kept — both Uri (1,796 hours, peak
+  raw 3,380 %) and Ian (59 hours) contain counties reporting more customers out than the
+  modeled total, a documented EAGLE-I data-quality issue; the event page shows the flag.
+- **Performance:** `scenario_summary` rescanned every event for every hour, for every
+  scenario, on every page request; with Uri that took seconds per request and stalled the
+  page tests for minutes. It is now an hourly difference-array sweep, cached per fixture
+  file (mtime + size): 0.26 s cold for all five scenarios, ~0 warm.
+- **Dashboard polish:** temporality badge (forecast/imminent/observed) on the dashboard and
+  events tables, the event page and playback; outage layer — county fill deepens with
+  `outage_pct` (10 % → 60 %+) on every map, legend says so; `compounding` chip
+  ("acuity +1" on boosted heat/cold items) linking the co-occurring events on the facility
+  page and in playback; `extreme_cold` colour and lane; the scenario switcher lists the new
+  fixtures automatically (`list_scenarios`). `data/hazard_sources.yaml` moved from `docs/`
+  per D7; catalog statuses updated to `integrated`.
+- **Goldens:** `uri_2021.json` (714 KB), `ian_2022.json` (regenerated: 514 KB),
+  `smoke_canada_2026.json` (491 KB); heat dome and NYC smoke unchanged.
+- **`make demo` from empty:** load + ingest (5 scenarios, 15,648 events) + match
+  (8,666 items) in ~8 s. Uri: 32,879 trigger evaluations → 2,972 items (2,824 superseded).
+- **Known limit:** playback loads a scenario's whole event list; for Uri that is 12,978
+  events, 15.4 MB before the gzip middleware (~0.6 s to serialize). The dashboard and events
+  pages are unaffected (they query by as-of time: 394 active events at the 2021-02-16 15:00
+  peak, 383 of them outages). A future iteration could serve playback a compact event shape.
+- **Success criteria:** 1–3 asserted by goldens; 4 (live EAGLE-I polling) by M7's provider
+  and contract test — with the token caveat; 5 (dual denominators) by M8's page test; 6
+  verified above. **Not done:** the recorded run-through (screenshots in `docs/guide/`) was
+  not re-taken this session.
+
 ## 2026-09-21 — M9: Cards 7 & 8, cold taxonomy, co-occurrence boost
 
 - **Cards transcribed** from `docs/card-library-additions.md`, clinical strings verbatim:

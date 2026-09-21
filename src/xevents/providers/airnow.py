@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -126,6 +126,59 @@ def parse_observations(
             )
         )
     return events
+
+
+# AirNow public file archive (files.airnowtech.org, no key): ``daily_data_v2.dat`` columns.
+DAILY_V2_COLUMNS = [
+    "date",
+    "aqsid",
+    "site",
+    "parameter",
+    "units",
+    "value",
+    "averaging_hours",
+    "agency",
+    "aqi",
+    "category",
+    "lat",
+    "lon",
+    "full_aqsid",
+]
+# archive parameter names → the names the current API uses (and our metrics)
+DAILY_V2_PARAMETERS = {"PM2.5-24hr": "PM2.5", "OZONE-8HR": "OZONE"}
+
+
+def parse_daily_data_v2(text: str, day: date) -> list[dict[str, Any]]:
+    """``daily_data_v2.dat`` rows → the observation-row shape ``parse_observations`` reads.
+
+    The daily file gives one AQI per (site, parameter) for the calendar day; the row is
+    stamped at 00:00 UTC of that day so the event spans the day. Rows without an AQI
+    (-999) and parameters other than PM2.5 (24 h) and ozone (8 h) are dropped.
+    """
+    rows: list[dict[str, Any]] = []
+    when = datetime(day.year, day.month, day.day, tzinfo=UTC).strftime("%Y-%m-%dT%H:%M")
+    for line in text.splitlines():
+        parts = line.split("|")
+        if len(parts) < len(DAILY_V2_COLUMNS):
+            continue
+        r = dict(zip(DAILY_V2_COLUMNS, parts, strict=False))
+        param = DAILY_V2_PARAMETERS.get(r["parameter"])
+        if param is None or r["aqi"] in ("", "-999"):
+            continue
+        rows.append(
+            {
+                "Latitude": r["lat"],
+                "Longitude": r["lon"],
+                "UTC": when,
+                "Parameter": param,
+                "AQI": r["aqi"],
+                "Category": r["category"],
+                "SiteName": r["site"],
+                "AgencyName": r["agency"],
+                "FullAQSCode": r["full_aqsid"],
+            }
+        )
+    return rows
 
 
 def _parse_utc(value: str) -> datetime | None:

@@ -59,14 +59,14 @@ sources:
     provider_module: providers/eagle_i.py
     endpoint_live: "https://gis.fema.gov/arcgis/rest/services/Partner/PowerOutages_EAGLE_I/FeatureServer"
     endpoint_historical: "ORNL EAGLE-I county datasets 2014-2025 (blanket DOI 10.13139/ORNLNCCS/1975203 for 2014-2022)"
-    auth: none
+    auth: "none for ORNL historical CSVs; FEMA partner FeatureServer is token-gated (EAGLEI_TOKEN) — verified 2026-09-21; public state-EMA mirrors expose the same fields (EAGLEI_FEATURE_URL)"
     granularity: [county_fips]
     cadence: "hourly (live); 15-min (historical)"
     temporality_map: {all: observed}
     attribution_required: "Electric customer outage data provided by EAGLE-I, Department of Energy."
-    caveats: ["customers are meters/accounts, not people", "~8% of US customers uncovered (small rural/municipal utilities)"]
-    denominators: "Moehl et al. modeled county customer dataset (with Brelsford et al. 2024, Sci Data, DOI 10.1038/s41597-024-03095-5)"
-    status: this_iteration
+    caveats: ["customers are meters/accounts, not people", "~8% of US customers uncovered (small rural/municipal utilities)", "customers_out can exceed the modeled county total (double counting); clamped at 100% with raw value kept"]
+    denominators: "Moehl et al. modeled county customer dataset (with Brelsford et al. 2024, Sci Data, DOI 10.1038/s41597-024-03095-5) — fixtures/reference/eaglei_customers.csv"
+    status: integrated
 
   - id: empower
     hazards: [exposure_layer]
@@ -76,8 +76,8 @@ sources:
     auth: none
     granularity: [zip, county]
     cadence: monthly_vintage
-    caveats: ["Medicare-beneficiary proxy, not veteran-specific - label everywhere", "planning/outreach datasets restricted to public-health officials"]
-    status: this_iteration
+    caveats: ["Medicare-beneficiary proxy, not veteran-specific - label everywhere", "planning/outreach datasets restricted to public-health officials", "small cells (1-10) masked to 11"]
+    status: integrated
 
   - id: psps
     hazards: [power_outage_planned]

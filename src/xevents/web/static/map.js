@@ -7,6 +7,7 @@ window.XMap = (() => {
      that any shaded county is obviously shaded. */
   const EVENT_TYPES = [
     { id: "heat", color: "#e4572e", label: "heat" },
+    { id: "extreme_cold", color: "#5fc9e8", label: "extreme cold / winter storm" },
     { id: "hurricane_flood", color: "#3d7fdc", label: "hurricane / flood" },
     { id: "wildfire_smoke", color: "#b5894e", label: "wildfire smoke" },
     { id: "air_pollution", color: "#a05cd6", label: "air pollution" },
@@ -16,6 +17,16 @@ window.XMap = (() => {
   const SEVERITY_RANK = { Extreme: 4, Severe: 3, Moderate: 2, Minor: 1, Unknown: 0 };
   /* Shading deepens with CAP severity; the floor keeps a minor alert visible. */
   const fillOpacity = (severityRank) => 0.34 + 0.12 * (severityRank || 0);
+  /* Outage layer: county fill deepens with the measured share of customers out (EAGLE-I),
+     from the same floor at 10 % to solid at 60 %+, so 15 % and 50 % outages read apart. */
+  const outageOpacity = (pct) => 0.34 + 0.6 * Math.min(1, Math.max(0, (Number(pct) || 0) - 10) / 50);
+  /* One rule for every map: outage events shade by percent out, everything else by severity. */
+  const eventOpacity = (e, severityRank) =>
+    e && e.event_type === "power_outage" && e.metrics && e.metrics.outage_pct !== undefined
+      ? outageOpacity(e.metrics.outage_pct)
+      : fillOpacity(severityRank);
+  /* Forecast / imminent / observed chip; the badge text is the temporality itself. */
+  const temporalityBadge = (t) => (t ? `<span class="tag temporality ${t}">${t}</span>` : "");
   const IDLE_COLOR = "#121a23";
 
   const BASE_STYLE = { weight: 0.35, color: "#243040", fillColor: "#121a23", fillOpacity: 1 };
@@ -62,8 +73,8 @@ window.XMap = (() => {
       .join("");
     return `<div class="hdr">Counties — active event</div>${rows}` +
       `<div><i style="background:${IDLE_COLOR};border-color:#2a3440"></i><span class="muted">no active event</span><span></span></div>` +
-      `<div class="note">Shading deepens with severity.</div>`;
+      `<div class="note">Shading deepens with severity; power outage shades by % of customers out.</div>`;
   }
 
-  return { create, paintCounties, counties, legendHtml, EVENT_TYPES, EVENT_COLORS, SEVERITY_RANK, fillOpacity, IDLE_COLOR };
+  return { create, paintCounties, counties, legendHtml, EVENT_TYPES, EVENT_COLORS, SEVERITY_RANK, fillOpacity, outageOpacity, eventOpacity, temporalityBadge, IDLE_COLOR };
 })();

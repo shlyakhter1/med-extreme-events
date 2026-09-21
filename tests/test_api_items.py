@@ -58,7 +58,16 @@ def client(tmp_path_factory: pytest.TempPathFactory) -> TestClient:
 
 def test_scenarios(client: TestClient) -> None:
     rows = client.get("/scenarios").json()
-    assert [r["id"] for r in rows] == ["heat_dome_2021", "ian_2022", "smoke_nyc_2023"]
+    assert [r["id"] for r in rows] == [
+        "heat_dome_2021",
+        "ian_2022",
+        "smoke_canada_2026",
+        "smoke_nyc_2023",
+        "uri_2021",
+    ]
+    uri = next(r for r in rows if r["id"] == "uri_2021")
+    assert uri["events"] > 12_000 and uri["event_types"] == ["extreme_cold", "power_outage"]
+    assert uri["peak_at"].startswith("2021-02-1"), "peak during the storm week"
     heat = rows[0]
     assert heat["events"] == 20 and heat["event_types"] == ["heat"]
     assert heat["window_start"] < heat["window_end"]

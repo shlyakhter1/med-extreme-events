@@ -1,6 +1,6 @@
 # US Hazard Event & Source Catalog
 
-*As of 2026-09-21. The system's map of hazard types → data sources for the US, with access details, temporality mapping, and card relevance. Machine-readable mirror: `data/hazard_sources.yaml`. Status: `integrated` (in the demo), `this_iteration` (M6–M10), `backlog` (cataloged for later). Global sources listed at the end.*
+*As of 2026-09-21. The system's map of hazard types → data sources for the US, with access details, temporality mapping, and card relevance. Machine-readable mirror: `data/hazard_sources.yaml`. Status: `integrated` (in the demo; M6–M10 items note their milestone), `backlog` (cataloged for later). Global sources listed at the end.*
 
 ## Integrated / this iteration
 
@@ -12,9 +12,9 @@
 | Disaster declarations | OpenFEMA DisasterDeclarationsSummaries v2 | Free, no key, OData filters | County | observed | context | integrated |
 | Air pollution (AQI) | AirNow API (2026 consolidated endpoints) | Free key; 500 req/h | ZIP / lat-lon; hourly obs, daily forecast | obs→observed, forecast→forecast | 8 | integrated |
 | Wildfire smoke | NOAA HMS smoke polygons | Free; shapefile/KML/WFS, daily | Polygon → county intersect | observed | 8 | integrated |
-| **Extreme cold / winter / ice** | NWS alerts (post-SCN23-44 taxonomy; legacy names normalized) | Free | Zone/county | watch→forecast, warning/advisory→imminent | **7** | this_iteration |
-| **Power outage (occurring)** | **EAGLE-I via FEMA ArcGIS FeatureServer**; ORNL historical county CSVs 2014–2025 for replay | Free, no key; hourly (live), 15-min (historical). Attribution required: "Electric customer outage data provided by EAGLE-I, Department of Energy." | County FIPS; customers-out (meters, not people; ~8% of customers uncovered) | observed | 3, 5, 6 (+boost to heat/cold cards) | this_iteration |
-| **Electricity-dependent exposure** | HHS emPOWER public REST (ArcGIS) | Free; monthly vintage | ZIP + county DME beneficiary counts (Medicare proxy) | n/a (exposure layer, cached reference) | 6 sub-panel; outage ranking | this_iteration |
+| **Extreme cold / winter / ice** | NWS alerts (post-SCN23-44 taxonomy; legacy names normalized) | Free | Zone/county | watch→forecast, warning/advisory→imminent | **7** | integrated (M9) |
+| **Power outage (occurring)** | **EAGLE-I via FEMA ArcGIS FeatureServer**; ORNL historical county CSVs 2014–2025 for replay | Free, no key; hourly (live), 15-min (historical). Attribution required: "Electric customer outage data provided by EAGLE-I, Department of Energy." | County FIPS; customers-out (meters, not people; ~8% of customers uncovered) | observed | 3, 5, 6 (+boost to heat/cold cards) | integrated (M7; FEMA partner service is token-gated — `EAGLEI_TOKEN`, or a public mirror via `EAGLEI_FEATURE_URL`) |
+| **Electricity-dependent exposure** | HHS emPOWER public REST (ArcGIS) | Free; monthly vintage | ZIP + county DME beneficiary counts (Medicare proxy) | n/a (exposure layer, cached reference) | 6 sub-panel; outage ranking | integrated (M8) |
 
 ## Backlog — health-relevant, sources verified
 

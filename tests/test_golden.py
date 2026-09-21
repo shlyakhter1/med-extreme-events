@@ -20,7 +20,7 @@ from xevents.denominators import PanelEstimator, ReferenceTables
 from xevents.engine import MatchResult, match
 from xevents.geography import CountyIndex, ZipCountyCrosswalk, attribute_facilities
 from xevents.geography.catchment import assign_catchments, assign_stations
-from xevents.models import ActionItem, Card, Estimate, Role
+from xevents.models import ActionItem, ActionItemStatus, Card, Estimate, EventType, Role
 from xevents.profiles import PROFILES_DIR, load_profile
 from xevents.providers.replay import load_scenario
 from xevents.providers.va_facilities import from_geojson
@@ -124,6 +124,9 @@ def test_heat_dome_2021_golden(world: tuple[list[Card], list, PanelEstimator]) -
 
 
 def test_ian_2022_golden(world: tuple[list[Card], list, PanelEstimator]) -> None:  # type: ignore[type-arg]
+    """Success criterion 2: the forecast → observed supersede. Hurricane-watch items on
+    Cards 5/6 transition to SUPERSEDED when EAGLE-I Florida outage events land, and the
+    outage items carry during-event actions."""
     result = run_scenario("ian_2022", world)
     check_golden("ian_2022", result)
     items = result.items
@@ -136,6 +139,115 @@ def test_ian_2022_golden(world: tuple[list[Card], list, PanelEstimator]) -> None
     assert items[0].card_id == "outage-dialysis", "dialysis ranks first by acuity"
     assert items[0].acuity_rank == 0
     assert {"vha_516", "vha_675"} & {i.scope_id for i in items}  # Bay Pines, Orlando
+    assert all(i.panel and i.panel.value > 0 for i in items)
+    by_id = {i.id: i for i in items}
+    watches = [
+        i
+        for i in items
+        if i.event_name == "Hurricane Watch" and i.card_id in ("outage-insulin", "outage-dialysis")
+    ]
+    assert watches, "the fixture holds hurricane-watch items on Cards 5/6"
+    superseded_by_outage = [
+        i
+        for i in watches
+        if i.status is ActionItemStatus.SUPERSEDED
+        and i.superseded_by
+        and by_id[i.superseded_by].event_type is EventType.POWER_OUTAGE
+    ]
+    assert superseded_by_outage, "watch items yield to observed outages (cross-family)"
+    for w in superseded_by_outage:
+        winner = by_id[w.superseded_by or ""]
+        assert winner.event_temporality.value == "observed"
+        assert winner.phase.value == "during_event"
+        assert all(a.phase.value in ("during_event", "any") for a in winner.actions)
+        assert winner.exposure is not None, "outage items carry the emPOWER line"
+    outage = [i for i in items if i.event_type is EventType.POWER_OUTAGE]
+    current = [i for i in outage if i.status is not ActionItemStatus.SUPERSEDED]
+    per_role = {(i.card_id, i.scope_id, i.role.value) for i in current}
+    assert len(per_role) == len(current), "one current outage item per card/facility/role"
+    assert any(i.event_key.startswith("eagle_i:12071:") for i in outage), "Lee County landfall"
+    assert all(i.compounding_events == [] for i in items), "no heat/cold in Ian"
+
+
+def test_uri_2021_golden(world: tuple[list[Card], list, PanelEstimator]) -> None:  # type: ignore[type-arg]
+    """Success criterion 1 (headline): Card 7 fires from normalized legacy CAP products,
+    Cards 3/5/6 fire from EAGLE-I observed-outage thresholds, and the cold × outage
+    co-occurrence boost applies."""
+    result = run_scenario("uri_2021", world)
+    check_golden("uri_2021", result)
+    items = result.items
+    assert {i.card_id for i in items} == {
+        "cold-cardio-respiratory",
+        "hurricane-delivery-interruption",
+        "outage-insulin",
+        "outage-dialysis",
+    }
+    events = {e.event_key: e for e in load_scenario("uri_2021")}
+    cold = [i for i in items if i.card_id == "cold-cardio-respiratory"]
+    assert cold and all(i.event_type is EventType.EXTREME_COLD for i in cold)
+    legacy = [i for i in cold if "raw_nws_event" in events[i.event_key].metrics]
+    assert legacy, "Card 7 fires from products that arrived under legacy Wind Chill names"
+    assert {events[i.event_key].event_name for i in legacy} <= {
+        "Extreme Cold Warning",
+        "Extreme Cold Watch",
+        "Cold Weather Advisory",
+    }
+    outage = [i for i in items if i.event_type is EventType.POWER_OUTAGE]
+    assert {i.card_id for i in outage} == {
+        "hurricane-delivery-interruption",
+        "outage-insulin",
+        "outage-dialysis",
+    }
+    assert all(float(events[i.event_key].metrics["outage_pct"]) >= 10 for i in outage)
+    assert all(
+        float(events[i.event_key].metrics["outage_pct"]) >= 25
+        for i in outage
+        if i.card_id == "hurricane-delivery-interruption"
+    )
+    profile = load_profile(PROFILES_DIR / "va.yaml")
+    base = profile.acuity_rank("cold_cardio_respiratory")
+    boosted = [i for i in cold if i.compounding_events]
+    assert boosted, "cold items in outage counties are boosted"
+    assert all(i.acuity_rank == base - 1 for i in boosted)
+    assert all(
+        events[k].event_type is EventType.POWER_OUTAGE
+        for i in boosted
+        for k in i.compounding_events
+    )
+    unboosted = [
+        i for i in cold if not i.compounding_events and i.status is not ActionItemStatus.SUPERSEDED
+    ]
+    assert all(i.acuity_rank == base for i in unboosted)
+    annotated = [i for i in outage if i.compounding_events]
+    assert annotated and all(
+        events[k].event_type is EventType.EXTREME_COLD
+        for i in annotated
+        for k in i.compounding_events
+    )
+    assert {"vha_580", "vha_549", "vha_671"} <= {
+        i.scope_id for i in items
+    }  # Houston, Dallas, San Antonio
+    assert all(i.panel and i.panel.value > 0 for i in items)
+
+
+def test_smoke_canada_2026_golden(world: tuple[list[Card], list, PanelEstimator]) -> None:  # type: ignore[type-arg]
+    """Success criterion 3: Card 8 fires for Midwest/Northeast facilities from AirNow AQI
+    and HMS density; the concurrent heat dome fires the heat cards."""
+    result = run_scenario("smoke_canada_2026", world)
+    check_golden("smoke_canada_2026", result)
+    items = result.items
+    smoke = [i for i in items if i.card_id == "smoke-copd-asthma"]
+    assert smoke
+    assert {i.event_type for i in smoke} == {EventType.AIR_POLLUTION, EventType.WILDFIRE_SMOKE}
+    assert {i.event_key.split(":")[0] for i in smoke} == {"airnow", "hms"}
+    assert {"heat-lithium", "heat-antipsychotics", "heat-heart-failure"} <= {
+        i.card_id for i in items
+    }
+    facilities = {i.scope_id for i in smoke}
+    assert {"vha_695", "vha_553", "vha_512", "vha_688"} & facilities, (
+        "Milwaukee/Detroit/Baltimore/DC"
+    )
+    assert all(i.phase.value == "during_event" for i in smoke if i.event_key.startswith("hms:"))
     assert all(i.panel and i.panel.value > 0 for i in items)
 
 
@@ -162,7 +274,13 @@ def test_card_needs_at_least_one_estimated_patient(
 ) -> None:
     profile = load_profile(PROFILES_DIR / "va.yaml")
     assert profile.min_panel_patients >= 1.0
-    for scenario in ("heat_dome_2021", "ian_2022", "smoke_nyc_2023"):
+    for scenario in (
+        "heat_dome_2021",
+        "ian_2022",
+        "smoke_nyc_2023",
+        "uri_2021",
+        "smoke_canada_2026",
+    ):
         result = run_scenario(scenario, world)
         for item in result.items:
             assert item.panel is not None

@@ -10,7 +10,7 @@ estimate that carries the formula, inputs and sources that produced it.
 ## Run it
 
 Needs Python 3.12 and [uv](https://docs.astral.sh/uv/). No API key, no database server and
-no network access: the reference data and the three replay scenarios are in this repository.
+no network access: the reference data and the five replay scenarios are in this repository.
 
 ```sh
 make demo          # empty state → facilities → replay events → action items → serve
@@ -35,7 +35,7 @@ docker build -t med-extreme-events:demo . && docker run --rm -p 8000:8000 med-ex
 **Hosting it on the web, live mode, pip instead of uv, and Postgres: see
 [docs/deploy.md](docs/deploy.md).**
 
-### The three scenarios
+### The five scenarios
 
 | Scenario | What fires |
 | --- | --- |

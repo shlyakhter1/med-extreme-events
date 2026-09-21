@@ -188,6 +188,9 @@ def test_events_show_location_and_timestamps(client: TestClient) -> None:
     base = {"scenario": "ian_2022", "at": "2022-09-27T16:00"}
     html = client.get("/dashboard/events", params=base).text
     assert "<th>Where</th>" in html and "<th>Onset (UTC)</th>" in html
+    assert (
+        'class="tag temporality forecast"' in html or 'class="tag temporality imminent"' in html
+    ), "every event row carries its temporality badge"
     assert "2022-09-2" in html, "timestamps are rendered"
     assert "FL" in html, "location is rendered"
     dash = client.get("/", params=base).text
@@ -308,8 +311,18 @@ def test_map_legend_explains_the_colours(client: TestClient) -> None:
     shaded county must never be mistakable for an unshaded one."""
     shared = client.get("/static/map.js").text
     assert "legendHtml" in shared and "EVENT_COLORS" in shared
-    for label in ("heat", "hurricane / flood", "wildfire smoke", "air pollution", "power outage"):
+    for label in (
+        "heat",
+        "extreme cold / winter storm",
+        "hurricane / flood",
+        "wildfire smoke",
+        "air pollution",
+        "power outage",
+    ):
         assert f'label: "{label}"' in shared, label
+    assert "outageOpacity" in shared and "shades by % of customers out" in shared, (
+        "the outage layer keys the county fill off percent out and the legend says so"
+    )
     assert "no active event" in shared, "the base colour needs a key too"
     assert "Shading deepens with severity" in shared
     assert "#8c6d3f" not in shared, "the old smoke brown read as unshaded at low opacity"

@@ -55,6 +55,11 @@ COVERAGE_CAVEAT = (
     "About 8% of US electric customers (small rural and municipal utilities) are not covered "
     "by EAGLE-I, so counts are a floor."
 )
+OVERCOUNT_CAVEAT = (
+    "customers_out exceeded the modeled county customer count (utility-map double counting "
+    "or a denominator vintage mismatch, both documented EAGLE-I data-quality issues); shown "
+    "as 100% with the raw value kept in metrics."
+)
 DENOMINATOR_SOURCE = (
     "Moehl et al. modeled county electric customers (MCC, 2022 vintage; Brelsford et al. 2024, "
     "Sci Data, doi:10.1038/s41597-024-03095-5)"
@@ -160,7 +165,8 @@ def polls_to_events(
             continue
         streak = 0
         for p in sorted(by_county[fips], key=lambda x: x.run_start):
-            pct = round(p.customers_out / county_customers * 100, 2)
+            raw_pct = round(p.customers_out / county_customers * 100, 2)
+            pct = min(raw_pct, 100.0)  # a county cannot lose more customers than it has
             if pct < threshold_pct:
                 streak = 0
                 continue
@@ -174,6 +180,9 @@ def polls_to_events(
                 "temporality_basis": "eagle-i measured customers out",
                 "denominator": "moehl_mcc_2022",
             }
+            if raw_pct > 100.0:
+                metrics["outage_pct_raw"] = raw_pct
+                metrics["data_quality_flag"] = "customers_out_exceeds_county_customers"
             metrics.update(p.extra)
             place = f"{p.county_name}, {p.state}" if p.county_name else fips
             events.append(

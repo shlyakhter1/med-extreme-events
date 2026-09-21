@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import math
 from datetime import UTC, datetime, timedelta
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +22,7 @@ from xevents.denominators import PanelEstimator, ReferenceTables
 from xevents.models import ActionItemStatus, Event, EventSource
 from xevents.profiles import PROFILES_DIR, load_profile
 from xevents.providers.eagle_i import ATTRIBUTION, COVERAGE_CAVEAT, CUSTOMERS_CAVEAT
-from xevents.providers.replay import list_scenarios, load_scenario
+from xevents.providers.replay import EVENTS_DIR, list_scenarios, load_scenario
 from xevents.providers.va_facilities import to_geojson
 from xevents.store import (
     TransitionError,
@@ -64,24 +66,42 @@ def event_json(event: Event, *, include_polygon: bool = False) -> dict[str, Any]
 
 def scenario_summary(name: str) -> dict[str, Any]:
     """Window plus ``peak_at``: the hour with the most simultaneously active events, which
-    the dashboard uses as its default "as of" moment for a replay."""
+    the dashboard uses as its default "as of" moment for a replay. Every page computes this
+    for every scenario, and Uri holds 13k events, so the result is cached per fixture file
+    (invalidated when ``events.json`` changes) and the peak is found with one sweep."""
+    path = EVENTS_DIR / name / "events.json"
+    stat = path.stat()
+    return dict(_scenario_summary(name, stat.st_mtime_ns, stat.st_size))
+
+
+@lru_cache(maxsize=32)
+def _scenario_summary(name: str, mtime_ns: int, size: int) -> dict[str, Any]:
     evs = load_scenario(name)
     start = min(e.onset for e in evs)
     end = max(e.expires for e in evs)
     last_onset = max(e.onset for e in evs)
-    best_t, best_n = start, -1
-    t = start
-    while t <= min(end, last_onset + timedelta(days=3)):
-        n = sum(1 for e in evs if e.onset <= t <= e.expires)
+    limit = min(end, last_onset + timedelta(days=3))
+    hours = int((limit - start).total_seconds() // 3600) + 1
+    # difference array over hourly steps t_k = start + k h: active iff onset <= t_k <= expires
+    diff = [0] * (hours + 1)
+    for e in evs:
+        lo = math.ceil((e.onset - start).total_seconds() / 3600)
+        hi = math.floor((e.expires - start).total_seconds() / 3600)
+        lo, hi = max(lo, 0), min(hi, hours - 1)
+        if lo <= hi:
+            diff[lo] += 1
+            diff[hi + 1] -= 1
+    best_k, best_n, n = 0, -1, 0
+    for k in range(hours):
+        n += diff[k]
         if n > best_n:
-            best_t, best_n = t, n
-        t += timedelta(hours=1)
+            best_k, best_n = k, n
     return {
         "id": name,
         "events": len(evs),
         "window_start": start.isoformat(),
         "window_end": end.isoformat(),
-        "peak_at": best_t.isoformat(),
+        "peak_at": (start + timedelta(hours=best_k)).isoformat(),
         "event_types": sorted({e.event_type.value for e in evs}),
     }
 

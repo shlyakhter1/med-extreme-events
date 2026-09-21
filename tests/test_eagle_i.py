@@ -18,6 +18,7 @@ from xevents.api import create_app
 from xevents.cards import CARDS_DIR, load_cards
 from xevents.engine import match
 from xevents.models import (
+    ActionItemStatus,
     CapSeverity,
     Card,
     Estimate,
@@ -171,6 +172,57 @@ def test_two_poll_debounce_end_to_end() -> None:
     assert set(by_card) == {"outage-insulin", "outage-dialysis", "hurricane-delivery-interruption"}
     assert by_card["hurricane-delivery-interruption"].role in set(Role)
     assert by_card["outage-dialysis"].acuity_rank == 0
+
+
+def test_outage_pct_is_clamped_and_flagged_when_customers_out_exceed_the_denominator() -> None:
+    """Uri 2021 and Ian 2022 both contain counties reporting more customers out than the
+    modeled county total (documented EAGLE-I data-quality issue). The percent is capped at
+    100 for thresholds and display; the raw value and a flag stay in metrics."""
+    polls = [_poll(LEE, 0, 900_000), _poll(LEE, 1, 900_000)]
+    events = polls_to_events(polls, CUSTOMERS, threshold_pct=10, poll_minutes=60)
+    assert events[0].metrics["outage_pct"] == 100.0
+    assert events[0].metrics["outage_pct_raw"] == 150.0
+    assert events[0].metrics["data_quality_flag"] == "customers_out_exceeds_county_customers"
+    assert events[0].severity is CapSeverity.EXTREME
+    normal = polls_to_events([_poll(LEE, 0, 90_000)], CUSTOMERS, threshold_pct=10, poll_minutes=60)
+    assert "outage_pct_raw" not in normal[0].metrics
+
+
+def test_newest_poll_supersedes_earlier_polls_of_the_same_outage() -> None:
+    """A county outage polled every hour must not pile up one active item per poll: the
+    latest measurement is the current item, earlier ones are superseded by it, whatever
+    their severity (a 30% poll followed by a 12% poll leaves the 12% item current)."""
+    cards = load_cards(CARDS_DIR)
+    profile = load_profile(PROFILES_DIR / "va.yaml")
+    facility = Facility(
+        id="vha_516",
+        name="Bay Pines",
+        facility_type="va_health_facility",
+        lat=27.8,
+        lon=-82.8,
+        operating_status=OperatingStatusCode.NORMAL,
+        county_fips=LEE,
+        visn="8",
+        classification="VA Medical Center (VAMC)",
+    )
+
+    def panels(fid: str, card: Card) -> Estimate:
+        return Estimate(label="p", value=50.0, formula="test", inputs={})
+
+    polls = [_poll(LEE, h, out) for h, out in enumerate([90_000, 180_000, 180_000, 72_000])]
+    events = polls_to_events(polls, CUSTOMERS, threshold_pct=10, poll_minutes=60)
+    result = match(events, cards, [facility], profile, panels, now=T0)
+    insulin = [
+        i for i in result.items if i.card_id == "outage-insulin" and i.role is Role.CARE_TEAM
+    ]
+    assert len(insulin) == 3, "polls 2-4 clear the debounce"
+    current = [i for i in insulin if i.status is not ActionItemStatus.SUPERSEDED]
+    assert [i.event_key for i in current] == [events[3].event_key], (
+        "only the newest poll is current"
+    )
+    assert current[0].event_severity is CapSeverity.MODERATE, "12% is current even after 30%"
+    older = [i for i in insulin if i.status is ActionItemStatus.SUPERSEDED]
+    assert all(i.superseded_by == current[0].id for i in older)
 
 
 # --------------------------------------------------------------------------- live (ArcGIS)

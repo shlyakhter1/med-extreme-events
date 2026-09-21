@@ -8,6 +8,7 @@ get the annotation only. No boost when the outage is below threshold or not sust
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import pytest
 
@@ -196,3 +197,36 @@ def test_cold_products_are_tracked_under_current_names() -> None:
     card7 = next(c for c in load_cards(CARDS_DIR) if c.number == 7)
     listed = {n for t in card7.event_triggers for n in t.conditions.nws_events}
     assert listed == current, "cards list current names only"
+
+
+# --------------------------------------------------------------------------- display
+
+
+def test_compounding_chip_renders(cards: list[Card], profile: Profile, tmp_path: Path) -> None:
+    """The boosted item shows a compounding chip linking to the outage event (M10 polish)."""
+    from fastapi.testclient import TestClient
+
+    from xevents.api import create_app
+    from xevents.store import (
+        init_db,
+        make_engine,
+        upsert_action_items,
+        upsert_events,
+        upsert_facilities,
+    )
+
+    cold = _weather("Extreme Cold Warning", EventType.EXTREME_COLD)
+    outage = _outage(2, 30.0, start=T0 + timedelta(hours=6))
+    result = match([cold, *outage], cards, [FACILITY], profile, _panels, now=T0)
+    eng = make_engine(f"sqlite:///{tmp_path / 'boost.db'}")
+    init_db(eng)
+    upsert_facilities(eng, [FACILITY])
+    upsert_events(eng, [cold, *outage])
+    upsert_action_items(eng, result.items)
+    client = TestClient(create_app(eng))
+    html = client.get(
+        f"/dashboard/facilities/{FACILITY.id}", params={"at": (T0 + timedelta(hours=8)).isoformat()}
+    ).text
+    assert 'class="tag compounding"' in html and "acuity +1" in html
+    assert outage[1].event_key in html, "the chip names the compounding outage"
+    assert 'class="tag temporality imminent"' in html or "imminent → pre_event" in html

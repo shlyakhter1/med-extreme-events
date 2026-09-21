@@ -416,11 +416,15 @@ def _observed(item: ActionItem) -> bool:
 def _supersedes(stronger: ActionItem, weaker: ActionItem) -> bool:
     """Observed beats forecast/imminent (never the reverse); within the same temporality
     class a higher CAP severity wins. Across event families only an observed event of the
-    listed stronger type may supersede, and only forecast/imminent items."""
+    listed stronger type may supersede, and only forecast/imminent items. Two measurements
+    of the same outage (consecutive polls) never coexist: the newer poll supersedes the
+    older one whatever its severity, so a county outage keeps one current item per role."""
     if stronger.event_type is not weaker.event_type:
         return _observed(stronger) and not _observed(weaker)
     if _observed(stronger) != _observed(weaker):
         return _observed(stronger)
+    if stronger.event_type is EventType.POWER_OUTAGE and _observed(stronger):
+        return stronger.window_end > weaker.window_end
     return SEVERITY_RANK[stronger.event_severity] > SEVERITY_RANK[weaker.event_severity]
 
 
@@ -439,6 +443,10 @@ def _apply_supersession(items: list[ActionItem]) -> None:
         group.sort(
             key=lambda it: (
                 not _observed(it),
+                # newest measurement first for observed outages; severity first otherwise
+                -(it.window_end.timestamp())
+                if it.event_type is EventType.POWER_OUTAGE and _observed(it)
+                else 0.0,
                 -SEVERITY_RANK[it.event_severity],
                 it.window_end,
                 it.id,
