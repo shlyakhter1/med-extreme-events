@@ -1,6 +1,7 @@
 # VA extreme-event demo — entry points. All Python runs through `uv run` (no venv activation needed).
 UV ?= uv
 SKILLS_REPO ?= ../../nyc2026-dataset
+PORT ?= 8000
 # If a .env exists at the repo root, every `uv run` below loads it (dotenv format).
 ENV_FILE := $(wildcard .env)
 RUN = $(UV) run $(if $(ENV_FILE),--env-file $(ENV_FILE),)
@@ -50,8 +51,8 @@ reference: ## rebuild cached reference data (county boundaries, ZIP↔county; fa
 load: ## load cached reference data into DATABASE_URL (SQLite fallback) with county/VISN attribution
 	$(RUN) python scripts/load_reference.py
 
-serve: ## run the API locally
-	$(RUN) uvicorn xevents.api:app --reload --port 8000
+serve: ## run the API locally from the working tree, reloading on change (PORT=8000)
+	$(RUN) uvicorn xevents.api:app --reload --port $(PORT)
 
 ingest: ## load events for EVENT_MODE=replay|live (default replay: all fixture scenarios)
 	$(RUN) python scripts/ingest.py
@@ -71,9 +72,9 @@ demo: ## fresh SQLite DB → reference data + catchments → replay scenarios �
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/load_reference.py
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/ingest.py --mode replay
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/match.py --mode replay
-	@echo "open http://localhost:8000/?scenario=heat_dome_2021  (and /playback)"
-	-open "http://localhost:8000/?scenario=heat_dome_2021" 2>/dev/null || true
-	DATABASE_URL=$(DEMO_DB) $(RUN) uvicorn xevents.api:app --port 8000
+	@echo "open http://localhost:$(PORT)/?scenario=heat_dome_2021  (and /playback)"
+	-open "http://localhost:$(PORT)/?scenario=heat_dome_2021" 2>/dev/null || true
+	DATABASE_URL=$(DEMO_DB) $(RUN) uvicorn xevents.api:app --port $(PORT)
 
 clean: ## remove caches
 	rm -rf .venv .pytest_cache .mypy_cache .ruff_cache

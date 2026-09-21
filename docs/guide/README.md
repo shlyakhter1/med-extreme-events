@@ -103,7 +103,7 @@ to a secret-named variable.
 | `make load` | Loads reference data, attributes facilities to county and VISN, builds catchments |
 | `make ingest` | Loads events (`EVENT_MODE=replay`: all scenarios; `live`: real feeds) |
 | `make match` | Runs the engine over stored events and writes action items |
-| `make serve` | Serves the API and pages on :8000 with reload |
+| `make serve` | Serves the working tree on :8000 with reload (`PORT=8001` to run beside a container; see [`docs/deploy.md`](../deploy.md) §1) |
 | `make reference` | Rebuilds the cached reference data from its sources (network; facilities need a key) |
 | `make scenarios` | Rebuilds the replay fixtures from their archived raw files |
 | `make schema` | Regenerates `cards/card.schema.json` from the Pydantic models |

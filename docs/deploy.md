@@ -46,6 +46,56 @@ make serve               # just the server
 make lint test           # ruff + mypy + pytest
 ```
 
+### Developing: serve your working tree, not a container
+
+A container is a snapshot of the code at the time its image was built. If one is running
+on :8000, for example the `mee` container started with `--restart unless-stopped`, it comes
+back whenever Docker starts. It keeps answering on :8000 with the old code, and changes in
+your working tree never show up. Check with `docker ps`.
+
+To see your edits, serve the working tree with `make serve`. It runs uvicorn with
+`--reload`, so the server restarts whenever you save a Python file. After editing JS or
+CSS, hard-refresh the browser (Cmd+Shift+R).
+
+**Option A: stop the container and use :8000.**
+
+```sh
+docker stop mee                                # stays stopped, even across Docker restarts
+DATABASE_URL=sqlite:///demo.db make serve      # the database `make demo` already built
+docker start mee                               # later, to bring the snapshot back
+```
+
+**Option B: keep the container on :8000 and run the working tree beside it.**
+
+```sh
+DATABASE_URL=sqlite:///demo.db make serve PORT=8001
+```
+
+Then :8000 is the snapshot and :8001 is your code. `make demo PORT=8001` works the same
+way.
+
+Notes:
+
+- **Name the database on the command line.** `make serve` reads `DATABASE_URL` from `.env`
+  when you don't. If `.env` points at the compose Postgres, run `make db-up` first. A
+  variable set on the command line takes precedence over `.env`.
+- **When to re-run the pipeline.** You don't need to rebuild the database for UI or API
+  changes. After changing cards, the profile, the engine, the denominators or the fixtures,
+  re-run `DATABASE_URL=sqlite:///demo.db make load ingest match` (or `make demo`), because
+  the action items are stored, not computed per request.
+- **Updating the container** to the current code takes a rebuild and a replacement:
+
+  ```sh
+  docker build -t med-extreme-events:demo .
+  docker rm -f mee
+  docker run -d --name mee --restart unless-stopped -p 8000:8000 \
+    -e NWS_USER_AGENT="med-extreme-events (contact: you@example.com)" med-extreme-events:demo
+  ```
+
+  The image bakes only the replays. Live events ingested into the old container are lost,
+  so re-run live ingestion inside the new one if you need them:
+  `docker exec mee sh -c 'python scripts/ingest.py --mode live && python scripts/match.py --mode live'`.
+
 ### Prefer pip over uv?
 
 `requirements.txt` is generated from the lockfile with pinned hashes:
@@ -86,7 +136,8 @@ docker build -t med-extreme-events:demo .
 docker run --rm -p 8000:8000 med-extreme-events:demo
 ```
 
-Open <http://localhost:8000>. The image is 381 MB and starts in a couple of seconds; most of
+Open <http://localhost:8000>. The container runs the code as it was when you built the
+image, so rebuild after pulling or editing (see "Developing" in §1). The image is 381 MB and starts in a couple of seconds; most of
 its size is the Python base image plus the county boundary and reference fixtures.
 
 ---
