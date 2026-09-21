@@ -59,7 +59,15 @@ def run_scenario(scenario: str, world: tuple[list[Card], list, PanelEstimator]) 
     # Production scopes action items to the stations that own a panel (scripts/match.py);
     # the golden contract must exercise the same scoping.
     stations = [f for f in facilities if estimator.owns_panel(f.id)]
-    return match(load_scenario(scenario), cards, stations, profile, panels, now=FIXED_NOW)
+    return match(
+        load_scenario(scenario),
+        cards,
+        stations,
+        profile,
+        panels,
+        now=FIXED_NOW,
+        exposures=estimator.empower_dme,
+    )
 
 
 def compact(items: list[ActionItem]) -> list[dict[str, object]]:

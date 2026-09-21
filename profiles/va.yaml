@@ -74,6 +74,13 @@ denominators:
     places_measure: diabetes
     basis: CDC PLACES county crude prevalence, adults >= 18, general population (cross-check for the VA multiplier)
     source: CDC PLACES 2025 county release
+  # emPOWER-backed key (county-specific; a MEASURED count of Medicare beneficiaries, not veterans —
+  # shown beside the veteran estimate with that label, never instead of it)
+  empower_dme:
+    empower_measure: power_dependent_dme
+    basis: HHS emPOWER de-identified count of Medicare (FFS + Advantage) beneficiaries with electricity-dependent DME claims, by county
+    source: HHS emPOWER public REST service (fixtures/reference/empower_county.csv; vintage in the file header)
+    note: Medicare proxy, not veteran-specific; small cells (1-10) are masked to 11 upstream.
 
 # Highest acuity first (docs/implementation-plan.md M4: dialysis > clozapine > insulin > …).
 acuity_order:

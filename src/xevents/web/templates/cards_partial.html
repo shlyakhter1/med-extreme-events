@@ -3,14 +3,25 @@
   {% set it = c.item %}{% set any = c.any %}
   <div class="card">
     <h3>{{ c.title }} <span class="tag">{{ any.acuity_class }}</span> <span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[any.event_severity.value] }}">{{ any.event_name }} · {{ any.event_severity.value }}</span></h3>
-    <div class="prov">Event <code>{{ any.event_key }}</code> · window {{ any.window_start.strftime('%Y-%m-%d %H:%MZ') }} → {{ any.window_end.strftime('%Y-%m-%d %H:%MZ') }} · card {{ any.card_id }} v{{ any.card_version }} · evidence: {{ any.evidence_tier.value }}</div>
+    <div class="prov">Event <code>{{ any.event_key }}</code> · window {{ any.window_start.strftime('%Y-%m-%d %H:%MZ') }} → {{ any.window_end.strftime('%Y-%m-%d %H:%MZ') }} · card {{ any.card_id }} v{{ any.card_version }} · evidence: {{ any.evidence_tier.value }} · {{ any.event_temporality.value }} → {{ any.phase.value }} actions</div>
+    {% if any.event_type.value == 'power_outage' %}<div class="prov">{{ eaglei.attribution }} {{ eaglei.caveats[0] }}</div>{% endif %}
     {% if any.panel %}
       <div class="prov">Affected panel ≈ <b style="color:var(--ink)">{{ '{:,.0f}'.format(any.panel.value) }}</b> {{ any.panel.unit }}
         <details><summary>how was this number computed?</summary>
           <div><b>{{ any.panel.label }}</b>: {{ any.panel.formula }}</div>
-          {% for comp in any.panel.components recursive %}<div style="margin-left:14px">↳ <b>{{ comp.label }}</b> = {{ '{:,.0f}'.format(comp.value) }}: {{ comp.formula }}{% if comp.components %}{{ loop(comp.components) }}{% endif %}</div>{% endfor %}
+          {% for comp in any.panel.components recursive %}<div style="margin-left:14px">↳ <b>{{ comp.label }}</b> = {{ '{:,.0f}'.format(comp.value) }}{% if comp.unit != 'veterans' %} {{ comp.unit }}{% endif %}: {{ comp.formula }}{% if comp.unit != 'veterans' %} · {{ comp.caveats[0] }}{% endif %}{% if comp.components %}{{ loop(comp.components) }}{% endif %}</div>{% endfor %}
           <div>Caveats: {{ any.panel.caveats|join(' ') }}</div>
           <div>Sources: {{ any.panel.sources|join('; ') }}</div>
+        </details>
+      </div>
+    {% endif %}
+    {% if any.exposure %}
+      <div class="prov"><b style="color:var(--ink)">{{ '{:,.0f}'.format(any.exposure.value) }}</b> electricity-dependent Medicare beneficiaries in catchment (emPOWER, measured; Medicare proxy — not veteran-specific)
+        <details><summary>how was this number computed?</summary>
+          <div><b>{{ any.exposure.label }}</b>: {{ any.exposure.formula }}</div>
+          <div>Ranking: {{ any.rank_formula }} (measured × measured; within the card's acuity class, larger ranks first).</div>
+          <div>Caveats: {{ any.exposure.caveats|join(' ') }}</div>
+          <div>Sources: {{ any.exposure.sources|join('; ') }}</div>
         </details>
       </div>
     {% endif %}

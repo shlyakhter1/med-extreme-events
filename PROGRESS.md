@@ -2,6 +2,52 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-21 — M8: emPOWER reference layer + Card 6 sub-panel
+
+- **Source verified:** the HHS emPOWER public REST service is `HHS_emPOWER_REST_Service_Public`
+  on ArcGIS Online (owner DHHS_gissupport; mirrored at geohealth.hhs.gov/dataaccess): layer 2
+  county (3,233 rows), layer 1 ZIP (31,919), layer 3 state, plus per-service-type layers.
+  Fields: `Medicare_Benes`, `Power_Dependent_Devices_DME`, `Facility_ESRD_Dialysis_Any_DME`,
+  `O2_Services_Any_DME`, `Home_Health_Services_Any_DME`, `AtHome_Hospice_Any_DME`,
+  `Any_Healthcare_Srvc_Any_DME`. No vintage field; the service's `dataLastEditDate`
+  (2026-09-21) stands in and goes into the CSV `#` header with the retrieval date.
+- **`scripts/build_empower.py`** → `fixtures/reference/empower_county.csv` (3,228 counties
+  after dropping five FIPS-less territory aggregates) and `empower_zip.csv`; layer ids and
+  field names pinned, build fails loudly on drift; raw county JSON kept, the 9.5 MB raw
+  ZIP pull git-ignored. `--refresh` re-pulls. Not yet in `make reference` (manual, monthly).
+- **Denominator kind:** `Denominator.empower_measure` (fourth exclusive kind) and
+  `profiles/va.yaml` `empower_dme` → `power_dependent_dme`. `ReferenceTables` loads the
+  county table (`load_empower` skips the header line, keeps the vintage in
+  `empower_source`); `PanelEstimator.empower_dme` sums it over the station's catchment,
+  unit **Medicare beneficiaries**, label "(emPOWER, measured)", caveats: Medicare proxy /
+  not veteran-specific / never replaces the veteran estimate; small cells masked to 11.
+  `card_panel` treats an emPOWER-keyed sub-panel as this measured component, not a share
+  of the condition panel. ZIP rollup is built and loadable but the catchment rollup is by
+  county (catchments are county sets); ZIP stays for provenance and a later facility view.
+- **ActionItem:** `exposure` (the emPOWER estimate on outage-triggered items), `rank_score`
+  and `rank_formula`. `engine.rank_for`: outage events rank by `outage_pct × empower_dme`
+  (measured × measured); everything else by panel size, so existing orderings are unchanged.
+  `match()` takes an optional `exposures` lookup (wired in `scripts/match.py`, the golden
+  harness and tests). Store gains a `rank_score` column and orders by it within acuity; the
+  dashboard board and the API compact rows use it. Golden files unchanged.
+- **Card 6 v1.2.0:** sub-panel `electricity_dependent_dme` (device classes `system: empower`:
+  power-dependent DME, O₂ services, facility ESRD dialysis; `denominator_key: empower_dme`),
+  the addendum's care-team pre-event addition (one verbatim item), the patient-facing
+  addition (verbatim) and the two escalation additions; `hhs-empower` source citation
+  updated. The verbatim test now reads both reviewed documents.
+- **Display:** outage-triggered items show both lines — the veteran estimate (existing) and
+  "N electricity-dependent Medicare beneficiaries in catchment (emPOWER, measured; Medicare
+  proxy — not veteran-specific)" — each with its own "how was this number computed?"
+  popover; the exposure popover carries the ranking formula. Sub-panel components with a
+  non-veteran unit print the unit and their first caveat in the panel popover.
+- **Tests:** `tests/test_empower.py` — build-script row parsing on saved samples, header
+  vintage, catchment rollup arithmetic, Card 6 measured sub-panel (not a share), addendum
+  strings, `rank_for`, the ordering proof (larger panel loses to larger
+  outage_pct × emPOWER on outage items; wins on hurricane items), and the rendered facility
+  page with both denominators and provenance.
+- **Next (M9):** Cards 7 and 8, cold/winter products in the NWS provider and IEM archive,
+  the co-occurrence boost with `compounding_events`, profile acuity classes for cold/smoke.
+
 ## 2026-09-21 — M7: EAGLE-I outage provider (live + replay) + customer denominators
 
 - **`providers/eagle_i.py`** with one core (`OutagePoll` → `polls_to_events`) fed by two

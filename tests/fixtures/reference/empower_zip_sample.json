@@ -1,0 +1,300 @@
+{
+  "objectIdFieldName" : "OBJECTID", 
+  "uniqueIdField" : 
+  {
+    "name" : "OBJECTID", 
+    "isSystemMaintained" : true
+  }, 
+  "globalIdFieldName" : "", 
+  "geometryProperties" : 
+  {
+    "shapeAreaFieldName" : "Shape__Area", 
+    "shapeLengthFieldName" : "Shape__Length", 
+    "units" : "esriMeters"
+  }, 
+  "geometryType" : "esriGeometryPolygon", 
+  "spatialReference" : {
+    "wkid" : 102100, 
+    "latestWkid" : 3857
+  }, 
+  "fields" : [
+    {
+      "name" : "OBJECTID", 
+      "type" : "esriFieldTypeOID", 
+      "alias" : "OBJECTID", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "STATE", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "STATE", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 2, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "AREA", 
+      "type" : "esriFieldTypeDouble", 
+      "alias" : "AREA", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "PA_NAME", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "PA_NAME", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 35, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "COUNTY", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "COUNTY", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 35, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Zip_Code_Recode", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "Zip_Code_Recode", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 5, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "County_FIPS_Code", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "County_FIPS_Code", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 3, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "State_FIPS_Code", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "State_FIPS_Code", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 2, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "FIPS_Code", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "FIPS_Code", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 5, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Zip_Code", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "Zip_Code", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 255, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Medicare_Benes", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Medicare_Benes", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Power_Dependent_Devices_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Power_Dependent_Devices_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Facility_ESRD_Dialysis_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Facility_ESRD_Dialysis_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "O2_Services_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "O2_Services_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Home_Health_Services_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Home_Health_Services_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "AtHome_Hospice_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "AtHome_Hospice_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Any_Healthcare_Srvc_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Any_Healthcare_Srvc_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Shape__Area", 
+      "type" : "esriFieldTypeDouble", 
+      "alias" : "Shape__Area", 
+      "sqlType" : "sqlTypeDouble", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Shape__Length", 
+      "type" : "esriFieldTypeDouble", 
+      "alias" : "Shape__Length", 
+      "sqlType" : "sqlTypeDouble", 
+      "domain" : null, 
+      "defaultValue" : null
+    }
+  ], 
+  "exceededTransferLimit" : true, 
+  "features" : [
+    {
+      "attributes" : {
+        "OBJECTID" : 2292, 
+        "STATE" : "FL", 
+        "AREA" : 21.2565, 
+        "PA_NAME" : "Bokeelia", 
+        "COUNTY" : "Lee", 
+        "Zip_Code_Recode" : "33922", 
+        "County_FIPS_Code" : "071", 
+        "State_FIPS_Code" : "12", 
+        "FIPS_Code" : "12071", 
+        "Zip_Code" : "33922", 
+        "Medicare_Benes" : 1666, 
+        "Power_Dependent_Devices_DME" : 48, 
+        "Facility_ESRD_Dialysis_Any_DME" : 0, 
+        "O2_Services_Any_DME" : 14, 
+        "Home_Health_Services_Any_DME" : 11, 
+        "AtHome_Hospice_Any_DME" : 0, 
+        "Any_Healthcare_Srvc_Any_DME" : 25, 
+        "Shape__Area" : 69218628.328125, 
+        "Shape__Length" : 273963.67904000595
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 2293, 
+        "STATE" : "FL", 
+        "AREA" : 2.345267, 
+        "PA_NAME" : "Captiva", 
+        "COUNTY" : "Lee", 
+        "Zip_Code_Recode" : "33924", 
+        "County_FIPS_Code" : "071", 
+        "State_FIPS_Code" : "12", 
+        "FIPS_Code" : "12071", 
+        "Zip_Code" : "33924", 
+        "Medicare_Benes" : 127, 
+        "Power_Dependent_Devices_DME" : 11, 
+        "Facility_ESRD_Dialysis_Any_DME" : 0, 
+        "O2_Services_Any_DME" : 0, 
+        "Home_Health_Services_Any_DME" : 11, 
+        "AtHome_Hospice_Any_DME" : 0, 
+        "Any_Healthcare_Srvc_Any_DME" : 11, 
+        "Shape__Area" : 7621819.046875, 
+        "Shape__Length" : 48413.069765135857
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 2294, 
+        "STATE" : "FL", 
+        "AREA" : 0.041162, 
+        "PA_NAME" : "Sanibel", 
+        "COUNTY" : "Lee", 
+        "Zip_Code_Recode" : "33957", 
+        "County_FIPS_Code" : "071", 
+        "State_FIPS_Code" : "12", 
+        "FIPS_Code" : "12071", 
+        "Zip_Code" : "33957", 
+        "Medicare_Benes" : 2529, 
+        "Power_Dependent_Devices_DME" : 51, 
+        "Facility_ESRD_Dialysis_Any_DME" : 11, 
+        "O2_Services_Any_DME" : 11, 
+        "Home_Health_Services_Any_DME" : 11, 
+        "AtHome_Hospice_Any_DME" : 0, 
+        "Any_Healthcare_Srvc_Any_DME" : 33, 
+        "Shape__Area" : 133463.388671875, 
+        "Shape__Length" : 2524.9940182814535
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 2295, 
+        "STATE" : "FL", 
+        "AREA" : 15.8692, 
+        "PA_NAME" : "Cape Coral", 
+        "COUNTY" : "Lee", 
+        "Zip_Code_Recode" : "33991", 
+        "County_FIPS_Code" : "071", 
+        "State_FIPS_Code" : "12", 
+        "FIPS_Code" : "12071", 
+        "Zip_Code" : "33991", 
+        "Medicare_Benes" : 7435, 
+        "Power_Dependent_Devices_DME" : 262, 
+        "Facility_ESRD_Dialysis_Any_DME" : 11, 
+        "O2_Services_Any_DME" : 64, 
+        "Home_Health_Services_Any_DME" : 57, 
+        "AtHome_Hospice_Any_DME" : 11, 
+        "Any_Healthcare_Srvc_Any_DME" : 143, 
+        "Shape__Area" : 51645625.865234375, 
+        "Shape__Length" : 127685.04227448936
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 2296, 
+        "STATE" : "FL", 
+        "AREA" : 41.4249, 
+        "PA_NAME" : "Cape Coral", 
+        "COUNTY" : "Lee", 
+        "Zip_Code_Recode" : "33993", 
+        "County_FIPS_Code" : "071", 
+        "State_FIPS_Code" : "12", 
+        "FIPS_Code" : "12071", 
+        "Zip_Code" : "33993", 
+        "Medicare_Benes" : 7711, 
+        "Power_Dependent_Devices_DME" : 258, 
+        "Facility_ESRD_Dialysis_Any_DME" : 11, 
+        "O2_Services_Any_DME" : 82, 
+        "Home_Health_Services_Any_DME" : 38, 
+        "AtHome_Hospice_Any_DME" : 11, 
+        "Any_Healthcare_Srvc_Any_DME" : 142, 
+        "Shape__Area" : 134917944.68359375, 
+        "Shape__Length" : 184529.88886258513
+      }
+    }
+  ]
+}

@@ -20,6 +20,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = REPO_ROOT / "fixtures" / "reference"
 VETPOP_PATH = REFERENCE / "vetpop_county.csv"
 PLACES_PATH = REFERENCE / "places_county.csv"
+EMPOWER_PATH = REFERENCE / "empower_county.csv"
+EMPOWER_UNIT = "Medicare beneficiaries"
 META_COLUMNS = {"county_fips", "state", "county", "population", "population_18plus"}
 # VetPop reports territories as single rows; spread them over the territory's counties.
 TERRITORY_ROWS = {"72000": "72", "90066": "66", "90078": "78", "90060": "60", "90069": "69"}
@@ -33,6 +35,31 @@ CATCHMENT_CAVEAT = (
     "Catchment = counties whose nearest anchor station (VAMC/HCC) is this one; clinics report "
     "their station's panel (Mode A approximation)."
 )
+MEDICARE_PROXY_CAVEAT = (
+    "emPOWER, measured; Medicare proxy — not veteran-specific. Counts Medicare (FFS + Advantage) "
+    "beneficiaries with electricity-dependent DME claims; shown beside the veteran estimate, "
+    "never in place of it."
+)
+EMPOWER_MASKING_CAVEAT = "emPOWER masks small cells (1–10) to 11, so small counties read high."
+
+
+def load_empower(path: Path = EMPOWER_PATH) -> tuple[dict[str, dict[str, int | None]], str]:
+    """County FIPS → emPOWER measure → count, plus the vintage line from the ``#`` header."""
+    header = ""
+    rows: dict[str, dict[str, int | None]] = {}
+    with path.open(newline="", encoding="utf-8") as f:
+        first = f.readline()
+        if first.startswith("#"):
+            header = first[1:].strip()
+        else:
+            f.seek(0)
+        reader = csv.DictReader(f)
+        measures = [
+            c for c in (reader.fieldnames or []) if c not in {"county_fips", "state", "county"}
+        ]
+        for r in reader:
+            rows[r["county_fips"]] = {m: (int(r[m]) if r[m] else None) for m in measures}
+    return rows, header
 
 
 @dataclass
@@ -43,6 +70,8 @@ class ReferenceTables:
     vetpop_source: str = field(default="VetPop2023 Table 9L")
     places_source: str = field(default="CDC PLACES 2025 county release")
     excluded: dict[str, int] = field(default_factory=dict)  # VetPop rows with no US county
+    empower: dict[str, dict[str, int | None]] = field(default_factory=dict)  # FIPS → measure
+    empower_source: str = field(default="HHS emPOWER public REST service")
 
     @classmethod
     def load(
@@ -51,6 +80,7 @@ class ReferenceTables:
         vetpop_path: Path = VETPOP_PATH,
         places_path: Path = PLACES_PATH,
         county_ids: set[str] | None = None,
+        empower_path: Path = EMPOWER_PATH,
     ) -> ReferenceTables:
         col = f"veterans_{projection_year}"
         veterans: dict[str, int] = {}
@@ -77,8 +107,16 @@ class ReferenceTables:
             measures = [c for c in (reader.fieldnames or []) if c not in META_COLUMNS]
             for r in reader:
                 places[r["county_fips"]] = {m: (float(r[m]) if r[m] else None) for m in measures}
+        empower, empower_header = load_empower(empower_path)
         return cls(
-            veterans=veterans, places=places, projection_year=projection_year, excluded=excluded
+            veterans=veterans,
+            places=places,
+            projection_year=projection_year,
+            excluded=excluded,
+            empower=empower,
+            empower_source=f"HHS emPOWER public REST service ({empower_header})"
+            if empower_header
+            else "HHS emPOWER public REST service",
         )
 
     @property
@@ -168,8 +206,53 @@ class PanelEstimator:
             components=[vets],
         )
 
+    def empower_dme(self, facility_id: str, key: str = "empower_dme") -> Estimate:
+        """Measured exposure layer: emPOWER electricity-dependent-DME Medicare beneficiaries
+        summed over the station's catchment counties. Unit is Medicare beneficiaries, never
+        veterans; the label says so, and it never replaces a condition panel."""
+        den = self.profile.denominators[key]
+        measure = den.empower_measure or ""
+        station, method = self.station_for(facility_id)
+        counties = self.catchment.get(station, [])
+        total = 0
+        missing = 0
+        for c in counties:
+            v = (self.tables.empower.get(c) or {}).get(measure)
+            if v is None:
+                missing += 1
+                continue
+            total += v
+        caveats = [MEDICARE_PROXY_CAVEAT, EMPOWER_MASKING_CAVEAT, den.basis, CATCHMENT_CAVEAT]
+        if den.note:
+            caveats.append(den.note)
+        if missing:
+            caveats.append(f"{missing} of {len(counties)} catchment counties have no emPOWER row.")
+        if method not in ("self", "none"):
+            caveats.append(f"Sized at parent station {station} (matched by {method}).")
+        return Estimate(
+            label=(
+                "Electricity-dependent DME Medicare beneficiaries in catchment (emPOWER, measured)"
+            ),
+            value=float(total),
+            unit=EMPOWER_UNIT,
+            formula=(
+                f"Σ emPOWER {measure}(c) over {len(counties)} catchment counties of "
+                f"station {station}"
+            ),
+            inputs={
+                "facility_id": facility_id,
+                "station_id": station,
+                "measure": measure,
+                "counties": len(counties),
+            },
+            sources=[den.source, self.tables.empower_source],
+            caveats=caveats,
+        )
+
     def condition_panel(self, facility_id: str, key: str) -> Estimate:
         den = self.profile.denominators[key]
+        if den.empower_measure is not None:
+            return self.empower_dme(facility_id, key)
         if den.rate is not None:
             pop = self._scoped_population(facility_id, den)
             return Estimate(
@@ -287,7 +370,20 @@ class PanelEstimator:
             panel = self._upper_bound(label, base, [])
         for sp in sel.sub_panels:
             sub_label = f"{sp.label} (sub-panel)"
-            if sp.denominator_key:
+            if sp.denominator_key and (
+                self.profile.denominators[sp.denominator_key].empower_measure is not None
+            ):
+                # a measured exposure layer, not a share of the condition panel
+                measured = self.empower_dme(facility_id, sp.denominator_key)
+                panel.components.append(
+                    measured.model_copy(
+                        update={
+                            "label": f"{sub_label}: {measured.label}",
+                            "caveats": [c for c in [sp.note] if c] + measured.caveats,
+                        }
+                    )
+                )
+            elif sp.denominator_key:
                 panel.components.append(
                     self._share_estimate(sub_label, base, sp.denominator_key, [sp.note])
                 )

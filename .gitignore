@@ -12,3 +12,4 @@ fixtures/live/
 fixtures/reference/raw/*.xlsx
 fixtures/reference/raw/cb_2021_us_county_5m.zip
 demo.db
+fixtures/reference/raw/empower_zip.json

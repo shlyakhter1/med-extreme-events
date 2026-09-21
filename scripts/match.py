@@ -76,7 +76,9 @@ def main() -> int:
             if scenario
             else [e for e in list_events(engine) if e.scenario is None]
         )
-        result = match(events, cards, facilities, profile, panels, now=now)
+        result = match(
+            events, cards, facilities, profile, panels, now=now, exposures=estimator.empower_dme
+        )
         if scenario:  # replays are rebuilt deterministically; live mode upserts
             delete_scenario_action_items(engine, scenario)
         counts = upsert_action_items(engine, result.items)

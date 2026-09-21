@@ -1,0 +1,242 @@
+{
+  "objectIdFieldName" : "OBJECTID", 
+  "uniqueIdField" : 
+  {
+    "name" : "OBJECTID", 
+    "isSystemMaintained" : true
+  }, 
+  "globalIdFieldName" : "", 
+  "geometryProperties" : 
+  {
+    "shapeAreaFieldName" : "Shape__Area", 
+    "shapeLengthFieldName" : "Shape__Length", 
+    "units" : "esriMeters"
+  }, 
+  "geometryType" : "esriGeometryPolygon", 
+  "spatialReference" : {
+    "wkid" : 102100, 
+    "latestWkid" : 3857
+  }, 
+  "fields" : [
+    {
+      "name" : "OBJECTID", 
+      "type" : "esriFieldTypeOID", 
+      "alias" : "OBJECTID", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "NAME", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "NAME", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 100, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "NAMELSAD", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "NAMELSAD", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 100, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "FIPS_Code_recode", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "FIPS_Code_recode", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 5, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "State", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "State", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 2, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "FIPS_Code", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "FIPS_Code", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 5, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "County_FIPS_Code", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "County_FIPS_Code", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 255, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "County", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "County", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 255, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "State_FIPS_Code", 
+      "type" : "esriFieldTypeString", 
+      "alias" : "State_FIPS_Code", 
+      "sqlType" : "sqlTypeOther", 
+      "length" : 255, 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Medicare_Benes", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Medicare_Benes", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Power_Dependent_Devices_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Power_Dependent_Devices_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Facility_ESRD_Dialysis_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Facility_ESRD_Dialysis_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "O2_Services_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "O2_Services_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Home_Health_Services_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Home_Health_Services_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "AtHome_Hospice_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "AtHome_Hospice_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Any_Healthcare_Srvc_Any_DME", 
+      "type" : "esriFieldTypeInteger", 
+      "alias" : "Any_Healthcare_Srvc_Any_DME", 
+      "sqlType" : "sqlTypeOther", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Shape__Area", 
+      "type" : "esriFieldTypeDouble", 
+      "alias" : "Shape__Area", 
+      "sqlType" : "sqlTypeDouble", 
+      "domain" : null, 
+      "defaultValue" : null
+    }, 
+    {
+      "name" : "Shape__Length", 
+      "type" : "esriFieldTypeDouble", 
+      "alias" : "Shape__Length", 
+      "sqlType" : "sqlTypeDouble", 
+      "domain" : null, 
+      "defaultValue" : null
+    }
+  ], 
+  "features" : [
+    {
+      "attributes" : {
+        "OBJECTID" : 713, 
+        "NAME" : "Pinellas", 
+        "NAMELSAD" : "Pinellas County", 
+        "FIPS_Code_recode" : "12103", 
+        "State" : "FL", 
+        "FIPS_Code" : "12103", 
+        "County_FIPS_Code" : "103", 
+        "County" : "Pinellas", 
+        "State_FIPS_Code" : "12", 
+        "Medicare_Benes" : 262628, 
+        "Power_Dependent_Devices_DME" : 8887, 
+        "Facility_ESRD_Dialysis_Any_DME" : 456, 
+        "O2_Services_Any_DME" : 1785, 
+        "Home_Health_Services_Any_DME" : 1225, 
+        "AtHome_Hospice_Any_DME" : 452, 
+        "Any_Healthcare_Srvc_Any_DME" : 3918, 
+        "Shape__Area" : 2024356933.3183594, 
+        "Shape__Length" : 204029.65584251087
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 749, 
+        "NAME" : "Lee", 
+        "NAMELSAD" : "Lee County", 
+        "FIPS_Code_recode" : "12071", 
+        "State" : "FL", 
+        "FIPS_Code" : "12071", 
+        "County_FIPS_Code" : "071", 
+        "County" : "Lee", 
+        "State_FIPS_Code" : "12", 
+        "Medicare_Benes" : 225241, 
+        "Power_Dependent_Devices_DME" : 7418, 
+        "Facility_ESRD_Dialysis_Any_DME" : 297, 
+        "O2_Services_Any_DME" : 1856, 
+        "Home_Health_Services_Any_DME" : 1199, 
+        "AtHome_Hospice_Any_DME" : 311, 
+        "Any_Healthcare_Srvc_Any_DME" : 3663, 
+        "Shape__Area" : 3941662439.7011719, 
+        "Shape__Length" : 271142.05560706306
+      }
+    }, 
+    {
+      "attributes" : {
+        "OBJECTID" : 2100, 
+        "NAME" : "Harris", 
+        "NAMELSAD" : "Harris County", 
+        "FIPS_Code_recode" : "48201", 
+        "State" : "TX", 
+        "FIPS_Code" : "48201", 
+        "County_FIPS_Code" : "201", 
+        "County" : "Harris", 
+        "State_FIPS_Code" : "48", 
+        "Medicare_Benes" : 667609, 
+        "Power_Dependent_Devices_DME" : 22868, 
+        "Facility_ESRD_Dialysis_Any_DME" : 1505, 
+        "O2_Services_Any_DME" : 4334, 
+        "Home_Health_Services_Any_DME" : 4419, 
+        "AtHome_Hospice_Any_DME" : 1359, 
+        "Any_Healthcare_Srvc_Any_DME" : 11617, 
+        "Shape__Area" : 6141503418.7734375, 
+        "Shape__Length" : 462578.18367080938
+      }
+    }
+  ]
+}

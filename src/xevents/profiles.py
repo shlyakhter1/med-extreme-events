@@ -28,12 +28,15 @@ class _Strict(BaseModel):
 
 class Denominator(_Strict):
     """Exactly one of: a rate (share of the profile population), an absolute national
-    count (allocated to facilities by veteran share), or a PLACES county measure name
-    (county-specific crude prevalence among adults, general population)."""
+    count (allocated to facilities by veteran share), a PLACES county measure name
+    (county-specific crude prevalence among adults, general population), or an emPOWER
+    county measure (a *measured* count of Medicare beneficiaries — a proxy layer that is
+    reported beside the veteran estimate, never in place of it)."""
 
     rate: float | None = Field(default=None, ge=0.0, le=1.0)
     count: int | None = Field(default=None, ge=0)
     places_measure: str | None = Field(default=None, pattern=r"^[a-z]+$")
+    empower_measure: str | None = Field(default=None, pattern=r"^[a-z_]+$")
     scope: Annotated[str, Field(pattern=r"^[a-z_]+$")] = Field(
         default="veterans",
         description="Population a rate applies to: 'veterans' (VetPop) or a key in "
@@ -45,9 +48,12 @@ class Denominator(_Strict):
 
     @model_validator(mode="after")
     def exactly_one(self) -> Self:
-        set_ = [x is not None for x in (self.rate, self.count, self.places_measure)]
+        set_ = [
+            x is not None
+            for x in (self.rate, self.count, self.places_measure, self.empower_measure)
+        ]
         if sum(set_) != 1:
-            raise ValueError("set exactly one of rate, count or places_measure")
+            raise ValueError("set exactly one of rate, count, places_measure or empower_measure")
         return self
 
 
