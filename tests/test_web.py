@@ -287,6 +287,17 @@ def test_playback_detail_can_be_closed(client: TestClient) -> None:
     # nothing selected leaves an empty panel rather than a stale one
     assert 'else $("detail").innerHTML = "";' in js
 
+
+def test_playback_switching_views_does_not_leak_paint(client: TestClient) -> None:
+    """The paint maps record what the map layers show, and render() clears whatever the new
+    view does not repaint. Emptying them on a view switch left the live view's flood counties
+    and facilities painted inside the heat-dome replay."""
+    js = client.get("/static/playback.js").text
+    load = js[js.index("async function loadScenario") :]
+    load = load[: load.index("\n  }\n")]
+    assert "lastCountyPaint = new Map()" not in load
+    assert "lastFacilityPaint = new Map()" not in load
+
     page = client.get("/playback").text
     for rule in (".crumbs", ".crumbs .closebtn", ".crumbs .crumb.on"):
         assert rule in page, rule

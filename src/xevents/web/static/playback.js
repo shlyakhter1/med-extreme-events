@@ -132,8 +132,9 @@
     state.selectedEvent = null;
     state.selectedCard = null;
     state.detailCache.clear();
-    state.lastCountyPaint = new Map();
-    state.lastFacilityPaint = new Map();
+    // Keep lastCountyPaint / lastFacilityPaint: they record what the layers actually show,
+    // and render() clears whatever the new view does not repaint. Emptying them here left
+    // the previous view's counties and facilities painted in the new one.
 
     // Focus the timeline on the alert window: a single long-running context event (a FEMA
     // incident period runs for weeks) should not squash the storm into a few pixels.
