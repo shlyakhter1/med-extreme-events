@@ -2,6 +2,24 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5).
 
+## 2026-09-21 — post-demo: design and user guide, key purged from history
+
+- **`docs/guide/`** is the new entry point for readers. It has an index (architecture,
+  quick start, configuration, guarantees) and three documents. The event layer
+  (`events-and-playback.md`) and the medical layer (`medical-layer.md`) are described
+  separately ahead of splitting them further. `events-and-playback.md` §7 lists every
+  current coupling between the two layers. `data-sources.md` covers every external source,
+  the layer that uses it, and its limits.
+- **Gaps the write-up surfaced:** no provider emits `power_outage` events or a `heatrisk`
+  metric, so those trigger branches on Cards 1, 2, 4, 5 and 6 are dormant. Smoke and air
+  events are mapped, but no card uses them.
+- **VA Facilities key removed from git history.** It had been committed in `.env.example`
+  in 575fdab and removed from the tree in the next-to-last commit. History was rewritten
+  with `git filter-repo --replace-text`, which puts `REDACTED` in its place, and no blob in
+  the repository contains it now. The key was public before the repo went private and must
+  still be **rotated** at developer.va.gov. The GitHub repo is to be deleted and recreated
+  from the clean history, because a force-push leaves the old commits reachable by SHA.
+
 ## 2026-09-20 — closing an open card in playback
 
 Opening a card in playback had no visible way out. Clicking the same row again did close

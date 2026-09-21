@@ -71,7 +71,11 @@ src/xevents/      models · providers · geography · denominators · engine · 
 tests/            unit, schema, golden-scenario and page tests
 ```
 
-Read `CLAUDE.md` first, then `docs/implementation-plan.md` for the milestones,
+**Start with the [design and user guide](docs/guide/README.md)**. It describes the event
+layer (feeds, event store, playback) and the medical layer (facilities, panels, cards,
+action items) separately, and lists every data source and how it is used.
+
+Contributors: read `CLAUDE.md` first, then `docs/implementation-plan.md` for the milestones,
 `docs/requirements.md` for the system concept, and `docs/card-library.md` for the clinical
 content, which is the source of truth for every patient-facing sentence.
 
