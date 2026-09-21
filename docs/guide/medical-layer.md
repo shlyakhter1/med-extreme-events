@@ -154,6 +154,13 @@ with the most simultaneously active events.
 
 **Dashboard (`/`).**
 
+![Care-team dashboard for the 2021 heat dome at 2021-06-29 18:00Z](images/dashboard-heat-dome.png)
+
+*The `heat_dome_2021` replay as of 2021-06-29 18:00Z. Eleven stations have open items from
+10 active heat events. Each station fires Cards 1, 2 and 4, with its largest panel and
+the event severity shown. On the map, heat-shaded counties and card-firing facilities are
+sized by panel.*
+
 - *Event board*: the facilities with active items, ranked by acuity, then severity × panel.
   Stations come before clinics on ties.
 - *Outreach queue*: the count of still-`issued` items in the two highest acuity classes
