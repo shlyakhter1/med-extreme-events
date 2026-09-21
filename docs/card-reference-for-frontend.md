@@ -94,9 +94,9 @@ Every card currently has `window_days` of **3–7 days** and `version` `1.0.0`.
 
 | # | `card_id` | Title | Fires on | Acuity rank | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| 6 | `outage-dialysis` | Hurricane/Power Outage × Dialysis-Dependent ESRD | hurricane, tropical storm, forecast outage | **0 (highest)** | strong |
-| 3 | `hurricane-delivery-interruption` | Hurricane/Flood × Delivery Interruption: Clozapine, LAIs, Methadone | hurricane, tropical storm, storm surge, flood, flash flood | 1 | inferential |
-| 5 | `outage-insulin` | Hurricane/Power Outage × Insulin-Dependent Diabetes | hurricane, tropical storm, forecast outage | 2 | strong |
+| 6 | `outage-dialysis` | Hurricane/Power Outage × Dialysis-Dependent ESRD | hurricane, tropical storm, observed outage ≥ 10% of county customers | **0 (highest)** | strong |
+| 3 | `hurricane-delivery-interruption` | Hurricane/Flood × Delivery Interruption: Clozapine, LAIs, Methadone | hurricane, tropical storm, storm surge, flood, flash flood, observed outage ≥ 25% | 1 | inferential |
+| 5 | `outage-insulin` | Hurricane/Power Outage × Insulin-Dependent Diabetes | hurricane, tropical storm, observed outage ≥ 10% | 2 | strong |
 | 1 | `heat-lithium` | Extreme Heat × Bipolar Disorder on Lithium | heat advisory/watch/warning, HeatRisk ≥ orange | 3 | strong |
 | 2 | `heat-antipsychotics` | Extreme Heat × Schizophrenia on Antipsychotics | same heat triggers | 4 | strong |
 | 4 | `heat-heart-failure` | Extreme Heat × Heart Failure on Diuretics / ACE-ARB-ARNI / Beta-blockers | same heat triggers | 5 | strong |
@@ -142,7 +142,8 @@ Hurricane/Flood × Delivery Interruption: Clozapine, LAIs, Methadone · acuity
 `clozapine_lai_methadone` (rank 1) · evidence **inferential**
 
 - **Triggers:** Hurricane Watch/Warning, Tropical Storm Watch/Warning, Storm Surge
-  Watch/Warning, Flood Watch/Warning, Flash Flood Warning.
+  Watch/Warning, Flood Watch/Warning, Flash Flood Warning; or an observed power outage
+  of ≥ 25% of county electric customers sustained over two consecutive polls.
 - **Population:** schizophrenia (F20), schizoaffective (F25), opioid-related disorders
   (F11).
 - **Three sub-panels**, each rendered as its own sized component under the card's panel:
@@ -179,8 +180,9 @@ Extreme Heat × Heart Failure on Diuretics / ACE-ARB-ARNI / Beta-blockers · acu
 Hurricane/Power Outage × Insulin-Dependent Diabetes · acuity `insulin` (rank 2) · evidence
 **strong**
 
-- **Triggers:** Hurricane Watch/Warning, Tropical Storm Watch/Warning, **or a forecast
-  power outage** — the first card with a non-weather trigger.
+- **Triggers:** Hurricane Watch/Warning, Tropical Storm Watch/Warning, **or an observed
+  power outage** of ≥ 10% of county electric customers sustained over two consecutive
+  polls — the first card with a non-weather trigger.
 - **Population:** type 1 (E10) and insulin-treated type 2 (E11) diabetes, on insulin
   (A10A) or GLP-1 analogues (A10BJ); insulin pump as a device class.
 - **Risk flags:** pump user, mail-order refrigerated supply.
@@ -195,7 +197,8 @@ Hurricane/Power Outage × Insulin-Dependent Diabetes · acuity `insulin` (rank 2
 Hurricane/Power Outage × Dialysis-Dependent ESRD · acuity `dialysis` (**rank 0**) ·
 evidence **strong**
 
-- **Triggers:** Hurricane Watch/Warning, Tropical Storm Watch/Warning, forecast outage.
+- **Triggers:** Hurricane Watch/Warning, Tropical Storm Watch/Warning, or an observed
+  outage of ≥ 10% of county customers sustained over two polls.
 - **Population:** ESRD (N18.6) and dialysis dependence (Z99.2); device classes for
   in-center hemodialysis and home dialysis.
 - **Risk flags:** home dialysis, emPOWER electricity-dependent.
@@ -243,6 +246,8 @@ Base URL is the app itself. Full interactive reference at `/docs`.
   "event_name": "Excessive Heat Warning",
   "event_type": "heat",
   "event_severity": "Severe",
+  "event_temporality": "imminent",
+  "phase": "pre_event",
   "card_id": "heat-lithium",
   "card_title": "Extreme Heat × Bipolar Disorder on Lithium",
   "facility_id": "vha_663",
@@ -252,12 +257,21 @@ Base URL is the app itself. Full interactive reference at `/docs`.
   "acuity_rank": 3,
   "acuity_class": "lithium",
   "panel": 3323,
+  "exposure": null,
+  "rank_score": 3323.0,
   "window_start": "2021-06-18T20:00:00+00:00",
   "window_end": "2021-07-02T08:44:00+00:00"
 }
 ```
 
 In compact rows `panel` is a **rounded number**. In full items it is an object.
+
+`exposure` is set only on power-outage items: the emPOWER count of electricity-dependent
+Medicare beneficiaries in the station's catchment (a full `Estimate` object in full items).
+It is a **measured Medicare proxy, not veteran-specific** — render it as a second line next
+to `panel`, with that label, never in place of it. `rank_score` orders items within an
+acuity class: panel size normally, `outage_pct × exposure` for outage items; the full item's
+`rank_formula` says which.
 
 ### Full item
 

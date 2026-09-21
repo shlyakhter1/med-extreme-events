@@ -22,6 +22,7 @@ from xevents.models import (
     Facility,
     OperatingStatusCode,
     Role,
+    Temporality,
 )
 from xevents.profiles import PROFILES_DIR, Profile, load_profile
 from xevents.store import (
@@ -72,6 +73,7 @@ def _event(
     hours: int = 48,
     event_type: EventType = EventType.HEAT,
     source: EventSource = EventSource.NWS,
+    temporality: Temporality = Temporality.IMMINENT,
 ) -> Event:
     return Event(
         source=source,
@@ -79,6 +81,7 @@ def _event(
         event_type=event_type,
         event_name=name,
         severity=severity,
+        temporality=temporality,
         onset=onset,
         expires=onset + timedelta(hours=hours),
         geography=EventGeography(county_fips=counties),

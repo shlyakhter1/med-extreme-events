@@ -488,6 +488,16 @@
       "title": "SubPanel",
       "type": "object"
     },
+    "Temporality": {
+      "description": "Forecast-vs-observed axis of an event (requirements v2 \u00a71). Every provider maps its\nown vocabulary onto these three values; the raw basis is kept in ``Event.metrics``.",
+      "enum": [
+        "forecast",
+        "imminent",
+        "observed"
+      ],
+      "title": "Temporality",
+      "type": "string"
+    },
     "TriggerConditions": {
       "additionalProperties": false,
       "description": "Threshold conditions for one trigger. All set fields must hold (AND);\na card lists several ``event_triggers`` when any one of them should fire (OR).",
@@ -541,18 +551,46 @@
           "description": "Require an OpenFEMA disaster declaration for the county.",
           "title": "Fema Declared"
         },
-        "outage_forecast": {
+        "temporality": {
           "anyOf": [
             {
-              "type": "boolean"
+              "$ref": "#/$defs/Temporality"
             },
             {
               "type": "null"
             }
           ],
           "default": null,
-          "description": "Require a forecast/declared power outage for the geography.",
-          "title": "Outage Forecast"
+          "description": "When set, the event's temporality (forecast/imminent/observed) must match."
+        },
+        "outage_pct_min": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Percent of county electric customers out (EAGLE-I) at or above.",
+          "title": "Outage Pct Min"
+        },
+        "sustained_polls_min": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The metric thresholds must hold for this many consecutive provider polls (contiguous events for the same source/type/geography) before the trigger fires.",
+          "title": "Sustained Polls Min"
         }
       },
       "title": "TriggerConditions",

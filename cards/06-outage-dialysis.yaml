@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=card.schema.json
 # Transcribed from docs/card-library.md — Card 6. Clinical strings are verbatim; do not edit in code.
 id: outage-dialysis
-version: 1.0.0
+version: 1.2.0
 number: 6
 title: Hurricane/Power Outage × Dialysis-Dependent ESRD
 summary: >-
@@ -19,7 +19,9 @@ event_triggers:
         - Tropical Storm Warning
   - type: power_outage
     conditions:
-      outage_forecast: true
+      temporality: observed
+      outage_pct_min: 10
+      sustained_polls_min: 2
 
 population_selector:
   condition_codes:
@@ -36,6 +38,18 @@ population_selector:
     Denominator anchor: >52,000 veterans on dialysis; ~13,000 new kidney-failure
     cases/year; VA historically finances ~60% of these veterans' dialysis, mostly in
     community units. Cross-reference HHS emPOWER ZIP-level electricity-dependent counts.
+  sub_panels:
+    - key: electricity_dependent_dme
+      label: Electricity-dependent DME at home
+      device_classes:
+        - {system: empower, code: power_dependent_dme, display: "Electricity-dependent durable medical equipment (oxygen concentrators, ventilators, CPAP/BiPAP, home-dialysis equipment, electric wheelchairs, enteral-feeding pumps)"}
+        - {system: empower, code: o2_dme, display: Oxygen services (any DME)}
+        - {system: empower, code: esrd_dialysis_dme, display: Facility ESRD dialysis (any DME)}
+      flags:
+        - empower_electricity_dependent
+      denominator_key: empower_dme
+      note: >-
+        Denominator: emPOWER county/ZIP counts (measured Medicare proxy — label as such).
 
 actions:
   care_team:
@@ -56,6 +70,12 @@ actions:
       text: >-
         Home dialysis: confirm backup power/water and manual PD capability; flag to
         emPOWER/utility priority-restoration lists.
+    - phase: pre_event
+      text: >-
+        Confirm backup power (battery/generator) and supplier contact for each flagged
+        patient; register eligible patients with utility medical-baseline/priority-restoration
+        programs; identify the nearest powered facility or shelter accepting medical
+        equipment; for oxygen users, confirm backup cylinders and conserving devices.
     - phase: during_event
       text: Activate the KCER hotline / ESRD-network coordination.
     - phase: during_event
@@ -76,6 +96,11 @@ actions:
         substitutes).
     - text: Keep a 3-day supply of your medicines and your dialysis info with you.
     - text: Call the KCER hotline (1-866-901-3773) or your center.
+    - text: >-
+        If your medical equipment needs electricity, plan for an outage now: know your backup
+        battery time, keep supplier and utility numbers handy, and know where you'd go if
+        power stays out. If you use oxygen, ask us about backup cylinders. If your equipment
+        stops and you can't restore power, call us or 911 — don't wait.
   caregiver: []
 
 escalation:
@@ -93,6 +118,14 @@ escalation:
   - signs: Confusion
     response: null
     emergency: false
+  - signs: >-
+      Equipment on backup power with less than 4 hours remaining and no restoration
+      estimate
+    response: call now for relocation
+    emergency: false
+  - signs: Oxygen interruption with breathlessness
+    response: emergency
+    emergency: true
 
 evidence_tier: strong
 evidence:
@@ -134,8 +167,9 @@ sources:
   - id: cms-kcer-emergency-diet
     citation: CMS/KCER 3-Day Emergency Diet and facility preparedness
   - id: hhs-empower
-    citation: HHS emPOWER
+    citation: HHS emPOWER Program documentation (DME categories, REST service)
     url: https://empowerprogram.hhs.gov/about.html
+    note: Electricity-dependent DME sub-panel per docs/card-library-additions.md (Card 6 addendum).
   - id: va-ohe-esrd-2022
     citation: VA Office of Health Equity ESRD data (2022)
     year: 2022

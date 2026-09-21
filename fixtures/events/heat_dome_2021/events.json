@@ -8,6 +8,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-25T20:00:00Z",
   "expires": "2021-07-02T08:44:00Z",
   "sent": "2021-06-25T20:00:00Z",
@@ -82,7 +83,9 @@
    "vtec": "EH.W",
    "wfo": "OTX",
    "statuses": "CAN",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Warning'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -96,6 +99,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "forecast",
   "onset": "2021-06-25T21:00:00Z",
   "expires": "2021-06-25T21:00:00Z",
   "sent": "2021-06-25T21:00:00Z",
@@ -139,7 +143,9 @@
    "vtec": "EH.A",
    "wfo": "MFR",
    "statuses": "UPG",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Watch'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -153,6 +159,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "forecast",
   "onset": "2021-06-25T21:00:00Z",
   "expires": "2021-06-25T21:00:00Z",
   "sent": "2021-06-25T21:00:00Z",
@@ -227,7 +234,9 @@
    "vtec": "EH.A",
    "wfo": "OTX",
    "statuses": "UPG",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Watch'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -241,6 +250,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "forecast",
   "onset": "2021-06-25T21:00:00Z",
   "expires": "2021-06-25T21:00:00Z",
   "sent": "2021-06-25T21:00:00Z",
@@ -324,7 +334,9 @@
    "vtec": "EH.A",
    "wfo": "PDT",
    "statuses": "UPG",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Watch'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -338,6 +350,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-25T21:00:00Z",
   "expires": "2021-07-02T20:43:00Z",
   "sent": "2021-06-25T21:00:00Z",
@@ -421,7 +434,9 @@
    "vtec": "EH.W",
    "wfo": "PDT",
    "statuses": "CAN",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Warning'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -435,6 +450,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "forecast",
   "onset": "2021-06-25T21:00:00Z",
   "expires": "2021-06-25T21:00:00Z",
   "sent": "2021-06-25T21:00:00Z",
@@ -503,7 +519,9 @@
    "vtec": "EH.A",
    "wfo": "PQR",
    "statuses": "UPG",
-   "product_count": 2
+   "product_count": 2,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Watch'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -517,6 +535,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "forecast",
   "onset": "2021-06-25T21:00:00Z",
   "expires": "2021-06-25T21:00:00Z",
   "sent": "2021-06-25T21:00:00Z",
@@ -570,7 +589,9 @@
    "vtec": "EH.A",
    "wfo": "SEW",
    "statuses": "UPG",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Watch'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -584,6 +605,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-25T21:00:00Z",
   "expires": "2021-06-30T06:00:00Z",
   "sent": "2021-06-25T21:00:00Z",
@@ -645,7 +667,9 @@
    "vtec": "EH.W",
    "wfo": "SEW",
    "statuses": "CON,EXA,EXP",
-   "product_count": 4
+   "product_count": 4,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Warning'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -659,6 +683,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-26T17:00:00Z",
   "expires": "2021-06-30T03:15:00Z",
   "sent": "2021-06-26T17:00:00Z",
@@ -729,7 +754,9 @@
    "vtec": "EH.W",
    "wfo": "PQR",
    "statuses": "CAN,EXP",
-   "product_count": 2
+   "product_count": 2,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Warning'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -743,6 +770,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-26T18:00:00Z",
   "expires": "2021-06-30T20:57:00Z",
   "sent": "2021-06-26T18:00:00Z",
@@ -786,7 +814,9 @@
    "vtec": "EH.W",
    "wfo": "MFR",
    "statuses": "CAN",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Warning'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -800,6 +830,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "forecast",
   "onset": "2021-06-26T18:00:00Z",
   "expires": "2021-06-26T18:00:00Z",
   "sent": "2021-06-26T18:00:00Z",
@@ -836,7 +867,9 @@
    "vtec": "EH.A",
    "wfo": "MSO",
    "statuses": "UPG",
-   "product_count": 2
+   "product_count": 2,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Watch'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -850,6 +883,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-26T18:00:00Z",
   "expires": "2021-07-02T02:00:00Z",
   "sent": "2021-06-26T18:00:00Z",
@@ -886,7 +920,9 @@
    "vtec": "EH.W",
    "wfo": "MSO",
    "statuses": "CON",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Warning'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -900,6 +936,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "forecast",
   "onset": "2021-06-27T18:00:00Z",
   "expires": "2021-06-27T18:00:00Z",
   "sent": "2021-06-27T18:00:00Z",
@@ -968,7 +1005,9 @@
    "vtec": "EH.A",
    "wfo": "BOI",
    "statuses": "UPG",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Watch'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -982,6 +1021,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-28T18:00:00Z",
   "expires": "2021-07-08T06:00:00Z",
   "sent": "2021-06-28T18:00:00Z",
@@ -1050,7 +1090,9 @@
    "vtec": "EH.W",
    "wfo": "BOI",
    "statuses": "CAN,EXP",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Warning'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -1064,6 +1106,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "forecast",
   "onset": "2021-06-28T18:00:00Z",
   "expires": "2021-06-28T18:00:00Z",
   "sent": "2021-06-28T18:00:00Z",
@@ -1128,7 +1171,9 @@
    "vtec": "EH.A",
    "wfo": "PIH",
    "statuses": "UPG",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Watch'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -1142,6 +1187,7 @@
   "severity": "Minor",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-29T09:20:00Z",
   "expires": "2021-07-06T21:26:00Z",
   "sent": "2021-06-29T09:20:00Z",
@@ -1185,7 +1231,9 @@
    "vtec": "HT.Y",
    "wfo": "MFR",
    "statuses": "CAN,EXP",
-   "product_count": 3
+   "product_count": 3,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Advisory'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -1199,6 +1247,7 @@
   "severity": "Minor",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-29T18:00:00Z",
   "expires": "2021-07-02T02:00:00Z",
   "sent": "2021-06-29T18:00:00Z",
@@ -1229,7 +1278,9 @@
    "vtec": "HT.Y",
    "wfo": "MSO",
    "statuses": "CON",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Advisory'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -1243,6 +1294,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-29T18:00:00Z",
   "expires": "2021-06-29T18:00:00Z",
   "sent": "2021-06-29T18:00:00Z",
@@ -1280,7 +1332,9 @@
    "vtec": "EH.W",
    "wfo": "PIH",
    "statuses": "CAN",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Warning'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -1294,6 +1348,7 @@
   "severity": "Minor",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-29T19:00:00Z",
   "expires": "2021-07-03T03:00:00Z",
   "sent": "2021-06-29T19:00:00Z",
@@ -1358,7 +1413,9 @@
    "vtec": "HT.Y",
    "wfo": "PIH",
    "statuses": "CAN,CON,EXT",
-   "product_count": 3
+   "product_count": 3,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Advisory'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"
@@ -1372,6 +1429,7 @@
   "severity": "Minor",
   "urgency": "Expected",
   "certainty": "Likely",
+  "temporality": "imminent",
   "onset": "2021-06-30T09:03:00Z",
   "expires": "2021-07-06T00:23:00Z",
   "sent": "2021-06-30T09:03:00Z",
@@ -1402,7 +1460,9 @@
    "vtec": "HT.Y",
    "wfo": "BOI",
    "statuses": "CAN",
-   "product_count": 1
+   "product_count": 1,
+   "retrieval": "iem_vtec_archive",
+   "temporality_basis": "nws product suffix 'Advisory'"
   },
   "scenario": "heat_dome_2021",
   "raw_ref": "fixtures/events/heat_dome_2021/raw/iem_watchwarn_2021-06-24_2021-07-02_EH-HT.csv"

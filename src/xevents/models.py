@@ -43,6 +43,15 @@ class HeatRiskLevel(StrEnum):
     MAGENTA = "magenta"
 
 
+class Temporality(StrEnum):
+    """Forecast-vs-observed axis of an event (requirements v2 §1). Every provider maps its
+    own vocabulary onto these three values; the raw basis is kept in ``Event.metrics``."""
+
+    FORECAST = "forecast"  # event may occur; days of lead time
+    IMMINENT = "imminent"  # event expected/beginning; hours of lead time
+    OBSERVED = "observed"  # event measured as occurring now
+
+
 class TriggerConditions(StrictModel):
     """Threshold conditions for one trigger. All set fields must hold (AND);
     a card lists several ``event_triggers`` when any one of them should fire (OR).
@@ -59,22 +68,43 @@ class TriggerConditions(StrictModel):
     fema_declared: bool | None = Field(
         default=None, description="Require an OpenFEMA disaster declaration for the county."
     )
-    outage_forecast: bool | None = Field(
-        default=None, description="Require a forecast/declared power outage for the geography."
+    temporality: Temporality | None = Field(
+        default=None,
+        description="When set, the event's temporality (forecast/imminent/observed) must match.",
     )
+    outage_pct_min: float | None = Field(
+        default=None,
+        ge=0,
+        le=100,
+        description="Percent of county electric customers out (EAGLE-I) at or above.",
+    )
+    sustained_polls_min: int | None = Field(
+        default=None,
+        ge=1,
+        description="The metric thresholds must hold for this many consecutive provider polls "
+        "(contiguous events for the same source/type/geography) before the trigger fires.",
+    )
+
+    @property
+    def has_metric_threshold(self) -> bool:
+        return any(v is not None for v in (self.heatrisk_min, self.aqi_min, self.outage_pct_min))
 
     @model_validator(mode="after")
     def at_least_one_condition(self) -> Self:
         if not any(
             [
                 self.nws_events,
-                self.heatrisk_min is not None,
-                self.aqi_min is not None,
+                self.has_metric_threshold,
                 self.fema_declared is not None,
-                self.outage_forecast is not None,
+                self.temporality is not None,
             ]
         ):
             raise ValueError("trigger conditions must set at least one threshold")
+        if self.sustained_polls_min is not None and not self.has_metric_threshold:
+            raise ValueError(
+                "sustained_polls_min needs a metric threshold to sustain "
+                "(heatrisk_min, aqi_min or outage_pct_min)"
+            )
         return self
 
 
@@ -350,6 +380,7 @@ class EventSource(StrEnum):
     AIRNOW = "airnow"
     HMS = "hms"
     OPENFEMA = "openfema"
+    EAGLE_I = "eagle_i"
     REPLAY = "replay"
 
 
@@ -402,6 +433,9 @@ class Event(StrictModel):
     severity: CapSeverity = CapSeverity.UNKNOWN
     urgency: CapUrgency = CapUrgency.UNKNOWN
     certainty: CapCertainty = CapCertainty.UNKNOWN
+    temporality: Temporality = Field(
+        description="Required, no default: a provider that fails to map it fails validation."
+    )
     onset: datetime
     expires: datetime
     sent: datetime | None = None
@@ -501,6 +535,11 @@ class ActionItem(StrictModel):
     event_type: EventType
     event_name: NonEmptyStr
     event_severity: CapSeverity
+    event_temporality: Temporality
+    phase: Phase = Field(
+        description="Derived from the event: forecast/imminent → pre_event, observed → "
+        "during_event. ``actions`` holds that phase's actions plus the phase-agnostic ones."
+    )
     card_id: NonEmptyStr
     card_version: NonEmptyStr
     card_title: NonEmptyStr
@@ -518,6 +557,18 @@ class ActionItem(StrictModel):
     evidence_tier: EvidenceTier
     sources: list[NonEmptyStr]
     panel: Estimate | None = None
+    exposure: Estimate | None = Field(
+        default=None,
+        description="Measured exposure layer shown beside the panel (emPOWER electricity-"
+        "dependent Medicare beneficiaries) on outage-triggered items; never replaces panel.",
+    )
+    rank_score: float = Field(
+        default=0.0,
+        ge=0,
+        description="Within an acuity class, larger ranks first. Panel size by default; for "
+        "outage events outage_pct × emPOWER count (measured × measured).",
+    )
+    rank_formula: str = Field(default="panel", description="How rank_score was computed.")
     acuity_class: NonEmptyStr
     acuity_rank: int = Field(ge=0)
     window_start: datetime

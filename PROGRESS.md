@@ -1,6 +1,49 @@
 # PROGRESS
 
-Short dated entries, newest first. One milestone per session (M0 → M5).
+Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
+
+## 2026-09-21 — M6: temporality axis + trigger schema v2
+
+- **`Temporality` enum** (`forecast | imminent | observed`) and a **required**
+  `Event.temporality` with no default: a provider that fails to map it, or a fixture record
+  without it, fails Pydantic validation (tests prove both). `ActionItem` gains
+  `event_temporality` and the derived `phase`; both are in the compact `/action-items` rows.
+- **Provider mapping tables are data**, raw basis kept in `metrics["temporality_basis"]`:
+  NWS by CAP certainty (`Observed` → observed) else product suffix (Watch → forecast;
+  Warning/Advisory/Alert → imminent; an unmapped suffix raises `ProviderError`); IEM archive
+  uses the same suffix rule; AirNow `product` parameter (`observation` → observed,
+  `forecast` → forecast); HMS and OpenFEMA → observed. `EventSource.EAGLE_I` added ahead of M7.
+- **NWS SCN23-44 normalization** (`LEGACY_NWS_EVENT_NAMES`) runs before the accepted-set
+  lookup in both the live parser and the archive parser; the legacy name is preserved in
+  `metrics["raw_nws_event"]`. Cold products themselves join the accepted set in M9 (Card 7).
+- **Trigger schema v2:** `outage_forecast` deleted; `temporality`, `outage_pct_min` (0–100)
+  and `sustained_polls_min` (≥ 1, must accompany a metric threshold) added; schema
+  regenerated; all six cards validate. Cards 5/6 fire on an observed outage ≥ 10 %, Card 3 on
+  ≥ 25 %, all debounced over 2 polls; card versions bumped to 1.1.0.
+- **Engine:** `phase_for` / `actions_for` derive the action phase from the event
+  (forecast/imminent → pre-event + any; observed → during-event + any); a role with no
+  actions in that phase gets no item. `poll_histories` builds contiguous chains per
+  (source, type, geography) — a gap between one poll's expiry and the next onset resets the
+  streak — and `sustained_polls_min` counts how many recent polls satisfy the thresholds.
+  Supersession now ranks observed above forecast/imminent before CAP severity (never the
+  reverse), and `SUPERSEDE_FAMILIES` allows observed `power_outage` to supersede
+  `hurricane_flood` items on cards 3/5/6 only.
+- **Decision — where streaks live:** the engine computes streaks from the event chain per
+  trigger threshold (Card 3's 25 % streak differs from Card 5's 10 % streak), so a
+  provider-stamped `poll_streak` (requirements §3) stays informational. The engine remains
+  pure.
+- **Fixtures rebuilt** from archived raw sources; the only field changes are `temporality`
+  and the two new metrics, so both golden files are unchanged. Heat dome: 12 imminent, 8
+  forecast; Ian: 45 imminent, 21 forecast, 1 observed (the FEMA declaration); smoke: all
+  observed.
+- **Schema change to the `events` table** (new `temporality` column): existing SQLite
+  databases must be rebuilt (`make demo`, or `make load ingest match` against the URL);
+  `create_all` does not alter tables. The Docker image rebuilds its database at build time.
+- Docs: `docs/card-reference-for-frontend.md` and `docs/guide/data-sources.md` no longer
+  describe the forecast-outage stub; CLAUDE.md lists the v2 docs and invariants.
+- **Next (M7):** EAGLE-I provider — live FEMA FeatureServer client, ORNL historical CSV
+  replay loader, Moehl county-customer denominators, `outage_pct` events, DOE attribution
+  and customers≠people footnotes in the UI.
 
 ## 2026-09-21 — post-demo: design and user guide, key purged from history
 

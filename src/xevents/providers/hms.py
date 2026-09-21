@@ -29,6 +29,7 @@ from xevents.models import (
     EventGeography,
     EventSource,
     EventType,
+    Temporality,
     TimeWindow,
 )
 from xevents.providers.base import EventProvider, ProviderError
@@ -103,6 +104,7 @@ def parse_smoke(
                 severity=DENSITY_SEVERITY.get(density, CapSeverity.UNKNOWN),
                 urgency=CapUrgency.EXPECTED,
                 certainty=CapCertainty.OBSERVED,
+                temporality=Temporality.OBSERVED,  # HMS is a satellite analysis product
                 onset=onset,
                 expires=max(expires, onset),
                 geography=EventGeography(
@@ -113,7 +115,11 @@ def parse_smoke(
                         "(representative point / vertex test)"
                     ),
                 ),
-                metrics={"smoke_density": density, "polygon_count": len(b["polys"])},
+                metrics={
+                    "smoke_density": density,
+                    "polygon_count": len(b["polys"]),
+                    "temporality_basis": "hms smoke analysis",
+                },
                 raw_ref=raw_ref,
             )
         )

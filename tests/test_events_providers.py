@@ -19,12 +19,19 @@ from xevents.models import (
     EventGeography,
     EventSource,
     EventType,
+    Temporality,
     TimeWindow,
 )
 from xevents.providers.airnow import parse_observations
 from xevents.providers.base import ProviderError
 from xevents.providers.hms import parse_smoke
-from xevents.providers.nws import NWS_EVENT_TYPES, NWSAlertsProvider, parse_alerts
+from xevents.providers.nws import (
+    NWS_EVENT_TYPES,
+    NWSAlertsProvider,
+    normalize_nws_event,
+    parse_alert,
+    parse_alerts,
+)
 from xevents.providers.openfema import parse_declarations
 
 FIX = Path(__file__).parent / "fixtures" / "events"
@@ -252,6 +259,7 @@ def test_live_dedupe_drops_archive_copies_of_active_alerts() -> None:
     common = {
         "event_type": EventType.HEAT,
         "event_name": "Heat Advisory",
+        "temporality": Temporality.IMMINENT,
         "onset": onset,
         "expires": onset + timedelta(hours=12),
         "geography": EventGeography(county_fips=["41051", "53033"]),
@@ -268,3 +276,78 @@ def test_live_dedupe_drops_archive_copies_of_active_alerts() -> None:
     assert dropped == 1
     assert [e.source_id for e in kept] == ["urn:oid:cap-1", "2026-KPQR-HT.Y-0008"]
     assert ingest.dedupe([live])[1] == 0
+
+
+# --------------------------------------------------------------------------- temporality
+
+
+def test_live_alerts_carry_temporality(resolver: UgcResolver) -> None:
+    doc = json.loads((FIX / "nws_alerts_active_sample.json").read_text(encoding="utf-8"))
+    by_name = {e.event_name: e for e in parse_alerts(doc, resolver)}
+    assert by_name["Flood Watch"].temporality is Temporality.FORECAST
+    assert by_name["Flash Flood Warning"].temporality is Temporality.IMMINENT
+    assert by_name["Heat Advisory"].temporality is Temporality.IMMINENT
+    assert all("temporality_basis" in e.metrics for e in by_name.values())
+    # CAP certainty=Observed wins over the product suffix
+    feature = next(f for f in doc["features"] if f["properties"]["event"] == "Flash Flood Warning")
+    observed = json.loads(json.dumps(feature))
+    observed["properties"]["certainty"] = "Observed"
+    ev = parse_alert(observed, resolver)
+    assert ev is not None and ev.temporality is Temporality.OBSERVED
+    assert ev.metrics["temporality_basis"] == "cap certainty=Observed"
+
+
+def test_legacy_cold_product_names_are_normalized(
+    resolver: UgcResolver, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """NWS SCN23-44 renamed the cold products; archived alerts carry the old names. The
+    provider normalizes before matching and keeps the raw name. The cold products join the
+    tracked set with Card 7 (M9); until then the normalized name is exercised by mapping it
+    onto an existing type for this test only."""
+    assert normalize_nws_event("Wind Chill Warning") == (
+        "Extreme Cold Warning",
+        "Wind Chill Warning",
+    )
+    assert normalize_nws_event("Wind Chill Watch") == ("Extreme Cold Watch", "Wind Chill Watch")
+    assert normalize_nws_event("Wind Chill Advisory") == (
+        "Cold Weather Advisory",
+        "Wind Chill Advisory",
+    )
+    assert normalize_nws_event("Hard Freeze Warning") == ("Freeze Warning", "Hard Freeze Warning")
+    assert normalize_nws_event("Heat Advisory") == ("Heat Advisory", None)
+    doc = json.loads((FIX / "nws_alerts_active_sample.json").read_text(encoding="utf-8"))
+    feature = json.loads(
+        json.dumps(next(f for f in doc["features"] if f["properties"]["event"] == "Heat Advisory"))
+    )
+    feature["properties"]["event"] = "Wind Chill Warning"
+    assert parse_alert(feature, resolver) is None, "cold products are not tracked before M9"
+    monkeypatch.setitem(NWS_EVENT_TYPES, "Extreme Cold Warning", EventType.HEAT)
+    ev = parse_alert(feature, resolver)
+    assert ev is not None
+    assert ev.event_name == "Extreme Cold Warning"
+    assert ev.metrics["raw_nws_event"] == "Wind Chill Warning"
+    assert ev.temporality is Temporality.IMMINENT
+
+
+def test_other_providers_map_temporality(counties: CountyIndex) -> None:
+    rows = json.loads((FIX / "openfema_ian_4673.json").read_text(encoding="utf-8"))[
+        "DisasterDeclarationsSummaries"
+    ]
+    assert parse_declarations(rows)[0].temporality is Temporality.OBSERVED
+    smoke = parse_smoke((FIX / "hms_smoke20230607.zip").read_bytes(), date(2023, 6, 7), counties)
+    assert smoke and all(e.temporality is Temporality.OBSERVED for e in smoke)
+    obs_rows: list[dict[str, Any]] = [
+        {
+            "Latitude": 40.7128,
+            "Longitude": -74.0060,
+            "UTC": "2023-06-07T18:00",
+            "Parameter": "PM2.5",
+            "AQI": 200,
+            "Category": 4,
+            "SiteName": "NYC",
+        }
+    ]
+    assert parse_observations(obs_rows, counties)[0].temporality is Temporality.OBSERVED
+    forecast = parse_observations(obs_rows, counties, product="forecast")[0]
+    assert forecast.temporality is Temporality.FORECAST
+    assert forecast.metrics["temporality_basis"] == "airnow forecast"

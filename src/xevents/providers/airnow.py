@@ -31,12 +31,19 @@ from xevents.models import (
     EventGeography,
     EventSource,
     EventType,
+    Temporality,
     TimeWindow,
 )
 from xevents.providers.base import EventProvider, ProviderError
 
 BASE_URL = "https://www.airnowapi.org"
 CONUS_BBOX = "-125.0,24.0,-66.0,50.0"
+# Temporality by AirNow product: monitor observations are measured now; the forecast
+# endpoint (not wired yet) describes tomorrow's AQI.
+AIRNOW_TEMPORALITY: dict[str, Temporality] = {
+    "observation": Temporality.OBSERVED,
+    "forecast": Temporality.FORECAST,
+}
 # AQI category thresholds; the card trigger `aqi_min` compares against the county max AQI.
 CATEGORY_SEVERITY = {
     1: CapSeverity.MINOR,  # Good
@@ -54,8 +61,11 @@ def parse_observations(
     *,
     aqi_min: int = 101,
     raw_ref: str | None = None,
+    product: str = "observation",
 ) -> list[Event]:
-    """Monitor rows → one event per (county, parameter) at or above ``aqi_min`` (USG+)."""
+    """Monitor rows → one event per (county, parameter) at or above ``aqi_min`` (USG+).
+    ``product`` names the AirNow product the rows came from (``AIRNOW_TEMPORALITY`` key)."""
+    temporality = AIRNOW_TEMPORALITY[product]
     best: dict[tuple[str, str], dict[str, Any]] = {}
     for r in rows:
         try:
@@ -97,6 +107,7 @@ def parse_observations(
                 severity=CATEGORY_SEVERITY.get(b["category"], CapSeverity.UNKNOWN),
                 urgency=CapUrgency.IMMEDIATE,
                 certainty=CapCertainty.OBSERVED,
+                temporality=temporality,
                 onset=when,
                 expires=when + timedelta(hours=24),
                 geography=EventGeography(
@@ -109,6 +120,7 @@ def parse_observations(
                     "aqi_category": b["category"],
                     "parameter": param,
                     "site": b["site"],
+                    "temporality_basis": f"airnow {product}",
                 },
                 raw_ref=raw_ref,
             )

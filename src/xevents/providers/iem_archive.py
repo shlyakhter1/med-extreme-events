@@ -29,7 +29,7 @@ from xevents.models import (
     TimeWindow,
 )
 from xevents.providers.base import EventProvider, ProviderError
-from xevents.providers.nws import NWS_EVENT_TYPES
+from xevents.providers.nws import NWS_EVENT_TYPES, normalize_nws_event, nws_temporality
 
 BASE_URL = "https://mesonet.agron.iastate.edu"
 WATCHWARN = "/cgi-bin/request/gis/watchwarn.py"
@@ -95,10 +95,23 @@ def parse_iem_csv(
             g["products"].add(r["product_id"])
     events = []
     for (year, wfo, ph, sig, eid), g in sorted(groups.items()):
-        name = VTEC_NAMES[f"{ph}.{sig}"]
+        name, legacy_name = normalize_nws_event(VTEC_NAMES[f"{ph}.{sig}"])
         ugcs = sorted(g["ugcs"])
         counties, note = resolver.resolve(ugcs)
         onset, expires = g["issue"], g["expire"]
+        # The archive records issued products, not observations: CAP certainty is unknown
+        # here, so temporality comes from the product suffix alone.
+        temporality, basis = nws_temporality(name, CapCertainty.LIKELY)
+        metrics: dict[str, float | int | str] = {
+            "vtec": f"{ph}.{sig}",
+            "wfo": wfo,
+            "statuses": ",".join(sorted(g["statuses"])),
+            "product_count": len(g["products"]),
+            "retrieval": "iem_vtec_archive",
+            "temporality_basis": basis,
+        }
+        if legacy_name is not None:
+            metrics["raw_nws_event"] = legacy_name
         events.append(
             Event(
                 source=EventSource.NWS,
@@ -109,6 +122,7 @@ def parse_iem_csv(
                 severity=SEVERITY.get(sig, CapSeverity.UNKNOWN),
                 urgency=CapUrgency.EXPECTED,
                 certainty=CapCertainty.LIKELY,
+                temporality=temporality,
                 onset=onset,
                 expires=max(expires, onset),
                 sent=onset,
@@ -118,13 +132,7 @@ def parse_iem_csv(
                     states=sorted({u[:2] for u in ugcs}),
                     note=f"IEM VTEC archive; {note}",
                 ),
-                metrics={
-                    "vtec": f"{ph}.{sig}",
-                    "wfo": wfo,
-                    "statuses": ",".join(sorted(g["statuses"])),
-                    "product_count": len(g["products"]),
-                    "retrieval": "iem_vtec_archive",
-                },
+                metrics=metrics,
                 scenario=scenario,
                 raw_ref=raw_ref,
             )

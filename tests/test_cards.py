@@ -15,7 +15,7 @@ from xevents.models import Card, EventType, EvidenceTier
 EXPECTED = {
     1: ("heat-lithium", {EventType.HEAT}),
     2: ("heat-antipsychotics", {EventType.HEAT}),
-    3: ("hurricane-delivery-interruption", {EventType.HURRICANE_FLOOD}),
+    3: ("hurricane-delivery-interruption", {EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE}),
     4: ("heat-heart-failure", {EventType.HEAT}),
     5: ("outage-insulin", {EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE}),
     6: ("outage-dialysis", {EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE}),
@@ -68,8 +68,13 @@ def test_heat_cards_share_trigger_vocabulary(cards: list[Card]) -> None:
 
 
 def test_patient_strings_are_verbatim_from_card_library(cards: list[Card]) -> None:
-    """Every patient-facing sentence must appear verbatim in docs/card-library.md."""
-    library = (CARDS_DIR.parent / "docs" / "card-library.md").read_text(encoding="utf-8")
+    """Every patient-facing sentence must appear verbatim in the reviewed card documents
+    (docs/card-library.md, or docs/card-library-additions.md for Cards 7-8 and the Card 6
+    addendum)."""
+    docs = CARDS_DIR.parent / "docs"
+    library = (docs / "card-library.md").read_text(encoding="utf-8") + (
+        docs / "card-library-additions.md"
+    ).read_text(encoding="utf-8")
     flat = re.sub(r"\s+", " ", library)
     for card in cards:
         for action in card.actions.patient:

@@ -1,0 +1,182 @@
+# hazard_sources.yaml — machine-readable mirror of docs/hazard-catalog.md
+# Documentation-grade for now (not loaded by code); a future iteration may drive
+# provider registration from it. status: integrated | this_iteration | backlog
+
+sources:
+  - id: nws_alerts
+    hazards: [heat, hurricane_flood, extreme_cold, winter_storm, high_wind, tornado]
+    provider_module: providers/nws.py
+    endpoint: https://api.weather.gov/alerts/active
+    auth: none            # User-Agent header required
+    granularity: [nws_zone, county]
+    cadence: "poll <=30s recommended; demo polls hourly"
+    temporality_map: {watch: forecast, warning: imminent, advisory: imminent, cap_certainty_observed: observed}
+    notes: "Legacy cold-product names normalized per SCN23-44 (Oct 2024); raw preserved in metrics."
+    status: integrated
+
+  - id: heatrisk
+    hazards: [heat]
+    endpoint: "GeoTIFF/KML at wpc.ncep.noaa.gov/heatrisk + NWS ArcGIS ImageServer"
+    auth: none
+    granularity: [grid]
+    cadence: daily, 7-day horizon
+    temporality_map: {all: forecast}
+    notes: experimental product; raster pipeline
+    status: backlog
+
+  - id: airnow
+    hazards: [air_pollution, wildfire_smoke]
+    provider_module: providers/airnow.py
+    endpoint: "AirNow API - 2026 consolidated services only (legacy retired 2026-09-30)"
+    auth: free_api_key
+    rate_limit: "500 req/hour"
+    granularity: [zip, latlon]
+    cadence: "hourly observations; daily forecast"
+    temporality_map: {observation: observed, forecast: forecast}
+    status: integrated
+
+  - id: hms_smoke
+    hazards: [wildfire_smoke]
+    provider_module: providers/hms.py
+    endpoint: "NOAA HMS smoke polygons (shapefile/KML/WFS, date-based URLs)"
+    auth: none
+    granularity: [polygon]
+    cadence: "daily; finalized next morning ET"
+    temporality_map: {all: observed}
+    status: integrated
+
+  - id: openfema
+    hazards: [declarations]
+    provider_module: providers/openfema.py
+    endpoint: "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries"
+    auth: none
+    granularity: [county]
+    temporality_map: {all: observed}
+    status: integrated
+
+  - id: eagle_i
+    hazards: [power_outage]
+    provider_module: providers/eagle_i.py
+    endpoint_live: "https://gis.fema.gov/arcgis/rest/services/Partner/PowerOutages_EAGLE_I/FeatureServer"
+    endpoint_historical: "ORNL EAGLE-I county datasets 2014-2025 (blanket DOI 10.13139/ORNLNCCS/1975203 for 2014-2022)"
+    auth: none
+    granularity: [county_fips]
+    cadence: "hourly (live); 15-min (historical)"
+    temporality_map: {all: observed}
+    attribution_required: "Electric customer outage data provided by EAGLE-I, Department of Energy."
+    caveats: ["customers are meters/accounts, not people", "~8% of US customers uncovered (small rural/municipal utilities)"]
+    denominators: "Moehl et al. modeled county customer dataset (with Brelsford et al. 2024, Sci Data, DOI 10.1038/s41597-024-03095-5)"
+    status: this_iteration
+
+  - id: empower
+    hazards: [exposure_layer]
+    kind: reference_data      # cached, not a live provider
+    build_script: scripts/build_empower.py
+    endpoint: "HHS emPOWER public REST service (ArcGIS)"
+    auth: none
+    granularity: [zip, county]
+    cadence: monthly_vintage
+    caveats: ["Medicare-beneficiary proxy, not veteran-specific - label everywhere", "planning/outreach datasets restricted to public-health officials"]
+    status: this_iteration
+
+  - id: psps
+    hazards: [power_outage_planned]
+    endpoint: "PG&E/SCE/SDG&E PSPS portals (partner-gated); CPUC rollup (open, lagged)"
+    auth: partner_gated
+    granularity: [circuit, county]
+    temporality_map: {all: forecast}
+    status: backlog
+
+  - id: usgs_earthquake
+    hazards: [earthquake]
+    endpoint: "USGS GeoJSON summary feeds + FDSN event query; PAGER alert levels"
+    auth: none
+    granularity: [point, shaking_extent]
+    cadence: real_time_minutes
+    temporality_map: {all: observed}
+    card_candidate: "earthquake x dialysis/DME infrastructure; trigger PAGER orange/red or M>=5 near facilities"
+    status: backlog
+
+  - id: nwps_flood
+    hazards: [flood]
+    endpoint: "NOAA NWPS API (water.noaa.gov/about/api) + Flood Inundation Mapping ArcGIS"
+    auth: none
+    granularity: [gauge, inundation_polygon]
+    temporality_map: {observation: observed, forecast: forecast}
+    caveats: ["API not supported 24/7; may change without notice"]
+    status: backlog
+
+  - id: wfigs_fire
+    hazards: [wildfire_incident]
+    endpoint: "NIFC/WFIGS ArcGIS FeatureServers (perimeters 5-min; IRWIN incidents)"
+    auth: none_with_attribution
+    granularity: [perimeter_polygon, point]
+    temporality_map: {all: observed}
+    status: backlog
+
+  - id: drought_monitor
+    hazards: [drought]
+    endpoint: "usdmdataservices.unl.edu REST; also CDC Environmental Tracking API"
+    auth: none
+    granularity: [county, huc]
+    cadence: weekly
+    temporality_map: {all: observed}
+    status: backlog
+
+  - id: eia_930
+    hazards: [grid_stress_proxy]
+    endpoint: "api.eia.gov electricity/rto (hourly demand + day-ahead forecast by BA)"
+    auth: free_api_key
+    granularity: [balancing_authority]
+    temporality_map: {forecast: forecast, demand: observed}
+    caveats: ["indirect proxy only - never a customers-out substitute"]
+    status: backlog
+
+  - id: oe_417
+    hazards: [major_outage_record]
+    endpoint: "DOE OE-417 filings; ORNL annual summaries"
+    auth: none
+    granularity: [event]
+    cadence: "6-72h lag"
+    temporality_map: {all: observed}
+    status: backlog
+
+  # ---- global expansion ----
+  - id: gdacs
+    scope: global
+    hazards: [earthquake, tropical_cyclone, flood, volcano, drought, wildfire]
+    endpoint: "GDACS GeoJSON API (gdacsapi/api/events)"
+    auth: none
+    license: MIT
+    temporality_map: {alert: imminent, event: observed}
+    status: backlog
+
+  - id: ibtracs
+    scope: global
+    hazards: [tropical_cyclone_history]
+    endpoint: "NOAA NCEI IBTrACS v04r01 (updated ~3x/week)"
+    auth: none
+    use: replay_backtest_catalog
+    status: backlog
+
+  - id: emdat
+    scope: global
+    hazards: [impact_catalog]
+    endpoint: "public.emdat.be (registration; non-commercial; no real-time API)"
+    auth: registration
+    use: severity_thresholds_backtesting
+    status: backlog
+
+  - id: eonet
+    scope: global
+    hazards: [meta_aggregator]
+    endpoint: "NASA EONET v3 API"
+    auth: none
+    use: prototype_new_hazard_types
+    status: backlog
+
+do_not_integrate:
+  - id: poweroutage_us
+    reason: "Contact-sales pricing; Aug-2025 API terms prohibit scraping and any AI/ML/RAG use"
+  - id: utility_map_scraping
+    reason: "Per-deployment GUIDs break silently; EAGLE-I already aggregates these maps"

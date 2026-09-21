@@ -143,6 +143,7 @@ class EventRow(Base):
     severity: Mapped[str] = mapped_column(String(16))
     urgency: Mapped[str] = mapped_column(String(16))
     certainty: Mapped[str] = mapped_column(String(16))
+    temporality: Mapped[str] = mapped_column(String(16), index=True)
     onset: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     expires: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     sent: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -163,6 +164,7 @@ class EventRow(Base):
             "severity": self.severity,
             "urgency": self.urgency,
             "certainty": self.certainty,
+            "temporality": self.temporality,
             "onset": _aware(self.onset),
             "expires": _aware(self.expires),
             "sent": _aware(self.sent) if self.sent else None,
@@ -185,6 +187,7 @@ class EventRow(Base):
             severity=e.severity.value,
             urgency=e.urgency.value,
             certainty=e.certainty.value,
+            temporality=e.temporality.value,
             onset=e.onset,
             expires=e.expires,
             sent=e.sent,
@@ -349,6 +352,7 @@ class ActionItemRow(Base):
     event_severity: Mapped[str] = mapped_column(String(16))
     acuity_rank: Mapped[int] = mapped_column(index=True)
     panel_value: Mapped[float | None] = mapped_column(Float, nullable=True)
+    rank_score: Mapped[float] = mapped_column(Float, default=0.0, index=True)
     status: Mapped[str] = mapped_column(String(16), index=True)
     superseded_by: Mapped[str | None] = mapped_column(String(512), nullable=True)
     window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
@@ -380,6 +384,7 @@ class ActionItemRow(Base):
             event_severity=item.event_severity.value,
             acuity_rank=item.acuity_rank,
             panel_value=item.panel.value if item.panel else None,
+            rank_score=item.rank_score,
             status=item.status.value,
             superseded_by=item.superseded_by,
             window_start=item.window_start,
@@ -424,6 +429,7 @@ def upsert_action_items(engine: Engine, items: list[ActionItem]) -> dict[str, in
                 existing.payload.get("actions") != fresh.payload.get("actions")
                 or _aware(existing.window_end) != item.window_end
                 or existing.panel_value != fresh.panel_value
+                or existing.rank_score != fresh.rank_score
                 or new_status is not current
                 or existing.superseded_by != item.superseded_by
             )
@@ -436,6 +442,7 @@ def upsert_action_items(engine: Engine, items: list[ActionItem]) -> dict[str, in
             existing.window_start = item.window_start
             existing.window_end = item.window_end
             existing.panel_value = fresh.panel_value
+            existing.rank_score = fresh.rank_score
             existing.status = new_status.value
             existing.superseded_by = (
                 item.superseded_by if new_status is ActionItemStatus.SUPERSEDED else None
@@ -497,7 +504,7 @@ def list_action_items(
     include_superseded: bool = False,
 ) -> list[ActionItem]:
     stmt = select(ActionItemRow).order_by(
-        ActionItemRow.acuity_rank, ActionItemRow.panel_value.desc(), ActionItemRow.id
+        ActionItemRow.acuity_rank, ActionItemRow.rank_score.desc(), ActionItemRow.id
     )
     if scenario is not None:
         stmt = stmt.where(ActionItemRow.scenario == scenario)

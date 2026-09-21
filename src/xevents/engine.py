@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
 from xevents.models import (
+    Action,
     ActionItem,
     ActionItemStatus,
     CapSeverity,
@@ -19,13 +20,26 @@ from xevents.models import (
     Event,
     EventSource,
     EventTrigger,
+    EventType,
     Facility,
     HeatRiskLevel,
+    Phase,
     Role,
+    Temporality,
 )
 from xevents.profiles import Profile
 
 PanelLookup = Callable[[str, Card], Estimate | None]
+ExposureLookup = Callable[[str], Estimate | None]
+
+# Cross-family supersede (requirements v2 §2): an *observed* event of the second type may
+# supersede forecast/imminent items of the first type on the listed cards only. Same-family
+# supersession needs no entry. Engine data, not card data.
+SUPERSEDE_FAMILIES: dict[tuple[EventType, EventType], frozenset[str]] = {
+    (EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE): frozenset(
+        {"hurricane-delivery-interruption", "outage-insulin", "outage-dialysis"}
+    ),
+}
 
 SEVERITY_RANK = {
     CapSeverity.EXTREME: 4,
@@ -56,13 +70,21 @@ class MatchResult:
     log: list[TriggerEvaluation] = field(default_factory=list)
 
 
-def trigger_matches(trigger: EventTrigger, event: Event) -> tuple[bool, str]:
-    """All set conditions of one trigger must hold."""
-    if trigger.type != event.event_type:
-        return False, f"type {event.event_type} != {trigger.type}"
+def phase_for(temporality: Temporality) -> Phase:
+    """Event-side phase selector: what is happening decides which actions apply."""
+    return Phase.DURING_EVENT if temporality is Temporality.OBSERVED else Phase.PRE_EVENT
+
+
+def actions_for(card: Card, role: Role, temporality: Temporality) -> list[Action]:
+    """The card's actions for ``role`` in the phase the event implies, plus phase-agnostic ones."""
+    phase = phase_for(temporality)
+    actions: list[Action] = getattr(card.actions, role.value)
+    return [a for a in actions if a.phase in (phase, Phase.ANY)]
+
+
+def _thresholds_hold(trigger: EventTrigger, event: Event) -> tuple[bool, str]:
+    """Metric thresholds only (the part of a trigger that ``sustained_polls_min`` debounces)."""
     c = trigger.conditions
-    if c.nws_events and (event.source != EventSource.NWS or event.event_name not in c.nws_events):
-        return False, f"'{event.event_name}' not in nws_events"
     if c.heatrisk_min is not None:
         level = event.metrics.get("heatrisk")
         try:
@@ -75,21 +97,90 @@ def trigger_matches(trigger: EventTrigger, event: Event) -> tuple[bool, str]:
         aqi = event.metrics.get("aqi")
         if not isinstance(aqi, int | float) or aqi < c.aqi_min:
             return False, f"aqi {aqi} < {c.aqi_min}"
+    if c.outage_pct_min is not None:
+        pct = event.metrics.get("outage_pct")
+        if not isinstance(pct, int | float) or pct < c.outage_pct_min:
+            return False, f"outage_pct {pct} < {c.outage_pct_min}"
+    return True, "thresholds hold"
+
+
+def trigger_matches(
+    trigger: EventTrigger, event: Event, history: list[Event] | None = None
+) -> tuple[bool, str]:
+    """All set conditions of one trigger must hold.
+
+    ``history`` is the chain of earlier contiguous events from the same source, type and
+    geography (oldest first) — the previous provider polls. ``sustained_polls_min`` counts
+    how many of the most recent polls, this one included, satisfy the metric thresholds.
+    """
+    if trigger.type != event.event_type:
+        return False, f"type {event.event_type} != {trigger.type}"
+    c = trigger.conditions
+    if c.nws_events and (event.source != EventSource.NWS or event.event_name not in c.nws_events):
+        return False, f"'{event.event_name}' not in nws_events"
+    if c.temporality is not None and event.temporality is not c.temporality:
+        return False, f"temporality {event.temporality} != {c.temporality}"
+    ok, why = _thresholds_hold(trigger, event)
+    if not ok:
+        return False, why
     if c.fema_declared and event.source != EventSource.OPENFEMA:
         return False, "not a FEMA declaration"
-    if c.outage_forecast and not event.metrics.get("outage_forecast"):
-        return False, "no outage forecast"
+    if c.sustained_polls_min is not None:
+        streak = 1
+        for prior in reversed(history or []):
+            if not _thresholds_hold(trigger, prior)[0]:
+                break
+            streak += 1
+        if streak < c.sustained_polls_min:
+            return False, f"sustained {streak} poll(s) < {c.sustained_polls_min}"
     return True, "matched"
 
 
-def card_matches(card: Card, event: Event) -> tuple[bool, str]:
+def card_matches(card: Card, event: Event, history: list[Event] | None = None) -> tuple[bool, str]:
     reasons = []
     for trigger in card.event_triggers:
-        ok, why = trigger_matches(trigger, event)
+        ok, why = trigger_matches(trigger, event, history)
         if ok:
             return True, why
         reasons.append(why)
     return False, "; ".join(reasons)
+
+
+def _poll_key(event: Event) -> tuple[str, str, tuple[str, ...]]:
+    return (event.source.value, event.event_type.value, tuple(event.geography.county_fips))
+
+
+def poll_histories(events: list[Event]) -> dict[str, list[Event]]:
+    """event_key → the contiguous chain of earlier events with the same source, type and
+    geography (a provider's previous polls). A gap between one event's expiry and the next
+    onset breaks the chain, so a debounce streak restarts after the condition lapses."""
+    chains: dict[tuple[str, str, tuple[str, ...]], list[Event]] = {}
+    out: dict[str, list[Event]] = {}
+    for event in sorted(events, key=lambda e: (e.onset, e.event_key)):
+        key = _poll_key(event)
+        chain = chains.get(key, [])
+        if chain and chain[-1].expires < event.onset:
+            chain = []
+        out[event.event_key] = list(chain)
+        chains[key] = [*chain, event]
+    return out
+
+
+def rank_for(event: Event, panel: Estimate | None, exposure: Estimate | None) -> tuple[float, str]:
+    """Ranking multiplier within an acuity class (requirements v2 §5): for outage events
+    the measured percent out times the measured emPOWER count; otherwise the panel size."""
+    pct = event.metrics.get("outage_pct")
+    if (
+        event.event_type is EventType.POWER_OUTAGE
+        and exposure is not None
+        and isinstance(pct, int | float)
+    ):
+        score = float(pct) * exposure.value
+        return score, (
+            f"outage_pct × empower_dme = {float(pct):g} × {exposure.value:.0f} = {score:.0f}"
+        )
+    value = panel.value if panel else 0.0
+    return value, f"panel = {value:.0f}"
 
 
 def _item_id(event_key: str, card_id: str, facility_id: str, role: Role) -> str:
@@ -101,11 +192,13 @@ def _build_item(
     card: Card,
     facility: Facility,
     role: Role,
+    actions: list[Action],
     profile: Profile,
     panel: Estimate | None,
+    exposure: Estimate | None,
     now: datetime,
 ) -> ActionItem:
-    actions = getattr(card.actions, role.value)
+    rank_score, rank_formula = rank_for(event, panel, exposure)
     message = None
     if role in (Role.PATIENT, Role.CAREGIVER):
         message = " ".join(a.text for a in actions)
@@ -124,6 +217,8 @@ def _build_item(
         event_type=event.event_type,
         event_name=event.event_name,
         event_severity=event.severity,
+        event_temporality=event.temporality,
+        phase=phase_for(event.temporality),
         card_id=card.id,
         card_version=card.version,
         card_title=card.title,
@@ -136,6 +231,9 @@ def _build_item(
         evidence_tier=card.evidence_tier,
         sources=[s.citation for s in card.sources],
         panel=panel,
+        exposure=exposure,
+        rank_score=rank_score,
+        rank_formula=rank_formula,
         acuity_class=card.acuity_class,
         acuity_rank=profile.acuity_rank(card.acuity_class),
         window_start=event.onset - timedelta(days=card.window_days.max),
@@ -153,10 +251,13 @@ def match(
     panels: PanelLookup,
     *,
     now: datetime,
+    exposures: ExposureLookup | None = None,
 ) -> MatchResult:
     """Produce one ActionItem per (event, card, facility, role), acuity-ranked, with
     weaker overlapping items of the same (card, facility, role, event type) marked
-    superseded by the strongest.
+    superseded by the strongest. An item carries the actions of the phase its event
+    implies (forecast/imminent → pre-event, observed → during-event) plus the phase-agnostic
+    ones; a role with nothing to say in that phase gets no item.
 
     A card is only issued where its estimated panel reaches ``profile.min_panel_patients``:
     an aggregate estimate below one patient does not describe anybody to act on. Callers
@@ -170,16 +271,19 @@ def match(
     log: list[TriggerEvaluation] = []
     items: list[ActionItem] = []
     panel_cache: dict[tuple[str, str], Estimate | None] = {}
+    exposure_cache: dict[str, Estimate | None] = {}
+    histories = poll_histories(events)
     for event in sorted(events, key=lambda e: (e.onset, e.event_key)):
         in_scope: dict[str, Facility] = {}
         for fips in event.geography.county_fips:
             for f in by_county.get(fips, []):
                 in_scope[f.id] = f
         for card in cards:
-            ok, why = card_matches(card, event)
+            ok, why = card_matches(card, event, histories[event.event_key])
             log.append(TriggerEvaluation(event.event_key, card.id, ok, why))
             if not ok or not in_scope:
                 continue
+            role_actions = {role: actions_for(card, role, event.temporality) for role in Role}
             for fid in sorted(in_scope):
                 facility = in_scope[fid]
                 key = (fid, card.id)
@@ -193,10 +297,19 @@ def match(
                     )
                     log.append(TriggerEvaluation(event.event_key, card.id, False, reason))
                     continue
-                for role in Role:
-                    if role is Role.CAREGIVER and not card.actions.caregiver:
+                exposure = None
+                if exposures is not None and event.event_type is EventType.POWER_OUTAGE:
+                    if fid not in exposure_cache:
+                        exposure_cache[fid] = exposures(fid)
+                    exposure = exposure_cache[fid]
+                for role, actions in role_actions.items():
+                    if not actions:
                         continue
-                    items.append(_build_item(event, card, facility, role, profile, panel, now))
+                    items.append(
+                        _build_item(
+                            event, card, facility, role, actions, profile, panel, exposure, now
+                        )
+                    )
     _apply_supersession(items)
     items.sort(key=_rank_key)
     return MatchResult(items=items, log=log)
@@ -206,34 +319,62 @@ def _rank_key(item: ActionItem) -> tuple[int, int, float, str]:
     return (
         item.acuity_rank,
         -SEVERITY_RANK[item.event_severity],
-        -(item.panel.value if item.panel else 0.0),
+        -item.rank_score,
         item.id,
     )
 
 
+def _family(item: ActionItem) -> EventType:
+    """The event family an item competes in for supersession: its own type, or the type
+    whose observed events may supersede it on this card (``SUPERSEDE_FAMILIES``)."""
+    for (weaker, stronger), card_ids in SUPERSEDE_FAMILIES.items():
+        if item.event_type is weaker and item.card_id in card_ids:
+            return stronger
+    return item.event_type
+
+
+def _observed(item: ActionItem) -> bool:
+    return item.event_temporality is Temporality.OBSERVED
+
+
+def _supersedes(stronger: ActionItem, weaker: ActionItem) -> bool:
+    """Observed beats forecast/imminent (never the reverse); within the same temporality
+    class a higher CAP severity wins. Across event families only an observed event of the
+    listed stronger type may supersede, and only forecast/imminent items."""
+    if stronger.event_type is not weaker.event_type:
+        return _observed(stronger) and not _observed(weaker)
+    if _observed(stronger) != _observed(weaker):
+        return _observed(stronger)
+    return SEVERITY_RANK[stronger.event_severity] > SEVERITY_RANK[weaker.event_severity]
+
+
 def _apply_supersession(items: list[ActionItem]) -> None:
-    """Within (card, facility, role, event_type), the strongest overlapping item wins;
-    the others are marked superseded_by it. Strength: CAP severity, then later onset."""
+    """Within (card, facility, role, event family), the strongest overlapping item wins;
+    the others are marked superseded_by it. Strength: observed over forecast/imminent, then
+    CAP severity, then later onset. Never duplicates, never downgrades observed → forecast."""
     groups: dict[tuple[str, str, str, str], list[ActionItem]] = {}
     for it in items:
-        groups.setdefault((it.card_id, it.scope_id, it.role.value, it.event_type.value), []).append(
+        groups.setdefault((it.card_id, it.scope_id, it.role.value, _family(it).value), []).append(
             it
         )
     for group in groups.values():
         if len(group) < 2:
             continue
-        group.sort(key=lambda it: (-SEVERITY_RANK[it.event_severity], it.window_end, it.id))
+        group.sort(
+            key=lambda it: (
+                not _observed(it),
+                -SEVERITY_RANK[it.event_severity],
+                it.window_end,
+                it.id,
+            )
+        )
         for i, weaker in enumerate(group):
             for stronger in group[:i]:
                 overlaps = (
                     weaker.window_start <= stronger.window_end
                     and stronger.window_start <= weaker.window_end
                 )
-                if (
-                    overlaps
-                    and SEVERITY_RANK[stronger.event_severity]
-                    > SEVERITY_RANK[weaker.event_severity]
-                ):
+                if overlaps and _supersedes(stronger, weaker):
                     weaker.status = ActionItemStatus.SUPERSEDED
                     weaker.superseded_by = stronger.id
                     break

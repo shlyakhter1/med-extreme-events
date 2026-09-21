@@ -6,8 +6,11 @@ A Mode A (aggregate, **no-PHI**) demo that maps forecast extreme events (heat, h
 
 Read before any work:
 - `docs/implementation-plan.md` — milestones M0–M5, each with a *Done when*
+- `docs/implementation-plan-v2.md` — milestones M6–M10 (temporality, EAGLE-I outages, emPOWER, Cards 7–8)
 - `docs/requirements.md` — system concept, data model, architecture (§7 has the action-item schema)
+- `docs/requirements-v2.md` — temporality axis, trigger schema v2, outage provider, co-occurrence boost (settled decisions; do not reopen)
 - `docs/card-library.md` — the six clinical cards; the source of truth for all card YAML content
+- `docs/card-library-additions.md` — Cards 7, 8 and the Card 6 addendum; the only source for their clinical strings
 
 Repo home: `shlyakhter1` GitHub. Stack: Python 3.12, FastAPI, SQLAlchemy + PostgreSQL/PostGIS (SQLite+SpatiaLite fallback), Pydantic v2, httpx, Jinja2 + htmx, pytest, ruff + mypy, Makefile entry points.
 
@@ -23,11 +26,19 @@ Repo home: `shlyakhter1` GitHub. Stack: Python 3.12, FastAPI, SQLAlchemy + Postg
 
 ## Working agreement
 
-- One milestone per session, in order M0 → M1 → M2 → M3 → M4 → M5.
-- A milestone is finished only when its *Done when* in `docs/implementation-plan.md` is verified and `make lint test` is green.
+- One milestone per session, in order M0 → … → M5 (`docs/implementation-plan.md`), then M6 → … → M10 (`docs/implementation-plan-v2.md`).
+- A milestone is finished only when its *Done when* in the implementation plan is verified and `make lint test` is green.
 - End every session with a short dated entry in `PROGRESS.md`: what was done, decisions made, what's next.
 - Golden scenario tests are the engine's contract: replaying `fixtures/events/heat_dome_2021` and `ian_2022` must produce the expected action-item sets exactly.
 - Fixtures are rebuildable: each scenario directory keeps raw source files, a README with retrieval date + URLs, and a builder script.
+
+## v2 invariants (requirements-v2 §8)
+
+- Every `Event` must carry `temporality` (`forecast | imminent | observed`); provider mapping tables are data, and the raw source basis is preserved in `metrics` (`temporality_basis`, `raw_nws_event`).
+- EAGLE-I attribution string is mandatory wherever outage data renders: "Electric customer outage data provided by EAGLE-I, Department of Energy." Customers are meters, not people — say so in provenance.
+- emPOWER numbers are always labeled as measured Medicare proxy; they never replace veteran denominators.
+- Cards 7/8 clinical strings come only from `docs/card-library-additions.md`; legacy NWS cold-product names are normalized in the provider (`LEGACY_NWS_EVENT_NAMES`), never listed in cards.
+- No compound trigger grammar — compounding is the engine co-occurrence boost only (backlog item for grammar). Cross-family supersede pairs live in `engine.SUPERSEDE_FAMILIES`, not in cards.
 
 ## Environment
 
@@ -37,6 +48,8 @@ VA_FACILITIES_API_KEY= # free at developer.va.gov
 NWS_USER_AGENT=        # "med-extreme-events-demo (contact: <email>)"
 EVENT_MODE=replay      # replay | live
 DATABASE_URL=          # postgres via docker-compose, or sqlite fallback
+EAGLEI_TOKEN=          # ArcGIS token for FEMA's partner EAGLE-I FeatureServer (token-gated)
+EAGLEI_FEATURE_URL=    # or a public EAGLE-I mirror layer with the same fields
 ```
 
 ## First task (M0)

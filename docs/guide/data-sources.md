@@ -104,12 +104,51 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
   first live pull in `fixtures/live/raw/airnow_data_*.json`. None of the scenarios contain
   AirNow data.
 
+### EAGLE-I county power outages (`providers/eagle_i.py`)
+
+- **What:** customers without power per county, collected by ORNL's EAGLE-I program for DOE
+  from utilities' public outage maps. Live: an ArcGIS FeatureServer table carrying the
+  EAGLE-I API fields (`currentOutage`, `currentOutageRunStartTime`, `countyFIPSCode`,
+  `coveredCustomers`, `modelCount` …), polled hourly; FEMA's partner service
+  (`gis.fema.gov/arcgis/rest/services/Partner/PowerOutages_EAGLE_I`) is the default but
+  answered *Token Required* on 2026-09-21, so set `EAGLEI_TOKEN`, or point
+  `EAGLEI_FEATURE_URL` at a public mirror with the same fields (state emergency-management
+  agencies publish them). Replay: the ORNL yearly county CSVs (15-minute cadence,
+  2014–2025, figshare doi:10.6084/m9.figshare.24237376), sliced per scenario and resampled
+  to hourly maxima.
+- **Denominator:** `fixtures/reference/eaglei_customers.csv` (Moehl et al. modeled county
+  customers, 2022), so live and replay compute `outage_pct` the same way; the feed's own
+  coverage fields are kept in `metrics` as `feed_*` for cross-checks.
+- **Events:** one observed `power_outage` per (county, poll) at or above the lowest
+  `outage_pct_min` any card asks for (10 %). Consecutive polls are contiguous events, which
+  is what the engine's `sustained_polls_min` debounce counts.
+- **Honest display:** every render carries the required attribution *"Electric customer
+  outage data provided by EAGLE-I, Department of Energy."*, states that customers are
+  meters/accounts rather than people, and that ~8 % of US customers (small rural and
+  municipal utilities) are not covered. The live feed appears in the freshness banner like
+  every other source.
+
+### HHS emPOWER electricity-dependent DME (reference layer, `denominators.py`)
+
+- **What:** the HHS emPOWER public REST service's de-identified monthly counts of Medicare
+  (FFS + Advantage) beneficiaries who rely on electricity-dependent durable medical
+  equipment, by county and ZIP, cached as `fixtures/reference/empower_county.csv` and
+  `empower_zip.csv` by `scripts/build_empower.py` (vintage in the file header; manual,
+  monthly refresh; layer ids and field names pinned so a portal change fails the build).
+- **How it is used:** a *measured exposure layer* beside the condition-based veteran
+  estimate, never instead of it. `PanelEstimator.empower_dme` sums the county counts over a
+  station's catchment (unit: Medicare beneficiaries). Card 6's `electricity_dependent_dme`
+  sub-panel reports it; outage-triggered items carry it as `exposure` and show both numbers;
+  for outage events the within-acuity ranking multiplier is `outage_pct × empower_dme`
+  (measured × measured) with the formula in the provenance popover.
+- **Limits:** a Medicare proxy, not veteran-specific (every render says so); small cells
+  (1–10) are masked to 11, so small counties read high; the planning/outreach datasets
+  beyond the public layer are restricted to public-health officials.
+
 ### Not yet connected
 
-`requirements.md` §4 names two more event sources that have no provider yet: **NWS HeatRisk**
-(a gridded 7-day heat-risk raster, needed by the `heatrisk_min` triggers) and **power
-outage** feeds (utility feeds and HHS emPOWER hazard layers, needed by the
-`outage_forecast` triggers on Cards 5 and 6).
+`requirements.md` §4 names one more event source that has no provider yet: **NWS HeatRisk**
+(a gridded 7-day heat-risk raster, needed by the `heatrisk_min` triggers).
 
 ## Shared reference
 

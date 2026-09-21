@@ -3,6 +3,12 @@
 Etiquette: a User-Agent with contact info is mandatory (``NWS_USER_AGENT``). We request
 ``status=actual`` and filter to the event vocabulary the cards use. Geography: CAP ``SAME``
 codes give county FIPS directly; UGC zones resolve through the zone-county correlation.
+
+Two normalizations happen before an event name is matched against the accepted set:
+legacy cold-product names (renamed by NWS SCN23-44, effective Oct 1, 2024) become their
+current names with the raw name kept in ``metrics["raw_nws_event"]``, and the product's
+temporality is derived from the CAP certainty and the product suffix (Watch → forecast;
+Warning/Advisory/Alert → imminent; ``certainty=Observed`` → observed).
 """
 
 from __future__ import annotations
@@ -24,11 +30,49 @@ from xevents.models import (
     EventGeography,
     EventSource,
     EventType,
+    Temporality,
     TimeWindow,
 )
 from xevents.providers.base import EventProvider, ProviderError
 
 BASE_URL = "https://api.weather.gov"
+
+# NWS SCN23-44: cold-season product renames effective Oct 1, 2024. Archived and replayed
+# alerts carry the legacy names; cards list current names only.
+LEGACY_NWS_EVENT_NAMES: dict[str, str] = {
+    "Wind Chill Warning": "Extreme Cold Warning",
+    "Wind Chill Watch": "Extreme Cold Watch",
+    "Wind Chill Advisory": "Cold Weather Advisory",
+    "Hard Freeze Warning": "Freeze Warning",
+}
+
+# Temporality by product suffix, unless CAP says the hazard is already observed.
+NWS_TEMPORALITY_BY_SUFFIX: dict[str, Temporality] = {
+    "Watch": Temporality.FORECAST,
+    "Warning": Temporality.IMMINENT,
+    "Advisory": Temporality.IMMINENT,
+    "Alert": Temporality.IMMINENT,
+}
+
+
+def normalize_nws_event(name: str) -> tuple[str, str | None]:
+    """``(current name, legacy name or None)`` for a raw NWS ``event`` value."""
+    current = LEGACY_NWS_EVENT_NAMES.get(name)
+    return (current, name) if current is not None else (name, None)
+
+
+def nws_temporality(event_name: str, certainty: CapCertainty) -> tuple[Temporality, str]:
+    """``(temporality, basis)`` for an NWS product; the basis is kept in ``metrics``.
+    Raises ``ProviderError`` for a product whose suffix has no mapping — an unmapped
+    temporality must fail loudly, never default."""
+    if certainty is CapCertainty.OBSERVED:
+        return Temporality.OBSERVED, "cap certainty=Observed"
+    suffix = event_name.rsplit(" ", 1)[-1]
+    try:
+        return NWS_TEMPORALITY_BY_SUFFIX[suffix], f"nws product suffix '{suffix}'"
+    except KeyError:
+        raise ProviderError(f"no temporality mapping for NWS product '{event_name}'") from None
+
 
 # NWS `event` → our event type. Anything not listed is ignored by the provider.
 NWS_EVENT_TYPES: dict[str, EventType] = {
@@ -69,7 +113,8 @@ def parse_alert(
 ) -> Event | None:
     """One CAP GeoJSON feature → Event, or None if the event type is not one we track."""
     p = feature.get("properties") or {}
-    event_type = NWS_EVENT_TYPES.get(p.get("event", ""))
+    event_name, legacy_name = normalize_nws_event(str(p.get("event") or ""))
+    event_type = NWS_EVENT_TYPES.get(event_name)
     if event_type is None:
         return None
     geocode = p.get("geocode") or {}
@@ -82,15 +127,25 @@ def parse_alert(
     if expires < onset:
         expires = onset
     states = sorted({u[:2] for u in ugcs})
+    certainty = _enum(CapCertainty, p.get("certainty"), CapCertainty.UNKNOWN)
+    temporality, basis = nws_temporality(event_name, certainty)
+    metrics: dict[str, float | int | str] = {
+        "message_type": str(p.get("messageType") or ""),
+        "sender": str(p.get("senderName") or ""),
+        "temporality_basis": basis,
+    }
+    if legacy_name is not None:
+        metrics["raw_nws_event"] = legacy_name
     return Event(
         source=EventSource.NWS,
         source_id=str(p["id"]),
         event_type=event_type,
-        event_name=str(p["event"]),
+        event_name=event_name,
         headline=p.get("headline") or None,
         severity=_enum(CapSeverity, p.get("severity"), CapSeverity.UNKNOWN),
         urgency=_enum(CapUrgency, p.get("urgency"), CapUrgency.UNKNOWN),
-        certainty=_enum(CapCertainty, p.get("certainty"), CapCertainty.UNKNOWN),
+        certainty=certainty,
+        temporality=temporality,
         onset=onset,
         expires=expires,
         sent=_parse_dt(p.get("sent")),
@@ -102,10 +157,7 @@ def parse_alert(
             area_desc=p.get("areaDesc") or None,
             note=note,
         ),
-        metrics={
-            "message_type": str(p.get("messageType") or ""),
-            "sender": str(p.get("senderName") or ""),
-        },
+        metrics=metrics,
         raw_ref=raw_ref,
     )
 

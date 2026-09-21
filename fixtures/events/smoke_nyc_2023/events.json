@@ -8,6 +8,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-06T11:00:00Z",
   "expires": "2023-06-07T00:30:00Z",
   "sent": null,
@@ -2661,7 +2662,8 @@
   },
   "metrics": {
    "smoke_density": "Heavy",
-   "polygon_count": 19
+   "polygon_count": 19,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230606.zip"
@@ -2675,6 +2677,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-06T11:00:00Z",
   "expires": "2023-06-07T00:30:00Z",
   "sent": null,
@@ -6689,7 +6692,8 @@
   },
   "metrics": {
    "smoke_density": "Medium",
-   "polygon_count": 21
+   "polygon_count": 21,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230606.zip"
@@ -6703,6 +6707,7 @@
   "severity": "Minor",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-06T11:10:00Z",
   "expires": "2023-06-07T00:30:00Z",
   "sent": null,
@@ -13427,7 +13432,8 @@
   },
   "metrics": {
    "smoke_density": "Light",
-   "polygon_count": 53
+   "polygon_count": 53,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230606.zip"
@@ -13441,6 +13447,7 @@
   "severity": "Minor",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-07T10:30:00Z",
   "expires": "2023-06-08T02:00:00Z",
   "sent": null,
@@ -18935,7 +18942,8 @@
   },
   "metrics": {
    "smoke_density": "Light",
-   "polygon_count": 33
+   "polygon_count": 33,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230607.zip"
@@ -18949,6 +18957,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-07T11:00:00Z",
   "expires": "2023-06-08T02:00:00Z",
   "sent": null,
@@ -22704,7 +22713,8 @@
   },
   "metrics": {
    "smoke_density": "Heavy",
-   "polygon_count": 37
+   "polygon_count": 37,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230607.zip"
@@ -22718,6 +22728,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-07T11:00:00Z",
   "expires": "2023-06-08T02:00:00Z",
   "sent": null,
@@ -27088,7 +27099,8 @@
   },
   "metrics": {
    "smoke_density": "Medium",
-   "polygon_count": 18
+   "polygon_count": 18,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230607.zip"
@@ -27102,6 +27114,7 @@
   "severity": "Severe",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-08T11:00:00Z",
   "expires": "2023-06-09T00:30:00Z",
   "sent": null,
@@ -29382,7 +29395,8 @@
   },
   "metrics": {
    "smoke_density": "Heavy",
-   "polygon_count": 13
+   "polygon_count": 13,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230608.zip"
@@ -29396,6 +29410,7 @@
   "severity": "Minor",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-08T11:00:00Z",
   "expires": "2023-06-09T01:40:00Z",
   "sent": null,
@@ -34501,7 +34516,8 @@
   },
   "metrics": {
    "smoke_density": "Light",
-   "polygon_count": 17
+   "polygon_count": 17,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230608.zip"
@@ -34515,6 +34531,7 @@
   "severity": "Moderate",
   "urgency": "Expected",
   "certainty": "Observed",
+  "temporality": "observed",
   "onset": "2023-06-08T11:00:00Z",
   "expires": "2023-06-09T01:40:00Z",
   "sent": null,
@@ -39032,7 +39049,8 @@
   },
   "metrics": {
    "smoke_density": "Medium",
-   "polygon_count": 15
+   "polygon_count": 15,
+   "temporality_basis": "hms smoke analysis"
   },
   "scenario": "smoke_nyc_2023",
   "raw_ref": "fixtures/events/smoke_nyc_2023/raw/hms_smoke20230608.zip"

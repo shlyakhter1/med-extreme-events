@@ -17,8 +17,9 @@ from xevents import __version__
 from xevents.carbon import load_carbon
 from xevents.cards import load_cards
 from xevents.denominators import PanelEstimator, ReferenceTables
-from xevents.models import ActionItemStatus, Event
+from xevents.models import ActionItemStatus, Event, EventSource
 from xevents.profiles import PROFILES_DIR, load_profile
+from xevents.providers.eagle_i import ATTRIBUTION, COVERAGE_CAVEAT, CUSTOMERS_CAVEAT
 from xevents.providers.replay import list_scenarios, load_scenario
 from xevents.providers.va_facilities import to_geojson
 from xevents.store import (
@@ -55,6 +56,9 @@ def event_json(event: Event, *, include_polygon: bool = False) -> dict[str, Any]
     exclude = None if include_polygon else {"geography": {"polygon"}}
     doc = event.model_dump(mode="json", exclude=exclude)
     doc["event_key"] = event.event_key
+    if event.source is EventSource.EAGLE_I:  # required wherever outage numbers render
+        doc["attribution"] = ATTRIBUTION
+        doc["caveats"] = [CUSTOMERS_CAVEAT, COVERAGE_CAVEAT]
     return doc
 
 
@@ -251,6 +255,8 @@ def create_app(engine: Engine | None = None) -> FastAPI:
                     "event_name": i.event_name,
                     "event_type": i.event_type.value,
                     "event_severity": i.event_severity.value,
+                    "event_temporality": i.event_temporality.value,
+                    "phase": i.phase.value,
                     "card_id": i.card_id,
                     "card_title": i.card_title,
                     "facility_id": i.scope_id,
@@ -260,6 +266,8 @@ def create_app(engine: Engine | None = None) -> FastAPI:
                     "acuity_rank": i.acuity_rank,
                     "acuity_class": i.acuity_class,
                     "panel": round(i.panel.value) if i.panel else None,
+                    "exposure": round(i.exposure.value) if i.exposure else None,
+                    "rank_score": round(i.rank_score, 1),
                     "window_start": i.window_start.isoformat(),
                     "window_end": i.window_end.isoformat(),
                 }

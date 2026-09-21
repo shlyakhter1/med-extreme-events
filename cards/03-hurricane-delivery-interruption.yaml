@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=card.schema.json
 # Transcribed from docs/card-library.md — Card 3. Clinical strings are verbatim; do not edit in code.
 id: hurricane-delivery-interruption
-version: 1.0.0
+version: 1.1.0
 number: 3
 title: "Hurricane/Flood × Delivery Interruption: Clozapine, LAIs, Methadone"
 summary: >-
@@ -22,6 +22,11 @@ event_triggers:
         - Flood Watch
         - Flood Warning
         - Flash Flood Warning
+  - type: power_outage
+    conditions:
+      temporality: observed
+      outage_pct_min: 25
+      sustained_polls_min: 2
 
 population_selector:
   condition_codes:

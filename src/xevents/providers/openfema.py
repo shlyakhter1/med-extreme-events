@@ -24,6 +24,7 @@ from xevents.models import (
     EventGeography,
     EventSource,
     EventType,
+    Temporality,
     TimeWindow,
 )
 from xevents.providers.base import EventProvider, ProviderError
@@ -80,6 +81,7 @@ def parse_declarations(rows: list[dict[str, Any]], raw_ref: str | None = None) -
                 else CapSeverity.MODERATE,
                 urgency=CapUrgency.PAST,
                 certainty=CapCertainty.OBSERVED,
+                temporality=Temporality.OBSERVED,  # a declaration means the event occurred
                 onset=onset,
                 expires=max(expires, onset),
                 sent=_dt(r.get("declarationDate")),
@@ -92,6 +94,7 @@ def parse_declarations(rows: list[dict[str, Any]], raw_ref: str | None = None) -
                     "fema_disaster_number": number,
                     "declaration_type": str(r.get("declarationType") or ""),
                     "incident_type": str(r.get("incidentType") or ""),
+                    "temporality_basis": "fema declaration",
                 },
                 raw_ref=raw_ref,
             )
