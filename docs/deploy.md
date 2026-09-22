@@ -2,7 +2,7 @@
 
 Two ways to run it: **locally** with `uv` (best for development) or **as a container**
 (best for showing it to someone else). Both default to replay mode, which needs no API key
-and no network, because the reference data and the three replay scenarios are committed to
+and no network, because the reference data and the five replay scenarios are committed to
 this repository.
 
 ---
@@ -21,7 +21,7 @@ make demo
 `make demo` builds a fresh SQLite database from an empty state and then serves it:
 
 1. `scripts/load_reference.py` — 1,400 VA health facilities, county attribution, catchments
-2. `scripts/ingest.py --mode replay` — the three replay scenarios (96 events)
+2. `scripts/ingest.py --mode replay` — the five replay scenarios (15,648 events)
 3. `scripts/match.py --mode replay` — the action items the engine derives from them
 4. `uvicorn` on <http://localhost:8000>
 
@@ -137,7 +137,7 @@ docker run --rm -p 8000:8000 med-extreme-events:demo
 ```
 
 Open <http://localhost:8000>. The container runs the code as it was when you built the
-image, so rebuild after pulling or editing (see "Developing" in §1). The image is 381 MB and starts in a couple of seconds; most of
+image, so rebuild after pulling or editing (see "Developing" in §1). The image is roughly 400 MB and starts in a couple of seconds; most of
 its size is the Python base image plus the county boundary and reference fixtures.
 
 ---
@@ -188,8 +188,10 @@ of memory (the county boundary file is held in memory for point-in-polygon looku
 ## 4. Live mode when hosted
 
 Replay mode is the right default for a demo: it is deterministic and nothing can break it.
-Live mode pulls current NWS alerts, FEMA declarations and NOAA smoke polygons, so it needs
-writable storage and outbound network access.
+Live mode pulls current NWS alerts (plus the two-week IEM archive backfill), FEMA
+declarations, NOAA smoke polygons, EAGLE-I county outages (`EAGLEI_TOKEN` for FEMA's
+partner layer, or a public mirror via `EAGLEI_FEATURE_URL`) and, with a key, AirNow, so it
+needs writable storage and outbound network access.
 
 1. Set `NWS_USER_AGENT` to a contact string. The National Weather Service requires it and
    will block requests without one.

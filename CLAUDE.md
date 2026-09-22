@@ -48,6 +48,7 @@ VA_FACILITIES_API_KEY= # free at developer.va.gov
 NWS_USER_AGENT=        # "med-extreme-events-demo (contact: <email>)"
 EVENT_MODE=replay      # replay | live
 DATABASE_URL=          # postgres via docker-compose, or sqlite fallback
+HUD_API_TOKEN=         # optional HUD USPS ZIP-county crosswalk (else the Census ZCTA fallback)
 EAGLEI_TOKEN=          # ArcGIS token for FEMA's partner EAGLE-I FeatureServer (token-gated)
 EAGLEI_FEATURE_URL=    # or a public EAGLE-I mirror layer with the same fields
 ```

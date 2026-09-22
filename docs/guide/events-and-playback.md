@@ -59,9 +59,9 @@ replayed. Details of each source are in [data-sources.md](data-sources.md).
 | `AirNowProvider` | Monitor observations mapped to counties as air-pollution events | live, only with `AIRNOW_API_KEY` |
 | `ReplayProvider` | Reads a scenario's `events.json` | replay |
 
-**Event types with no producer yet.** No provider emits `power_outage` events or a
-`heatrisk` metric, so any card trigger that depends on them is currently dormant. Smoke and
-air-pollution events are ingested and mapped, but no v1 card triggers on them.
+**Event types with no producer yet.** No provider emits a `heatrisk` metric, so the
+HeatRisk triggers on the heat cards are dormant. Power outages come from EAGLE-I
+(`providers/eagle_i.py`), smoke and air pollution fire Card 8, cold products fire Card 7.
 
 ## 3. Live and replay modes
 
@@ -96,14 +96,16 @@ empty map is never mistaken for an all-clear.
 
 Each scenario lives in `fixtures/events/<scenario>/` and contains the raw archived source
 files (`raw/`), a `build.py` that turns them into `events.json`, and a README with retrieval
-dates and URLs. `make scenarios` rebuilds all three. `fixtures/events/README.md` lists the
+dates and URLs. `make scenarios` rebuilds all five. `fixtures/events/README.md` lists the
 known gaps.
 
 | Scenario | Window (UTC) | Events | What it shows |
 | --- | --- | --- | --- |
 | `heat_dome_2021` | 2021-06-25 → 07-08 | 20 NWS heat products (watches → warnings) over 129 WA/OR/ID counties | Heat watches escalating to warnings across the Pacific Northwest |
 | `ian_2022` | 2022-09-23 → 11-04 | 66 NWS tropical, surge and flood products plus FEMA DR-4673, 70 FL counties | Hurricane landfall and flooding, with the declaration as context |
-| `smoke_nyc_2023` | 2023-06-06 → 06-09 | 9 HMS smoke events (3 days × 3 densities) | Canadian wildfire smoke over New York. Exercises the smoke path |
+| `smoke_nyc_2023` | 2023-06-06 → 06-09 | 9 HMS smoke events (3 days × 3 densities) | Canadian wildfire smoke over New York; Card 8 |
+| `uri_2021` | 2021-02-10 → 02-21 | 78 NWS cold/winter products (35 under legacy Wind Chill names) + 12,900 hourly EAGLE-I county outage events, TX | Legacy-name normalization, observed-outage thresholds, cold × outage boost |
+| `smoke_canada_2026` | 2026-07-13 → 07-21 | 21 HMS smoke events, 715 AirNow county-day AQI events, 82 NWS heat products | Smoke corridor with a concurrent heat dome; Card 8 plus the heat cards |
 
 To add a scenario, create `fixtures/events/<name>/` with `raw/`, a `build.py` that uses the
 archive and HMS providers (see `_common.py`) and writes `events.json` with

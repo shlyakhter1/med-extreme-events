@@ -11,7 +11,7 @@ The system has two layers that will be separated further, and each has its own d
 | Document | Covers |
 | --- | --- |
 | [events-and-playback.md](events-and-playback.md) | **Event layer.** Pulls weather and environmental feeds, normalizes them into one event model, resolves them to counties, stores them, and plays them back on a map. It knows nothing about medicine. |
-| [medical-layer.md](medical-layer.md) | **Medical layer.** Holds the VA facilities, their catchments and estimated patient panels, and the six clinical playbook cards. It matches events to cards and turns each match into action items for care teams and patients. |
+| [medical-layer.md](medical-layer.md) | **Medical layer.** Holds the VA facilities, their catchments and estimated patient panels, and the eight clinical playbook cards. It matches events to cards and turns each match into action items for care teams and patients. |
 | [data-sources.md](data-sources.md) | Every external source: what it provides, how it is fetched and cached, which layer uses it, and its known gaps. |
 
 ## The system in one paragraph
@@ -90,6 +90,8 @@ Copy `.env.example` to `.env`, which is gitignored. Every `make` target loads it
 | `VA_FACILITIES_API_KEY` | Rebuilding `facilities.geojson` only (`make reference`) | none |
 | `AIRNOW_API_KEY` | Live air-quality events. Skipped when unset | none |
 | `HUD_API_TOKEN` | Optional HUD ZIP↔county crosswalk. Census ZCTA is used otherwise | none |
+| `EAGLEI_TOKEN` | Live EAGLE-I outages from FEMA's partner FeatureServer, which is token-gated | none |
+| `EAGLEI_FEATURE_URL` | A public EAGLE-I mirror layer with the same fields, used instead of FEMA's | FEMA partner layer |
 
 **Never commit a key.** `.env.example` must hold empty assignments only.
 `tests/test_secrets.py` fails the build if a tracked file assigns a credential-shaped value
@@ -115,7 +117,7 @@ These come from `CLAUDE.md`, and tests enforce most of them.
 
 1. **No PHI, no synthetic patients.** Panels are aggregate estimates with provenance.
 2. **The engine is pure.** `src/xevents/engine.py` does no I/O. The same inputs always produce
-   the same action items, and two golden tests pin the replay output exactly.
+   the same action items, and five golden tests pin the replay output exactly.
 3. **Clinical text comes only from card YAML.** Code copies it verbatim and never
    generates, paraphrases or "improves" it.
 4. **Nothing advises stopping or changing a medication.** Every medication card carries the
@@ -131,6 +133,6 @@ These come from `CLAUDE.md`, and tests enforce most of them.
 
 - `docs/card-reference-for-frontend.md`: API shapes and rendering rules for anyone building
   a UI on the action items.
-- `docs/card-library.md`: the clinical source of truth for all six cards.
+- `docs/card-library.md` and `docs/card-library-additions.md`: the clinical source of truth for all eight cards.
 - `PROGRESS.md`: the dated log of what was built, what was decided, and what still needs a
   clinical reviewer.

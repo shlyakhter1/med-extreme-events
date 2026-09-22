@@ -1,6 +1,6 @@
 # Playbook cards — reference for the front-end team
 
-*As of 2026-09-20. Describes the six v1 cards as the API serves them, and the rules for
+*As of 2026-09-21. Describes the eight cards as the API serves them, and the rules for
 rendering them. Source of truth for the clinical wording is `docs/card-library.md`; the
 machine-readable form is `cards/*.yaml`, validated against `cards/card.schema.json`.*
 
@@ -88,7 +88,7 @@ times over.
 
 ---
 
-## 3. The six cards
+## 3. The eight cards
 
 Every card currently has `window_days` of **3–7 days** and `version` `1.0.0`.
 
@@ -223,7 +223,7 @@ Base URL is the app itself. Full interactive reference at `/docs`.
 
 | Endpoint | Returns |
 | --- | --- |
-| `GET /cards` | All six card definitions (the reviewed content) |
+| `GET /cards` | All eight card definitions (the reviewed content) |
 | `GET /action-items?scenario=&at=&facility=&role=&card=&status=` | Compact rows for lists and maps |
 | `GET /action-items/{id}` | One item in full, including card text and panel provenance |
 | `POST /action-items/{id}/status` | Status transition, body `{"status": "acknowledged"}` |
@@ -406,5 +406,6 @@ any new view: an explicit close, a keyboard escape, and a visible trail back.
 - **Clinical review is open** on the claim evidence tiers, the ICD-10/ATC code bindings,
   the heat-watch trigger, and the VHA-user share used to scale literature rates. See the
   top of `PROGRESS.md`. Nothing about the payload shape depends on those outcomes.
-- **AirNow** air-quality events are not verified against a live key yet, so `air_pollution`
-  events may not appear. No v1 card triggers on them.
+- **AirNow** live pulls are not verified against a real key yet, so live `air_pollution`
+  events may not appear; the `smoke_canada_2026` replay carries them from the keyless file
+  archive, and Card 8 fires on them.

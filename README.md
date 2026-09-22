@@ -41,7 +41,9 @@ docker build -t med-extreme-events:demo . && docker run --rm -p 8000:8000 med-ex
 | --- | --- |
 | `heat_dome_2021` | Pacific Northwest heat dome. Cards 1, 2 and 4 across 70 WA/OR/ID facilities |
 | `ian_2022` | Hurricane Ian. Cards 3, 5 and 6 across 81 Florida facilities, dialysis ranked first |
-| `smoke_nyc_2023` | Canadian wildfire smoke over New York. No v1 card covers smoke, so nothing fires |
+| `smoke_nyc_2023` | Canadian wildfire smoke over New York, June 2023. Card 8 across Northeast facilities |
+| `uri_2021` | Winter Storm Uri, Texas, February 2021. Card 7 from cold products (legacy Wind Chill names normalized), Cards 3, 5 and 6 from 12,900 hourly EAGLE-I county outage measurements, cold × outage boost |
+| `smoke_canada_2026` | Canadian wildfire smoke, July 2026, Upper Midwest to the Northeast, with the central-US heat dome. Card 8 from AirNow AQI and HMS smoke, Cards 1, 2 and 4 where heat co-occurs |
 
 ### Other commands
 
@@ -52,7 +54,7 @@ make serve                 # the server on its own
 make lint test             # ruff + mypy + pytest
 make reference             # rebuild cached source data (needs VA_FACILITIES_API_KEY)
 make scenarios             # rebuild the replay fixtures from their archived sources
-EVENT_MODE=live make ingest match   # real feeds: last 2 weeks of NWS alerts + FEMA + NOAA
+EVENT_MODE=live make ingest match   # real feeds: NWS alerts (+2-week archive), FEMA, NOAA smoke, EAGLE-I outages
 ```
 
 ## How it works
@@ -60,10 +62,10 @@ EVENT_MODE=live make ingest match   # real feeds: last 2 weeks of NWS alerts + F
 An event feed fires for a county, the facilities in that county come into scope, each card
 whose trigger matches produces one action item per role, and the affected panel is sized
 from aggregate data. The matching engine is pure and deterministic: the same events always
-produce the same action items, which two golden tests pin exactly.
+produce the same action items, which five golden tests pin exactly.
 
 ```
-cards/            six reviewed playbook cards as YAML + generated JSON Schema
+cards/            eight reviewed playbook cards as YAML + generated JSON Schema
 docs/carbon.yaml  display-only medication carbon estimates (methods in carbon-footprint.md)
 profiles/va.yaml  VA denominators, acuity order, channels, care-system hooks
 fixtures/         replay scenarios (events/) and cached reference data (reference/)
@@ -90,8 +92,10 @@ needs a clinical reviewer.
 
 All public, all cached into `fixtures/reference/` with retrieval dates: VA Lighthouse
 Facilities API, NWS alerts (plus the Iowa State VTEC archive for historical replays), NOAA
-HMS smoke polygons, OpenFEMA declarations, AirNow, CDC PLACES, VA VetPop, and Census county
-boundaries and ZCTA crosswalks.
+HMS smoke polygons, OpenFEMA declarations, AirNow (live API and the keyless public file
+archive), DOE/ORNL EAGLE-I county power outages with the Moehl county customer counts, HHS
+emPOWER electricity-dependent DME counts, CDC PLACES, VA VetPop, and Census county boundaries
+and ZCTA crosswalks.
 
 Agent Skills for these sources live in the sibling repository `../../nyc2026-dataset` and
 are used in place, never copied. See "Data-source skills" in `CLAUDE.md`.

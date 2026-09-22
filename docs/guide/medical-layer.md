@@ -72,8 +72,9 @@ panel.
 
 ## 4. Playbook cards
 
-The six cards in `cards/*.yaml` are the clinical content. Each is transcribed verbatim from
-`docs/card-library.md`, which is the reviewed source of truth.
+The eight cards in `cards/*.yaml` are the clinical content. Each is transcribed verbatim
+from `docs/card-library.md` (Cards 1–6) or `docs/card-library-additions.md` (Cards 7, 8 and
+the Card 6 electricity-dependent DME sub-panel), the reviewed sources of truth.
 
 | # | Card id | Fires on | Panel basis | Acuity (1 = highest) |
 | --- | --- | --- | --- | --- |
@@ -141,14 +142,15 @@ expires items whose window has ended. Re-running `match` upserts by natural key:
 refreshes, while delivery and acknowledgement progress and `created_at` are kept. Replays
 are rebuilt from scratch.
 
-**Golden tests** pin the replay output exactly: `heat_dome_2021` → 240 items (Cards 1, 2 and 4
-across WA/OR/ID stations), and `ian_2022` → 352 items (Cards 3, 5 and 6 in Florida, with
-dialysis ranked first). To regenerate them after an intended change, run
-`UPDATE_GOLDEN=1 make test` and review the diff.
+**Golden tests** pin the replay output exactly for all five scenarios: `heat_dome_2021`
+(240 items, Cards 1, 2 and 4 across WA/OR/ID stations), `ian_2022` (2,104 items, most
+superseded as hurricane-watch items yield to observed outages; dialysis ranked first),
+`smoke_nyc_2023`, `uri_2021` and `smoke_canada_2026`. To regenerate them after an intended
+change, run `UPDATE_GOLDEN=1 make test` and review the diff.
 
 ## 6. Using the care-team pages
 
-The header of every page carries a **scenario switcher** (the three replays and
+The header of every page carries a **scenario switcher** (the five replays and
 **live (now)**) and an **as of** time in UTC. A replay opens at its peak hour, the hour
 with the most simultaneously active events.
 
@@ -229,6 +231,6 @@ These are tracked in `PROGRESS.md`:
   only advisories and warnings.
 - Claim-level evidence tiers, and the terminology bindings (ICD-10-CM, ATC), are engineering
   placeholders.
-- Caregiver text is empty on all six cards. It is content for a reviewer to write, not code.
+- Caregiver text is empty on all eight cards. It is content for a reviewer to write, not code.
 - Notification channels (My HealtheVet, VEText, Clinical Contact Center) are named in the
   profile, but no adapters exist.

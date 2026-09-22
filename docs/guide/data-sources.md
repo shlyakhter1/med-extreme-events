@@ -16,9 +16,9 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
 | [NWS alerts API](#nws-alerts-apiweathergov) | Watches, warnings and advisories in force now (CAP) | Event | live | User-Agent | `fixtures/live/raw/` |
 | [IEM VTEC archive](#iowa-environmental-mesonet-iem) | Historical NWS products, plus dated zone geometry | Event | replay builds, live 2-week backfill | none | `fixtures/events/*/raw/` |
 | [NWS zone-county correlation](#nws-zone-county-correlation-file) | Forecast zone → county | Event | all NWS resolution | none | `fixtures/reference/nws_zone_county.csv` |
-| [NOAA HMS smoke](#noaa-hms-smoke-polygons) | Daily smoke plume polygons by density | Event | live, `smoke_nyc_2023` | none | `fixtures/events/smoke_nyc_2023/raw/` |
+| [NOAA HMS smoke](#noaa-hms-smoke-polygons) | Daily smoke plume polygons by density | Event | live, `smoke_nyc_2023`, `smoke_canada_2026` | none | `fixtures/events/smoke_*/raw/` |
 | [OpenFEMA](#openfema-disaster-declarations) | Disaster declarations by county | Event (context) | live, `ian_2022` | none | `fixtures/events/ian_2022/raw/` |
-| [AirNow](#airnow) | Monitor AQI observations | Event | live, key only | API key | `fixtures/live/raw/` |
+| [AirNow](#airnow) | Monitor AQI observations | Event | live (API key); `smoke_canada_2026` via the keyless file archive | API key (live only) | `fixtures/live/raw/`, `fixtures/events/smoke_canada_2026/raw/` |
 | [Census county boundaries](#census-county-boundaries) | County polygons, the join geometry and basemap | Shared | always | none | `fixtures/reference/counties.geojson` |
 | [VA Facilities API](#va-lighthouse-facilities-api) | 1,400 VA health facilities, location, VISN, status | Medical | reference build | API key | `fixtures/reference/facilities.geojson` |
 | [Census ZCTA ↔ county / HUD USPS](#zip--county-census-zcta-or-hud-usps) | ZIP → county fallback for facilities | Medical | reference build | HUD token optional | `fixtures/reference/zip_county.csv` |
@@ -78,7 +78,7 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
 - **Code:** `src/xevents/providers/hms.py`, `src/xevents/geography/polygons.py`.
 - **Limits:** these are analyst-drawn plumes of smoke in the atmospheric column, seen
   from satellite. They do not measure surface air quality. Coverage is approximate at plume
-  edges. No v1 card triggers on smoke.
+  edges. Card 8 fires on Medium and Heavy density.
 
 ### OpenFEMA disaster declarations
 
@@ -220,7 +220,7 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
   because PLACES dropped it.
 - **Used for:** panel keys that the profile maps to a `places_measure`, applied to all
   veterans in each county, and as a cross-check for the VA diabetes multiplier. None of the
-  six v1 cards sizes its panel on PLACES directly.
+  cards 1–6 sizes its panel on PLACES directly; Cards 7 and 8 do.
 - **Builder:** `scripts/build_places.py`.
 - **Limits:** these are model-based estimates for the general population, not veterans. The
   UI says so. 187 counties have suppressed values.

@@ -18,7 +18,7 @@ COPY fixtures/ ./fixtures/
 # The carbon table is display data read at runtime (docs/carbon-footprint.md has the methods).
 COPY docs/carbon.yaml ./docs/carbon.yaml
 
-# Build the demo database at image build time: facilities + catchments, the three replay
+# Build the demo database at image build time: facilities + catchments, the five replay
 # scenarios, and the action items the engine derives from them.
 ENV DATABASE_URL=sqlite:////app/demo.db
 RUN python scripts/load_reference.py \

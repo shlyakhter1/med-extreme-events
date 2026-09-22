@@ -41,12 +41,15 @@ db-up: ## start postgres+postgis via docker compose
 db-down: ## stop the database
 	docker compose down
 
-reference: ## rebuild cached reference data (county boundaries, ZIP↔county; facilities needs VA_FACILITIES_API_KEY)
+reference: ## rebuild all cached reference data (boundaries, zones, crosswalks, PLACES, VetPop, EAGLE-I customers, emPOWER; facilities needs VA_FACILITIES_API_KEY)
 	$(RUN) python scripts/build_county_boundaries.py
 	$(RUN) python scripts/build_nws_zones.py
 	$(RUN) python scripts/build_ct_crosswalk.py
 	$(RUN) python scripts/build_zip_county.py
+	$(RUN) python scripts/build_places.py
+	$(RUN) python scripts/build_vetpop.py
 	$(RUN) python scripts/build_eaglei_customers.py
+	$(RUN) python scripts/build_empower.py
 	$(RUN) python scripts/build_facilities.py
 
 load: ## load cached reference data into DATABASE_URL (SQLite fallback) with county/VISN attribution
