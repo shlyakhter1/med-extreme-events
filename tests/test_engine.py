@@ -298,7 +298,12 @@ def test_store_upsert_idempotent_and_keeps_progress(
     upsert_action_items(
         engine, match([longer], cards, FACILITIES[:1], profile, _panels, now=NOW).items
     )
-    assert get_action_item(engine, first).status is ActionItemStatus.ISSUED  # type: ignore[union-attr]
+    restored = get_action_item(engine, first)
+    assert restored is not None
+    assert restored.status is ActionItemStatus.ACKNOWLEDGED, (
+        "progress parked by the supersession is restored when the stronger alert goes away"
+    )
+    assert restored.acknowledged_at is not None
     # expiry
     assert expire_action_items(engine, NOW + timedelta(days=30)) > 0
     assert all(
@@ -316,3 +321,40 @@ def test_list_filters_active_at(engine: Engine, cards: list[Card], profile: Prof
     assert list_action_items(engine, active_at=NOW + timedelta(hours=1))
     assert list_action_items(engine, active_at=NOW - timedelta(days=8)) == []
     assert list_action_items(engine, active_at=NOW + timedelta(days=2)) == []
+
+
+def test_store_detects_content_changes_and_orders_like_the_engine(
+    engine: Engine, cards: list[Card], profile: Profile
+) -> None:
+    """A re-ingested event that strengthened (Minor → Extreme) must refresh the stored row,
+    and the store must hand items back in the engine's order (severity counts)."""
+    minor = _event("Heat Advisory", ["41051"], severity=CapSeverity.MINOR, source_id="s", onset=NOW)
+    items = match([minor], cards, FACILITIES[:1], profile, _panels, now=NOW).items
+    upsert_action_items(engine, items)
+    extreme = minor.model_copy(update={"severity": CapSeverity.EXTREME})
+    counts = upsert_action_items(
+        engine, match([extreme], cards, FACILITIES[:1], profile, _panels, now=NOW).items
+    )
+    assert counts["updated"] == len(items) and counts["unchanged"] == 0
+    stored = get_action_item(engine, items[0].id)
+    assert stored is not None and stored.event_severity is CapSeverity.EXTREME
+    # ordering: same acuity class, Extreme with a small panel ranks before Minor with a big one
+    small = _event(
+        "Heat Advisory", ["41051"], severity=CapSeverity.EXTREME, source_id="x1", onset=NOW
+    )
+    big = _event("Heat Advisory", ["41051"], severity=CapSeverity.MINOR, source_id="x2", onset=NOW)
+
+    def panels(fid: str, card: Card) -> Estimate:
+        return Estimate(label="p", value=50.0, formula="t", inputs={})
+
+    def big_panels(fid: str, card: Card) -> Estimate:
+        return Estimate(label="p", value=500.0, formula="t", inputs={})
+
+    a = match([small], cards, FACILITIES[:1], profile, panels, now=NOW).items
+    b = match([big], cards, FACILITIES[:1], profile, big_panels, now=NOW).items
+    upsert_action_items(engine, a + b)
+    listed = list_action_items(
+        engine, facility_id="vha_648", card_id="heat-lithium", role="patient"
+    )
+    keys = [i.event_key for i in listed if i.event_key in ("nws:x1", "nws:x2")]
+    assert keys == ["nws:x1", "nws:x2"], "Extreme first, as the engine orders it"

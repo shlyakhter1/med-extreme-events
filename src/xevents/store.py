@@ -16,6 +16,7 @@ from typing import Any
 from sqlalchemy import JSON, DateTime, Engine, Float, String, Text, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
+from xevents.engine import rank_key
 from xevents.geography.catchment import CatchmentAssignment, StationAssignment
 from xevents.models import (
     ALLOWED_TRANSITIONS,
@@ -355,6 +356,9 @@ class ActionItemRow(Base):
     rank_score: Mapped[float] = mapped_column(Float, default=0.0, index=True)
     status: Mapped[str] = mapped_column(String(16), index=True)
     superseded_by: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    # progress (delivered/acknowledged) parked while a stronger alert supersedes this item,
+    # restored when that alert goes away
+    status_before_superseded: Mapped[str | None] = mapped_column(String(16), nullable=True)
     window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     window_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     scenario: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
@@ -400,10 +404,20 @@ class TransitionError(ValueError):
     pass
 
 
+# Payload keys the store owns (status machine, timestamps); everything else is engine content
+# and any change to it is a real update.
+_STORE_OWNED = {"status", "superseded_by", "created_at", "acknowledged_at"}
+
+
+def _content(payload: dict[str, Any]) -> dict[str, Any]:
+    return {k: v for k, v in payload.items() if k not in _STORE_OWNED}
+
+
 def upsert_action_items(engine: Engine, items: list[ActionItem]) -> dict[str, int]:
     """Insert new items; refresh content of existing ones by natural key while keeping any
     status progress (delivered/acknowledged/completed) — except that engine-computed
-    supersession always applies. Returns counts."""
+    supersession always applies. Progress parked by a supersession is restored when the
+    stronger alert goes away. Returns counts."""
     counts = {"inserted": 0, "updated": 0, "unchanged": 0}
     with session_scope(engine) as s:
         for item in items:
@@ -414,25 +428,24 @@ def upsert_action_items(engine: Engine, items: list[ActionItem]) -> dict[str, in
                 continue
             current = ActionItemStatus(existing.status)
             new_status = current
+            parked = existing.status_before_superseded
             if item.status is ActionItemStatus.SUPERSEDED and current not in (
                 ActionItemStatus.COMPLETED,
                 ActionItemStatus.EXPIRED,
+                ActionItemStatus.SUPERSEDED,
             ):
                 new_status = ActionItemStatus.SUPERSEDED
+                parked = current.value
             elif (
                 current is ActionItemStatus.SUPERSEDED
                 and item.status is not ActionItemStatus.SUPERSEDED
             ):
-                new_status = ActionItemStatus.ISSUED  # the stronger alert went away
+                # the stronger alert went away: pick up where the team left off
+                new_status = ActionItemStatus(parked or ActionItemStatus.ISSUED.value)
+                parked = None
             fresh = ActionItemRow.from_model(item)
             changed = (
-                existing.payload.get("actions") != fresh.payload.get("actions")
-                or _aware(existing.window_end) != item.window_end
-                or existing.panel_value != fresh.panel_value
-                or existing.rank_score != fresh.rank_score
-                or existing.payload.get("compounding_events", [])
-                != fresh.payload.get("compounding_events", [])
-                or existing.acuity_rank != item.acuity_rank
+                _content(existing.payload) != _content(fresh.payload)
                 or new_status is not current
                 or existing.superseded_by != item.superseded_by
             )
@@ -447,10 +460,14 @@ def upsert_action_items(engine: Engine, items: list[ActionItem]) -> dict[str, in
             existing.panel_value = fresh.panel_value
             existing.rank_score = fresh.rank_score
             existing.acuity_rank = item.acuity_rank
+            existing.event_severity = item.event_severity.value
             existing.status = new_status.value
+            existing.status_before_superseded = parked
             existing.superseded_by = (
                 item.superseded_by if new_status is ActionItemStatus.SUPERSEDED else None
             )
+            if new_status in (ActionItemStatus.ISSUED, ActionItemStatus.DELIVERED):
+                existing.acknowledged_at = None  # parked (superseded) rows keep it for restore
             counts["updated"] += 1
     return counts
 
@@ -507,9 +524,7 @@ def list_action_items(
     active_at: datetime | None = None,
     include_superseded: bool = False,
 ) -> list[ActionItem]:
-    stmt = select(ActionItemRow).order_by(
-        ActionItemRow.acuity_rank, ActionItemRow.rank_score.desc(), ActionItemRow.id
-    )
+    stmt = select(ActionItemRow)
     if scenario is not None:
         stmt = stmt.where(ActionItemRow.scenario == scenario)
     if facility_id:
@@ -527,7 +542,8 @@ def list_action_items(
             ActionItemRow.window_start <= active_at, ActionItemRow.window_end >= active_at
         )
     with Session(engine) as s:
-        return [row.to_model() for row in s.scalars(stmt)]
+        items = [row.to_model() for row in s.scalars(stmt)]
+    return sorted(items, key=rank_key)  # the engine's order: acuity, severity, score, id
 
 
 def get_action_item(engine: Engine, item_id: str) -> ActionItem | None:

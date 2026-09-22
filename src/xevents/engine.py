@@ -324,7 +324,7 @@ def match(
                     )
     _apply_supersession(items, by_key)
     _apply_co_occurrence_boost(items, by_key, facility_county, log, profile)
-    items.sort(key=_rank_key)
+    items.sort(key=rank_key)
     return MatchResult(items=items, log=log)
 
 
@@ -391,7 +391,9 @@ def _apply_co_occurrence_boost(
             it.compounding_events = hits
 
 
-def _rank_key(item: ActionItem) -> tuple[int, int, float, str]:
+def rank_key(item: ActionItem) -> tuple[int, int, float, str]:
+    """The engine's item order: acuity class, CAP severity, rank score, then id. The store
+    sorts with the same key so pages and the API agree with the engine."""
     return (
         item.acuity_rank,
         -SEVERITY_RANK[item.event_severity],

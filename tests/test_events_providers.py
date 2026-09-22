@@ -276,6 +276,12 @@ def test_live_dedupe_drops_archive_copies_of_active_alerts() -> None:
     assert dropped == 1
     assert [e.source_id for e in kept] == ["urn:oid:cap-1", "2026-KPQR-HT.Y-0008"]
     assert ingest.dedupe([live])[1] == 0
+    # a later run: the alert has left /alerts/active but the archive still carries it, and
+    # the store already holds the CAP copy → the archive copy is dropped against the store
+    kept, dropped = ingest.dedupe([archived, other], existing=[live])
+    assert dropped == 1 and [e.source_id for e in kept] == ["2026-KPQR-HT.Y-0008"]
+    # a stored archive copy does not seed the filter (only CAP rows are authoritative)
+    assert ingest.dedupe([live], existing=[archived])[1] == 0
 
 
 # --------------------------------------------------------------------------- temporality

@@ -32,7 +32,13 @@ from xevents.providers.iem_archive import IEMArchiveProvider
 from xevents.providers.nws import NWSAlertsProvider
 from xevents.providers.openfema import OpenFEMAProvider
 from xevents.providers.replay import list_scenarios, load_scenario
-from xevents.store import delete_scenario_events, init_db, make_engine, upsert_events
+from xevents.store import (
+    delete_scenario_events,
+    init_db,
+    list_events,
+    make_engine,
+    upsert_events,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 LIVE_RAW = REPO_ROOT / "fixtures" / "live" / "raw"
@@ -51,23 +57,29 @@ def ingest_replay(engine: object, scenario: str | None) -> int:
     return 0
 
 
-def dedupe(events: list[Event]) -> tuple[list[Event], int]:
-    """Drop archive copies of alerts the live CAP feed already gave us.
+def _signature(e: Event) -> tuple[str, tuple[str, ...], str]:
+    counties = tuple(sorted(e.geography.county_fips))
+    return (e.event_name, counties, e.onset.strftime("%Y-%m-%dT%H"))
+
+
+def dedupe(events: list[Event], existing: list[Event] | None = None) -> tuple[list[Event], int]:
+    """Drop archive copies of alerts the live CAP feed already gave us — in this run or in
+    an earlier one.
 
     The same warning can arrive twice: once from ``/alerts/active`` (authoritative for what
     is in force now) and once from the archive backfill. They carry different ids, so the
     natural key cannot catch it. Match on what actually identifies the alert instead —
     product name, counties and onset hour — and keep the first, which is the live copy.
+    ``existing`` are the store's live CAP rows: once an alert leaves ``/alerts/active`` the
+    archive still carries it for two weeks, and without this seed every alert ended up
+    stored twice.
     """
-
-    def signature(e: Event) -> tuple[str, tuple[str, ...], str]:
-        counties = tuple(sorted(e.geography.county_fips))
-        return (e.event_name, counties, e.onset.strftime("%Y-%m-%dT%H"))
-
-    seen: set[tuple[str, tuple[str, ...], str]] = set()
+    seen: set[tuple[str, tuple[str, ...], str]] = {
+        _signature(e) for e in (existing or []) if e.source_id.startswith("urn:oid:")
+    }
     kept: list[Event] = []
     for e in events:
-        sig = signature(e)
+        sig = _signature(e)
         if sig in seen:
             continue
         seen.add(sig)
@@ -136,9 +148,10 @@ def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
         print(f"{name}: {len(got)} events")
         events.extend(got)
 
-    events, dropped = dedupe(events)
+    stored_live = [e for e in list_events(engine, source="nws") if e.scenario is None]  # type: ignore[arg-type]
+    events, dropped = dedupe(events, existing=stored_live)
     if dropped:
-        print(f"de-duplicated {dropped} archive copies of currently-active alerts")
+        print(f"de-duplicated {dropped} archive copies of alerts already held from the CAP feed")
     n = upsert_events(engine, events)  # type: ignore[arg-type]
     print(f"live: {n} events upserted from {len(providers) - failures}/{len(providers)} providers")
     return 1 if failures == len(providers) else 0
