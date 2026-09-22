@@ -40,6 +40,14 @@ about 29 s → 18 s cold on the hosted instance, and 0 bytes on revalidation.
 - `max-age` stays at 86400. A longer window would leave a deploy's boundary changes unseen,
   since the URL carries no version; the ETag is what makes the daily expiry cheap now.
 
+**Verified on Render** (92fb20d, after the deploy): counties 1,592,451 → 942,603 B,
+states 517,233 → 382,038 B, 2.11 → 1.32 MB together. `If-None-Match` returns 304 with an
+empty body on both. Wall-clock for counties was 6.2 s then 1.8 / 0.7 / 0.6 s on repeat,
+against 21.8 s and 25.7 s before — but the instance was plainly less contended during the
+second measurement, so treat the byte counts as the result and the seconds as indicative.
+Free-instance throughput moved by more than 10× between two measurements of the *same*
+build, which is worth remembering before reading any single timing as a regression.
+
 **Follow-ups.**
 - Cloudflare in front of Render answers `cf-cache-status: DYNAMIC` for these — it does not
   edge-cache `application/geo+json`, so every cold browser still pulls from the origin.
