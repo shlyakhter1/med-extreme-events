@@ -34,7 +34,12 @@ change on re-ingest/re-match.
 - Local after (first / repeat): Scenarios 0.76 / 0.07 s (was 1.95), Cards 0.10 / 0.05 s
   (was 0.60), Uri events compact 0.23 / 0.01 s (was 0.70), Uri items 0.20 / 0.01 s.
 
-**Still to verify** on Render after deploy (re-run the curl timings above).
+**Verified on Render** (830d761, after the first live refresh finished; three rounds):
+Scenarios 1.3–1.5 s (was 26–29), Cards 1.1–1.4 s (was ~8.4), Monitor on Uri — events
+0.5 s + items 0.4–0.55 s (was ~15 + 9 s), live Monitor data 0.2–0.5 s events + 0.8–1.4 s
+items, county/state outlines 0.14–0.23 s on repeat (was 3.5–5 s). During the first live
+refresh after a deploy (~1–2 min) pages are ~2× slower; a cold start after ~15 min idle
+still costs the instance wake-up.
 
 ## 2026-09-22 — Monitor (one main view), Scenarios and Cards tabs, neighbouring countries
 
