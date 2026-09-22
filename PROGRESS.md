@@ -2,6 +2,40 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-22 — hosted performance (Render free CPU)
+
+**Measured on Render** (before): Scenarios 26–29 s every time, Cards ~8.4 s every time,
+Monitor switching to Uri ~24 s (`/events?scenario=uri_2021` 15.4 MB in 15 s, action items
+1.9 MB in 9 s), county outlines 5.5 MB re-gzipped at level 9 on every Monitor load. Locally
+the same work is ~14× faster, which is why it felt fine locally. Causes: every request
+validated thousands of stored rows into Pydantic models and re-serialized them; the
+EAGLE-I attribution and caveats were repeated on each of ~13k outage events (3.8 MB of the
+16 MB); GZip level 9 on megabyte bodies; nothing cached per replay although replays only
+change on re-ingest/re-match.
+
+**Done.** `make lint test` green (277 passed).
+- `store.compact_events` / `compact_action_items` / `action_item_facts`: read columns (and
+  the stored JSON payload) without model validation. `/events?compact=1` returns map and
+  timeline fields only, with the EAGLE-I attribution once at the top level (Uri: 15.4 → 4.6 MB
+  raw, 0.17 MB gzipped); Monitor uses it and fetches a selected event's full record from
+  `/events/detail` on demand. Compact `/action-items` uses the fast path (a test checks it
+  equals the validated path, row for row and in order).
+- Replay responses are cached in-process as (raw, gzip) bodies keyed on
+  `store.replay_version` — row counts, latest write times and the count per status, so
+  Acknowledge / Mark completed invalidate it (tested). The Scenarios and Cards per-replay
+  stats are memoised on the same fingerprint.
+- Reference boundary files are gzipped once and sent with `Cache-Control: max-age=86400`;
+  GZipMiddleware drops to level 5 (level 9 cost ~0.5 s per counties response locally, ~6 s
+  hosted, for the same size).
+- When live refresh is on (hosted/container), a startup thread warms the replay caches with
+  the exact keys Monitor requests (tested), so the first visitor after a deploy doesn't wait.
+- The hourly live refresh subprocess runs under `nice -n 10` so page requests get the CPU
+  first while it runs.
+- Local after (first / repeat): Scenarios 0.76 / 0.07 s (was 1.95), Cards 0.10 / 0.05 s
+  (was 0.60), Uri events compact 0.23 / 0.01 s (was 0.70), Uri items 0.20 / 0.01 s.
+
+**Still to verify** on Render after deploy (re-run the curl timings above).
+
 ## 2026-09-22 — Monitor (one main view), Scenarios and Cards tabs, neighbouring countries
 
 Decided with the user in a grilling session (plan: one live-first view; details below).

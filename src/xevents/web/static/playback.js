@@ -20,7 +20,7 @@
     cards: new Map(), lastBadges: new Map(), feeds: null,
     layout: "browse", browseView: null, focusFitKey: null,
     blockCache: new Map(), blockKey: null, blockSeq: 0, compact: false,
-    outreachOnly: false, restoring: false,
+    outreachOnly: false, restoring: false, eventDetail: new Map(),
   };
   // stations (VAMC/HCC) rank before clinics, as on the old dashboard board; the classes come
   // from the profile via the page, never from this file
@@ -250,7 +250,9 @@
     const live = id === "live";
     const q = live ? "" : `scenario=${encodeURIComponent(id)}&`;
     const [ev, it, feeds] = await Promise.all([
-      getJSON(`/events?${q}`.replace(/[?&]$/, "")),
+      // compact: map/timeline fields only (a Uri replay drops from ~16 MB to a few); the full
+      // event is fetched when one is selected
+      getJSON(`/events?${q}compact=1`),
       getJSON(`/action-items?${q}include_superseded=true`),
       live ? getJSON("/feeds").catch(() => null) : Promise.resolve(null),
     ]);
@@ -1090,6 +1092,16 @@
   function renderEventDetail() {
     const e = eventByKey(state.selectedEvent);
     if (!e) return;
+    // The list carries compact events; the full one (urgency, notes, outage counts,
+    // attribution) comes from /events/detail on first selection and is kept.
+    const key = e.event_key;
+    if (!state.eventDetail.has(key)) {
+      state.eventDetail.set(key, null);
+      getJSON(`/events/detail?key=${encodeURIComponent(key)}`)
+        .then((doc) => { state.eventDetail.set(key, doc); if (state.selectedEvent === key) renderEventDetail(); })
+        .catch(() => state.eventDetail.delete(key));
+    }
+    const d = state.eventDetail.get(key) || e;
     const mine = state.items.filter((i) => i.event_key === e.event_key);
     const facs = new Set(mine.map((i) => i.facility_id));
     const byCard = new Map();
@@ -1108,10 +1120,10 @@
       <div class="cb-prov" style="margin-top:4px">${esc(e.event_key)}</div>
       <div class="prov"><b>Where:</b> ${esc(placeOf(e))}${e.geography.states?.length ? ` (${esc(e.geography.states.join(", "))})` : ""}</div>
       <div class="prov"><b>When:</b> ${fmt(e._t0)} → ${fmt(e._t1)} (${Math.round((e._t1 - e._t0) / 36e5)} h)</div>
-      <div class="prov">Urgency ${esc(e.urgency)} · certainty ${esc(e.certainty)} · source ${esc(e.source)}</div>
-      ${e.geography.note ? `<div class="prov">${esc(e.geography.note)}</div>` : ""}
-      ${e.metrics && e.metrics.outage_pct !== undefined ? `<div class="prov"><b>Outage:</b> ${Number(e.metrics.customers_out).toLocaleString()} of ${Number(e.metrics.county_customers).toLocaleString()} customers out (${esc(e.metrics.outage_pct)}%)</div>` : ""}
-      ${e.attribution ? `<div class="prov">${esc(e.attribution)} ${(e.caveats || []).map(esc).join(" ")}</div>` : ""}
+      ${d.urgency ? `<div class="prov">Urgency ${esc(d.urgency)} · certainty ${esc(d.certainty)} · source ${esc(d.source)}</div>` : `<div class="prov">source ${esc(e.source)} · loading details…</div>`}
+      ${d.geography.note ? `<div class="prov">${esc(d.geography.note)}</div>` : ""}
+      ${d.metrics && d.metrics.customers_out !== undefined ? `<div class="prov"><b>Outage:</b> ${Number(d.metrics.customers_out).toLocaleString()} of ${Number(d.metrics.county_customers).toLocaleString()} customers out (${esc(d.metrics.outage_pct)}%)</div>` : ""}
+      ${d.attribution ? `<div class="prov">${esc(d.attribution)} ${(d.caveats || []).map(esc).join(" ")}</div>` : ""}
       <div style="margin-top:8px; font-size:12.5px"><b>Cards fired:</b> ${byCard.size ? `${mine.length} action items at ${plural(facs.size, "facility", "facilities")}` : "none — no card trigger matches this event"}</div>
       ${cardList ? `<ul>${cardList}</ul>` : ""}
       <div class="prov" style="margin-top:8px"><a href="/dashboard/events/${encodeURIComponent(e.event_key)}?scenario=${encodeURIComponent($("scenario").value)}">open full event page →</a></div>

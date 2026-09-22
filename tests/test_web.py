@@ -725,3 +725,86 @@ def test_card_detail_is_verbatim_and_complete(client: TestClient) -> None:
     assert "Lithium carbonate" in lithium and "must not be added together" in lithium
     assert "Panel t CO₂e/yr" not in lithium, "no panel to scale to on the card page"
     assert client.get("/card-library/nope").status_code == 404
+
+
+def test_compact_payloads_and_replay_cache(client: TestClient) -> None:
+    """Hosted on a small CPU, Monitor was slow because every replay request re-validated and
+    re-serialized thousands of rows and repeated the EAGLE-I text on every event. The fast
+    paths must return the same data, and the cache must not hide a status change."""
+    from xevents.api import compact_item
+    from xevents.store import compact_action_items, list_action_items
+
+    eng = client.app.state.engine  # type: ignore[attr-defined]
+    # compact events: much smaller, keep what the map and timeline read
+    full = client.get("/events", params={"scenario": "ian_2022"})
+    compact = client.get("/events", params={"scenario": "ian_2022", "compact": "1"})
+    assert compact.status_code == 200 and len(compact.content) < len(full.content) / 2
+    doc = compact.json()
+    assert doc["count"] == full.json()["count"]
+    ev = doc["events"][0]
+    for k in (
+        "event_key",
+        "event_name",
+        "event_type",
+        "severity",
+        "temporality",
+        "onset",
+        "expires",
+    ):
+        assert k in ev, k
+    assert "county_fips" in ev["geography"] and "raw_ref" not in ev and "attribution" not in ev
+    outage = [e for e in doc["events"] if e["source"] == "eagle_i"]
+    if outage:
+        assert "outage_pct" in outage[0]["metrics"]
+        assert doc["eaglei"]["attribution"].startswith("Electric customer outage data provided")
+    # compact action items: the column fast path equals the validated path, in the same order
+    fast = compact_action_items(eng, scenario="ian_2022", include_superseded=True)
+    slow = [
+        compact_item(i)
+        for i in list_action_items(eng, scenario="ian_2022", include_superseded=True)
+    ]
+    assert fast == slow
+    api = client.get("/action-items", params={"scenario": "ian_2022", "include_superseded": "true"})
+    assert api.json()["items"] == fast
+    # the replay cache keys on the rows' fingerprint: acknowledging an item shows up at once
+    params = {"scenario": "heat_dome_2021", "role": "care_team"}
+    before = {
+        i["id"]: i["status"] for i in client.get("/action-items", params=params).json()["items"]
+    }
+    target = next(k for k, v in before.items() if v == "issued")
+    assert (
+        client.post(
+            f"/dashboard/action-items/{target}/status", params={"status": "acknowledged"}
+        ).status_code
+        == 200
+    )
+    after = {
+        i["id"]: i["status"] for i in client.get("/action-items", params=params).json()["items"]
+    }
+    assert after[target] == "acknowledged"
+    # boundary files: gzipped once, cacheable by the browser for a day
+    geo = client.get("/reference/counties", headers={"Accept-Encoding": "gzip"})
+    assert geo.status_code == 200 and "max-age=86400" in geo.headers["cache-control"]
+    assert geo.headers.get("content-encoding") == "gzip"
+    assert geo.json()["type"] == "FeatureCollection"
+    # Monitor asks for the compact form and fetches a selected event's detail on demand
+    js = client.get("/static/playback.js").text
+    assert "compact=1" in js and "/events/detail?key=" in js
+
+
+def test_cache_warm_up_fills_the_entries_monitor_reads(client: TestClient) -> None:
+    """The startup warm-up must build the same cache keys Monitor's requests produce, or the
+    first visitor after a deploy still waits."""
+    import xevents.api as api
+
+    eng = client.app.state.engine  # type: ignore[attr-defined]
+    api._BODY_CACHE.clear()
+    api._warm(eng)
+    warmed = set(api._BODY_CACHE)
+    assert any(k[0] == "events" for k in warmed) and any(k[0] == "items" for k in warmed)
+    client.get("/events", params={"scenario": "heat_dome_2021", "compact": "1"})
+    client.get("/action-items", params={"scenario": "heat_dome_2021", "include_superseded": "true"})
+    assert set(api._BODY_CACHE) == warmed, "Monitor's requests hit the warmed entries"
+    js = client.get("/static/playback.js").text
+    assert "getJSON(`/events?${q}compact=1`)" in js
+    assert "getJSON(`/action-items?${q}include_superseded=true`)" in js

@@ -2,17 +2,21 @@
 
 from __future__ import annotations
 
+import gzip
+import json
 import math
-from collections.abc import AsyncIterator
+import threading
+import time
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
-from functools import lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy import Engine
@@ -29,6 +33,8 @@ from xevents.providers.va_facilities import to_geojson
 from xevents.store import (
     TransitionError,
     catchment_map,
+    compact_action_items,
+    compact_events,
     feed_status,
     get_action_item,
     get_event,
@@ -38,6 +44,7 @@ from xevents.store import (
     list_events,
     list_facilities,
     make_engine,
+    replay_version,
     station_map,
     transition_action_item,
 )
@@ -125,12 +132,161 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     minutes = live_refresh.minutes_from_env()
     if minutes:
         live_refresh.start(minutes)
+        # hosted: warm the replay caches in the background so the first visitor after a
+        # deploy is not the one who waits for them
+        threading.Thread(
+            target=_warm, args=(app.state.engine,), name="warm-caches", daemon=True
+        ).start()
     yield
+
+
+def _warm(engine: Engine) -> None:
+    from xevents.web.views import warm_replay_caches  # local import: views imports api
+
+    started = time.monotonic()
+    try:
+        for name in list_scenarios():
+            version = replay_version(engine, name)
+            _cache_body(
+                _events_key(name, version),
+                partial(_json_of, partial(_compact_events_doc, engine, name)),
+            )
+            _cache_body(
+                _items_key(name, version),
+                partial(_json_of, partial(_compact_items_doc, engine, name)),
+            )
+        warm_replay_caches(engine)
+        print(
+            f"cache warm-up: {len(list_scenarios())} replays in {time.monotonic() - started:.0f}s",
+            flush=True,
+        )
+    except Exception as exc:  # warming is best-effort: a failure only means a slower first page
+        print(f"cache warm-up failed: {type(exc).__name__}: {exc}", flush=True)
+
+
+_BODY_CACHE: dict[tuple[object, ...], tuple[bytes, bytes]] = {}
+
+
+def _cache_body(key: tuple[object, ...], build: Callable[[], bytes]) -> tuple[bytes, bytes]:
+    """The (raw, gzipped) body for ``key``, built and compressed once."""
+    hit = _BODY_CACHE.get(key)
+    if hit is None:
+        raw = build()
+        hit = (raw, gzip.compress(raw, 6))
+        if len(_BODY_CACHE) > 64:
+            _BODY_CACHE.clear()
+        _BODY_CACHE[key] = hit
+    return hit
+
+
+# Monitor's two replay requests, exactly as playback.js makes them (so the warm-up fills the
+# same cache entries the page reads): /events?scenario=…&compact=1 and
+# /action-items?scenario=…&include_superseded=true.
+def _events_key(scenario: str, version: object) -> tuple[object, ...]:
+    return ("events", scenario, None, None, False, True, version)
+
+
+def _items_key(scenario: str, version: object) -> tuple[object, ...]:
+    return ("items", scenario, None, None, True, True, version)
+
+
+def _compact_events_doc(
+    engine: Engine, scenario: str | None, active_at: datetime | None = None
+) -> dict[str, Any]:
+    docs = compact_events(
+        engine, scenario=scenario, live_only=scenario is None, active_at=active_at
+    )
+    doc: dict[str, Any] = {"count": len(docs), "events": docs}
+    if any(d["source"] == EventSource.EAGLE_I.value for d in docs):
+        doc["eaglei"] = {"attribution": ATTRIBUTION, "caveats": [CUSTOMERS_CAVEAT, COVERAGE_CAVEAT]}
+    return doc
+
+
+def _compact_items_doc(
+    engine: Engine,
+    scenario: str | None,
+    role: str | None = None,
+    include_superseded: bool = True,
+    active_at: datetime | None = None,
+) -> dict[str, Any]:
+    items = compact_action_items(
+        engine,
+        scenario=scenario,
+        live_only=scenario is None,
+        role=role,
+        include_superseded=include_superseded,
+        active_at=active_at,
+    )
+    return {"count": len(items), "items": items}
+
+
+def _cached(
+    request: Request,
+    key: tuple[object, ...],
+    build: Callable[[], bytes],
+    media_type: str = "application/json",
+    max_age: int | None = None,
+) -> Response:
+    """Serve a body built once per ``key``, gzipped once. For responses that do not change
+    between deploys or re-matches: replay scenarios (keyed on ``replay_version``) and the
+    reference boundary files (keyed on file mtime). Encoding a 15 MB replay and gzipping it
+    on every request is what made the hosted demo take tens of seconds."""
+    raw, gz = _cache_body(key, build)
+    headers = {"Vary": "Accept-Encoding"}
+    if max_age:
+        headers["Cache-Control"] = f"public, max-age={max_age}"
+    if "gzip" in request.headers.get("accept-encoding", ""):
+        return Response(gz, media_type=media_type, headers={**headers, "Content-Encoding": "gzip"})
+    return Response(raw, media_type=media_type, headers=headers)
+
+
+def _static_geo(request: Request, path: Path) -> Response:
+    """A reference boundary file, gzipped once and cacheable by the browser for a day (the
+    files change only with a deploy): the map no longer re-downloads 2 MB on every visit."""
+    key = ("geo", str(path), path.stat().st_mtime_ns)
+    return _cached(request, key, path.read_bytes, "application/geo+json", max_age=86400)
+
+
+def compact_item(i: Any) -> dict[str, Any]:
+    """One item in the compact shape (same fields as ``store.compact_action_items``)."""
+    return {
+        "id": i.id,
+        "event_key": i.event_key,
+        "event_name": i.event_name,
+        "event_type": i.event_type.value,
+        "event_severity": i.event_severity.value,
+        "event_temporality": i.event_temporality.value,
+        "phase": i.phase.value,
+        "card_id": i.card_id,
+        "card_title": i.card_title,
+        "facility_id": i.scope_id,
+        "role": i.role.value,
+        "status": i.status.value,
+        "superseded_by": i.superseded_by,
+        "acuity_rank": i.acuity_rank,
+        "acuity_class": i.acuity_class,
+        "panel": round(i.panel.value) if i.panel else None,
+        "exposure": round(i.exposure.value) if i.exposure else None,
+        "rank_score": round(i.rank_score, 1),
+        "window_start": i.window_start.isoformat(),
+        "window_end": i.window_end.isoformat(),
+    }
+
+
+def _json_of(build: Callable[[], Any]) -> bytes:
+    return _json_bytes(build())
+
+
+def _json_bytes(doc: Any) -> bytes:
+    return json.dumps(doc, separators=(",", ":"), ensure_ascii=False).encode()
 
 
 def create_app(engine: Engine | None = None) -> FastAPI:
     app = FastAPI(title="med-extreme-events", version=__version__, lifespan=_lifespan)
-    app.add_middleware(GZipMiddleware, minimum_size=1024)
+    # Level 5: nearly the size of level 9 at a fraction of the CPU — on a small hosted CPU,
+    # level 9 on megabyte responses cost seconds per request. Large, stable bodies are
+    # pre-compressed once instead (``_cached``), and the middleware passes them through.
+    app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=5)
     app.state.engine = engine or make_engine()
 
     def _engine(request: Request) -> Engine:
@@ -225,18 +381,42 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         at: str | None = Query(default=None, description="ISO timestamp; only events active then"),
         county: str | None = Query(default=None, pattern=r"^\d{5}$"),
         include_polygons: bool = Query(default=False),
-    ) -> dict[str, Any]:
-        rows = list_events(
-            _engine(request),
-            scenario=scenario,
-            active_at=_parse_at(at),
-            county_fips=county,
-            live_only=scenario is None,
-        )
-        return {
-            "count": len(rows),
-            "events": [event_json(e, include_polygon=include_polygons) for e in rows],
-        }
+        compact: bool = Query(
+            default=False,
+            description="map/timeline fields only; EAGLE-I attribution once at the top level; "
+            "full events at /events/detail",
+        ),
+    ) -> Any:
+        eng = _engine(request)
+        active_at = _parse_at(at)
+
+        def build() -> dict[str, Any]:
+            if compact and not county and not include_polygons:
+                return _compact_events_doc(eng, scenario, active_at)
+            rows = list_events(
+                eng,
+                scenario=scenario,
+                active_at=active_at,
+                county_fips=county,
+                live_only=scenario is None,
+            )
+            return {
+                "count": len(rows),
+                "events": [event_json(e, include_polygon=include_polygons) for e in rows],
+            }
+
+        if scenario is not None:  # replays change only on re-ingest/re-match: cache the body
+            key = (
+                "events",
+                scenario,
+                at,
+                county,
+                include_polygons,
+                compact,
+                replay_version(eng, scenario),
+            )
+            return _cached(request, key, lambda: _json_bytes(build()))
+        return build()
 
     @app.get("/events/detail")
     def event_detail(request: Request, key: str = Query(...)) -> dict[str, Any]:
@@ -276,47 +456,43 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         compact: bool = Query(
             default=True, description="omit card text; use /action-items/{id} for it"
         ),
-    ) -> dict[str, Any]:
-        rows = list_action_items(
-            _engine(request),
-            scenario=scenario,
-            live_only=scenario is None,
-            facility_id=facility,
-            role=role,
-            card_id=card,
-            status=status,
-            active_at=_parse_at(at),
-            include_superseded=include_superseded,
-        )
-        if compact:
-            items = [
-                {
-                    "id": i.id,
-                    "event_key": i.event_key,
-                    "event_name": i.event_name,
-                    "event_type": i.event_type.value,
-                    "event_severity": i.event_severity.value,
-                    "event_temporality": i.event_temporality.value,
-                    "phase": i.phase.value,
-                    "card_id": i.card_id,
-                    "card_title": i.card_title,
-                    "facility_id": i.scope_id,
-                    "role": i.role.value,
-                    "status": i.status.value,
-                    "superseded_by": i.superseded_by,
-                    "acuity_rank": i.acuity_rank,
-                    "acuity_class": i.acuity_class,
-                    "panel": round(i.panel.value) if i.panel else None,
-                    "exposure": round(i.exposure.value) if i.exposure else None,
-                    "rank_score": round(i.rank_score, 1),
-                    "window_start": i.window_start.isoformat(),
-                    "window_end": i.window_end.isoformat(),
-                }
-                for i in rows
-            ]
-        else:
-            items = [i.model_dump(mode="json") for i in rows]
-        return {"count": len(items), "items": items}
+    ) -> Any:
+        eng = _engine(request)
+        active_at = _parse_at(at)
+        simple = not (facility or card or status)
+
+        def build() -> dict[str, Any]:
+            if compact and simple:  # the Monitor path: columns + stored payload, no validation
+                return _compact_items_doc(eng, scenario, role, include_superseded, active_at)
+            rows = list_action_items(
+                eng,
+                scenario=scenario,
+                live_only=scenario is None,
+                facility_id=facility,
+                role=role,
+                card_id=card,
+                status=status,
+                active_at=active_at,
+                include_superseded=include_superseded,
+            )
+            if compact:
+                items = [compact_item(i) for i in rows]
+            else:
+                items = [i.model_dump(mode="json") for i in rows]
+            return {"count": len(items), "items": items}
+
+        if scenario is not None and simple:
+            key = (
+                "items",
+                scenario,
+                role,
+                at,
+                include_superseded,
+                compact,
+                replay_version(eng, scenario),
+            )
+            return _cached(request, key, lambda: _json_bytes(build()))
+        return build()
 
     @app.get("/action-items/{item_id:path}")
     def action_item(request: Request, item_id: str) -> dict[str, Any]:
@@ -378,18 +554,18 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         return doc
 
     @app.get("/reference/counties")
-    def counties() -> FileResponse:
-        return FileResponse(COUNTIES_GEOJSON, media_type="application/geo+json")
+    def counties(request: Request) -> Response:
+        return _static_geo(request, COUNTIES_GEOJSON)
 
     @app.get("/reference/states")
-    def states() -> FileResponse:
+    def states(request: Request) -> Response:
         """State and territory outlines for the map overlay (Census 1:5m, as the counties)."""
-        return FileResponse(STATES_GEOJSON, media_type="application/geo+json")
+        return _static_geo(request, STATES_GEOJSON)
 
     @app.get("/reference/countries")
-    def countries() -> FileResponse:
+    def countries(request: Request) -> Response:
         """Neighbouring countries (Natural Earth 1:50m) — a basemap backdrop, no data."""
-        return FileResponse(COUNTRIES_GEOJSON, media_type="application/geo+json")
+        return _static_geo(request, COUNTRIES_GEOJSON)
 
     from xevents.web.views import router as web_router
 

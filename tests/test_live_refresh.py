@@ -33,9 +33,12 @@ def test_refresh_runs_ingest_then_match_in_live_mode(monkeypatch: pytest.MonkeyP
 
     monkeypatch.setattr(subprocess, "run", fake_run)
     assert live_refresh.refresh_once() is True
-    scripts = [Path(c[0][1]).name for c in calls]
+    # the command may be prefixed with `nice -n 10` (lower priority than the web process)
+    nice = live_refresh._NICE
+    assert all(c[0][: len(nice)] == nice for c in calls)
+    scripts = [Path(c[0][len(nice) + 1]).name for c in calls]
     assert scripts == ["ingest.py", "match.py"]
-    assert all(c[0][2:] == ["--mode", "live"] for c in calls)
+    assert all(c[0][len(nice) + 2 :] == ["--mode", "live"] for c in calls)
     assert all(c[1]["EVENT_MODE"] == "live" for c in calls)
 
 
@@ -43,7 +46,7 @@ def test_refresh_stops_when_ingest_fails(monkeypatch: pytest.MonkeyPatch) -> Non
     calls: list[str] = []
 
     def fake_run(cmd: list[str], **kw: Any) -> subprocess.CompletedProcess[str]:
-        calls.append(Path(cmd[1]).name)
+        calls.append(next(Path(a).name for a in cmd if a.endswith(".py")))
         return subprocess.CompletedProcess(cmd, 1, stdout="", stderr="all providers failed")
 
     monkeypatch.setattr(subprocess, "run", fake_run)

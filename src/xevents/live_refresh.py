@@ -13,6 +13,7 @@ appears in the host's logs.
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import sys
 import threading
@@ -39,6 +40,11 @@ def minutes_from_env(env: dict[str, str] | None = None) -> float:
     return value if value > 0 else 0.0
 
 
+# The refresh shares a small hosted CPU with the web process; run it at lower priority so page
+# requests are served first while an hourly ingest is running.
+_NICE = ["nice", "-n", "10"] if shutil.which("nice") else []
+
+
 def refresh_once(timeout_s: float = 900.0) -> bool:
     """Run live ingest then live match. False if a step failed (ingest fails only when every
     provider failed; the per-provider lines say which)."""
@@ -46,7 +52,7 @@ def refresh_once(timeout_s: float = 900.0) -> bool:
     for script, args in STEPS:
         started = time.monotonic()
         result = subprocess.run(
-            [sys.executable, str(REPO_ROOT / "scripts" / script), *args],
+            [*_NICE, sys.executable, str(REPO_ROOT / "scripts" / script), *args],
             cwd=REPO_ROOT,
             env=env,
             capture_output=True,

@@ -36,6 +36,8 @@ from xevents.scenario_guide import load_guide
 from xevents.sources import load_backlog, load_registry
 from xevents.store import (
     TransitionError,
+    action_item_facts,
+    compact_events,
     feed_status,
     get_event,
     get_facility,
@@ -43,6 +45,7 @@ from xevents.store import (
     list_action_items,
     list_events,
     list_facilities,
+    replay_version,
     transition_action_item,
 )
 from xevents.timeparse import BadTimestamp, parse_at, to_input_value
@@ -526,6 +529,20 @@ def sources_page(
     return templates.TemplateResponse(request, "sources.html", ctx)
 
 
+parse_iso = datetime.fromisoformat
+
+
+def warm_replay_caches(engine: Engine) -> None:
+    """Fill the per-replay caches behind the Scenarios and Cards pages, so the first visitor
+    after a deploy does not pay for them. Called from the app's startup thread."""
+    from xevents.api import scenario_summary  # local import avoids a circular import
+
+    for name in list_scenarios():
+        _replay_stats(engine, name)
+        start = datetime.fromisoformat(scenario_summary(name)["window_start"])
+        _card_firing(engine, name, start)
+
+
 def _live_summary(engine: Engine, cards: dict[str, Any]) -> dict[str, Any]:
     """What the live scenario holds right now, computed from the live rows: the Monitor window
     (two weeks back, up to a week ahead), events in it by source, what fires now and what
@@ -533,17 +550,19 @@ def _live_summary(engine: Engine, cards: dict[str, Any]) -> dict[str, Any]:
     now = datetime.now(UTC)
     start, end = now - timedelta(days=14), now + timedelta(days=7)
     events = [
-        e for e in list_events(engine, live_only=True) if e.expires >= start and e.onset <= end
+        e
+        for e in compact_events(engine, live_only=True)
+        if parse_iso(e["expires"]) >= start and parse_iso(e["onset"]) <= end
     ]
     by_source: dict[str, int] = {}
     for e in events:
-        by_source[e.source.value] = by_source.get(e.source.value, 0) + 1
+        by_source[e["source"]] = by_source.get(e["source"], 0) + 1
     items = [
         i
-        for i in list_action_items(engine, live_only=True, role=Role.CARE_TEAM.value)
-        if i.window_end >= start and i.window_start <= end
+        for i in action_item_facts(engine, live_only=True, role=Role.CARE_TEAM.value)
+        if i["window_end"] >= start and i["window_start"] <= end
     ]
-    now_items = [i for i in items if i.window_start <= now <= i.window_end]
+    now_items = [i for i in items if i["window_start"] <= now <= i["window_end"]]
 
     def by_number(ids: set[str]) -> list[Any]:
         return sorted((cards[c] for c in ids if c in cards), key=lambda c: c.number)
@@ -554,17 +573,46 @@ def _live_summary(engine: Engine, cards: dict[str, Any]) -> dict[str, Any]:
         "window_start": start,
         "window_end": end,
         "events": len(events),
-        "events_now": sum(1 for e in events if e.onset <= now <= e.expires),
-        "forecast_ahead": sum(1 for e in events if e.onset > now),
+        "events_now": sum(
+            1 for e in events if parse_iso(e["onset"]) <= now <= parse_iso(e["expires"])
+        ),
+        "forecast_ahead": sum(1 for e in events if parse_iso(e["onset"]) > now),
         "by_source": sorted(by_source.items(), key=lambda kv: -kv[1]),
-        "cards_now": by_number({i.card_id for i in now_items}),
-        "cards_window": by_number({i.card_id for i in items}),
-        "facilities_now": len({i.scope_id for i in now_items}),
-        "facilities_window": len({i.scope_id for i in items}),
+        "cards_now": by_number({i["card_id"] for i in now_items}),
+        "cards_window": by_number({i["card_id"] for i in items}),
+        "facilities_now": len({i["scope_id"] for i in now_items}),
+        "facilities_window": len({i["scope_id"] for i in items}),
         "last_run": datetime.fromisoformat(last) if last else None,
         "problems": [r["provider"] for r in runs if r["status"] == "failed"],
         "partial": [s for s in load_registry().sources if s.live.coverage_level == "partial"],
     }
+
+
+_STATS_CACHE: dict[tuple[object, ...], Any] = {}
+
+
+def _per_replay(kind: str, engine: Engine, scenario: str, build: Any) -> Any:
+    """Memoise a per-replay computation on the replay's row fingerprint: replays change only
+    on re-ingest, re-match or a status change, so pages stop recomputing them per request."""
+    key = (kind, scenario, replay_version(engine, scenario))
+    if key not in _STATS_CACHE:
+        if len(_STATS_CACHE) > 64:
+            _STATS_CACHE.clear()
+        _STATS_CACHE[key] = build()
+    return _STATS_CACHE[key]
+
+
+def _replay_stats(engine: Engine, scenario: str) -> dict[str, Any]:
+    def build() -> dict[str, Any]:
+        facts = action_item_facts(engine, scenario=scenario, include_superseded=True)
+        numbers = {c.id: c.number for c in load_cards()}
+        return {
+            "card_ids": sorted({f["card_id"] for f in facts}, key=lambda c: numbers.get(c, 99)),
+            "facilities": len({f["scope_id"] for f in facts}),
+            "item_count": sum(1 for f in facts if f["status"] != ActionItemStatus.SUPERSEDED.value),
+        }
+
+    return dict(_per_replay("stats", engine, scenario, build))
 
 
 @router.get("/replays", response_class=HTMLResponse)
@@ -581,17 +629,14 @@ def replays_page(request: Request) -> HTMLResponse:
         summary = summaries.get(r.id)
         if summary is None:
             continue
-        items = list_action_items(engine, scenario=r.id, include_superseded=True)
-        fired = sorted(
-            {i.card_id for i in items}, key=lambda c: cards[c].number if c in cards else 99
-        )
+        stats = _replay_stats(engine, r.id)
         rows.append(
             {
                 "guide": r,
                 "summary": summary,
-                "cards": [cards[c] for c in fired if c in cards],
-                "facilities": len({i.scope_id for i in items}),
-                "item_count": sum(1 for i in items if i.status is not ActionItemStatus.SUPERSEDED),
+                "cards": [cards[c] for c in stats["card_ids"] if c in cards],
+                "facilities": stats["facilities"],
+                "item_count": stats["item_count"],
             }
         )
     ctx.update(
@@ -606,49 +651,41 @@ def replays_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "replays.html", ctx)
 
 
-_FIRING_CACHE: dict[tuple[str, int], dict[str, dict[str, Any]]] = {}
-
-
 def _card_firing(
     engine: Engine, scenario: str, window_start: datetime
 ) -> dict[str, dict[str, Any]]:
     """card id → where and when it fires in one replay: facilities reached, first time, and
     the peak hour (most facilities at once) — the moment Monitor should open on. Care-team
-    items only, superseded ones excluded, as Monitor shows them. Cached per replay (keyed by
-    item count, so a re-match refreshes it)."""
-    items = [
-        i
-        for i in list_action_items(engine, scenario=scenario, role=Role.CARE_TEAM.value)
-        if i.status is not ActionItemStatus.SUPERSEDED
-    ]
-    key = (scenario, len(items))
-    if key in _FIRING_CACHE:
-        return _FIRING_CACHE[key]
-    by_card: dict[str, list[ActionItem]] = {}
-    for i in items:
-        by_card.setdefault(i.card_id, []).append(i)
-    out: dict[str, dict[str, Any]] = {}
-    for card_id, its in by_card.items():
-        # candidate moments: each item's opening hour, not before the replay's first onset
-        # (Monitor's timeline starts there)
-        starts = sorted(
-            {max(i.window_start, window_start).replace(minute=0, second=0) for i in its}
-        )
-        best, best_n = starts[0], -1
-        for t in starts:
-            n = len({i.scope_id for i in its if i.window_start <= t <= i.window_end})
-            if n > best_n:
-                best, best_n = t, n
-        out[card_id] = {
-            "facilities": len({i.scope_id for i in its}),
-            "first": min(i.window_start for i in its),
-            "peak": best,
-            "peak_facilities": best_n,
-        }
-    if len(_FIRING_CACHE) > 32:
-        _FIRING_CACHE.clear()
-    _FIRING_CACHE[key] = out
-    return out
+    items only, superseded ones excluded, as Monitor shows them. Memoised per replay on its
+    row fingerprint (``_per_replay``)."""
+
+    def build() -> dict[str, dict[str, Any]]:
+        facts = action_item_facts(engine, scenario=scenario, role=Role.CARE_TEAM.value)
+        by_card: dict[str, list[dict[str, Any]]] = {}
+        for f in facts:
+            by_card.setdefault(f["card_id"], []).append(f)
+        out: dict[str, dict[str, Any]] = {}
+        for card_id, its in by_card.items():
+            # candidate moments: each item's opening hour, not before the replay's first
+            # onset (Monitor's timeline starts there)
+            starts = sorted(
+                {max(i["window_start"], window_start).replace(minute=0, second=0) for i in its}
+            )
+            best, best_n = starts[0], -1
+            for t in starts:
+                n = len({i["scope_id"] for i in its if i["window_start"] <= t <= i["window_end"]})
+                if n > best_n:
+                    best, best_n = t, n
+            out[card_id] = {
+                "facilities": len({i["scope_id"] for i in its}),
+                "first": min(i["window_start"] for i in its),
+                "peak": best,
+                "peak_facilities": best_n,
+            }
+        return out
+
+    result: dict[str, dict[str, Any]] = _per_replay("firing", engine, scenario, build)
+    return result
 
 
 def _cards_context(request: Request) -> dict[str, Any]:
@@ -665,8 +702,8 @@ def _cards_context(request: Request) -> dict[str, Any]:
             firing.setdefault(card_id, []).append({"scenario": s["id"], **f})
     now = datetime.now(UTC)
     live: dict[str, set[str]] = {}
-    for i in list_action_items(engine, live_only=True, active_at=now, role=Role.CARE_TEAM.value):
-        live.setdefault(i.card_id, set()).add(i.scope_id)
+    for i in action_item_facts(engine, live_only=True, active_at=now, role=Role.CARE_TEAM.value):
+        live.setdefault(i["card_id"], set()).add(i["scope_id"])
     ctx.update(
         show_asof=False,
         show_banner=False,

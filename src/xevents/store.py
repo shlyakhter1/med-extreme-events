@@ -637,6 +637,223 @@ def list_action_items(
     return sorted(items, key=rank_key)  # the engine's order: acuity, severity, score, id
 
 
+def _item_filters(
+    stmt: Any,
+    *,
+    scenario: str | None,
+    live_only: bool,
+    role: str | None,
+    include_superseded: bool,
+    active_at: datetime | None,
+) -> Any:
+    if scenario is not None:
+        stmt = stmt.where(ActionItemRow.scenario == scenario)
+    elif live_only:
+        stmt = stmt.where(ActionItemRow.scenario.is_(None))
+    if role:
+        stmt = stmt.where(ActionItemRow.role == role)
+    if not include_superseded:
+        stmt = stmt.where(ActionItemRow.status != ActionItemStatus.SUPERSEDED.value)
+    if active_at is not None:
+        stmt = stmt.where(
+            ActionItemRow.window_start <= active_at, ActionItemRow.window_end >= active_at
+        )
+    return stmt
+
+
+def action_item_facts(
+    engine: Engine,
+    *,
+    scenario: str | None = None,
+    live_only: bool = False,
+    role: str | None = None,
+    include_superseded: bool = False,
+    active_at: datetime | None = None,
+) -> list[dict[str, Any]]:
+    """The indexed columns of matching items, without the payload: for pages that count and
+    group items (where each card fires, what is live now). Validating every full item is what
+    made those pages slow on a small CPU."""
+    stmt = _item_filters(
+        select(
+            ActionItemRow.card_id,
+            ActionItemRow.scope_id,
+            ActionItemRow.role,
+            ActionItemRow.status,
+            ActionItemRow.event_key,
+            ActionItemRow.window_start,
+            ActionItemRow.window_end,
+        ),
+        scenario=scenario,
+        live_only=live_only,
+        role=role,
+        include_superseded=include_superseded,
+        active_at=active_at,
+    )
+    with Session(engine) as s:
+        return [
+            {
+                "card_id": r.card_id,
+                "scope_id": r.scope_id,
+                "role": r.role,
+                "status": r.status,
+                "event_key": r.event_key,
+                "window_start": _aware(r.window_start),
+                "window_end": _aware(r.window_end),
+            }
+            for r in s.execute(stmt)
+        ]
+
+
+def compact_action_items(
+    engine: Engine,
+    *,
+    scenario: str | None = None,
+    live_only: bool = False,
+    role: str | None = None,
+    include_superseded: bool = False,
+    active_at: datetime | None = None,
+) -> list[dict[str, Any]]:
+    """The ``/action-items?compact=1`` rows, read straight from columns and the stored
+    payload (already JSON) instead of validating each item — same fields, same order."""
+    stmt = _item_filters(
+        select(ActionItemRow),
+        scenario=scenario,
+        live_only=live_only,
+        role=role,
+        include_superseded=include_superseded,
+        active_at=active_at,
+    )
+    rows: list[dict[str, Any]] = []
+    with Session(engine) as s:
+        for r in s.scalars(stmt):
+            p = r.payload
+            panel = p.get("panel")
+            exposure = p.get("exposure")
+            rows.append(
+                {
+                    "id": r.id,
+                    "event_key": r.event_key,
+                    "event_name": p["event_name"],
+                    "event_type": r.event_type,
+                    "event_severity": r.event_severity,
+                    "event_temporality": p["event_temporality"],
+                    "phase": p["phase"],
+                    "card_id": r.card_id,
+                    "card_title": p["card_title"],
+                    "facility_id": r.scope_id,
+                    "role": r.role,
+                    "status": r.status,
+                    "superseded_by": r.superseded_by,
+                    "acuity_rank": r.acuity_rank,
+                    "acuity_class": p["acuity_class"],
+                    "panel": round(panel["value"]) if panel else None,
+                    "exposure": round(exposure["value"]) if exposure else None,
+                    "rank_score": round(r.rank_score, 1),
+                    "window_start": _aware(r.window_start).isoformat(),
+                    "window_end": _aware(r.window_end).isoformat(),
+                }
+            )
+    sev = {"Extreme": 4, "Severe": 3, "Moderate": 2, "Minor": 1, "Unknown": 0}
+    rows.sort(
+        key=lambda d: (
+            d["acuity_rank"],
+            -sev.get(d["event_severity"], 0),
+            -d["rank_score"],
+            d["id"],
+        )
+    )
+    return rows
+
+
+def compact_events(
+    engine: Engine,
+    *,
+    scenario: str | None = None,
+    live_only: bool = False,
+    active_at: datetime | None = None,
+) -> list[dict[str, Any]]:
+    """What a map and timeline need from each event, straight from the columns: no headline,
+    raw path, provenance metrics or per-event attribution (the caller adds attribution once).
+    The full event stays one call away at ``/events/detail``."""
+    stmt = select(
+        EventRow.event_key,
+        EventRow.source,
+        EventRow.event_type,
+        EventRow.event_name,
+        EventRow.severity,
+        EventRow.temporality,
+        EventRow.onset,
+        EventRow.expires,
+        EventRow.geography,
+        EventRow.metrics,
+    ).order_by(EventRow.onset, EventRow.event_key)
+    if scenario is not None:
+        stmt = stmt.where(EventRow.scenario == scenario)
+    elif live_only:
+        stmt = stmt.where(EventRow.scenario.is_(None))
+    if active_at is not None:
+        stmt = stmt.where(EventRow.onset <= active_at, EventRow.expires >= active_at)
+    out: list[dict[str, Any]] = []
+    with Session(engine) as s:
+        for r in s.execute(stmt):
+            g = r.geography or {}
+            m = r.metrics or {}
+            area = g.get("area_desc")
+            geo: dict[str, Any] = {"county_fips": g.get("county_fips", [])}
+            if g.get("states"):
+                geo["states"] = g["states"]
+            if area:
+                geo["area_desc"] = area if len(area) <= 70 else area[:69] + "…"
+            doc: dict[str, Any] = {
+                "event_key": r.event_key,
+                "source": r.source,
+                "event_type": r.event_type,
+                "event_name": r.event_name,
+                "severity": r.severity,
+                "temporality": r.temporality,
+                "onset": _aware(r.onset).isoformat(),
+                "expires": _aware(r.expires).isoformat(),
+                "geography": geo,
+            }
+            kept = {k: m[k] for k in ("outage_pct", "poll_streak") if k in m}
+            if kept:
+                doc["metrics"] = kept
+            out.append(doc)
+    return out
+
+
+def replay_version(engine: Engine, scenario: str) -> tuple[object, ...]:
+    """A cheap fingerprint of one replay's stored rows, so cached responses for it are rebuilt
+    only when something changes: a re-ingest or re-match (counts, latest write times) or a
+    status change from the Acknowledge / Mark completed buttons (non-issued count, latest
+    acknowledgement)."""
+    from sqlalchemy import func
+
+    with Session(engine) as s:
+        ev = s.execute(
+            select(func.count(), func.max(EventRow.ingested_at)).where(
+                EventRow.scenario == scenario
+            )
+        ).one()
+        it = s.execute(
+            select(
+                func.max(ActionItemRow.created_at), func.max(ActionItemRow.acknowledged_at)
+            ).where(ActionItemRow.scenario == scenario)
+        ).one()
+        by_status = s.execute(
+            select(ActionItemRow.status, func.count())
+            .where(ActionItemRow.scenario == scenario)
+            .group_by(ActionItemRow.status)
+        ).all()
+    return (
+        int(ev[0]),
+        str(ev[1]),
+        str(it[0]),
+        str(it[1]),
+        tuple(sorted((st, int(n)) for st, n in by_status)),
+    )
+
+
 def get_action_item(engine: Engine, item_id: str) -> ActionItem | None:
     with Session(engine) as s:
         row = s.get(ActionItemRow, item_id)
