@@ -401,3 +401,44 @@ def test_feeds_and_scenario_peak(client: TestClient) -> None:
     scen = client.get("/scenarios").json()
     heat = next(s for s in scen if s["id"] == "heat_dome_2021")
     assert heat["window_start"] <= heat["peak_at"] <= heat["window_end"]
+
+
+def test_partial_validates_role_and_facility(client: TestClient) -> None:
+    """The htmx partial used to 500 on an unknown role and 200 on an unknown facility."""
+    base = {"scenario": "heat_dome_2021", "at": AT}
+    assert (
+        client.get(
+            "/dashboard/facilities/vha_648/cards", params={**base, "role": "bogus"}
+        ).status_code
+        == 422
+    )
+    assert client.get("/dashboard/facilities/vha_nope/cards", params=base).status_code == 404
+    assert (
+        client.get(
+            "/dashboard/facilities/vha_648/cards", params={**base, "role": "patient"}
+        ).status_code
+        == 200
+    )
+
+
+def test_live_pages_do_not_load_replay_rows(client: TestClient) -> None:
+    """Live views filter in SQL: no replay fixture rows are deserialized and discarded."""
+    from xevents.store import list_action_items, list_events
+
+    eng = client.app.state.engine  # type: ignore[attr-defined]
+    assert list_events(eng, live_only=True) == [] and list_action_items(eng, live_only=True) == []
+    assert list_events(eng, scenario="heat_dome_2021"), "scenario filtering is unaffected"
+    live = client.get("/dashboard/events", params={"scenario": "live", "window": "all"}).text
+    assert "Excessive Heat Warning" not in live, "replay rows must not leak into live pages"
+    assert client.get("/events").json()["count"] == 0
+    assert client.get("/action-items", params={"compact": "1"}).json()["count"] == 0
+
+
+def test_map_legend_carries_eaglei_attribution(client: TestClient) -> None:
+    js = client.get("/static/map.js").text
+    assert "Electric customer outage data provided by EAGLE-I, Department of Energy." in js
+    assert 'power_outage ? `<div class="note">${EAGLEI_ATTRIBUTION}' in js, (
+        "the attribution renders in the legend whenever outage counties are shaded"
+    )
+    pb = client.get("/static/playback.js").text
+    assert 'titles.map(esc).join("<br>")' in pb, "tooltip line breaks must not be escaped"

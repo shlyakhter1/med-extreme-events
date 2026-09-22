@@ -59,7 +59,7 @@
   {% endfor %}
   </tbody>
 </table>
-{% if events|selectattr('source.value', 'equalto', 'eagle_i')|list %}<div class="muted" style="font-size:12px">{{ eaglei.attribution }} {{ eaglei.caveats|join(' ') }}</div>{% endif %}
+{% if has_outage %}<div class="muted" style="font-size:12px">{{ eaglei.attribution }} {{ eaglei.caveats|join(' ') }}</div>{% endif %}
 {% if events_total > events|length %}<div class="muted" style="margin-top:6px">… {{ events_total - events|length }} more · <a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">see all</a></div>{% endif %}
 
 <script>

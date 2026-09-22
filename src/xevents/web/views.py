@@ -19,7 +19,7 @@ from sqlalchemy import Engine
 from xevents.carbon import CarbonTable, load_carbon
 from xevents.cards import load_cards
 from xevents.geography.counties import CountyIndex
-from xevents.models import ActionItem, ActionItemStatus, Event, Role
+from xevents.models import ActionItem, ActionItemStatus, Event, EventSource, Role
 from xevents.providers.eagle_i import ATTRIBUTION as EAGLEI_ATTRIBUTION
 from xevents.providers.eagle_i import (
     COVERAGE_CAVEAT,
@@ -155,10 +155,9 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
 def _items_at(
     request: Request, scenario: str | None, as_of: datetime, **kw: Any
 ) -> list[ActionItem]:
-    rows = list_action_items(_engine(request), scenario=scenario, active_at=as_of, **kw)
-    if scenario is None:
-        rows = [i for i in rows if i.scenario is None]
-    return rows
+    return list_action_items(
+        _engine(request), scenario=scenario, active_at=as_of, live_only=scenario is None, **kw
+    )
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -170,9 +169,12 @@ def dashboard(
     ctx = _context(request, scenario, at)
     engine = _engine(request)
     items = _items_at(request, ctx["scenario"], ctx["as_of"])
-    events = list_events(engine, scenario=ctx["scenario"], active_at=ctx["as_of"])
-    if ctx["scenario"] is None:
-        events = [e for e in events if e.scenario is None]
+    events = list_events(
+        engine,
+        scenario=ctx["scenario"],
+        active_at=ctx["as_of"],
+        live_only=ctx["scenario"] is None,
+    )
     facilities = {f.id: f for f in list_facilities(engine)}
     board: dict[str, dict[str, Any]] = {}
     for it in items:
@@ -214,6 +216,7 @@ def dashboard(
         board=ranked,
         events=sorted(events, key=lambda e: (e.onset, e.event_key))[:25],
         events_total=len(events),
+        has_outage=any(e.source is EventSource.EAGLE_I for e in events),
         item_count=len(items),
         event_count=len(events),
         event_counts=sorted(event_counts.items(), key=lambda kv: -kv[1]),
@@ -296,7 +299,12 @@ def facility_cards_partial(
     role: str = "care_team",
 ) -> HTMLResponse:
     ctx = _context(request, scenario, at)
-    role_enum = Role(role)
+    if get_facility(_engine(request), facility_id) is None:
+        raise HTTPException(status_code=404, detail=f"unknown facility {facility_id}")
+    try:
+        role_enum = Role(role)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"unknown role {role}") from None
     cards = _facility_cards(request, facility_id, ctx["scenario"], ctx["as_of"], role_enum)
     ctx.update(
         facility_id=facility_id, cards=cards, role=role_enum.value, roles=[r.value for r in Role]
@@ -371,9 +379,9 @@ def events_page(
     ctx = _context(request, scenario, at)
     engine = _engine(request)
     active_at = ctx["as_of"] if window == "active" else None
-    events = list_events(engine, scenario=ctx["scenario"], active_at=active_at)
-    if ctx["scenario"] is None:
-        events = [e for e in events if e.scenario is None]
+    events = list_events(
+        engine, scenario=ctx["scenario"], active_at=active_at, live_only=ctx["scenario"] is None
+    )
     items = _items_at(request, ctx["scenario"], ctx["as_of"])
     rows = _event_rows(sorted(events, key=lambda e: (e.onset, e.event_key)), items)
     ctx.update(rows=rows, window=window, total=len(rows))

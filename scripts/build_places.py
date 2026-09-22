@@ -57,20 +57,25 @@ def main() -> int:
             r.raise_for_status()
             raw_path.write_bytes(r.content)
     rows = json.loads(raw_path.read_text(encoding="utf-8"))
+    if not rows:
+        raise SystemExit("PLACES payload is empty — not overwriting the committed table")
+    # Build every output row before touching the file: a renamed upstream field must fail
+    # here, not leave a header-only CSV over the committed one.
+    out_rows = [
+        [
+            r["countyfips"],
+            r["stateabbr"],
+            r["countyname"],
+            r.get("totalpopulation", ""),
+            r.get("totalpop18plus", ""),
+        ]
+        + [r.get(f"{m}_crudeprev", "") for m in MEASURES]
+        for r in sorted(rows, key=lambda r: r["countyfips"])
+    ]
     with OUT.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["county_fips", "state", "county", "population", "population_18plus", *MEASURES])
-        for r in sorted(rows, key=lambda r: r["countyfips"]):
-            w.writerow(
-                [
-                    r["countyfips"],
-                    r["stateabbr"],
-                    r["countyname"],
-                    r.get("totalpopulation", ""),
-                    r.get("totalpop18plus", ""),
-                ]
-                + [r.get(f"{m}_crudeprev", "") for m in MEASURES]
-            )
+        w.writerows(out_rows)
     stamp = datetime.now(UTC).strftime("%Y-%m-%d")
     print(
         f"wrote {OUT} ({len(rows)} counties, PLACES {RELEASE} release {DATASET}, retrieved {stamp})"

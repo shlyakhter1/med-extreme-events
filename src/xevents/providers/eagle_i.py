@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 import os
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
@@ -46,6 +47,8 @@ from xevents.models import (
     TimeWindow,
 )
 from xevents.providers.base import FIXTURES_DIR, EventProvider, ProviderError
+
+log = logging.getLogger(__name__)
 
 ATTRIBUTION = "Electric customer outage data provided by EAGLE-I, Department of Energy."
 CUSTOMERS_CAVEAT = (
@@ -335,6 +338,13 @@ class EagleIProvider(EventProvider):
     def fetch(self, window: TimeWindow) -> list[Event]:
         """The current snapshot (one run per county); the store accumulates polls over time."""
         polls, raw_ref = self.fetch_polls()
+        missing = skipped_counties(polls, self.customers)
+        if missing:
+            log.warning(
+                "EAGLE-I: %d counties have no customer denominator and are skipped: %s",
+                len(missing),
+                ", ".join(missing[:10]),
+            )
         events = polls_to_events(
             polls,
             self.customers,
@@ -457,13 +467,21 @@ def load_ornl_events(
 ) -> list[Event]:
     """Replay path: ORNL CSV slice → events. Hourly resampling (max within the hour) is the
     default for fixtures; ``None`` keeps the native 15-minute cadence."""
-    polls: Iterable[OutagePoll] = iter_ornl_csv(
-        path, states=states, counties=counties, start=start, end=end
+    polls: list[OutagePoll] = list(
+        iter_ornl_csv(path, states=states, counties=counties, start=start, end=end)
     )
     minutes = ORNL_POLL_MINUTES
     if resample_minutes:
         polls = resample_polls(polls, resample_minutes)
         minutes = resample_minutes
+    missing = skipped_counties(polls, customers)
+    if missing:
+        log.warning(
+            "EAGLE-I %s: %d counties have no customer denominator and are skipped: %s",
+            path.name,
+            len(missing),
+            ", ".join(missing[:10]),
+        )
     return polls_to_events(
         polls,
         customers,
@@ -487,5 +505,7 @@ STATE_ABBR: dict[str, str] = {
     "Rhode Island": "RI", "South Carolina": "SC", "South Dakota": "SD", "Tennessee": "TN",
     "Texas": "TX", "Utah": "UT", "Vermont": "VT", "Virginia": "VA", "Washington": "WA",
     "West Virginia": "WV", "Wisconsin": "WI", "Wyoming": "WY", "Puerto Rico": "PR",
+    "Guam": "GU", "Virgin Islands": "VI", "U.S. Virgin Islands": "VI", "American Samoa": "AS",
+    "Northern Mariana Islands": "MP",
 }  # fmt: skip
 STATE_NAME = {v: k for k, v in STATE_ABBR.items()}

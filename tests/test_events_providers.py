@@ -413,3 +413,70 @@ def test_live_ingest_isolates_a_transport_failure(
     assert rc == 0, "some providers succeeded"
     stored = [e for e in list_events(engine) if e.scenario is None]
     assert [e.event_key for e in stored] == ["hms:ok"]
+
+
+def test_openfema_pages_until_a_short_page() -> None:
+    from xevents.providers.openfema import PAGE, OpenFEMAProvider
+
+    rows = json.loads((FIX / "openfema_ian_4673.json").read_text(encoding="utf-8"))[
+        "DisasterDeclarationsSummaries"
+    ]
+    calls: list[int] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        skip = int(request.url.params["$skip"])
+        calls.append(skip)
+        assert request.url.params["$top"] == str(PAGE)
+        if skip == 0:  # a full first page forces a second request
+            return httpx.Response(
+                200, json={"DisasterDeclarationsSummaries": rows * (PAGE // len(rows) + 1)}
+            )
+        return httpx.Response(200, json={"DisasterDeclarationsSummaries": rows})
+
+    provider = OpenFEMAProvider(transport=httpx.MockTransport(handler))
+    window = TimeWindow(
+        start=datetime(2022, 9, 20, tzinfo=UTC), end=datetime(2022, 10, 5, tzinfo=UTC)
+    )
+    events = provider.fetch(window)
+    provider.close()
+    assert calls == [0, PAGE], "second page requested with $skip"
+    assert [e.source_id for e in events] == ["4673"], "rows group by disaster number"
+
+
+def test_malformed_alert_is_skipped_not_fatal(resolver: UgcResolver) -> None:
+    doc = json.loads((FIX / "nws_alerts_active_sample.json").read_text(encoding="utf-8"))
+    broken = json.loads(json.dumps(doc))
+    bad = broken["features"][0]
+    for k in ("onset", "effective", "sent", "ends", "expires"):
+        bad["properties"][k] = None
+    events = parse_alerts(broken, resolver)
+    assert len(events) == len(parse_alerts(doc, resolver)) - (
+        1 if bad["properties"]["event"] in NWS_EVENT_TYPES else 0
+    )
+
+
+def test_state_abbreviations_cover_territories() -> None:
+    from xevents.providers.eagle_i import STATE_ABBR
+
+    for name, abbr in (
+        ("Guam", "GU"),
+        ("Virgin Islands", "VI"),
+        ("American Samoa", "AS"),
+        ("Northern Mariana Islands", "MP"),
+        ("Puerto Rico", "PR"),
+    ):
+        assert STATE_ABBR[name] == abbr
+
+
+def test_empower_builder_refuses_swapped_layers() -> None:
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "build_empower", Path(__file__).parents[1] / "scripts" / "build_empower.py"
+    )
+    assert spec and spec.loader
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod.expect_layer_name(mod.COUNTY_LAYER, "Electricity Dependent DME – ALL – CountyLevel")
+    with pytest.raises(SystemExit, match="expected a county-level layer"):
+        mod.expect_layer_name(mod.COUNTY_LAYER, "Electricity Dependent DME – ALL – ZipLevel")

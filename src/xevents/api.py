@@ -207,10 +207,12 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         include_polygons: bool = Query(default=False),
     ) -> dict[str, Any]:
         rows = list_events(
-            _engine(request), scenario=scenario, active_at=_parse_at(at), county_fips=county
+            _engine(request),
+            scenario=scenario,
+            active_at=_parse_at(at),
+            county_fips=county,
+            live_only=scenario is None,
         )
-        if scenario is None:
-            rows = [e for e in rows if e.scenario is None]
         return {
             "count": len(rows),
             "events": [event_json(e, include_polygon=include_polygons) for e in rows],
@@ -258,6 +260,7 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         rows = list_action_items(
             _engine(request),
             scenario=scenario,
+            live_only=scenario is None,
             facility_id=facility,
             role=role,
             card_id=card,
@@ -265,8 +268,6 @@ def create_app(engine: Engine | None = None) -> FastAPI:
             active_at=_parse_at(at),
             include_superseded=include_superseded,
         )
-        if scenario is None:
-            rows = [i for i in rows if i.scenario is None]
         if compact:
             items = [
                 {
@@ -325,12 +326,11 @@ def create_app(engine: Engine | None = None) -> FastAPI:
         rows = list_action_items(
             _engine(request),
             scenario=scenario,
+            live_only=scenario is None,
             facility_id=facility_id,
             role=role,
             active_at=_parse_at(at),
         )
-        if scenario is None:
-            rows = [i for i in rows if i.scenario is None]
         return {"count": len(rows), "items": [i.model_dump(mode="json") for i in rows]}
 
     # ------------------------------------------------------------------ cards & reference

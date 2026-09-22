@@ -2,6 +2,45 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-21 — independent code review and fixes (five commits)
+
+Five read-only reviewers (engine/store, providers, denominators/cards, web, repo health)
+reported; every high finding was reproduced before fixing. Fixes landed in the order of
+impact, one commit each; `make lint test` green throughout (242 tests).
+
+- **High:** supersession compared item windows (which include the pre-event lead), so a
+  warning that ended June 3 superseded a separate advisory starting June 8 — now an event
+  that ended before the weaker one began cannot supersede it (newer events still supersede
+  older overlapping-lead ones, so the hurricane-watch → observed-outage transition holds);
+  three goldens regenerated where past events had wrongly superseded later ones. Live
+  ingest isolates every provider failure (httpx errors are not `OSError`). Playback no longer
+  crashes in empty live mode. `parse_at` converts offsets to UTC (SQLite compares text).
+- **Panel semantics:** sub-panels with no reviewed denominator (Card 3 LAI, OUD) are declared
+  "not sized" instead of borrowing the schizophrenia panel; multi-condition cards (7, 8)
+  headline the largest single-condition panel, labelled a lower bound; class-share wording
+  only where a class exists; unknown PLACES measure / missing VetPop year raise; the profile
+  check rejects emPOWER or a share as a headline denominator; every component shows a caveat.
+- **Store:** whole-payload change detection; progress parked by a supersession is restored
+  (`status_before_superseded` column — rebuild SQLite DBs); listing order = engine order
+  (severity now counts); live dedupe seeded from stored CAP rows.
+- **Docs:** five scenarios / eight cards / five goldens / EAGLE-I + emPOWER everywhere;
+  `make reference` rebuilds every table.
+- **Remaining mediums:** partial route 422/404; live views filter in SQL (`live_only`); the
+  map legend carries the EAGLE-I attribution whenever outage counties are shaded and the
+  dashboard footnote keys off all active events; `network` marker gated by
+  `RUN_NETWORK_TESTS`; `build_places` builds rows before writing; emPOWER build checks layer
+  names and refuses empty results; OpenFEMA pages with `$skip`; missing outage denominators
+  are logged; territory abbreviations; a malformed CAP feature is skipped, not fatal; playback
+  tooltip escaping; goldens now pin `acuity_rank`, `compounding_events`, `exposure`,
+  `rank_score` and regenerate only for `UPDATE_GOLDEN=<scenario>|all`.
+- **Not addressed (low):** later-onset tie-break for equal-severity CAP updates (spec gap,
+  test encodes current behaviour); duplicate event keys in one match call; items with no
+  panel bypass `min_panel_patients`; direction-agnostic cross-family rule (latent);
+  hard-coded "Don't stop your medication" prefix; secret scan skips `.py/.json/.csv`;
+  acknowledge button after success; colour-only card chips; archive events carry the union
+  of zones ever attached (cancelled counties stay "under warning"); fixture rebuilds add
+  ~13 MB Uri blobs to history.
+
 ## 2026-09-21 — M10: fixtures, catalogs, dashboard polish — iteration v2 complete
 
 - **Uri 2021 (headline):** `fixtures/events/uri_2021/` — IEM VTEC archive Feb 10–21 2021

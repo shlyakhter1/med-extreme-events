@@ -628,7 +628,7 @@
       });
       const titles = ids.map((id) => state.cards.get(id)?.title || id);
       marker.bindTooltip(
-        `<b>${esc(facilityProps.get(fid)?.name || fid)}</b><br>${esc(facilityPlace(fid))}<br>${esc(titles.join("<br>"))}`,
+        `<b>${esc(facilityProps.get(fid)?.name || fid)}</b><br>${esc(facilityPlace(fid))}<br>${titles.map(esc).join("<br>")}`,
         { direction: "top" }
       );
       marker.on("click", () => selectFacility(fid));

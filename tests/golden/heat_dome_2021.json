@@ -6,7 +6,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KBOI-EH.W-0003|heat-antipsychotics|vha_531|care_team",
-"panel": 1348
+"panel": 1348,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1348.4
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -15,7 +19,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KBOI-EH.W-0003|heat-antipsychotics|vha_531|patient",
-"panel": 1348
+"panel": 1348,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1348.4
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -24,7 +32,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_654|care_team",
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -33,7 +45,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_654|patient",
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -42,7 +58,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KBOI-EH.W-0003|heat-heart-failure|vha_531|care_team",
-"panel": 1161
+"panel": 1161,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1161.1
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -51,7 +71,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KBOI-EH.W-0003|heat-heart-failure|vha_531|patient",
-"panel": 1161
+"panel": 1161,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1161.1
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -60,7 +84,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_654|care_team",
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -69,7 +97,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_654|patient",
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -78,7 +110,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KBOI-EH.W-0003|heat-lithium|vha_531|care_team",
-"panel": 1124
+"panel": 1124,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1123.6
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -87,7 +123,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KBOI-EH.W-0003|heat-lithium|vha_531|patient",
-"panel": 1124
+"panel": 1124,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1123.6
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -96,7 +136,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_654|care_team",
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KBOI-EH.A-0002",
@@ -105,7 +149,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_654|patient",
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -114,7 +162,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1348
+"panel": 1348,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1348.4
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -123,7 +175,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1348
+"panel": 1348,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1348.4
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -132,7 +188,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -141,7 +201,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -150,7 +214,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1161
+"panel": 1161,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1161.1
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -159,7 +227,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1161
+"panel": 1161,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1161.1
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -168,7 +240,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -177,7 +253,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -186,7 +266,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1124
+"panel": 1124,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1123.6
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -195,7 +279,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1124
+"panel": 1124,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1123.6
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -204,7 +292,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KBOI-EH.W-0003",
@@ -213,7 +305,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -222,7 +318,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653|care_team",
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -231,7 +331,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653|patient",
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -240,7 +344,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653BY|care_team",
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -249,7 +357,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653BY|patient",
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -258,7 +370,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_654|care_team",
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -267,7 +383,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_654|patient",
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -276,7 +396,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_692|care_team",
-"panel": 1024
+"panel": 1024,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1024.0
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -285,7 +409,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_692|patient",
-"panel": 1024
+"panel": 1024,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1024.0
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -294,7 +422,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653|care_team",
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -303,7 +435,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653|patient",
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -312,7 +448,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653BY|care_team",
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -321,7 +461,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653BY|patient",
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -330,7 +474,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_654|care_team",
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -339,7 +487,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_654|patient",
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -348,7 +500,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_692|care_team",
-"panel": 882
+"panel": 882,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 881.8
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -357,7 +513,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_692|patient",
-"panel": 882
+"panel": 882,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 881.8
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -366,7 +526,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653|care_team",
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -375,7 +539,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653|patient",
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -384,7 +552,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653BY|care_team",
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -393,7 +565,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653BY|patient",
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -402,7 +578,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_654|care_team",
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -411,7 +591,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_654|patient",
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -420,7 +604,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_692|care_team",
-"panel": 853
+"panel": 853,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 853.3
 },
 {
 "event": "nws:2021-KMFR-EH.A-0003",
@@ -429,7 +617,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_692|patient",
-"panel": 853
+"panel": 853,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 853.3
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -438,7 +630,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -447,7 +643,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -456,7 +656,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -465,7 +669,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -474,7 +682,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -483,7 +695,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -492,7 +708,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1024
+"panel": 1024,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1024.0
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -501,7 +721,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1024
+"panel": 1024,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1024.0
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -510,7 +734,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -519,7 +747,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -528,7 +760,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -537,7 +773,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -546,7 +786,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -555,7 +799,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -564,7 +812,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 882
+"panel": 882,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 881.8
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -573,7 +825,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 882
+"panel": 882,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 881.8
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -582,7 +838,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -591,7 +851,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -600,7 +864,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -609,7 +877,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -618,7 +890,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -627,7 +903,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -636,7 +916,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 853
+"panel": 853,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 853.3
 },
 {
 "event": "nws:2021-KMFR-EH.W-0002",
@@ -645,7 +929,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 853
+"panel": 853,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 853.3
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -654,7 +942,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653|care_team",
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -663,7 +955,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653|patient",
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -672,7 +968,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653BY|care_team",
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -681,7 +981,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653BY|patient",
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -690,7 +994,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_654|care_team",
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -699,7 +1007,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_654|patient",
-"panel": 1064
+"panel": 1064,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1063.9
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -708,7 +1020,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_692|care_team",
-"panel": 1024
+"panel": 1024,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1024.0
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -717,7 +1033,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-antipsychotics|vha_692|patient",
-"panel": 1024
+"panel": 1024,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1024.0
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -726,7 +1046,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653|care_team",
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -735,7 +1059,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653|patient",
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -744,7 +1072,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653BY|care_team",
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -753,7 +1085,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653BY|patient",
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -762,7 +1098,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_654|care_team",
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -771,7 +1111,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_654|patient",
-"panel": 916
+"panel": 916,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 916.1
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -780,7 +1124,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_692|care_team",
-"panel": 882
+"panel": 882,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 881.8
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -789,7 +1137,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-heart-failure|vha_692|patient",
-"panel": 882
+"panel": 882,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 881.8
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -798,7 +1150,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653|care_team",
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -807,7 +1163,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653|patient",
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -816,7 +1176,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653BY|care_team",
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -825,7 +1189,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653BY|patient",
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -834,7 +1202,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_654|care_team",
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -843,7 +1215,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_654|patient",
-"panel": 887
+"panel": 887,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 886.6
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -852,7 +1228,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_692|care_team",
-"panel": 853
+"panel": 853,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 853.3
 },
 {
 "event": "nws:2021-KMFR-HT.Y-0002",
@@ -861,7 +1241,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KMFR-EH.W-0002|heat-lithium|vha_692|patient",
-"panel": 853
+"panel": 853,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 853.3
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -870,7 +1254,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663|care_team",
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -879,7 +1267,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663|patient",
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -888,7 +1280,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KOTX-EH.W-0001|heat-antipsychotics|vha_668|care_team",
-"panel": 1435
+"panel": 1435,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1435.4
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -897,7 +1293,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KOTX-EH.W-0001|heat-antipsychotics|vha_668|patient",
-"panel": 1435
+"panel": 1435,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1435.4
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -906,7 +1306,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663|care_team",
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -915,7 +1319,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663|patient",
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -924,7 +1332,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KOTX-EH.W-0001|heat-heart-failure|vha_668|care_team",
-"panel": 1236
+"panel": 1236,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1236.1
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -933,7 +1345,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KOTX-EH.W-0001|heat-heart-failure|vha_668|patient",
-"panel": 1236
+"panel": 1236,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1236.1
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -942,7 +1358,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663|care_team",
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -951,7 +1371,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663|patient",
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -960,7 +1384,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KOTX-EH.W-0001|heat-lithium|vha_668|care_team",
-"panel": 1196
+"panel": 1196,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1196.2
 },
 {
 "event": "nws:2021-KOTX-EH.A-0001",
@@ -969,7 +1397,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KOTX-EH.W-0001|heat-lithium|vha_668|patient",
-"panel": 1196
+"panel": 1196,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1196.2
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -978,7 +1410,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -987,7 +1423,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -996,7 +1436,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1435
+"panel": 1435,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1435.4
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1005,7 +1449,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1435
+"panel": 1435,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1435.4
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1014,7 +1462,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1023,7 +1475,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1032,7 +1488,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1236
+"panel": 1236,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1236.1
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1041,7 +1501,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1236
+"panel": 1236,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1236.1
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1050,7 +1514,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1059,7 +1527,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1068,7 +1540,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1196
+"panel": 1196,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1196.2
 },
 {
 "event": "nws:2021-KOTX-EH.W-0001",
@@ -1077,7 +1553,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1196
+"panel": 1196,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1196.2
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1086,7 +1566,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653BY|care_team",
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1095,7 +1579,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653BY|patient",
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1104,7 +1592,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663|care_team",
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1113,7 +1605,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663|patient",
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1122,7 +1618,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663A4|care_team",
-"panel": 2634
+"panel": 2634,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2633.9
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1131,7 +1631,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663A4|patient",
-"panel": 2634
+"panel": 2634,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2633.9
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1140,7 +1644,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPDT-EH.W-0001|heat-antipsychotics|vha_687|care_team",
-"panel": 765
+"panel": 765,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 765.4
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1149,7 +1657,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPDT-EH.W-0001|heat-antipsychotics|vha_687|patient",
-"panel": 765
+"panel": 765,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 765.4
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1158,7 +1670,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653BY|care_team",
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1167,7 +1683,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653BY|patient",
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1176,7 +1696,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663|care_team",
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1185,7 +1709,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663|patient",
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1194,7 +1722,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663A4|care_team",
-"panel": 2268
+"panel": 2268,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2268.1
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1203,7 +1735,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663A4|patient",
-"panel": 2268
+"panel": 2268,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2268.1
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1212,7 +1748,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPDT-EH.W-0001|heat-heart-failure|vha_687|care_team",
-"panel": 659
+"panel": 659,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 659.1
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1221,7 +1761,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPDT-EH.W-0001|heat-heart-failure|vha_687|patient",
-"panel": 659
+"panel": 659,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 659.1
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1230,7 +1774,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653BY|care_team",
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1239,7 +1787,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653BY|patient",
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1248,7 +1800,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663|care_team",
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1257,7 +1813,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663|patient",
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1266,7 +1826,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663A4|care_team",
-"panel": 2195
+"panel": 2195,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2194.9
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1275,7 +1839,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663A4|patient",
-"panel": 2195
+"panel": 2195,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2194.9
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1284,7 +1852,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPDT-EH.W-0001|heat-lithium|vha_687|care_team",
-"panel": 638
+"panel": 638,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 637.9
 },
 {
 "event": "nws:2021-KPDT-EH.A-0001",
@@ -1293,7 +1865,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPDT-EH.W-0001|heat-lithium|vha_687|patient",
-"panel": 638
+"panel": 638,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 637.9
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1302,7 +1878,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1311,7 +1891,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1320,7 +1904,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1329,7 +1917,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1338,7 +1930,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 2634
+"panel": 2634,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2633.9
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1347,7 +1943,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 2634
+"panel": 2634,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2633.9
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1356,7 +1956,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 765
+"panel": 765,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 765.4
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1365,7 +1969,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 765
+"panel": 765,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 765.4
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1374,7 +1982,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1383,7 +1995,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1392,7 +2008,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1401,7 +2021,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1410,7 +2034,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 2268
+"panel": 2268,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2268.1
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1419,7 +2047,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 2268
+"panel": 2268,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2268.1
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1428,7 +2060,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 659
+"panel": 659,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 659.1
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1437,7 +2073,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 659
+"panel": 659,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 659.1
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1446,7 +2086,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1455,7 +2099,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1464,7 +2112,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1473,7 +2125,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1482,7 +2138,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 2195
+"panel": 2195,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2194.9
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1491,7 +2151,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 2195
+"panel": 2195,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2194.9
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1500,7 +2164,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 638
+"panel": 638,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 637.9
 },
 {
 "event": "nws:2021-KPDT-EH.W-0001",
@@ -1509,7 +2177,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 638
+"panel": 638,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 637.9
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1518,7 +2190,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_648|care_team",
-"panel": 1504
+"panel": 1504,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1504.5
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1527,7 +2203,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_648|patient",
-"panel": 1504
+"panel": 1504,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1504.5
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1536,7 +2216,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_648A4|care_team",
-"panel": 1587
+"panel": 1587,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1586.7
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1545,7 +2229,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_648A4|patient",
-"panel": 1587
+"panel": 1587,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1586.7
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1554,7 +2242,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653|care_team",
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1563,7 +2255,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653|patient",
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1572,7 +2268,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653BY|care_team",
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1581,7 +2281,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-antipsychotics|vha_653BY|patient",
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1590,7 +2294,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_648|care_team",
-"panel": 1296
+"panel": 1296,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1295.5
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1599,7 +2307,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_648|patient",
-"panel": 1296
+"panel": 1296,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1295.5
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1608,7 +2320,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_648A4|care_team",
-"panel": 1366
+"panel": 1366,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1366.3
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1617,7 +2333,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_648A4|patient",
-"panel": 1366
+"panel": 1366,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1366.3
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1626,7 +2346,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653|care_team",
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1635,7 +2359,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653|patient",
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1644,7 +2372,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653BY|care_team",
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1653,7 +2385,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-heart-failure|vha_653BY|patient",
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1662,7 +2398,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_648|care_team",
-"panel": 1254
+"panel": 1254,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1253.7
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1671,7 +2411,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_648|patient",
-"panel": 1254
+"panel": 1254,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1253.7
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1680,7 +2424,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_648A4|care_team",
-"panel": 1322
+"panel": 1322,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1322.2
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1689,7 +2437,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_648A4|patient",
-"panel": 1322
+"panel": 1322,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1322.2
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1698,7 +2450,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653|care_team",
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1707,7 +2463,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653|patient",
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1716,7 +2476,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653BY|care_team",
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KPQR-EH.A-0001",
@@ -1725,7 +2489,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KPQR-EH.W-0001|heat-lithium|vha_653BY|patient",
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1734,7 +2502,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1504
+"panel": 1504,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1504.5
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1743,7 +2515,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1504
+"panel": 1504,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1504.5
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1752,7 +2528,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1587
+"panel": 1587,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1586.7
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1761,7 +2541,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1587
+"panel": 1587,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1586.7
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1770,7 +2554,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1779,7 +2567,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 306
+"panel": 306,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 306.5
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1788,7 +2580,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1797,7 +2593,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1091
+"panel": 1091,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1090.7
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1806,7 +2606,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1296
+"panel": 1296,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1295.5
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1815,7 +2619,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1296
+"panel": 1296,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1295.5
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1824,7 +2632,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1366
+"panel": 1366,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1366.3
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1833,7 +2645,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1366
+"panel": 1366,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1366.3
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1842,7 +2658,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1851,7 +2671,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 264
+"panel": 264,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 263.9
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1860,7 +2684,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1869,7 +2697,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 939
+"panel": 939,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 939.3
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1878,7 +2710,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1254
+"panel": 1254,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1253.7
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1887,7 +2723,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1254
+"panel": 1254,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1253.7
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1896,7 +2736,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 1322
+"panel": 1322,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1322.2
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1905,7 +2749,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 1322
+"panel": 1322,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 1322.2
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1914,7 +2762,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1923,7 +2775,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 255
+"panel": 255,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 255.4
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1932,7 +2788,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KPQR-EH.W-0001",
@@ -1941,7 +2801,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 909
+"panel": 909,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 909.0
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -1950,7 +2814,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663|care_team",
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -1959,7 +2827,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663|patient",
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -1968,7 +2840,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663A4|care_team",
-"panel": 2634
+"panel": 2634,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2633.9
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -1977,7 +2853,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-antipsychotics|vha_663A4|patient",
-"panel": 2634
+"panel": 2634,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2633.9
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -1986,7 +2866,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663|care_team",
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -1995,7 +2879,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663|patient",
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -2004,7 +2892,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663A4|care_team",
-"panel": 2268
+"panel": 2268,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2268.1
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -2013,7 +2905,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-heart-failure|vha_663A4|patient",
-"panel": 2268
+"panel": 2268,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2268.1
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -2022,7 +2918,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663|care_team",
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -2031,7 +2931,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663|patient",
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -2040,7 +2944,11 @@
 "role": "care_team",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663A4|care_team",
-"panel": 2195
+"panel": 2195,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2194.9
 },
 {
 "event": "nws:2021-KSEW-EH.A-0001",
@@ -2049,7 +2957,11 @@
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KSEW-EH.W-0001|heat-lithium|vha_663A4|patient",
-"panel": 2195
+"panel": 2195,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2194.9
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2058,7 +2970,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2067,7 +2983,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3988
+"panel": 3988,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3987.6
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2076,7 +2996,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 2634
+"panel": 2634,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2633.9
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2085,7 +3009,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 2634
+"panel": 2634,
+"acuity_rank": 4,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2633.9
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2094,7 +3022,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2103,7 +3035,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3434
+"panel": 3434,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3433.7
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2112,7 +3048,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 2268
+"panel": 2268,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2268.1
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2121,7 +3061,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 2268
+"panel": 2268,
+"acuity_rank": 5,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2268.1
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2130,7 +3074,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2139,7 +3087,11 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3323
+"panel": 3323,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 3323.0
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2148,7 +3100,11 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 2195
+"panel": 2195,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2194.9
 },
 {
 "event": "nws:2021-KSEW-EH.W-0001",
@@ -2157,6 +3113,10 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 2195
+"panel": 2195,
+"acuity_rank": 3,
+"compounding_events": [],
+"exposure": null,
+"rank_score": 2194.9
 }
 ]

@@ -222,10 +222,15 @@ def list_events(
     event_type: str | None = None,
     active_at: datetime | None = None,
     county_fips: str | None = None,
+    live_only: bool = False,
 ) -> list[Event]:
+    """``scenario=None`` means no scenario filter; ``live_only=True`` keeps only live rows
+    (scenario NULL) so live pages never deserialize the replay fixtures."""
     stmt = select(EventRow).order_by(EventRow.onset, EventRow.event_key)
     if scenario is not None:
         stmt = stmt.where(EventRow.scenario == scenario)
+    elif live_only:
+        stmt = stmt.where(EventRow.scenario.is_(None))
     if source:
         stmt = stmt.where(EventRow.source == source)
     if event_type:
@@ -523,10 +528,13 @@ def list_action_items(
     status: str | None = None,
     active_at: datetime | None = None,
     include_superseded: bool = False,
+    live_only: bool = False,
 ) -> list[ActionItem]:
     stmt = select(ActionItemRow)
     if scenario is not None:
         stmt = stmt.where(ActionItemRow.scenario == scenario)
+    elif live_only:
+        stmt = stmt.where(ActionItemRow.scenario.is_(None))
     if facility_id:
         stmt = stmt.where(ActionItemRow.scope_id == facility_id)
     if role:

@@ -1,9 +1,11 @@
 """Golden scenario tests — the engine's determinism contract.
 
 Replaying a scenario must produce exactly the recorded action-item set (event, card,
-facility, role, status, superseded_by). Regenerate deliberately with
-``UPDATE_GOLDEN=1 uv run pytest tests/test_golden.py`` after an intended engine or fixture
-change, and review the diff.
+facility, role, status, superseded_by, panel, acuity rank, boost annotation, exposure and
+rank score). Regenerate deliberately with ``UPDATE_GOLDEN=<scenario>`` (or ``all``), e.g.
+``UPDATE_GOLDEN=uri_2021 uv run pytest tests/test_golden.py``, after an intended engine or
+fixture change, and review the diff. A bare ``UPDATE_GOLDEN=1`` no longer rewrites every
+file.
 """
 
 from __future__ import annotations
@@ -80,6 +82,10 @@ def compact(items: list[ActionItem]) -> list[dict[str, object]]:
             "status": it.status.value,
             "superseded_by": it.superseded_by,
             "panel": round(it.panel.value) if it.panel else None,
+            "acuity_rank": it.acuity_rank,
+            "compounding_events": list(it.compounding_events),
+            "exposure": round(it.exposure.value) if it.exposure else None,
+            "rank_score": round(it.rank_score, 1),
         }
         for it in items
     ]
@@ -91,8 +97,13 @@ def compact(items: list[ActionItem]) -> list[dict[str, object]]:
 def check_golden(scenario: str, result: MatchResult) -> None:
     path = GOLDEN_DIR / f"{scenario}.json"
     got = compact(result.items)
-    if os.environ.get("UPDATE_GOLDEN"):
+    update = os.environ.get("UPDATE_GOLDEN", "")
+    if update in ("all", scenario):
         path.write_text(json.dumps(got, indent=0) + "\n", encoding="utf-8")
+    elif update:
+        assert update in ("1", "true") or update in {p.stem for p in GOLDEN_DIR.glob("*.json")}, (
+            f"UPDATE_GOLDEN={update!r} names no scenario; use a scenario id or 'all'"
+        )
     assert path.exists(), f"missing golden file {path}; run with UPDATE_GOLDEN=1"
     expected = json.loads(path.read_text(encoding="utf-8"))
     assert len(got) == len(expected), f"{scenario}: {len(got)} items vs golden {len(expected)}"

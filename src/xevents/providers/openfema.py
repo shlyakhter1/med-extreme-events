@@ -42,6 +42,7 @@ SELECT = (
     "disasterNumber,state,declarationType,declarationDate,incidentType,declarationTitle,"
     "incidentBeginDate,incidentEndDate,fipsStateCode,fipsCountyCode,designatedArea"
 )
+PAGE = 5000  # OpenFEMA's maximum $top; pages continue with $skip until a short page
 
 
 def _dt(value: str | None) -> datetime | None:
@@ -128,15 +129,25 @@ class OpenFEMAProvider(EventProvider):
         """Declarations overlapping ``window`` (declared within the 60 days before it)."""
         since = (window.start - timedelta(days=60)).strftime("%Y-%m-%dT00:00:00.000z")
         types = " or ".join(f"incidentType eq '{t}'" for t in INCIDENT_TYPES)
-        params = {
-            "$filter": f"declarationDate ge '{since}' and ({types})",
-            "$select": SELECT,
-            "$top": "5000",
-        }
-        r = self._client.get("/DisasterDeclarationsSummaries", params=params)
-        if r.status_code != 200:
-            raise ProviderError(f"OpenFEMA: HTTP {r.status_code} {r.text[:200]}")
-        doc = r.json()
+        rows: list[dict[str, Any]] = []
+        skip = 0
+        while True:  # a busy season exceeds one page; truncation used to be silent
+            params = {
+                "$filter": f"declarationDate ge '{since}' and ({types})",
+                "$select": SELECT,
+                "$orderby": "disasterNumber,fipsStateCode,fipsCountyCode",
+                "$top": str(PAGE),
+                "$skip": str(skip),
+            }
+            r = self._client.get("/DisasterDeclarationsSummaries", params=params)
+            if r.status_code != 200:
+                raise ProviderError(f"OpenFEMA: HTTP {r.status_code} {r.text[:200]}")
+            page = r.json().get("DisasterDeclarationsSummaries", [])
+            rows.extend(page)
+            if len(page) < PAGE:
+                break
+            skip += PAGE
+        doc = {"DisasterDeclarationsSummaries": rows}
         raw_ref = None
         if self.raw_dir is not None:
             self.raw_dir.mkdir(parents=True, exist_ok=True)
@@ -144,5 +155,5 @@ class OpenFEMAProvider(EventProvider):
             out = self.raw_dir / f"openfema_declarations_{stamp}.json"
             out.write_text(json.dumps(doc), encoding="utf-8")
             raw_ref = str(out)
-        events = parse_declarations(doc.get("DisasterDeclarationsSummaries", []), raw_ref)
+        events = parse_declarations(rows, raw_ref)
         return [e for e in events if e.expires >= window.start and e.onset <= window.end]

@@ -14,6 +14,7 @@ Warning/Advisory/Alert → imminent; ``certainty=Observed`` → observed).
 from __future__ import annotations
 
 import json
+import logging
 import os
 from datetime import UTC, datetime
 from pathlib import Path
@@ -36,6 +37,7 @@ from xevents.models import (
 from xevents.providers.base import EventProvider, ProviderError
 
 BASE_URL = "https://api.weather.gov"
+log = logging.getLogger(__name__)
 
 # NWS SCN23-44: cold-season product renames effective Oct 1, 2024. Archived and replayed
 # alerts carry the legacy names; cards list current names only.
@@ -174,11 +176,21 @@ def parse_alert(
 def parse_alerts(
     doc: dict[str, Any], resolver: UgcResolver, raw_ref: str | None = None
 ) -> list[Event]:
+    """Every parseable tracked alert; a malformed feature is logged and skipped rather than
+    discarding the whole active feed for that run."""
     events = []
+    skipped = 0
     for feature in doc.get("features", []):
-        ev = parse_alert(feature, resolver, raw_ref)
+        try:
+            ev = parse_alert(feature, resolver, raw_ref)
+        except ProviderError as exc:
+            skipped += 1
+            log.warning("NWS: skipping alert: %s", exc)
+            continue
         if ev is not None:
             events.append(ev)
+    if skipped:
+        log.warning("NWS: %d of %d alerts skipped", skipped, len(doc.get("features", [])))
     return events
 
 

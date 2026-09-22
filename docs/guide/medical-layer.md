@@ -146,7 +146,7 @@ are rebuilt from scratch.
 (240 items, Cards 1, 2 and 4 across WA/OR/ID stations), `ian_2022` (2,104 items, most
 superseded as hurricane-watch items yield to observed outages; dialysis ranked first),
 `smoke_nyc_2023`, `uri_2021` and `smoke_canada_2026`. To regenerate them after an intended
-change, run `UPDATE_GOLDEN=1 make test` and review the diff.
+change, run `UPDATE_GOLDEN=<scenario> make test` (or `UPDATE_GOLDEN=all`) and review the diff.
 
 ## 6. Using the care-team pages
 

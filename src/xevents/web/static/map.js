@@ -63,6 +63,8 @@ window.XMap = (() => {
   }
 
   /* Shared legend markup so the dashboard and playback explain the map the same way. */
+  const EAGLEI_ATTRIBUTION = "Electric customer outage data provided by EAGLE-I, Department of Energy. Customers are meters, not people; ~8% of US customers are not covered.";
+
   function legendHtml(countsByType, options = {}) {
     const rows = EVENT_TYPES.filter((t) => !options.onlyActive || (countsByType || {})[t.id])
       .map((t) => {
@@ -73,7 +75,8 @@ window.XMap = (() => {
       .join("");
     return `<div class="hdr">Counties — active event</div>${rows}` +
       `<div><i style="background:${IDLE_COLOR};border-color:#2a3440"></i><span class="muted">no active event</span><span></span></div>` +
-      `<div class="note">Shading deepens with severity; power outage shades by % of customers out.</div>`;
+      `<div class="note">Shading deepens with severity; power outage shades by % of customers out.</div>` +
+      ((countsByType || {}).power_outage ? `<div class="note">${EAGLEI_ATTRIBUTION}</div>` : "");
   }
 
   return { create, paintCounties, counties, legendHtml, EVENT_TYPES, EVENT_COLORS, SEVERITY_RANK, fillOpacity, outageOpacity, eventOpacity, temporalityBadge, IDLE_COLOR };

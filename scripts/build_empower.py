@@ -56,7 +56,19 @@ def layer_info(client: httpx.Client, layer: int) -> dict[str, Any]:
     missing = [f for f in MEASURES if f not in names]
     if missing:
         raise SystemExit(f"emPOWER layer {layer} ({doc.get('name')}) lacks fields {missing}")
+    expect_layer_name(layer, str(doc.get("name") or ""))
     return doc
+
+
+LAYER_NAME_WORDS = {COUNTY_LAYER: "county", ZIP_LAYER: "zip"}
+
+
+def expect_layer_name(layer: int, name: str) -> None:
+    """Layer ids are pinned; if the portal reorders them the county build would silently
+    consume ZIP rows (one row per ZIP, last one wins per county). Refuse that."""
+    word = LAYER_NAME_WORDS[layer]
+    if word not in name.lower():
+        raise SystemExit(f"emPOWER layer {layer} is named {name!r}; expected a {word}-level layer")
 
 
 def fetch_layer(
@@ -112,6 +124,8 @@ def rows_from(features: list[dict[str, Any]], keys: dict[str, str]) -> list[dict
 
 
 def write_csv(path: Path, rows: list[dict[str, Any]], columns: list[str], header: str) -> None:
+    if not rows:
+        raise SystemExit(f"no rows for {path.name} — not overwriting the committed table")
     with path.open("w", newline="", encoding="utf-8") as f:
         f.write(f"# {header}\n")
         w = csv.DictWriter(f, fieldnames=columns)
