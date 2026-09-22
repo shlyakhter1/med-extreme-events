@@ -188,10 +188,10 @@ def test_outage_pct_is_clamped_and_flagged_when_customers_out_exceed_the_denomin
     assert "outage_pct_raw" not in normal[0].metrics
 
 
-def test_newest_poll_supersedes_earlier_polls_of_the_same_outage() -> None:
-    """A county outage polled every hour must not pile up one active item per poll: the
-    latest measurement is the current item, earlier ones are superseded by it, whatever
-    their severity (a 30% poll followed by a 12% poll leaves the 12% item current)."""
+def test_each_poll_is_current_only_during_its_own_hour() -> None:
+    """Consecutive readings of one county outage never supersede each other; an observed
+    item has no lead window, so at any moment the current item is that hour's reading —
+    never a later one (a replay once showed the Feb 18 reading as current on Feb 16)."""
     cards = load_cards(CARDS_DIR)
     profile = load_profile(PROFILES_DIR / "va.yaml")
     facility = Facility(
@@ -216,13 +216,18 @@ def test_newest_poll_supersedes_earlier_polls_of_the_same_outage() -> None:
         i for i in result.items if i.card_id == "outage-insulin" and i.role is Role.CARE_TEAM
     ]
     assert len(insulin) == 3, "polls 2-4 clear the debounce"
-    current = [i for i in insulin if i.status is not ActionItemStatus.SUPERSEDED]
-    assert [i.event_key for i in current] == [events[3].event_key], (
-        "only the newest poll is current"
+    assert all(i.status is ActionItemStatus.ISSUED for i in insulin), "readings coexist in time"
+    for i in insulin:
+        ev = next(e for e in events if e.event_key == i.event_key)
+        assert i.window_start == ev.onset and i.window_end == ev.expires, "no lead window"
+    for k in (1, 2, 3):  # half past each poll hour: exactly that poll's item is active
+        t = T0 + timedelta(hours=k, minutes=30)
+        active = [i for i in insulin if i.window_start <= t <= i.window_end]
+        assert [i.event_key for i in active] == [events[k].event_key]
+    severities = [i.event_severity for i in sorted(insulin, key=lambda i: i.window_start)]
+    assert severities == [CapSeverity.SEVERE, CapSeverity.SEVERE, CapSeverity.MODERATE], (
+        "each hour keeps its own severity (30% then 12%)"
     )
-    assert current[0].event_severity is CapSeverity.MODERATE, "12% is current even after 30%"
-    older = [i for i in insulin if i.status is ActionItemStatus.SUPERSEDED]
-    assert all(i.superseded_by == current[0].id for i in older)
 
 
 # --------------------------------------------------------------------------- live (ArcGIS)

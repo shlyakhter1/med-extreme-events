@@ -193,6 +193,15 @@ def rank_for(event: Event, panel: Estimate | None, exposure: Estimate | None) ->
     return value, f"panel = {value:.0f}"
 
 
+def item_window_start(event: Event, card: Card) -> datetime:
+    """Forecast and imminent events open the card's pre-event lead window (act days ahead);
+    an observed event is already happening, so its item starts at the observation. Without
+    this, a replay showed an outage measured on Feb 18 as the current reading on Feb 16."""
+    if event.temporality is Temporality.OBSERVED:
+        return event.onset
+    return event.onset - timedelta(days=card.window_days.max)
+
+
 def _item_id(event_key: str, card_id: str, facility_id: str, role: Role) -> str:
     return f"{event_key}|{card_id}|{facility_id}|{role.value}"
 
@@ -246,7 +255,7 @@ def _build_item(
         rank_formula=rank_formula,
         acuity_class=card.acuity_class,
         acuity_rank=profile.acuity_rank(card.acuity_class),
-        window_start=event.onset - timedelta(days=card.window_days.max),
+        window_start=item_window_start(event, card),
         window_end=event.expires,
         scenario=event.scenario,
         created_at=now,
@@ -418,15 +427,15 @@ def _observed(item: ActionItem) -> bool:
 def _supersedes(stronger: ActionItem, weaker: ActionItem) -> bool:
     """Observed beats forecast/imminent (never the reverse); within the same temporality
     class a higher CAP severity wins. Across event families only an observed event of the
-    listed stronger type may supersede, and only forecast/imminent items. Two measurements
-    of the same outage (consecutive polls) never coexist: the newer poll supersedes the
-    older one whatever its severity, so a county outage keeps one current item per role."""
+    listed stronger type may supersede, and only forecast/imminent items. Measurements of
+    the same outage (consecutive polls) never supersede each other: each is current during
+    its own poll window, which the item window now equals (observed items have no lead)."""
     if stronger.event_type is not weaker.event_type:
         return _observed(stronger) and not _observed(weaker)
     if _observed(stronger) != _observed(weaker):
         return _observed(stronger)
     if stronger.event_type is EventType.POWER_OUTAGE and _observed(stronger):
-        return stronger.window_end > weaker.window_end
+        return False
     return SEVERITY_RANK[stronger.event_severity] > SEVERITY_RANK[weaker.event_severity]
 
 
@@ -454,10 +463,6 @@ def _apply_supersession(items: list[ActionItem], events: dict[str, Event]) -> No
         group.sort(
             key=lambda it: (
                 not _observed(it),
-                # newest measurement first for observed outages; severity first otherwise
-                -(it.window_end.timestamp())
-                if it.event_type is EventType.POWER_OUTAGE and _observed(it)
-                else 0.0,
                 -SEVERITY_RANK[it.event_severity],
                 it.window_end,
                 it.id,

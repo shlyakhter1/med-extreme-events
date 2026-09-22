@@ -897,7 +897,7 @@
       const any = Object.values(entry.roles)[0];
       const it = entry.roles[state.role];
       html += `<div class="card"><h3>${esc(entry.title)}</h3>
-        <div class="prov">${esc(any.event_name)} · ${esc(any.event_severity)} ${XMap.temporalityBadge(any.event_temporality)}${any.compounding_events && any.compounding_events.length ? ` <span class="tag compounding">compounding${any.event_type !== "power_outage" ? " · acuity +1" : ""}</span> ${any.compounding_events.map(esc).join(" ")}` : ""}</div>
+        <div class="prov">${esc(any.event_name)} · ${esc(any.event_severity)} ${XMap.temporalityBadge(any.event_temporality)}${any.compounding_events && any.compounding_events.length ? ` <span class="tag compounding">compounding${any.event_type !== "power_outage" ? " · acuity +1" : ""}</span> ${any.compounding_events.slice(0, 3).map(esc).join(" ")}${any.compounding_events.length > 3 ? ` and ${any.compounding_events.length - 3} more` : ""}` : ""}</div>
         <div class="prov"><b>Window:</b> ${fmtShort(parse(any.window_start))} → ${fmtShort(parse(any.window_end))} UTC</div>`;
       if (any.panel) {
         html += `<div class="prov">Affected panel ≈ <b style="color:var(--ink)">${Math.round(any.panel.value).toLocaleString()}</b>

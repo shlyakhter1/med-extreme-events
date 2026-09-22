@@ -230,3 +230,42 @@ def test_compounding_chip_renders(cards: list[Card], profile: Profile, tmp_path:
     assert 'class="tag compounding"' in html and "acuity +1" in html
     assert outage[1].event_key in html, "the chip names the compounding outage"
     assert 'class="tag temporality imminent"' in html or "imminent → pre_event" in html
+
+
+def test_compounding_chip_shows_three_and_a_count(
+    cards: list[Card], profile: Profile, tmp_path: Path
+) -> None:
+    """A long outage stamps many polls on the boosted item; the chip names three and counts
+    the rest instead of listing every poll."""
+    from fastapi.testclient import TestClient
+
+    from xevents.api import create_app
+    from xevents.store import (
+        init_db,
+        make_engine,
+        upsert_action_items,
+        upsert_events,
+        upsert_facilities,
+    )
+
+    cold = _weather("Extreme Cold Warning", EventType.EXTREME_COLD)
+    outage = _outage(8, 30.0, start=T0 + timedelta(hours=2))
+    result = match([cold, *outage], cards, [FACILITY], profile, _panels, now=T0)
+    boosted = next(i for i in result.items if i.card_id == "cold-cardio-respiratory")
+    assert len(boosted.compounding_events) == 7, "polls 2-8 clear the debounce"
+    eng = make_engine(f"sqlite:///{tmp_path / 'chip.db'}")
+    init_db(eng)
+    upsert_facilities(eng, [FACILITY])
+    upsert_events(eng, [cold, *outage])
+    upsert_action_items(eng, result.items)
+    html = (
+        TestClient(create_app(eng))
+        .get(
+            f"/dashboard/facilities/{FACILITY.id}",
+            params={"at": (T0 + timedelta(hours=5)).isoformat()},
+        )
+        .text
+    )
+    chip = next(c for c in html.split('class="tag compounding"')[1:] if "acuity +1" in c)
+    chip = chip.split("</div>")[0]
+    assert chip.count("/dashboard/events/eagle_i:") == 3 and "and 4 more" in chip

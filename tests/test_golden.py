@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -152,20 +152,26 @@ def test_ian_2022_golden(world: tuple[list[Card], list, PanelEstimator]) -> None
     assert {"vha_516", "vha_675"} & {i.scope_id for i in items}  # Bay Pines, Orlando
     assert all(i.panel and i.panel.value > 0 for i in items)
     by_id = {i.id: i for i in items}
-    watches = [
-        i
-        for i in items
-        if i.event_name == "Hurricane Watch" and i.card_id in ("outage-insulin", "outage-dialysis")
+    hurricane_cards = ("outage-insulin", "outage-dialysis")
+    # forecast → imminent: watches on Cards 5/6 yield to the warnings that followed them
+    watches = [i for i in items if i.event_name.endswith("Watch") and i.card_id in hurricane_cards]
+    assert watches and all(
+        by_id[i.superseded_by or ""].event_name.endswith("Warning")
+        for i in watches
+        if i.status is ActionItemStatus.SUPERSEDED
+    )
+    # imminent → observed: warnings yield to the measured outage (cross-family)
+    warnings = [
+        i for i in items if i.event_name.endswith("Warning") and i.card_id in hurricane_cards
     ]
-    assert watches, "the fixture holds hurricane-watch items on Cards 5/6"
     superseded_by_outage = [
         i
-        for i in watches
+        for i in warnings
         if i.status is ActionItemStatus.SUPERSEDED
         and i.superseded_by
         and by_id[i.superseded_by].event_type is EventType.POWER_OUTAGE
     ]
-    assert superseded_by_outage, "watch items yield to observed outages (cross-family)"
+    assert superseded_by_outage, "warning items yield to observed outages (cross-family)"
     for w in superseded_by_outage:
         winner = by_id[w.superseded_by or ""]
         assert winner.event_temporality.value == "observed"
@@ -173,9 +179,12 @@ def test_ian_2022_golden(world: tuple[list[Card], list, PanelEstimator]) -> None
         assert all(a.phase.value in ("during_event", "any") for a in winner.actions)
         assert winner.exposure is not None, "outage items carry the emPOWER line"
     outage = [i for i in items if i.event_type is EventType.POWER_OUTAGE]
-    current = [i for i in outage if i.status is not ActionItemStatus.SUPERSEDED]
-    per_role = {(i.card_id, i.scope_id, i.role.value) for i in current}
-    assert len(per_role) == len(current), "one current outage item per card/facility/role"
+    # each reading is current only in its own hour: at half past an hour, one per card/role
+    lee = [i for i in outage if i.scope_id == outage[0].scope_id and i.role.value == "care_team"]
+    for i in lee:
+        t = i.window_start + timedelta(minutes=30)
+        active = [j for j in lee if j.card_id == i.card_id and j.window_start <= t <= j.window_end]
+        assert active == [i], "one current outage reading per card, facility and role"
     assert any(i.event_key.startswith("eagle_i:12071:") for i in outage), "Lee County landfall"
     assert all(i.compounding_events == [] for i in items), "no heat/cold in Ian"
 
