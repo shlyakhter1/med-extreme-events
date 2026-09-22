@@ -30,11 +30,21 @@ window.XMap = (() => {
   const IDLE_COLOR = "#121a23";
 
   const BASE_STYLE = { weight: 0.35, color: "#243040", fillColor: "#121a23", fillOpacity: 1 };
+  /* State outlines sit above the county fill so a single-state event (Uri, Texas) reads as
+     "this state", and a multi-state one shows where it crosses borders. No fill, so they
+     never hide an event colour. */
+  const STATE_STYLE = { weight: 1.2, color: "#7d8fa6", opacity: 0.9, fill: false };
   let countiesPromise = null;
+  let statesPromise = null;
 
   function counties() {
     if (!countiesPromise) countiesPromise = fetch("/reference/counties").then((r) => r.json());
     return countiesPromise;
+  }
+
+  function states() {
+    if (!statesPromise) statesPromise = fetch("/reference/states").then((r) => r.json());
+    return statesPromise;
   }
 
   async function create(elementId, opts = {}) {
@@ -44,22 +54,25 @@ window.XMap = (() => {
       preferCanvas: true,
       ...opts,
     }).setView(opts.center || [38.5, -96], opts.zoom || 4);
-    const geo = await counties();
+    const [geo, stateGeo] = await Promise.all([counties(), states()]);
     const layer = L.geoJSON(geo, { style: () => ({ ...BASE_STYLE }), interactive: false }).addTo(map);
     const byFips = new Map();
     layer.eachLayer((l) => byFips.set(l.feature.id, l));
+    const stateLayer = L.geoJSON(stateGeo, { style: () => ({ ...STATE_STYLE }), interactive: false }).addTo(map);
     L.control.attribution({ prefix: false })
-      .addAttribution("County boundaries: US Census Bureau (1:5m)")
+      .addAttribution("County and state boundaries: US Census Bureau (1:5m)")
       .addTo(map);
-    return { map, countyLayer: layer, byFips, baseStyle: BASE_STYLE };
+    return { map, countyLayer: layer, stateLayer, byFips, baseStyle: BASE_STYLE };
   }
 
-  /* Paint a subset of counties; everything else returns to the base style. */
+  /* Paint a subset of counties; everything else returns to the base style. State outlines
+     are brought back on top afterwards, so a painted county edge never covers a border. */
   function paintCounties(ctx, colorByFips) {
     ctx.byFips.forEach((layer, fips) => {
       const hit = colorByFips.get(fips);
       layer.setStyle(hit ? { ...ctx.baseStyle, fillColor: hit.color, fillOpacity: hit.opacity ?? 0.55, color: hit.color, weight: 0.5 } : ctx.baseStyle);
     });
+    if (ctx.stateLayer) ctx.stateLayer.bringToFront();
   }
 
   /* Shared legend markup so the dashboard and playback explain the map the same way. */
@@ -75,6 +88,7 @@ window.XMap = (() => {
       .join("");
     return `<div class="hdr">Counties — active event</div>${rows}` +
       `<div><i style="background:${IDLE_COLOR};border-color:#2a3440"></i><span class="muted">no active event</span><span></span></div>` +
+      `<div><i style="background:transparent;border:0;border-top:2px solid ${STATE_STYLE.color};height:0;margin-top:6px"></i><span class="muted">state border</span><span></span></div>` +
       `<div class="note">Shading deepens with severity; power outage shades by % of customers out.</div>` +
       ((countsByType || {}).power_outage ? `<div class="note">${EAGLEI_ATTRIBUTION}</div>` : "");
   }

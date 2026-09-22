@@ -43,6 +43,7 @@ db-down: ## stop the database
 
 reference: ## rebuild all cached reference data (boundaries, zones, crosswalks, PLACES, VetPop, EAGLE-I customers, emPOWER; facilities needs VA_FACILITIES_API_KEY)
 	$(RUN) python scripts/build_county_boundaries.py
+	$(RUN) python scripts/build_state_boundaries.py
 	$(RUN) python scripts/build_nws_zones.py
 	$(RUN) python scripts/build_ct_crosswalk.py
 	$(RUN) python scripts/build_zip_county.py

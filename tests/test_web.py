@@ -442,3 +442,19 @@ def test_map_legend_carries_eaglei_attribution(client: TestClient) -> None:
     )
     pb = client.get("/static/playback.js").text
     assert 'titles.map(esc).join("<br>")' in pb, "tooltip line breaks must not be escaped"
+
+
+def test_maps_draw_state_borders(client: TestClient) -> None:
+    """Every map overlays state outlines, so a single-state event (Uri, Texas) shows where
+    the state ends; the outlines are drawn above the county fill and keyed in the legend."""
+    r = client.get("/reference/states")
+    assert r.status_code == 200
+    doc = r.json()
+    states = {f["properties"]["state"] for f in doc["features"]}
+    assert len(doc["features"]) == 56 and {"TX", "FL", "PR", "DC", "AK", "HI"} <= states
+    assert all(f["geometry"]["type"] in ("Polygon", "MultiPolygon") for f in doc["features"])
+    js = client.get("/static/map.js").text
+    assert 'fetch("/reference/states")' in js and "stateLayer" in js
+    assert "ctx.stateLayer.bringToFront()" in js, "borders stay above repainted counties"
+    assert "state border" in js, "the legend keys the outline"
+    assert "fill: false" in js, "outlines never hide an event colour"
