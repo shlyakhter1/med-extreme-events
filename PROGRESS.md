@@ -2,6 +2,66 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-22 — session handoff: state of the system
+
+**Where things stand.** Iteration v2 (M6–M10) is complete, reviewed and deployed. `main` is
+the deployed branch; working tree clean except the untracked `docs/ui_design/` (a playback
+redesign handoff, deliberately not committed — to be picked up in its own session).
+
+- **Public demo:** <https://med-extreme-events.onrender.com> — Render blueprint
+  (`render.yaml`), free plan, auto-deploys `main` only after the GitHub `ci` workflow (lint +
+  262 tests) passes. First live refresh after a deploy takes ~3 min on the free CPU; the
+  instance sleeps after ~15 min idle and refills live data on wake.
+- **Local demo container:** `mee` on :8000 from image `med-extreme-events:demo`. It must be
+  **rebuilt**, not restarted, to pick up code (`docker build -t med-extreme-events:demo . &&
+  docker rm -f mee && docker run -d --name mee --restart unless-stopped -p 8000:8000
+  med-extreme-events:demo`). Live data refreshes itself inside the container.
+- **Replay scenarios (5):** `heat_dome_2021`, `ian_2022` (with EAGLE-I FL outages),
+  `smoke_nyc_2023`, `uri_2021` (headline: legacy cold names, TX outages, cold×outage boost),
+  `smoke_canada_2026` (HMS + keyless AirNow archive + heat dome). Five goldens pin them;
+  regenerate with `UPDATE_GOLDEN=<scenario>|all` and review the diff.
+- **Cards (8):** 1–6 from `docs/card-library.md`, 7 (cold) and 8 (smoke) plus the Card 6
+  electricity-dependent DME sub-panel from `docs/card-library-additions.md`.
+- **Live feeds (all keyless, refreshed at startup and hourly, `LIVE_REFRESH_MINUTES=60`):**
+  NWS CAP + 14-day IEM archive, OpenFEMA, NOAA HMS smoke, AirNow public files (hourly monitors
+  + reporting-area forecasts → Card 8 pre-event), EAGLE-I **Georgia and Ohio only** via public
+  state mirrors (`EAGLEI_FEATURE_URL`). Every provider run is recorded (`feed_runs`) and shown
+  in the live banner with the outage coverage.
+- **Docs to start from:** `docs/guide/README.md` (index), `docs/guide/user-interface.md`
+  (every screen: how to use it and how it is meant to work), `docs/guide/data-sources.md`,
+  `docs/deploy.md`, `docs/card-reference-for-frontend.md`.
+
+**Open items, roughly in priority order.**
+
+1. **National EAGLE-I live coverage** needs a FEMA partner token (`EAGLEI_TOKEN`, set as a
+   Render secret; no code change) or a DOE/ORNL EAGLE-I account (may need an adapter). The
+   user may not be able to get access soon; GA/OH mirrors cover the demo meanwhile. The
+   mirrors are unofficial and can change or stop — the banner will show a failed/stale run.
+2. **Playback redesign** — handoff in `docs/ui_design/` (untracked): two layouts on one clock
+   (Browse / Card focus), inside the existing Jinja2 + htmx + vanilla-JS stack, no build step.
+3. **Known UI issues** (`docs/guide/user-interface.md` §12): replay supersession is computed
+   once over the whole scenario (a watch can look superseded before its warning is issued);
+   status buttons have no login on the public site (changes reset on redeploy); card chips on
+   the playback map are colour-only.
+4. **Low-priority review leftovers** (see the 2026-09-21 review entry): equal-severity CAP
+   update tie-break; duplicate event keys in one match call; items with no panel bypass
+   `min_panel_patients`; direction-agnostic cross-family supersede rule (latent); hard-coded
+   "Don't stop your medication" prefix; secret scan skips `.py/.json/.csv`; archive events
+   keep cancelled zones; each fixture rebuild adds ~13 MB Uri blobs to git history.
+5. **Recorded run-through / guide screenshots** for heat dome and Ian predate v2 (the new UI
+   guide has current Uri, smoke 2026 and live screenshots).
+6. **Clinical review** of Cards 7/8, the Card 6 addendum, the acuity placement of cold
+   (below heart failure) and smoke (below cold), and caregiver text (empty on all cards).
+
+**Operational notes.**
+
+- SQLite runs in WAL mode; the schema gained `events.temporality`, action-item
+  `status_before_superseded` and `rank_score`, and the `feed_runs` table — rebuild any old
+  local DB with `make demo`.
+- `.env` has no `NWS_USER_AGENT`; the image sets a repo-URL contact string. Local
+  `make ingest` in live mode needs it exported.
+- Commits carry the `Co-Authored-By` trailer; pushes to `main` deploy, so keep CI green.
+
 ## 2026-09-22 — keyless AirNow live, EAGLE-I GA/OH mirrors, observed-event windows
 
 - **Observed events have no lead window** (`engine.item_window_start`): an observed item
