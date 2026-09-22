@@ -3,7 +3,7 @@
 A browser form submits ``2026-09-20T11:42:21+00:00`` as ``...21 00:00`` because ``+`` is the
 URL encoding for a space, so a naive ``fromisoformat`` rejects what the page itself produced.
 We accept that form, a trailing ``Z``, a bare date, and ``datetime-local`` minute precision.
-Naive values are read as UTC.
+Naive values are read as UTC; offset values are converted to UTC.
 """
 
 from __future__ import annotations
@@ -37,7 +37,9 @@ def parse_at(value: str | None) -> datetime | None:
                 continue
         else:
             raise BadTimestamp(f"bad timestamp {value!r}") from None
-    return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
+    # Always hand back UTC: the SQLite fallback compares stored timestamps as wall-clock
+    # text, so an offset left on the value would shift every active-at query by that offset.
+    return dt.astimezone(UTC) if dt.tzinfo else dt.replace(tzinfo=UTC)
 
 
 def to_input_value(dt: datetime) -> str:

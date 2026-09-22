@@ -322,7 +322,7 @@ def match(
                             event, card, facility, role, actions, profile, panel, exposure, now
                         )
                     )
-    _apply_supersession(items)
+    _apply_supersession(items, by_key)
     _apply_co_occurrence_boost(items, by_key, facility_county, log, profile)
     items.sort(key=_rank_key)
     return MatchResult(items=items, log=log)
@@ -428,10 +428,19 @@ def _supersedes(stronger: ActionItem, weaker: ActionItem) -> bool:
     return SEVERITY_RANK[stronger.event_severity] > SEVERITY_RANK[weaker.event_severity]
 
 
-def _apply_supersession(items: list[ActionItem]) -> None:
+def _apply_supersession(items: list[ActionItem], events: dict[str, Event]) -> None:
     """Within (card, facility, role, event family), the strongest overlapping item wins;
     the others are marked superseded_by it. Strength: observed over forecast/imminent, then
-    CAP severity, then later onset. Never duplicates, never downgrades observed → forecast."""
+    CAP severity, then later onset. Never duplicates, never downgrades observed → forecast.
+
+    Overlap is judged on item windows (which include the card's pre-event lead), with one
+    guard: an event that ended before the weaker event began cannot supersede it. Without
+    the guard a Severe warning from last week suppressed this week's separate Minor
+    advisory for the same card and facility, because the advisory's lead window reached
+    back into the warning. The guard is one-directional on purpose: a newer observed
+    outage still supersedes the pre-event items of a hurricane watch that has already
+    expired — that is the forecast → observed transition the requirements describe.
+    """
     groups: dict[tuple[str, str, str, str], list[ActionItem]] = {}
     for it in items:
         groups.setdefault((it.card_id, it.scope_id, it.role.value, _family(it).value), []).append(
@@ -458,7 +467,8 @@ def _apply_supersession(items: list[ActionItem]) -> None:
                     weaker.window_start <= stronger.window_end
                     and stronger.window_start <= weaker.window_end
                 )
-                if overlaps and _supersedes(stronger, weaker):
+                ended_before = events[stronger.event_key].expires < events[weaker.event_key].onset
+                if overlaps and not ended_before and _supersedes(stronger, weaker):
                     weaker.status = ActionItemStatus.SUPERSEDED
                     weaker.superseded_by = stronger.id
                     break

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -164,6 +164,19 @@ def test_form_submitted_timestamp_is_accepted(client: TestClient) -> None:
         r = client.get("/", params={"scenario": "heat_dome_2021", "at": value})
         assert r.status_code == 200, f"{value!r} → {r.status_code} {r.text[:120]}"
     assert client.get("/", params={"at": "nonsense"}).status_code == 422
+    # an offset is converted, never carried into the SQLite wall-clock comparison
+    from xevents.timeparse import parse_at
+
+    parsed = parse_at("2021-06-01T16:30:00+05:00")
+    assert parsed == datetime(2021, 6, 1, 11, 30, tzinfo=UTC)
+    assert parsed is not None and parsed.utcoffset() == timedelta(0)
+    r_off = client.get(
+        "/events", params={"scenario": "heat_dome_2021", "at": "2021-06-28T05:00:00+05:00"}
+    )
+    r_utc = client.get(
+        "/events", params={"scenario": "heat_dome_2021", "at": "2021-06-28T00:00:00Z"}
+    )
+    assert r_off.json()["count"] == r_utc.json()["count"], "same instant, same events"
     # the header control must emit a value the form can submit back unchanged
     html = client.get("/", params={"scenario": "heat_dome_2021", "at": "2021-06-28T00:00"}).text
     assert 'type="datetime-local" name="at" value="2021-06-28T00:00"' in html
@@ -200,6 +213,10 @@ def test_events_show_location_and_timestamps(client: TestClient) -> None:
 def test_playback_offers_live_and_navigation(client: TestClient) -> None:
     """You must be able to get from playback back to live without editing the URL."""
     html = client.get("/playback").text
+    js = client.get("/static/playback.js").text
+    assert "if (!onsets.length)" in js and "no live events ingested yet" in js, (
+        "live mode with no events must not compute Math.min() of nothing"
+    )
     assert 'id="nav-dashboard"' in html and 'id="nav-events"' in html
     assert 'id="scenario"' in html
     js = client.get("/static/playback.js").text

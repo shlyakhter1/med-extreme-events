@@ -142,13 +142,22 @@
     // incident period runs for weeks) should not squash the storm into a few pixels.
     const onsets = state.events.map((e) => e._t0);
     const shortEnds = state.events.filter((e) => e._t1 - e._t0 <= 14 * 24 * HOUR).map((e) => e._t1);
-    state.t0 = Math.min(...onsets);
-    state.t1 = Math.max(shortEnds.length ? Math.max(...shortEnds) : 0, Math.max(...onsets) + 24 * HOUR);
+    if (!onsets.length) {
+      // No events (live mode before any ingest): Math.min() of nothing is Infinity and
+      // formatting it throws, so anchor the window on the last 24 h and say why it is empty.
+      state.t1 = Date.now();
+      state.t0 = state.t1 - 24 * HOUR;
+    } else {
+      state.t0 = Math.min(...onsets);
+      state.t1 = Math.max(shortEnds.length ? Math.max(...shortEnds) : 0, Math.max(...onsets) + 24 * HOUR);
+    }
     $("t-start").textContent = fmt(state.t0);
     $("t-end").textContent = fmt(state.t1);
 
     const superseded = state.items.filter((i) => i.status === "superseded").length;
-    $("status").textContent = `${state.events.length} events · ${state.items.length} items (${superseded} superseded)`;
+    $("status").textContent = state.events.length
+      ? `${state.events.length} events · ${state.items.length} items (${superseded} superseded)`
+      : (live ? "no live events ingested yet — run EVENT_MODE=live make ingest match, or pick a replay scenario" : `no events in ${id}`);
     drawTimeline();
     // Start where there is something to see: now for live, the busiest hour for a replay.
     const peak = live ? Date.now() : state.scenarios.find((s) => s.id === id)?.peak_at;

@@ -350,3 +350,60 @@ def test_other_providers_map_temporality(counties: CountyIndex) -> None:
     forecast = parse_observations(obs_rows, counties, product="forecast")[0]
     assert forecast.temporality is Temporality.FORECAST
     assert forecast.metrics["temporality_basis"] == "airnow forecast"
+
+
+def test_live_ingest_isolates_a_transport_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A timeout on one feed (httpx errors are not OSError) must not abort the run: the
+    other providers still run and their events are stored."""
+    import importlib.util
+
+    from xevents.store import init_db, list_events, make_engine
+
+    spec = importlib.util.spec_from_file_location(
+        "ingest", Path(__file__).parents[1] / "scripts" / "ingest.py"
+    )
+    assert spec and spec.loader
+    ingest = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ingest)
+
+    class Boom:
+        def fetch(self, window: TimeWindow) -> list[Event]:
+            raise httpx.ConnectTimeout("api.weather.gov timed out")
+
+        def close(self) -> None:
+            pass
+
+    class Fine:
+        def fetch(self, window: TimeWindow) -> list[Event]:
+            onset = window.start
+            return [
+                Event(
+                    source=EventSource.HMS,
+                    source_id="ok",
+                    event_type=EventType.WILDFIRE_SMOKE,
+                    event_name="HMS smoke (Heavy)",
+                    temporality=Temporality.OBSERVED,
+                    onset=onset,
+                    expires=onset + timedelta(hours=1),
+                    geography=EventGeography(county_fips=["41051"]),
+                )
+            ]
+
+        def close(self) -> None:
+            pass
+
+    monkeypatch.setattr(ingest, "NWSAlertsProvider", lambda *a, **k: Boom())
+    monkeypatch.setattr(ingest, "IEMArchiveProvider", lambda *a, **k: Boom())
+    monkeypatch.setattr(ingest, "OpenFEMAProvider", lambda *a, **k: Boom())
+    monkeypatch.setattr(ingest, "HMSSmokeProvider", lambda *a, **k: Fine())
+    monkeypatch.setattr(ingest, "EagleIProvider", lambda *a, **k: Boom())
+    monkeypatch.setattr(ingest, "load_customers", lambda: {})
+    monkeypatch.delenv("AIRNOW_API_KEY", raising=False)
+    engine = make_engine(f"sqlite:///{tmp_path / 'live.db'}")
+    init_db(engine)
+    rc = ingest.ingest_live(engine, days_ahead=1, lookback_days=1)
+    assert rc == 0, "some providers succeeded"
+    stored = [e for e in list_events(engine) if e.scenario is None]
+    assert [e.event_key for e in stored] == ["hms:ok"]

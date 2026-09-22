@@ -25510,8 +25510,8 @@
 "card": "cold-cardio-respiratory",
 "facility": "vha_740",
 "role": "care_team",
-"status": "superseded",
-"superseded_by": "nws:2021-KBRO-WS.W-0001|cold-cardio-respiratory|vha_740|care_team",
+"status": "issued",
+"superseded_by": null,
 "panel": 4666
 },
 {
@@ -25519,8 +25519,8 @@
 "card": "cold-cardio-respiratory",
 "facility": "vha_740",
 "role": "patient",
-"status": "superseded",
-"superseded_by": "nws:2021-KBRO-WS.W-0001|cold-cardio-respiratory|vha_740|patient",
+"status": "issued",
+"superseded_by": null,
 "panel": 4666
 },
 {
@@ -25727,7 +25727,7 @@
 "facility": "vha_671",
 "role": "care_team",
 "status": "superseded",
-"superseded_by": "nws:2021-KEWX-WS.W-0002|cold-cardio-respiratory|vha_671|care_team",
+"superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671|care_team",
 "panel": 14659
 },
 {
@@ -25736,7 +25736,7 @@
 "facility": "vha_671",
 "role": "patient",
 "status": "superseded",
-"superseded_by": "nws:2021-KEWX-WS.W-0002|cold-cardio-respiratory|vha_671|patient",
+"superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671|patient",
 "panel": 14659
 },
 {
@@ -25745,7 +25745,7 @@
 "facility": "vha_671A4",
 "role": "care_team",
 "status": "superseded",
-"superseded_by": "nws:2021-KEWX-WS.W-0002|cold-cardio-respiratory|vha_671A4|care_team",
+"superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671A4|care_team",
 "panel": 1868
 },
 {
@@ -25754,7 +25754,7 @@
 "facility": "vha_671A4",
 "role": "patient",
 "status": "superseded",
-"superseded_by": "nws:2021-KEWX-WS.W-0002|cold-cardio-respiratory|vha_671A4|patient",
+"superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671A4|patient",
 "panel": 1868
 },
 {
@@ -25763,7 +25763,7 @@
 "facility": "vha_674",
 "role": "care_team",
 "status": "superseded",
-"superseded_by": "nws:2021-KEWX-WS.W-0002|cold-cardio-respiratory|vha_674|care_team",
+"superseded_by": "nws:2021-KFWD-WS.W-0003|cold-cardio-respiratory|vha_674|care_team",
 "panel": 10067
 },
 {
@@ -25772,7 +25772,7 @@
 "facility": "vha_674",
 "role": "patient",
 "status": "superseded",
-"superseded_by": "nws:2021-KEWX-WS.W-0002|cold-cardio-respiratory|vha_674|patient",
+"superseded_by": "nws:2021-KFWD-WS.W-0003|cold-cardio-respiratory|vha_674|patient",
 "panel": 10067
 },
 {
@@ -25781,7 +25781,7 @@
 "facility": "vha_671",
 "role": "care_team",
 "status": "superseded",
-"superseded_by": "nws:2021-KEWX-WS.W-0002|cold-cardio-respiratory|vha_671|care_team",
+"superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671|care_team",
 "panel": 14659
 },
 {
@@ -25790,7 +25790,7 @@
 "facility": "vha_671",
 "role": "patient",
 "status": "superseded",
-"superseded_by": "nws:2021-KEWX-WS.W-0002|cold-cardio-respiratory|vha_671|patient",
+"superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671|patient",
 "panel": 14659
 },
 {
@@ -26069,7 +26069,7 @@
 "facility": "vha_674",
 "role": "care_team",
 "status": "superseded",
-"superseded_by": "nws:2021-KFWD-WS.W-0002|cold-cardio-respiratory|vha_674|care_team",
+"superseded_by": "nws:2021-KFWD-WS.W-0003|cold-cardio-respiratory|vha_674|care_team",
 "panel": 10067
 },
 {
@@ -26078,7 +26078,7 @@
 "facility": "vha_674",
 "role": "patient",
 "status": "superseded",
-"superseded_by": "nws:2021-KFWD-WS.W-0002|cold-cardio-respiratory|vha_674|patient",
+"superseded_by": "nws:2021-KFWD-WS.W-0003|cold-cardio-respiratory|vha_674|patient",
 "panel": 10067
 },
 {
@@ -26087,7 +26087,7 @@
 "facility": "vha_674A4",
 "role": "care_team",
 "status": "superseded",
-"superseded_by": "nws:2021-KFWD-WS.W-0002|cold-cardio-respiratory|vha_674A4|care_team",
+"superseded_by": "nws:2021-KFWD-WS.W-0003|cold-cardio-respiratory|vha_674A4|care_team",
 "panel": 2410
 },
 {
@@ -26096,7 +26096,7 @@
 "facility": "vha_674A4",
 "role": "patient",
 "status": "superseded",
-"superseded_by": "nws:2021-KFWD-WS.W-0002|cold-cardio-respiratory|vha_674A4|patient",
+"superseded_by": "nws:2021-KFWD-WS.W-0003|cold-cardio-respiratory|vha_674A4|patient",
 "panel": 2410
 },
 {
@@ -26320,8 +26320,8 @@
 "card": "cold-cardio-respiratory",
 "facility": "vha_580",
 "role": "care_team",
-"status": "superseded",
-"superseded_by": "nws:2021-KHGX-WC.W-0001|cold-cardio-respiratory|vha_580|care_team",
+"status": "issued",
+"superseded_by": null,
 "panel": 17996
 },
 {
@@ -26329,8 +26329,8 @@
 "card": "cold-cardio-respiratory",
 "facility": "vha_580",
 "role": "patient",
-"status": "superseded",
-"superseded_by": "nws:2021-KHGX-WC.W-0001|cold-cardio-respiratory|vha_580|patient",
+"status": "issued",
+"superseded_by": null,
 "panel": 17996
 },
 {
@@ -26605,42 +26605,6 @@
 },
 {
 "event": "nws:2021-KSJT-WC.Y-0001",
-"card": "cold-cardio-respiratory",
-"facility": "vha_671A4",
-"role": "care_team",
-"status": "superseded",
-"superseded_by": "nws:2021-KSJT-WS.W-0002|cold-cardio-respiratory|vha_671A4|care_team",
-"panel": 1868
-},
-{
-"event": "nws:2021-KSJT-WC.Y-0001",
-"card": "cold-cardio-respiratory",
-"facility": "vha_671A4",
-"role": "patient",
-"status": "superseded",
-"superseded_by": "nws:2021-KSJT-WS.W-0002|cold-cardio-respiratory|vha_671A4|patient",
-"panel": 1868
-},
-{
-"event": "nws:2021-KSJT-WC.Y-0002",
-"card": "cold-cardio-respiratory",
-"facility": "vha_519",
-"role": "care_team",
-"status": "superseded",
-"superseded_by": "nws:2021-KMAF-WS.W-0002|cold-cardio-respiratory|vha_519|care_team",
-"panel": 3717
-},
-{
-"event": "nws:2021-KSJT-WC.Y-0002",
-"card": "cold-cardio-respiratory",
-"facility": "vha_519",
-"role": "patient",
-"status": "superseded",
-"superseded_by": "nws:2021-KMAF-WS.W-0002|cold-cardio-respiratory|vha_519|patient",
-"panel": 3717
-},
-{
-"event": "nws:2021-KSJT-WC.Y-0002",
 "card": "cold-cardio-respiratory",
 "facility": "vha_671A4",
 "role": "care_team",
@@ -26649,12 +26613,48 @@
 "panel": 1868
 },
 {
-"event": "nws:2021-KSJT-WC.Y-0002",
+"event": "nws:2021-KSJT-WC.Y-0001",
 "card": "cold-cardio-respiratory",
 "facility": "vha_671A4",
 "role": "patient",
 "status": "superseded",
 "superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671A4|patient",
+"panel": 1868
+},
+{
+"event": "nws:2021-KSJT-WC.Y-0002",
+"card": "cold-cardio-respiratory",
+"facility": "vha_519",
+"role": "care_team",
+"status": "issued",
+"superseded_by": null,
+"panel": 3717
+},
+{
+"event": "nws:2021-KSJT-WC.Y-0002",
+"card": "cold-cardio-respiratory",
+"facility": "vha_519",
+"role": "patient",
+"status": "issued",
+"superseded_by": null,
+"panel": 3717
+},
+{
+"event": "nws:2021-KSJT-WC.Y-0002",
+"card": "cold-cardio-respiratory",
+"facility": "vha_671A4",
+"role": "care_team",
+"status": "superseded",
+"superseded_by": "nws:2021-KEWX-WC.W-0002|cold-cardio-respiratory|vha_671A4|care_team",
+"panel": 1868
+},
+{
+"event": "nws:2021-KSJT-WC.Y-0002",
+"card": "cold-cardio-respiratory",
+"facility": "vha_671A4",
+"role": "patient",
+"status": "superseded",
+"superseded_by": "nws:2021-KEWX-WC.W-0002|cold-cardio-respiratory|vha_671A4|patient",
 "panel": 1868
 },
 {
@@ -26681,7 +26681,7 @@
 "facility": "vha_671A4",
 "role": "care_team",
 "status": "superseded",
-"superseded_by": "nws:2021-KSJT-WS.W-0002|cold-cardio-respiratory|vha_671A4|care_team",
+"superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671A4|care_team",
 "panel": 1868
 },
 {
@@ -26690,7 +26690,7 @@
 "facility": "vha_671A4",
 "role": "patient",
 "status": "superseded",
-"superseded_by": "nws:2021-KSJT-WS.W-0002|cold-cardio-respiratory|vha_671A4|patient",
+"superseded_by": "nws:2021-KEWX-WC.W-0001|cold-cardio-respiratory|vha_671A4|patient",
 "panel": 1868
 },
 {

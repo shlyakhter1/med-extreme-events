@@ -18,6 +18,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+import httpx
+
 from xevents.cards import load_cards
 from xevents.geography.counties import CountyIndex
 from xevents.geography.nws_zones import UgcResolver
@@ -121,13 +123,15 @@ def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
         print("airnow: skipped (AIRNOW_API_KEY not set)")
 
     for name, factory, w in providers:
+        # One feed must never take the others down: transport errors (httpx exceptions are
+        # not OSError), malformed JSON and validation errors are all caught per provider.
         try:
             provider = factory()
             got = provider.fetch(w)
             provider.close()
-        except (ProviderError, OSError) as exc:
+        except (ProviderError, OSError, httpx.HTTPError, ValueError) as exc:
             failures += 1
-            print(f"{name}: FAILED {exc}", file=sys.stderr)
+            print(f"{name}: FAILED {type(exc).__name__}: {exc}", file=sys.stderr)
             continue
         print(f"{name}: {len(got)} events")
         events.extend(got)

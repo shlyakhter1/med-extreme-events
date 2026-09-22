@@ -351,3 +351,42 @@ def test_same_family_observed_supersedes_forecast(cards: list[Card], profile: Pr
         now=NOW,
     ).items
     assert all(i.status is ActionItemStatus.ISSUED for i in outage_items if i.event_key == "nws:hw")
+
+
+def test_past_event_does_not_supersede_a_later_separate_event(
+    cards: list[Card], profile: Profile
+) -> None:
+    """Item windows include the card's pre-event lead, so a Severe warning that ended on
+    June 3 used to supersede a separate Minor advisory starting June 8 (its 7-day lead
+    reached back into the warning). An event that ended before the weaker one began must
+    not supersede it; a newer event may still supersede an older overlapping-lead one."""
+    heat_facility = Facility.model_validate({**FACILITY.model_dump(), "county_fips": "41051"})
+    jun1 = datetime(2026, 6, 1, tzinfo=UTC)
+
+    def heat(name: str, sid: str, sev: CapSeverity, start: datetime, days: int) -> Event:
+        return Event(
+            source=EventSource.NWS,
+            source_id=sid,
+            event_type=EventType.HEAT,
+            event_name=name,
+            severity=sev,
+            temporality=Temporality.IMMINENT,
+            onset=start,
+            expires=start + timedelta(days=days),
+            geography=EventGeography(county_fips=["41051"]),
+        )
+
+    past = heat("Excessive Heat Warning", "past", CapSeverity.SEVERE, jun1, 2)
+    later = heat("Heat Advisory", "later", CapSeverity.MINOR, jun1 + timedelta(days=7), 1)
+    items = match([past, later], cards, [heat_facility], profile, _panels, now=jun1).items
+    assert all(i.status is ActionItemStatus.ISSUED for i in items), (
+        "two separate weeks of weather are two separate sets of items"
+    )
+    # the reverse order — a stronger warning arriving after a weaker advisory that already
+    # ended — still supersedes, because the warning is the newer picture
+    early = heat("Heat Advisory", "early", CapSeverity.MINOR, jun1, 1)
+    strong = heat(
+        "Excessive Heat Warning", "strong", CapSeverity.SEVERE, jun1 + timedelta(days=3), 2
+    )
+    items = match([early, strong], cards, [heat_facility], profile, _panels, now=jun1).items
+    assert all(i.status is ActionItemStatus.SUPERSEDED for i in items if i.event_key == "nws:early")
