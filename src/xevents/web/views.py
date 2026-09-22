@@ -19,8 +19,10 @@ from sqlalchemy import Engine
 
 from xevents.carbon import CarbonTable, load_carbon
 from xevents.cards import load_cards
+from xevents.geography.catchment import is_anchor
 from xevents.geography.counties import CountyIndex
 from xevents.models import ActionItem, ActionItemStatus, Event, EventSource, Role
+from xevents.profiles import PROFILES_DIR, load_profile
 from xevents.providers.eagle_i import ATTRIBUTION as EAGLEI_ATTRIBUTION
 from xevents.providers.eagle_i import (
     COVERAGE_CAVEAT,
@@ -29,6 +31,7 @@ from xevents.providers.eagle_i import (
     OVERCOUNT_CAVEAT,
 )
 from xevents.providers.replay import list_scenarios
+from xevents.sources import load_backlog, load_registry
 from xevents.store import (
     TransitionError,
     feed_status,
@@ -217,6 +220,7 @@ def dashboard(
                 "rank_score": 0.0,
                 "severity": 0,
                 "acuity_rank": 99,
+                "acuity_class": "",
                 "events": set(),
             },
         )
@@ -224,7 +228,8 @@ def dashboard(
         row["panel"] = max(row["panel"], it.panel.value if it.panel else 0.0)
         row["rank_score"] = max(row["rank_score"], it.rank_score)
         row["severity"] = max(row["severity"], SEVERITY_RANK[it.event_severity.value])
-        row["acuity_rank"] = min(row["acuity_rank"], it.acuity_rank)
+        if it.acuity_rank < row["acuity_rank"]:
+            row["acuity_rank"], row["acuity_class"] = it.acuity_rank, it.acuity_class
         row["events"].add(it.event_name)
 
     def board_key(r: dict[str, Any]) -> tuple[int, float, int, str]:
@@ -264,9 +269,16 @@ def _display_role(role: str) -> Role:
 
 
 def _facility_cards(
-    request: Request, facility_id: str, scenario: str | None, as_of: datetime, role: Role
+    request: Request,
+    facility_id: str,
+    scenario: str | None,
+    as_of: datetime,
+    role: Role,
+    card: str | None = None,
 ) -> list[dict[str, Any]]:
     items = _items_at(request, scenario, as_of, facility_id=facility_id)
+    if card:
+        items = [i for i in items if i.card_id == card]
     by_card: dict[str, dict[str, Any]] = {}
     for it in items:
         entry = by_card.setdefault(
@@ -286,12 +298,16 @@ def _facility_cards(
         ):
             entry["roles"][it.role.value] = it
     cards = sorted(by_card.values(), key=lambda c: c["acuity_rank"])
-    numbers = {card.id: card.number for card in load_cards()}
+    # The card definition carries both phases' actions: the block shows the phase that applies
+    # now at full strength and the other one as reference, all verbatim from the YAML.
+    defs = {d.id: d for d in load_cards()}
     for c in cards:
+        d = defs.get(str(c["card_id"]))
+        c["def"] = d
         c["item"] = c["roles"].get(role.value)
         c["caregiver"] = c["roles"].get(Role.CAREGIVER.value) if role is Role.PATIENT else None
         c["any"] = next(iter(c["roles"].values()))
-        c["carbon"] = carbon_for(numbers.get(str(c["card_id"]), 0))
+        c["carbon"] = carbon_for(d.number if d else 0)
     return cards
 
 
@@ -315,7 +331,7 @@ def facility_page(
         facility=facility,
         cards=cards,
         role=role,
-        roles=DISPLAY_ROLES,
+        display_roles=DISPLAY_ROLES,
         carbon_disclaimer=carbon_table().ui_disclaimer,
     )
     return templates.TemplateResponse(request, "facility.html", ctx)
@@ -328,17 +344,30 @@ def facility_cards_partial(
     scenario: str | None = None,
     at: str | None = None,
     role: str = "care_team",
+    card: str | None = None,
+    embed: bool = False,
 ) -> HTMLResponse:
+    """The card block alone. The facility page swaps it in with htmx; the playback card
+    focus fetches it with ``card=`` and ``embed=1`` so both surfaces render one partial."""
     ctx = _context(request, scenario, at)
-    if get_facility(_engine(request), facility_id) is None:
+    facility = get_facility(_engine(request), facility_id)
+    if facility is None:
         raise HTTPException(status_code=404, detail=f"unknown facility {facility_id}")
     try:
         role_enum = Role(role)
     except ValueError:
         raise HTTPException(status_code=422, detail=f"unknown role {role}") from None
-    cards = _facility_cards(request, facility_id, ctx["scenario"], ctx["as_of"], role_enum)
+    cards = _facility_cards(
+        request, facility_id, ctx["scenario"], ctx["as_of"], role_enum, card=card
+    )
     ctx.update(
-        facility_id=facility_id, cards=cards, role=role_enum.value, roles=[r.value for r in Role]
+        facility=facility,
+        facility_id=facility_id,
+        cards=cards,
+        role=role_enum.value,
+        display_roles=DISPLAY_ROLES,
+        embed=embed,
+        carbon_disclaimer=carbon_table().ui_disclaimer,
     )
     return templates.TemplateResponse(request, "cards_partial.html", ctx)
 
@@ -364,7 +393,10 @@ def patient_view(
     scenario: str | None = None,
     at: str | None = None,
     role: str = "patient",
+    view: str = Query(default="card", pattern="^(card|pair)$"),
 ) -> HTMLResponse:
+    """The light patient card, print-ready. ``view=pair`` sets the care-team block beside it
+    so a reviewer sees both renderings of the same action item at once."""
     ctx = _context(request, scenario, at)
     fac = get_facility(_engine(request), facility)
     if fac is None:
@@ -375,11 +407,20 @@ def patient_view(
         cards = [c for c in cards if c["card_id"] == card]
         if not cards and card not in {c.id for c in load_cards()}:
             raise HTTPException(status_code=404, detail=f"unknown card {card}")
+    care_by_card: dict[str, dict[str, Any]] = {}
+    if view == "pair":
+        care = _facility_cards(
+            request, facility, ctx["scenario"], ctx["as_of"], Role.CARE_TEAM, card=card
+        )
+        care_by_card = {str(c["card_id"]): c for c in care}
     ctx.update(
         facility=fac,
         cards=cards,
         role=role_enum.value,
         card=card,
+        view=view,
+        care_by_card=care_by_card,
+        display_roles=DISPLAY_ROLES,
         carbon_disclaimer=carbon_table().ui_disclaimer,
     )
     return templates.TemplateResponse(request, "patient_view.html", ctx)
@@ -450,6 +491,89 @@ def event_page(
         superseded=sum(1 for i in mine if i.status is ActionItemStatus.SUPERSEDED),
     )
     return templates.TemplateResponse(request, "event.html", ctx)
+
+
+def _source_status(runs: list[dict[str, Any]], as_of: datetime) -> dict[str, Any]:
+    """One status for a live source from its providers' latest runs: failed beats stale
+    beats ok; a source whose providers never ran (or were skipped) says so."""
+    if not runs:
+        return {"state": "none", "label": "no live run yet", "runs": []}
+    for r in runs:
+        at = datetime.fromisoformat(r["run_at"])
+        r["run_hhmm"] = at.strftime("%m-%d %H:%MZ")
+        r["stale"] = r["status"] == "ok" and (as_of - at).total_seconds() / 3600 > STALE_AFTER_HOURS
+    if any(r["status"] == "failed" for r in runs):
+        state, label = "failed", "last run failed"
+    elif all(r["status"] == "skipped" for r in runs):
+        state, label = "off", "not configured"
+    elif any(r["stale"] for r in runs):
+        state, label = "stale", "stale"
+    else:
+        state = "ok"
+        label = f"{sum(r['events'] for r in runs if r['status'] == 'ok')} live events"
+    return {"state": state, "label": label, "runs": runs}
+
+
+@router.get("/sources", response_class=HTMLResponse)
+def sources_page(
+    request: Request, scenario: str | None = None, at: str | None = None
+) -> HTMLResponse:
+    """Every data source: what it provides, what it drives, where it covers — the live
+    coverage limits stated plainly (EAGLE-I: Georgia and Ohio only) — and its last live run."""
+    ctx = _context(request, scenario, at)
+    engine = _engine(request)
+    registry = load_registry()
+    runs_by_provider = {r["provider"]: r for r in latest_feed_runs(engine)}
+    now = datetime.now(UTC)
+    replays: dict[str, list[str]] = {}
+    for s in ctx["scenarios"]:
+        for src in s.get("sources", []):
+            replays.setdefault(src, []).append(s["id"])
+    facilities = list_facilities(engine)
+    anchors = load_profile(PROFILES_DIR / "va.yaml").catchment.anchor_classifications
+    facility_facts = {
+        "total": len(facilities),
+        "stations": sum(1 for f in facilities if is_anchor(f, anchors)),
+        "visns": len({f.visn for f in facilities if f.visn}),
+        "states": len({f.state for f in facilities if f.state}),
+    }
+    rows: list[dict[str, Any]] = []
+    for src in registry.sources:
+        runs = [dict(runs_by_provider[p]) for p in src.live.runs if p in runs_by_provider]
+        rows.append(
+            {
+                "src": src,
+                "status": _source_status(runs, now) if src.live.mode == "live" else None,
+                "replays": replays.get(src.event_source or "", []),
+            }
+        )
+    layers = [
+        (
+            "event",
+            "Event layer",
+            "What is happening, and where: the hazard feeds cards trigger on.",
+        ),
+        ("shared", "Shared reference", "Geography every source is joined through."),
+        (
+            "medical",
+            "Medical layer",
+            "Who is affected: facilities, veterans and the estimates behind every panel.",
+        ),
+    ]
+    ctx.update(
+        guide=registry.guide,
+        layers=[
+            (key, title, blurb, [r for r in rows if r["src"].layer == key])
+            for key, title, blurb in layers
+        ],
+        backlog=load_backlog(),
+        facility_facts=facility_facts,
+        live_problems=[
+            r for r in rows if r["status"] and r["status"]["state"] in ("failed", "stale", "off")
+        ],
+        partial=[r for r in rows if r["src"].live.coverage_level == "partial"],
+    )
+    return templates.TemplateResponse(request, "sources.html", ctx)
 
 
 @router.get("/playback", response_class=HTMLResponse)

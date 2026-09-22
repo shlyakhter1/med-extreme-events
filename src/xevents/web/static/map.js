@@ -7,7 +7,7 @@ window.XMap = (() => {
      that any shaded county is obviously shaded. */
   const EVENT_TYPES = [
     { id: "heat", color: "#e4572e", label: "heat" },
-    { id: "extreme_cold", color: "#5fc9e8", label: "extreme cold / winter storm" },
+    { id: "extreme_cold", color: "#33b5c9", label: "extreme cold / winter storm" },
     { id: "hurricane_flood", color: "#3d7fdc", label: "hurricane / flood" },
     { id: "wildfire_smoke", color: "#b5894e", label: "wildfire smoke" },
     { id: "air_pollution", color: "#a05cd6", label: "air pollution" },

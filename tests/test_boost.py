@@ -227,9 +227,9 @@ def test_compounding_chip_renders(cards: list[Card], profile: Profile, tmp_path:
     html = client.get(
         f"/dashboard/facilities/{FACILITY.id}", params={"at": (T0 + timedelta(hours=8)).isoformat()}
     ).text
-    assert 'class="tag compounding"' in html and "acuity +1" in html
+    assert "compounding · acuity +1" in html
     assert outage[1].event_key in html, "the chip names the compounding outage"
-    assert 'class="tag temporality imminent"' in html or "imminent → pre_event" in html
+    assert "imminent → pre-event" in html
 
 
 def test_compounding_chip_shows_three_and_a_count(
@@ -266,6 +266,8 @@ def test_compounding_chip_shows_three_and_a_count(
         )
         .text
     )
-    chip = next(c for c in html.split('class="tag compounding"')[1:] if "acuity +1" in c)
-    chip = chip.split("</div>")[0]
+    # the chip says compounding; the provenance line names three events and counts the rest
+    assert "compounding · acuity +1" in html
+    lines = [c.split("</div>")[0] for c in html.split("compounding with ")[1:]]
+    chip = next(c for c in lines if "eagle_i:" in c)
     assert chip.count("/dashboard/events/eagle_i:") == 3 and "and 4 more" in chip

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Events · med-extreme-events{% endblock %}
 {% block content %}
-<h2 style="margin:0 0 4px">Events <span class="muted" style="font-weight:normal">— {{ total }} {{ 'active at ' ~ as_of_iso if window == 'active' else 'in this ' ~ mode ~ ' feed (whole window)' }}</span></h2>
+<h2 class="page-h">Events <span class="muted">— {{ total }} {{ 'active at ' ~ as_of_iso if window == 'active' else 'in this ' ~ mode ~ ' feed (whole window)' }}</span></h2>
 <p class="muted" style="margin-top:0">
   {% if window == 'active' %}<a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}&window=all">Show every event in the window →</a>
   {% else %}<a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}&window=active">Show only events active at the as-of time →</a>{% endif %}

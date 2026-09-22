@@ -1,0 +1,4 @@
+# Claude Design runtime + interactive prototypes: kept locally, not committed.
+# The README and screenshots are the spec; the code is now the reference.
+*.dc.html
+support.js

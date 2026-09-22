@@ -6,7 +6,7 @@ PORT ?= 8000
 ENV_FILE := $(wildcard .env)
 RUN = $(UV) run $(if $(ENV_FILE),--env-file $(ENV_FILE),)
 
-.PHONY: help install lint fmt test schema skills skills-check db-up db-down reference load serve ingest match scenarios demo clean
+.PHONY: help install lint fmt test schema skills skills-check db-up db-down reference load serve ingest match scenarios demo container clean
 
 help: ## list targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-14s %s\n", $$1, $$2}'
@@ -82,6 +82,12 @@ demo: ## fresh SQLite DB → reference data + catchments → replay scenarios �
 	@echo "open http://localhost:$(PORT)/?scenario=heat_dome_2021  (and /playback)"
 	-open "http://localhost:$(PORT)/?scenario=heat_dome_2021" 2>/dev/null || true
 	DATABASE_URL=$(DEMO_DB) $(RUN) uvicorn xevents.api:app --port $(PORT)
+
+container: ## rebuild the local demo image and replace the `mee` container on :8000 (code is baked in; restart is not enough)
+	docker build -t med-extreme-events:demo .
+	docker rm -f mee 2>/dev/null || true
+	docker run -d --name mee --restart unless-stopped -p 8000:8000 med-extreme-events:demo
+	@echo "mee rebuilt: http://localhost:8000 (live data refills in a few minutes)"
 
 clean: ## remove caches
 	rm -rf .venv .pytest_cache .mypy_cache .ruff_cache

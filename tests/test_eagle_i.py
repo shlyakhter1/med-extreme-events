@@ -459,7 +459,7 @@ def test_outage_renders_with_attribution_and_footnotes(tmp_path: Path) -> None:
     fid = result.items[0].scope_id
     facility = client.get(f"/dashboard/facilities/{fid}", params={"at": at})
     assert facility.status_code == 200
-    assert ATTRIBUTION in facility.text and "observed → during_event actions" in facility.text
+    assert ATTRIBUTION in facility.text and "observed → during-event" in facility.text
     assert "Hurricane/Power Outage × Dialysis-Dependent ESRD" in facility.text
 
 

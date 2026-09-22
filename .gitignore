@@ -6,6 +6,8 @@ __pycache__/
 .ruff_cache/
 .env
 *.db
+*.db-shm
+*.db-wal
 .DS_Store
 dist/
 fixtures/live/

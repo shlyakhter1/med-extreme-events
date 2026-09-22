@@ -1,27 +1,29 @@
 {% extends "base.html" %}
+{% from "macros.html" import patient_card, pair_note, pair_script %}
 {% block title %}Your alerts · {{ facility.name }}{% endblock %}
+{% block body_class %}patient-page{% endblock %}
 {% block content %}
-<div class="patient">
-  <p class="muted">Read-only preview of what a patient — or whoever is helping them — at <b>{{ facility.name }}</b> would receive, rendered from the same action items as the care-team dashboard.</p>
-  {% if not cards %}<p class="big">No active alerts for you right now.</p>{% endif %}
-  {% for c in cards %}{% set it = c.item %}{% set any = c.any %}
-    <div class="card">
-      <h3>{{ c.title }}</h3>
-      <div class="prov">{{ any.event_name }} · until {{ any.window_end.strftime('%b %d, %H:%MZ') }}</div>
-      {% if it and it.message %}
-        <p class="big">{{ it.message }}</p>
-        {% if c.caregiver and c.caregiver.message %}
-          <p class="muted" style="margin-bottom:2px">If you are helping someone with this:</p>
-          <p class="big">{{ c.caregiver.message }}</p>
-        {% endif %}
-        {% if it.safety_message %}<div class="warn">{{ it.safety_message }}</div>{% endif %}
-        <p><b>Call right away if you notice:</b></p>
-        <ul class="actions">{% for e in it.escalation %}<li>{{ e.signs }} → {{ e.response }}{% if e.emergency %} — <b>this is an emergency (911)</b>{% endif %}</li>{% endfor %}</ul>
-      {% else %}
-        <p class="muted">No {{ role }} guidance has been written for this card yet. Please contact your care team.</p>
-      {% endif %}
-      <p class="prov">This is decision support for contacting your care team, not a diagnosis. Guidance text is reviewed clinical content ({{ any.card_id }} v{{ any.card_version }}).</p>
+{% set q = 'facility=' ~ facility.id ~ '&scenario=' ~ (scenario or 'live') ~ '&at=' ~ as_of_input ~ ('&card=' ~ card if card else '') %}
+<div class="no-print" style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:18px">
+  <p class="muted" style="margin:0; max-width:720px">Read-only preview of what a patient — or whoever is helping them — at <b style="color:var(--ink)">{{ facility.name }}</b> would receive, rendered from the same action items as the care-team dashboard.</p>
+  <div class="seg" style="margin:0 0 0 auto">
+    {% if view == 'pair' %}<a href="/demo/patient-view?{{ q }}">patient card only</a><span class="on">beside the care-team view</span>
+    {% else %}<span class="on">patient card only</span><a href="/demo/patient-view?{{ q }}&view=pair">beside the care-team view</a>{% endif %}
+  </div>
+</div>
+{% if not cards %}<p style="font-size:16.5px">No active alerts for you right now.</p>{% endif %}
+{% if view == 'pair' %}
+  {% for c in cards %}
+    <div class="pair-page" style="margin-bottom:34px">
+      <div class="no-print">{% with cards=[care_by_card[c.card_id]] if c.card_id in care_by_card else [], role='care_team', embed=True, hide_roles=True, sid_prefix=loop.index ~ '-' %}{% include "cards_partial.html" %}{% endwith %}</div>
+      <div class="pair">{{ patient_card(c, c.item, facility, as_of) }}</div>
     </div>
   {% endfor %}
-</div>
+{% else %}
+  <div class="pair" style="align-items:flex-start">
+    <div class="cards-col">{% for c in cards %}{{ patient_card(c, c.item, facility, as_of) }}{% endfor %}</div>
+    {% if cards %}{{ pair_note() }}{% endif %}
+  </div>
+{% endif %}
+{{ pair_script() }}
 {% endblock %}

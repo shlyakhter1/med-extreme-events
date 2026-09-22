@@ -1,0 +1,75 @@
+{#- Shared components. The patient card is the only surface a non-clinician reads: a light,
+    print-ready object with no operator chrome. Every sentence on it is the action item's own
+    verbatim card text, in card order — nothing here is written or paraphrased in code. -#}
+
+{% macro patient_card(c, it, facility, as_of) -%}
+{% set any = c.any %}
+<article class="patient-card">
+  <div class="eyebrow"><span>VA · care alert</span><span class="ts">{{ as_of.strftime('%b %d, %H:%MZ') }}</span></div>
+  <h3>{{ c.title }}</h3>
+  <div class="where">{{ facility.name if facility else any.scope_id }} · until {{ any.window_end.strftime('%b %d, %H:%MZ') }}</div>
+  {% if it and (it.actions or it.message) %}
+    <ul class="say">
+      {% if it.actions %}{% for a in it.actions %}<li>{{ a.text }}</li>{% endfor %}{% else %}<li>{{ it.message }}</li>{% endif %}
+    </ul>
+    {% if c.caregiver and c.caregiver.message %}
+      <p class="cg">If you are helping someone with this:</p>
+      <ul class="say">{% for a in c.caregiver.actions %}<li>{{ a.text }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if it.safety_message %}<div class="safety">{{ it.safety_message }}</div>{% endif %}
+    <div class="call">
+      <div class="h">Call right away if you notice:</div>
+      <ul>{% for e in it.escalation %}<li>{{ e.signs }}{% if e.emergency %} — <b>this is an emergency (911)</b>{% elif e.response %} — {{ e.response }}{% endif %}</li>{% endfor %}</ul>
+    </div>
+  {% else %}
+    <p class="none">No patient guidance has been written for this card yet. Please contact your care team.</p>
+  {% endif %}
+  <div class="foot">This is decision support for contacting your care team, not a diagnosis. Guidance text is reviewed clinical content ({{ any.card_id }} v{{ any.card_version }}).</div>
+</article>
+{%- endmacro %}
+
+{% macro pair_note() -%}
+<div class="pair-note no-print">
+  <div class="lbl">Why it looks different</div>
+  <p>This is what a veteran — or whoever is helping them — receives. It drops the operator chrome (provenance, panel arithmetic, statuses), keeps the reviewed sentences at 16.5px and prints on one page in black on white.</p>
+  <p>Nothing is paraphrased: the sentences, the safety line and the escalation signs are the card's own text, in the card's own order.</p>
+  <div class="btns"><button type="button" data-print-card>Print</button><button type="button" data-copy-card>Copy text</button></div>
+</div>
+{%- endmacro %}
+
+{#- Print one card / copy its text. Delegated so it also works on markup injected later
+    (the playback reading column fetches the card block after load). -#}
+{% macro pair_script() -%}
+<script>
+(() => {
+  if (window.__pairWired) return;
+  window.__pairWired = true;
+  // one card beside the button: print that card alone; several (the patient page): print all
+  const cardFor = (btn) => {
+    const cards = btn.closest(".pair")?.querySelectorAll(".patient-card") || [];
+    return cards.length === 1 ? cards[0] : null;
+  };
+  document.addEventListener("click", (e) => {
+    const p = e.target.closest && e.target.closest("[data-print-card]");
+    const c = e.target.closest && e.target.closest("[data-copy-card]");
+    if (p) {
+      const card = cardFor(p);
+      if (!card) { window.print(); return; }
+      card.classList.add("printing");
+      document.body.classList.add("print-one");
+      window.print();
+      card.classList.remove("printing");
+      document.body.classList.remove("print-one");
+    } else if (c) {
+      const scope = cardFor(c) || c.closest(".pair")?.querySelector(".cards-col");
+      if (!scope || !navigator.clipboard) return;
+      navigator.clipboard.writeText(scope.innerText).then(() => {
+        const old = c.textContent;
+        c.textContent = "Copied";
+        setTimeout(() => { c.textContent = old; }, 1200);
+      });
+    }
+  });
+})();
+</script>
+{%- endmacro %}

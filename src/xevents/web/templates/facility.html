@@ -1,14 +1,16 @@
 {% extends "base.html" %}
+{% from "macros.html" import pair_script %}
 {% block title %}{{ facility.name }} · med-extreme-events{% endblock %}
 {% block content %}
-<p><a href="/?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">← Event board</a></p>
-<h2 style="margin:0">{{ facility.name }} <span class="muted" style="font-weight:normal">{{ facility.classification or '' }} · {{ facility.city }}, {{ facility.state }} · VISN {{ facility.visn }} · county {{ facility.county_fips }} · status {{ facility.operating_status }}</span></h2>
-<p class="prov">{{ facility.county_source }}</p>
-<div class="roles" style="margin:12px 0">
-  {% for r, label in roles %}
-    {% if r == role %}<span class="on">{{ label }}</span>{% else %}<a href="#" hx-get="/dashboard/facilities/{{ facility.id }}/cards?role={{ r }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}" hx-target="#cards" hx-push-url="/dashboard/facilities/{{ facility.id }}?role={{ r }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}">{{ label }}</a>{% endif %}
-  {% endfor %}
-  <a href="/demo/patient-view?facility={{ facility.id }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}" style="border:none">open patient view ↗</a>
-</div>
-<div id="cards">{% include "cards_partial.html" %}</div>
+<nav class="crumbs" aria-label="breadcrumb">
+  <a class="crumb" href="/?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">Event board</a>
+  <span class="sep">/</span>
+  <span class="crumb on">{{ facility.name }}</span>
+  <a class="closebtn" href="/?scenario={{ scenario or 'live' }}&at={{ as_of_input }}" title="Back to the event board" aria-label="Close" style="display:flex;align-items:center;justify-content:center;text-decoration:none">×</a>
+</nav>
+<h1 style="margin:0; font-size:25px; line-height:1.2; font-weight:600; letter-spacing:-.01em">{{ facility.name }}</h1>
+<div class="muted" style="font-size:13px; margin-top:4px">{{ facility.classification or '' }} · {{ facility.city }}, {{ facility.state }} · VISN {{ facility.visn }} · county {{ facility.county_fips }} · status {{ facility.operating_status }}</div>
+<p class="prov">{{ facility.county_source }} · <a href="/demo/patient-view?facility={{ facility.id }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}">open patient view ↗</a></p>
+<div id="cards" style="margin-top:26px">{% include "cards_partial.html" %}</div>
+{{ pair_script() }}
 {% endblock %}

@@ -307,7 +307,7 @@ def test_outage_item_shows_both_denominators_with_provenance(
     client = TestClient(create_app(engine))
     at = (T0 + timedelta(hours=1, minutes=30)).isoformat()
     html = client.get(f"/dashboard/facilities/{fid}", params={"at": at}).text
-    assert "Affected panel ≈" in html, "veteran estimate line"
+    assert "Affected panel" in html and "<b>≈ " in html, "veteran estimate stat block"
     assert (
         "electricity-dependent Medicare beneficiaries in catchment "
         "(emPOWER, measured; Medicare proxy — not veteran-specific)"

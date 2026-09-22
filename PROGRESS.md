@@ -2,6 +2,88 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-22 — Sources tab, `make container`, design bundle
+
+- **Sources tab** (`/sources`, after API in both headers): one card per source the demo
+  uses, grouped event / shared / medical, with what it provides, what it drives, live
+  coverage (partial coverage in amber and called out at the top: EAGLE-I GA and OH only,
+  AirNow monitor areas), access, cadence, limits, attribution, and the last live run per
+  provider. Replays carrying a source are computed (`scenario_summary` gained `sources`);
+  VA facility counts come from the DB (1,400 facilities, 184 stations, 18 VISNs, 57 states
+  and territories on the demo DB). Text lives in the new `data/sources.yaml`
+  (`src/xevents/sources.py` loads it, strict schema); the "Not yet connected" list is read
+  from `data/hazard_sources.yaml` `backlog` rows, so the backlog is not duplicated. Map view
+  of coverage deliberately deferred (text first).
+- **Dockerfile now copies `data/`** — the page reads it at runtime; without this the
+  container and Render would 500 on `/sources`.
+- **`make container`**: rebuilds `med-extreme-events:demo` and replaces `mee` on :8000.
+- **Design bundle** moved to `docs/design/2026-09-playback-redesign/`: README (with a status
+  note) and screenshots are committed; the `.dc.html` prototypes and `support.js` runtime are
+  kept locally and gitignored there.
+- `.gitignore`: `*.db-shm`, `*.db-wal`.
+- A local `demo.db` older than the `feed_runs` table 500s on live pages including `/sources`;
+  `make demo` rebuilds it (as noted in the handoff entry).
+- **Pending (user asked to remember):** refresh the remaining guide screenshots and UI manual
+  after the redesign.
+
+## 2026-09-22 — playback redesign (Claude Design handoff)
+
+Implemented the handoff (now `docs/design/2026-09-playback-redesign/README.md`) inside the existing Jinja2 + htmx + vanilla-JS stack
+(no build step, no new Python/JS dependencies). `make lint test` green (264 passed).
+
+**Done.**
+- **One stylesheet**, `static/app.css`: the handoff's token block, every shared component
+  (chip, stat-block, rank-row, action-list, escalate block, crumbs, map legend, timeline,
+  patient card), both playback layouts, phone rules (<900px) and a print stylesheet. The two
+  inline `:root` blocks are gone.
+- **Fonts self-hosted**: IBM Plex Sans 400/500/600 and Mono 400/500, latin woff2 from
+  `@fontsource` (~100 KB) plus `OFL.txt` in `static/fonts/`. New *assets*, not dependencies;
+  the stack falls back to `system-ui` / system mono.
+- **Playback** (`playback.html`, `playback.js` rewritten): derived layout —
+  `selectedCard || selectedFacility ? focus : browse` — driven by grid areas on `#pb-body`,
+  so the Leaflet container is never reparented; `invalidateSize()` after each swap, browse
+  view restored on exit. Regrouped header with 19px clock (*UTC · peak hour*), replay/live
+  banner (live keeps per-feed freshness and the not-an-all-clear sentence), hazard pills,
+  236px legend with the grey-dot key moved into it, HTML timeline with a fixed 168px label
+  column and a playhead through every lane, focus inset (190px) with county/state label and
+  **expand map ⤢**, rail bars ∝ panel, "Triggered by" with outage % and polls.
+- **One card block for both surfaces.** Playback's card focus fetches
+  `/dashboard/facilities/{id}/cards?card=…&embed=1&at=…` — the same `cards_partial.html` the
+  facility page uses — cached by the ids of the items active at *t*. `roleContent`,
+  `carbonBlock` and `roleToggle` were deleted from JS; no card text is built client-side.
+- **Card block** rebuilt to the reading hierarchy: 25px title, chip row (compounding chip +
+  "compounding with" three keys and a count), mono provenance, stat blocks, audience toggle,
+  both phases from the card with the applicable one marked *applies now*, the other at 72%
+  as *reference*, the escalation block always open, sources / carbon / patient view.
+- **Patient view**: light 380px card, 16.5px sentences from the item's own `actions`, print
+  one card alone (Print) or all (Ctrl+P), Copy text; `?view=pair` shows the care-team block
+  beside each card. **Dashboard** event board is a rank-row list (events table kept).
+  **Facility page** gained the breadcrumb.
+- Colours: card palette now matches the handoff tokens (1 `#3d7fdc`, 3 `#4a9d5f`,
+  6 `#e368a8`, 7 `#33b5c9`), with a test that `CARD_COLORS` equals `--card-N`; map cold
+  hazard → `#33b5c9`.
+- Tests rewritten where they pinned the old JS string builders or markup (playback card
+  detail, carbon/two-audiences, compounding chip, EAGLE-I phase label, emPOWER stat block);
+  new tests for colour parity, the embedded partial, and the pair/print view.
+
+**Decisions / deviations from the handoff.**
+- **Patient card headline = card title.** The mock's "Power outage in your area and you
+  depend on dialysis" is not in card YAML (constraint 4), so it is not used. A reviewed
+  plain-language headline would be a card-content addition. **Needs clinical review.**
+- **Smoke hue stays `#b5894e`** (map.js's earlier fix; the token's `#8c6d3f` read as
+  unshaded). Card 8's chip stays `#8c6d3f`.
+- **Legend attribution keeps the full mandatory EAGLE-I string**, not the mock's shortened
+  "U.S. DOE" note (v2 invariant).
+- **Facility-only selection also uses the focus layout** (reading column shows every card at
+  the facility); the handoff derived focus from `selectedCard` only. Event selection stays in
+  browse.
+- Guide screenshots `playback-uri.png` and the new `playback-card-focus.png` are current;
+  `dashboard-*`, `facility-uri.png`, `playback-heat-dome*` and `playback-smoke-2026.png`
+  predate the redesign.
+
+**Next.** Refresh the remaining guide screenshots; rebuild the `mee` demo container and
+deploy (push to `main` after CI).
+
 ## 2026-09-22 — session handoff: state of the system
 
 **Where things stand.** Iteration v2 (M6–M10) is complete, reviewed and deployed. `main` is

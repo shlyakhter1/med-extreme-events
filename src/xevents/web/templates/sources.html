@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Data sources · med-extreme-events{% endblock %}
+{% block content %}
+<h1 class="fac-h" style="margin:0; font-size:25px; line-height:1.2; font-weight:600; letter-spacing:-.01em">Data sources</h1>
+<p class="muted" style="max-width:820px; margin:6px 0 0">Every source is public and nothing about an individual patient is used. Event feeds say what is happening and where; the medical layer says who is affected. Reference tables are cached in the repository, so replays run offline; live mode polls the event feeds at startup and hourly. Full details: <a href="{{ guide }}">data-sources guide ↗</a>.</p>
+
+{% if partial or live_problems %}
+<div class="src-callouts">
+  {% for r in partial %}
+    <div class="notice"><b>{{ r.src.name }}</b> — live coverage is partial: {{ r.src.live.coverage }}</div>
+  {% endfor %}
+  {% for r in live_problems %}
+    <div class="notice"><b>{{ r.src.name }}</b> — {{ r.status.label }}{% for run in r.status.runs if run.detail %}: {{ run.detail }}{% endfor %}. Absence of items is not an all-clear while a feed is down or stale.</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% for key, title, blurb, rows in layers %}
+<section class="src-layer">
+  <div class="phase-h"><span class="t">{{ title }}</span><span class="rule"></span><span class="s">{{ rows|length }} source{{ 's' if rows|length != 1 }}</span></div>
+  <p class="prov" style="margin:-4px 0 12px">{{ blurb }}</p>
+  <div class="src-grid">
+  {% for r in rows %}{% set s = r.src %}{% set st = r.status %}
+    <article class="src-card" id="{{ s.id }}">
+      <div class="src-h">
+        <h2>{{ s.name }}</h2>
+        <span class="chips" style="margin-left:auto">
+          <span class="chip">{{ s.live.mode }}</span>
+          {% if st %}<span class="chip {{ 'alarm' if st.state in ('failed',) else 'warn' if st.state in ('stale', 'off', 'none') else 'ok' }}">{{ st.label }}</span>{% endif %}
+        </span>
+      </div>
+      <p class="src-provides">{{ s.provides }}</p>
+      <div class="src-cov {{ s.live.coverage_level }}"><span class="lbl">{{ 'Live coverage' if s.live.mode == 'live' else 'Coverage' }}</span><span>{{ s.live.coverage }}</span></div>
+      {% if s.facility_counts %}
+      <div class="stats" style="margin-top:12px; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px">
+        {% for n, label in [(facility_facts.total, 'facilities'), (facility_facts.stations, 'stations'), (facility_facts.visns, 'VISNs'), (facility_facts.states, 'states & territories')] %}
+        <div class="stat-block" style="padding:9px 10px"><div class="v" style="margin:0"><b style="font-size:19px">{{ '{:,}'.format(n) }}</b></div><div class="q">{{ label }}</div></div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <dl class="src-dl">
+        <dt>Drives</dt><dd>{{ s.drives }}</dd>
+        {% if s.replay or r.replays %}<dt>Replay</dt><dd>{{ s.replay or '' }}{% if r.replays %}<span class="chips" style="margin-top:4px">{% for sc in r.replays %}<a class="chip" href="/playback?scenario={{ sc }}">{{ sc }}</a>{% endfor %}</span>{% endif %}</dd>{% endif %}
+        <dt>Access</dt><dd>{{ s.auth }}</dd>
+        <dt>Cadence</dt><dd>{{ s.cadence }}</dd>
+      </dl>
+      {% if s.limits %}<ul class="src-limits">{% for l in s.limits %}<li>{{ l }}</li>{% endfor %}</ul>{% endif %}
+      {% if s.attribution %}<div class="cb-prov sans" style="margin-top:10px"><i>{{ s.attribution }}</i></div>{% endif %}
+      {% if st and st.runs %}
+        <div class="cb-prov" style="margin-top:10px">{% for run in st.runs %}{{ run.provider }}: {{ run.status }}{% if run.status == 'ok' %} · {{ run.events }} events{% endif %} · {{ run.run_hhmm }}{% if run.stale %} · stale{% endif %}{% if run.detail %}<br><span class="src-detail">{{ run.detail }}</span>{% endif %}{{ '<br>'|safe if not loop.last }}{% endfor %}</div>
+      {% endif %}
+      <div class="src-foot">{% if s.code %}<code>{{ s.code }}</code>{% endif %}{% if s.anchor %}<a href="{{ guide }}#{{ s.anchor }}">details ↗</a>{% endif %}</div>
+    </article>
+  {% endfor %}
+  </div>
+</section>
+{% endfor %}
+
+{% if backlog %}
+<section class="src-layer">
+  <div class="phase-h"><span class="t">Not yet connected</span><span class="rule"></span><span class="s">{{ backlog|length }} candidates</span></div>
+  <p class="prov" style="margin:-4px 0 12px">Evaluated in the hazard catalog but not wired to a provider. Nothing on this list can trigger a card.</p>
+  <div class="rank-list" style="border-radius:9px; overflow:hidden; border:1px solid var(--line); max-width:1100px">
+  {% for b in backlog %}
+    <div class="rank-row">
+      <span class="r1"><span class="name mono">{{ b.id }}</span><span class="right chips" style="gap:5px">{% if b.scope %}<span class="tag">{{ b.scope }}</span>{% endif %}{% for h in b.hazards %}<span class="tag">{{ h.replace('_', ' ') }}</span>{% endfor %}</span></span>
+      {% if b.endpoint or b.notes %}<span class="r2"><span>{{ b.endpoint or '' }}{% if b.notes %} · {{ b.notes }}{% endif %}</span></span>{% endif %}
+    </div>
+  {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

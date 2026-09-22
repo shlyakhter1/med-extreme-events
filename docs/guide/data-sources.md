@@ -3,6 +3,9 @@
 *Part of the [design and user guide](README.md). As of 2026-09-21. Retrieval dates are
 those of the cached copies in `fixtures/`.*
 
+The app's **Sources** tab (`/sources`) shows the same sources with their live status; its
+text comes from `data/sources.yaml`. When a fact here changes, change it there too.
+
 Every source is public. Nothing about an individual patient is used, and no source needs a
 key at demo time: the reference tables and replay scenarios are cached in `fixtures/` with
 their raw files and a builder script, so the demo runs offline. Keys and network access are

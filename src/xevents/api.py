@@ -107,6 +107,7 @@ def _scenario_summary(name: str, mtime_ns: int, size: int) -> dict[str, Any]:
         "window_end": end.isoformat(),
         "peak_at": (start + timedelta(hours=best_k)).isoformat(),
         "event_types": sorted({e.event_type.value for e in evs}),
+        "sources": sorted({e.source.value for e in evs}),
     }
 
 

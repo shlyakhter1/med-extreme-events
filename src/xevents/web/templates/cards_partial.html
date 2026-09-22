@@ -1,52 +1,102 @@
+{#- The card block: one reading hierarchy for the facility page and the playback card focus
+    (which fetches this partial with embed=1). Title → chips → quiet mono provenance → stat
+    blocks → audience toggle → actions with the phase that applies now at full strength →
+    escalation, never collapsed → sources / carbon / patient view. All clinical text is the
+    action item's or the card's own verbatim YAML. -#}
+{% from "macros.html" import patient_card, pair_note %}
+{% set phase_label = {'pre_event': 'Pre-event', 'during_event': 'During event', 'any': 'Any phase'} %}
+{% set fac_q = 'facility=' ~ (facility.id if facility else facility_id) ~ '&scenario=' ~ (scenario or 'live') ~ '&at=' ~ as_of_input %}
 {% if not cards %}<div class="muted">No cards fired for this facility at {{ as_of_iso }}.</div>{% endif %}
 {% for c in cards %}
-  {% set it = c.item %}{% set any = c.any %}
-  <div class="card">
-    <h3>{{ c.title }} <span class="tag">{{ any.acuity_class }}</span> <span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[any.event_severity.value] }}">{{ any.event_name }} · {{ any.event_severity.value }}</span></h3>
-    <div class="prov">Event <code>{{ any.event_key }}</code> · window {{ any.window_start.strftime('%Y-%m-%d %H:%MZ') }} → {{ any.window_end.strftime('%Y-%m-%d %H:%MZ') }} · card {{ any.card_id }} v{{ any.card_version }} · evidence: {{ any.evidence_tier.value }} · {{ any.event_temporality.value }} → {{ any.phase.value }} actions</div>
-    {% if any.event_type.value == 'power_outage' %}<div class="prov">{{ eaglei.attribution }} {{ eaglei.caveats[0] }}</div>{% endif %}
-    {% if any.compounding_events %}<div class="prov"><span class="tag compounding" title="co-occurring event in this county (requirements v2 §4)">compounding{% if any.event_type.value != 'power_outage' %} · acuity +1{% endif %}</span>
-      {% for k in any.compounding_events[:3] %}<a href="/dashboard/events/{{ k }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}"><code>{{ k }}</code></a>{{ ' ' if not loop.last }}{% endfor %}{% if any.compounding_events|length > 3 %} <span class="muted">and {{ any.compounding_events|length - 3 }} more</span>{% endif %}</div>{% endif %}
-    {% if any.panel %}
-      <div class="prov">Affected panel ≈ <b style="color:var(--ink)">{{ '{:,.0f}'.format(any.panel.value) }}</b> {{ any.panel.unit }}
+  {% set it = c.item %}{% set any = c.any %}{% set d = c.def %}
+  {% set now_phase = any.phase.value %}
+  <article class="card-block" style="--card-color:var(--card-{{ d.number if d else 0 }})">
+    <div class="cb-title"><i class="cb-chip" aria-hidden="true"></i><h2>{{ c.title }}</h2></div>
+    <div class="chips">
+      <span class="chip">acuity: {{ any.acuity_class }}</span>
+      <span class="chip warn">{{ any.event_name }} · {{ any.event_severity.value }}</span>
+      <span class="chip alarm" title="event temporality → the card phase that applies">{{ any.event_temporality.value }} → {{ now_phase.replace('_', '-') }}</span>
+      {% if any.compounding_events %}<span class="chip warn" title="co-occurring event in this county (requirements v2 §4)">compounding{% if any.event_type.value != 'power_outage' %} · acuity +1{% endif %}</span>{% endif %}
+    </div>
+    <div class="cb-prov">event <code>{{ any.event_key }}</code> · window {{ any.window_start.strftime('%Y-%m-%d %H:%MZ') }} → {{ any.window_end.strftime('%Y-%m-%d %H:%MZ') }} · card {{ any.card_id }} v{{ any.card_version }} · evidence: {{ any.evidence_tier.value }}
+      {%- if any.compounding_events %}<br>compounding with {% for k in any.compounding_events[:3] %}<a href="/dashboard/events/{{ k }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}"{% if embed %} target="_blank"{% endif %}>{{ k }}</a>{{ ', ' if not loop.last }}{% endfor %}{% if any.compounding_events|length > 3 %} and {{ any.compounding_events|length - 3 }} more{% endif %}{% endif %}</div>
+    {% if any.event_type.value == 'power_outage' %}<div class="cb-prov sans">{{ eaglei.attribution }} {{ eaglei.caveats[0] }}</div>{% endif %}
+
+    {% if any.panel or any.exposure %}
+    <div class="stats">
+      {% if any.panel %}
+      <div class="stat-block">
+        <div class="lbl">Affected panel</div>
+        <div class="v"><b>≈ {{ '{:,.0f}'.format(any.panel.value) }}</b><span>{{ any.panel.unit }}</span></div>
+        <div class="q">{{ any.panel.label }}</div>
         <details><summary>how was this number computed?</summary>
           <div><b>{{ any.panel.label }}</b>: {{ any.panel.formula }}</div>
-          {% for comp in any.panel.components recursive %}<div style="margin-left:14px">↳ <b>{{ comp.label }}</b> = {{ '{:,.0f}'.format(comp.value) }}{% if comp.unit != 'veterans' %} {{ comp.unit }}{% endif %}: {{ comp.formula }}{% if comp.caveats %} · {{ comp.caveats[0] }}{% endif %}{% if comp.components %}{{ loop(comp.components) }}{% endif %}</div>{% endfor %}
+          {% for comp in any.panel.components recursive %}<div class="comp">↳ <b>{{ comp.label }}</b> = {{ '{:,.0f}'.format(comp.value) }}{% if comp.unit != 'veterans' %} {{ comp.unit }}{% endif %}: {{ comp.formula }}{% if comp.caveats %} · {{ comp.caveats[0] }}{% endif %}{% if comp.components %}{{ loop(comp.components) }}{% endif %}</div>{% endfor %}
           <div>Caveats: {{ any.panel.caveats|join(' ') }}</div>
           <div>Sources: {{ any.panel.sources|join('; ') }}</div>
         </details>
       </div>
-    {% endif %}
-    {% if any.exposure %}
-      <div class="prov"><b style="color:var(--ink)">{{ '{:,.0f}'.format(any.exposure.value) }}</b> electricity-dependent Medicare beneficiaries in catchment (emPOWER, measured; Medicare proxy — not veteran-specific)
-        <details><summary>how was this number computed?</summary>
+      {% endif %}
+      {% if any.exposure %}
+      <div class="stat-block">
+        <div class="lbl">Electricity-dependent</div>
+        <div class="v"><b>{{ '{:,.0f}'.format(any.exposure.value) }}</b><span>{{ any.exposure.unit }}</span></div>
+        <div class="q">electricity-dependent Medicare beneficiaries in catchment (emPOWER, measured; Medicare proxy — not veteran-specific)</div>
+        <details><summary>ranking formula</summary>
           <div><b>{{ any.exposure.label }}</b>: {{ any.exposure.formula }}</div>
           <div>Ranking: {{ any.rank_formula }} (measured × measured; within the card's acuity class, larger ranks first).</div>
           <div>Caveats: {{ any.exposure.caveats|join(' ') }}</div>
           <div>Sources: {{ any.exposure.sources|join('; ') }}</div>
         </details>
       </div>
-    {% endif %}
-    {% if it %}
-      {% if it.message %}
-        <p style="font-size:15px">{{ it.message }}</p>
-        {% if c.caregiver and c.caregiver.message %}
-          <div class="prov" style="margin-top:6px">For a caregiver</div>
-          <p style="font-size:15px">{{ c.caregiver.message }}</p>
-        {% elif role == 'patient' %}
-          <div class="prov" style="margin-top:6px">Caregiver wording is not yet written for this card; the guidance above is what a caregiver would be given.</div>
-        {% endif %}
-      {% else %}
-        {% for phase in ['pre_event', 'during_event', 'any'] %}{% set acts = it.actions|selectattr('phase.value', 'equalto', phase)|list %}{% if acts %}
-          <div class="prov" style="margin-top:6px">{{ {'pre_event':'Pre-event (3–7 days out)','during_event':'During event','any':'Actions'}[phase] }}</div>
-          <ul class="actions">{% for a in acts %}<li>{{ a.text }}</li>{% endfor %}</ul>
-        {% endif %}{% endfor %}
       {% endif %}
-      {% if it.safety_message %}<div class="warn">{{ it.safety_message }}</div>{% endif %}
-      <details><summary>escalation triggers ({{ it.escalation|length }})</summary><ul class="actions">{% for e in it.escalation %}<li>{{ e.signs }} → <b>{{ e.response }}</b>{% if e.emergency %} 🚨{% endif %}</li>{% endfor %}</ul></details>
-      <details><summary>sources ({{ it.sources|length }})</summary><ul class="actions">{% for s in it.sources %}<li>{{ s }}</li>{% endfor %}</ul></details>
+    </div>
+    {% endif %}
+
+    {% if not hide_roles %}
+    <div class="seg" role="group" aria-label="audience">
+      {% for r, label in display_roles %}
+        {% if r == role %}<span class="on">{{ label }}</span>
+        {% else %}<a href="/dashboard/facilities/{{ facility.id if facility else facility_id }}?role={{ r }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}" data-role="{{ r }}"
+          {%- if not embed %} hx-get="/dashboard/facilities/{{ facility.id if facility else facility_id }}/cards?role={{ r }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}" hx-target="#cards" hx-push-url="/dashboard/facilities/{{ facility.id if facility else facility_id }}?role={{ r }}&scenario={{ scenario or 'live' }}&at={{ as_of_input }}"{% endif %}>{{ label }}</a>{% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if role == 'care_team' and it %}
+      {% set acts = d.actions.care_team if d else it.actions %}
+      {% for phase in [now_phase, 'any', 'during_event' if now_phase == 'pre_event' else 'pre_event'] %}
+        {% set grp = acts|selectattr('phase.value', 'equalto', phase)|list %}
+        {% if grp %}
+          {% set applies = phase == now_phase or phase == 'any' %}
+          <div class="phase-h{{ ' now' if applies }}"><span class="t">{{ phase_label[phase] }}{% if phase == 'pre_event' and d %} · {{ d.window_days.min }}–{{ d.window_days.max }} days out{% endif %}</span><span class="rule"></span><span class="s">{{ 'applies now' if applies else 'reference' }}</span></div>
+          <ul class="action-list{{ '' if applies else ' ref' }}">{% for a in grp %}<li>{{ a.text }}</li>{% endfor %}</ul>
+        {% endif %}
+      {% endfor %}
+      {% if it.safety_message %}<div class="escalate safety">{{ it.safety_message }}</div>{% endif %}
+      <div class="escalate">
+        <div class="h">Escalate</div>
+        <ul>{% for e in it.escalation %}<li>{{ e.signs }}{% if e.response %} <b>→ {{ e.response }}</b>{% endif %}{% if e.emergency and 'emergenc' not in (e.response or '')|lower %} <b>(emergency)</b>{% endif %}</li>{% endfor %}</ul>
+      </div>
+    {% elif it %}
+      <div class="patient-rendering">
+        <div class="hd"><span class="lbl">Patient &amp; caregiver rendering</span><span>same action item, verbatim card text — what the veteran receives</span></div>
+        <div class="pair">
+          {{ patient_card(c, it, facility, as_of) }}
+          {{ pair_note() }}
+        </div>
+        {% if not (c.caregiver and c.caregiver.message) %}<div class="prov" style="margin-top:12px">Caregiver wording is not yet written for this card; the guidance above is what a caregiver would be given.</div>{% endif %}
+      </div>
+    {% else %}
+      <div class="muted" style="margin-top:18px">No {{ role.replace('_',' ') }} content on this card (reviewed content pending).</div>
+    {% endif %}
+
+    {% if it %}
+    <div class="cb-foot">
+      <details><summary>sources ({{ it.sources|length }})</summary><ul>{% for s in it.sources %}<li>{{ s }}</li>{% endfor %}</ul></details>
       {% if c.carbon %}
       <details><summary>carbon footprint of this card's therapies ({{ c.carbon|length }})</summary>
+        <div>
         <div class="prov" style="margin:4px 0">Scaled to this facility's estimated panel of <b>{{ '{:,.0f}'.format(any.panel.value) if any.panel else '—' }}</b> patients.
           Drugs on a card are alternatives, so rows are separate scenarios and must not be added together.</div>
         <table class="carbon">
@@ -67,19 +117,20 @@
           </tbody>
         </table>
         <div class="warn" style="margin-top:6px">{{ carbon_disclaimer }}</div>
+        </div>
       </details>
       {% endif %}
-      <div style="margin-top:8px; display:flex; gap:8px; align-items:center">
-        <span id="status-{{ loop.index }}">{% with item=it %}{% include "status_badge.html" %}{% endwith %}</span>
-        {% if it.status.value in ('issued', 'delivered') %}
-          <button hx-post="/dashboard/action-items/{{ it.id }}/status?status=acknowledged" hx-target="#status-{{ loop.index }}" hx-swap="innerHTML">Acknowledge</button>
-        {% elif it.status.value == 'acknowledged' %}
-          <button hx-post="/dashboard/action-items/{{ it.id }}/status?status=completed" hx-target="#status-{{ loop.index }}" hx-swap="innerHTML">Mark completed</button>
-        {% endif %}
-        <span class="prov">item <code>{{ it.id }}</code></span>
-      </div>
-    {% else %}
-      <div class="muted">No {{ role.replace('_',' ') }} content on this card (reviewed content pending).</div>
+      <a href="/demo/patient-view?{{ fac_q }}&card={{ any.card_id }}" target="_blank" rel="noopener">open patient view ↗</a>
+    </div>
+    <div class="cb-status">
+      {% set sid = 'status-' ~ (sid_prefix or '') ~ loop.index %}<span id="{{ sid }}">{% with item=it %}{% include "status_badge.html" %}{% endwith %}</span>
+      {% if it.status.value in ('issued', 'delivered') %}
+        <button hx-post="/dashboard/action-items/{{ it.id }}/status?status=acknowledged" hx-target="#{{ sid }}" hx-swap="innerHTML">Acknowledge</button>
+      {% elif it.status.value == 'acknowledged' %}
+        <button hx-post="/dashboard/action-items/{{ it.id }}/status?status=completed" hx-target="#{{ sid }}" hx-swap="innerHTML">Mark completed</button>
+      {% endif %}
+      <span class="prov">item <code>{{ it.id }}</code></span>
+    </div>
     {% endif %}
-  </div>
+  </article>
 {% endfor %}

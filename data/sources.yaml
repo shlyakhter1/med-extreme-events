@@ -1,0 +1,266 @@
+# sources.yaml — every data source the demo uses, as shown on the /sources page.
+# Facts mirror docs/guide/data-sources.md (the prose reference); keep the two in step.
+# Sources not yet connected are read from data/hazard_sources.yaml (status: backlog), so
+# the backlog lives in one place. Live run status and facility counts are not written
+# here: the page reads them from the database at request time.
+#
+# live.mode:  live       — polled by live ingest; `runs` are the provider names in feed_runs
+#             reference  — cached reference table, rebuilt by hand (make reference)
+#             display    — shown in the UI only, never used for triggering or ranking
+# live.coverage_level: full | partial | none — drives the coverage chip colour.
+
+guide: https://github.com/shlyakhter1/med-extreme-events/blob/main/docs/guide/data-sources.md
+
+sources:
+  # ------------------------------------------------------------------ event layer
+  - id: nws
+    name: NWS alerts
+    layer: event
+    event_source: nws
+    provides: Watches, warnings and advisories in force now (CAP) — heat, cold and winter storm, tropical, surge, flood, Air Quality Alerts.
+    drives: Cards 1–7 (heat, hurricane/flood, cold triggers)
+    live:
+      mode: live
+      runs: ["nws (active)"]
+      coverage: National (all NWS offices).
+      coverage_level: full
+    replay: Historical products come from the IEM archive below.
+    auth: No key; a User-Agent with contact details is mandatory.
+    cadence: Polled at startup and hourly (NWS allows every 30 s).
+    limits:
+      - Reports only what is in force now and keeps no history.
+      - Legacy cold-product names (pre-Oct 2024) are normalized in the provider.
+    code: src/xevents/providers/nws.py
+    anchor: nws-alerts-apiweathergov
+
+  - id: iem
+    name: Iowa Environmental Mesonet (IEM) VTEC archive
+    layer: event
+    event_source: nws
+    provides: Historical NWS watches and warnings with dated zone geometry.
+    drives: Every NWS event in the replays; the 14-day live backfill.
+    live:
+      mode: live
+      runs: ["nws (archive, 14d)"]
+      coverage: National, last 14 days.
+      coverage_level: full
+    replay: Source of NWS products in all five replays.
+    auth: None.
+    cadence: With each live refresh (14-day window).
+    limits:
+      - Non-VTEC products (such as Air Quality Alerts) are absent.
+    code: src/xevents/providers/iem_archive.py
+    anchor: iowa-environmental-mesonet-iem
+
+  - id: hms
+    name: NOAA HMS smoke polygons
+    layer: event
+    event_source: hms
+    provides: Daily analyst-drawn smoke plumes by density (Light, Medium, Heavy).
+    drives: Card 8 (Medium and Heavy)
+    live:
+      mode: live
+      runs: ["hms"]
+      coverage: National (CONUS, Alaska, Hawaii), last 2 days.
+      coverage_level: full
+    replay: smoke_nyc_2023, smoke_canada_2026.
+    auth: None.
+    cadence: Daily; finalized the next morning (ET).
+    limits:
+      - Smoke in the atmospheric column seen from satellite, not surface air quality.
+      - County coverage is approximate at plume edges.
+    code: src/xevents/providers/hms.py
+    anchor: noaa-hms-smoke-polygons
+
+  - id: airnow
+    name: AirNow
+    layer: event
+    event_source: airnow
+    provides: Hourly monitor AQI (PM2.5, ozone) and reporting-area forecasts.
+    drives: Card 8 (AQI ≥ 101; forecasts fire it pre-event)
+    live:
+      mode: live
+      runs: ["airnow (files)", "airnow (api)"]
+      coverage: Where monitors and forecast reporting areas exist — cities and suburbs; many rural counties have no monitor.
+      coverage_level: partial
+    replay: smoke_canada_2026 (keyless daily archive).
+    auth: None for the public files (the default); the optional API needs a key (500 req/h).
+    cadence: Hourly observations; daily forecasts.
+    limits:
+      - Data are preliminary and unvalidated.
+      - Category-only forecasts use the category's lower-bound AQI (recorded in metrics).
+      - A forecast is placed in the county holding the reporting area's centre.
+    code: src/xevents/providers/airnow.py
+    anchor: airnow
+
+  - id: eagle_i
+    name: EAGLE-I county power outages
+    layer: event
+    event_source: eagle_i
+    provides: Electric customers without power per county, from utilities' public outage maps (ORNL for DOE).
+    drives: Cards 5 and 6 (≥ 10 % out, sustained two polls); the co-occurrence boost on heat and cold cards
+    live:
+      mode: live
+      runs: ["eagle_i"]
+      coverage: Georgia and Ohio only — public state mirrors (Georgia GEMA, Ohio). A power outage anywhere else is invisible live until a FEMA partner token (EAGLEI_TOKEN) is set.
+      coverage_level: partial
+    replay: National historical data (ORNL county CSVs, 2014–2025) — ian_2022 (FL), uri_2021 (TX).
+    auth: FEMA's national layer needs a partner token; the state mirrors and ORNL archive need none.
+    cadence: Hourly live; 15-minute historical, resampled to hourly maxima.
+    limits:
+      - Customers are meters/accounts, not people.
+      - About 8 % of US customers (small rural and municipal utilities) are not covered.
+      - The mirrors are unofficial copies and can change or stop without notice.
+    attribution: Electric customer outage data provided by EAGLE-I, Department of Energy.
+    code: src/xevents/providers/eagle_i.py
+    anchor: eagle-i-county-power-outages-providerseagle_ipy
+
+  - id: openfema
+    name: OpenFEMA disaster declarations
+    layer: event
+    event_source: openfema
+    provides: Disaster declarations by county.
+    drives: Context only — declarations are post-hoc, so no card triggers on them.
+    live:
+      mode: live
+      runs: ["openfema"]
+      coverage: National.
+      coverage_level: full
+    replay: ian_2022.
+    auth: None.
+    cadence: With each live refresh.
+    limits:
+      - Declared after the fact; useful for context and review, not early warning.
+    code: src/xevents/providers/openfema.py
+    anchor: openfema-disaster-declarations
+
+  # ------------------------------------------------------------------ shared reference
+  - id: counties
+    name: Census county boundaries (1:5m, 2023)
+    layer: shared
+    provides: County polygons — the join geometry for every source and the map basemap (no third-party tiles).
+    drives: Every county join; every map.
+    live:
+      mode: reference
+      coverage: 3,235 counties including PR, GU, AS, MP and VI.
+      coverage_level: full
+    auth: None.
+    cadence: Static vintage; rebuilt with make reference.
+    limits:
+      - Generalized boundaries — a facility within a few hundred metres of a county line can land in the neighbour.
+    code: src/xevents/geography/counties.py
+    anchor: census-county-boundaries
+
+  - id: nws_zones
+    name: NWS zone–county correlation
+    layer: shared
+    provides: Public forecast zone → county FIPS (4,848 rows), plus the Connecticut legacy-county crosswalk.
+    drives: Resolving every zone-based NWS product to counties.
+    live:
+      mode: reference
+      coverage: National.
+      coverage_level: full
+    auth: None.
+    cadence: Rebuilt when NWS publishes a new file.
+    limits:
+      - Lacks zone codes retired before the current file; the IEM path uses dated geometry instead.
+    code: src/xevents/geography/nws_zones.py
+    anchor: nws-zone-county-correlation-file
+
+  # ------------------------------------------------------------------ medical layer
+  - id: va_facilities
+    name: VA Lighthouse Facilities API (v1)
+    layer: medical
+    facility_counts: true
+    provides: VA health facilities — location, classification (station vs clinic), VISN, health care system, operating status.
+    drives: The facility spine; cards are issued only at stations (VAMC/HCC), which own a catchment.
+    live:
+      mode: reference
+      coverage: All VA health facilities returned by the API (pulled 2026-09-20 from the sandbox host).
+      coverage_level: full
+    auth: API key (developer.va.gov); self-service keys work only against the sandbox host.
+    cadence: Rebuilt by hand with make reference.
+    limits:
+      - No VA market attribution — no usable tabular VISN/market/county source was found.
+      - Operating status is as of the pull, not live.
+    code: src/xevents/providers/va_facilities.py
+    anchor: va-lighthouse-facilities-api
+
+  - id: vetpop
+    name: VA VetPop2023 (Table 9L)
+    layer: medical
+    provides: Living veterans per county, projected 2023–2030 (the profile uses 2026).
+    drives: The size of every catchment, and so every panel estimate.
+    live:
+      mode: reference
+      coverage: All US counties; territories spread evenly over their counties.
+      coverage_level: full
+    auth: None.
+    cadence: Static vintage.
+    limits:
+      - Projections, not counts; "Foreign Countries" (~77k) excluded.
+    code: src/xevents/denominators.py
+    anchor: va-vetpop2023
+
+  - id: places
+    name: CDC PLACES (county, 2025 release)
+    layer: medical
+    provides: County chronic-disease prevalence — COPD, asthma, CHD, diabetes, depression, stroke and others.
+    drives: Panel sizing for Cards 7 and 8.
+    live:
+      mode: reference
+      coverage: All US counties except 187 with suppressed values.
+      coverage_level: full
+    auth: None.
+    cadence: Annual release.
+    limits:
+      - Model-based estimates for the general adult population, not veterans.
+      - No CKD measure (PLACES dropped it).
+    anchor: cdc-places
+
+  - id: empower
+    name: HHS emPOWER electricity-dependent DME
+    layer: medical
+    provides: Medicare beneficiaries relying on electricity-dependent medical equipment, by county.
+    drives: The exposure number beside the veteran panel on outage cards, and outage ranking (outage % × emPOWER).
+    live:
+      mode: reference
+      coverage: All US counties.
+      coverage_level: full
+    auth: None (public layer).
+    cadence: Monthly vintage; refreshed by hand.
+    limits:
+      - A Medicare proxy, not veteran-specific — labelled so everywhere.
+      - Small cells (1–10) are masked to 11, so small counties read high.
+    anchor: hhs-empower-electricity-dependent-dme-reference-layer-denominatorspy
+
+  - id: zip_county
+    name: ZIP → county (Census ZCTA or HUD USPS)
+    layer: medical
+    provides: A fallback ZIP → county assignment for facilities.
+    drives: Facility county attribution when point-in-polygon fails (0 facilities on the current pull).
+    live:
+      mode: reference
+      coverage: 33,791 ZIPs.
+      coverage_level: full
+    auth: None (HUD crosswalk optional with a token).
+    cadence: Static vintage.
+    limits:
+      - ZCTAs only approximate USPS ZIPs; about 30 % span more than one county.
+    code: src/xevents/geography/zip_county.py
+    anchor: zip--county-census-zcta-or-hud-usps
+
+  - id: carbon
+    name: Medication carbon estimates
+    layer: medical
+    provides: Order-of-magnitude life-cycle carbon of each card's therapies, from published LCAs.
+    drives: The carbon panel only.
+    live:
+      mode: display
+      coverage: Therapies on Cards 1–8.
+      coverage_level: full
+    auth: n/a
+    cadence: Edited with the literature.
+    limits:
+      - Display only — never used for triggering, ranking or clinical decisions.
+    anchor: medication-carbon-estimates

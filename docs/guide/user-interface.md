@@ -36,6 +36,7 @@ a station, and its panel is an estimate with its formula attached.
 | Event page | `/dashboard/events/{event_key}` | One event: its counties, fields, metrics and the items it produced |
 | Playback | `/playback` | Scrub a scenario through time on the map |
 | API | `/docs` | The JSON API behind every page (interactive OpenAPI) |
+| Sources | `/sources` | See every data source, what it drives, where it covers live, and its last run |
 
 ## 3. Controls every page shares
 
@@ -63,7 +64,11 @@ a station, and its panel is an estimate with its formula attached.
 fire Card 3; AirNow ozone forecasts for Dallas–Fort Worth and Houston fire Card 8 (purple
 on the map). The banner lists every provider's last run and the outage coverage (GA, OH).*
 
+*(Screenshot predates the 2026-09-22 redesign: the board is now a ranked list, not a table.)*
+
 **How to use it.** Read the **Event board** from the top: it is the order in which to act.
+Each row is one decision: the station, its location and cards on the second line, the
+largest panel on the right, and its top acuity class and severity as tags.
 Click a facility name for its cards. The **Outreach queue** banner counts the highest-acuity
 items nobody has acknowledged yet. The map shows where the events are; click a facility dot
 to open it. The **Active events** table lists what is driving the items.
@@ -98,8 +103,13 @@ and the emPOWER line, and during-event actions; their chip names the cold warnin
 co-occur with. The cold card carries the boost chip (three outage readings "and 11 more")
 and pre-event actions.*
 
-**How to use it.** Toggle **care team** / **patient & caregiver** to switch between the
-clinician checklist and the patient wording. Expand **how was this number computed?** under
+*(Screenshot predates the 2026-09-22 redesign; the block order below is current.)*
+
+The card block on this page is the same partial the playback card focus shows
+(`cards_partial.html`), so the two surfaces cannot drift apart.
+
+**How to use it.** Toggle **care team** / **patient & caregiver** inside a card to switch
+between the clinician checklist and the light patient card that the veteran receives. Expand **how was this number computed?** under
 any number to see its formula, inputs, caveats and sources. Use **Acknowledge**, then **Mark
 completed**, to record progress. **open patient view ↗** shows the patient-facing rendering.
 
@@ -132,17 +142,24 @@ Each block has, top to bottom:
    the HHS emPOWER count, always labelled *measured; Medicare proxy — not veteran-specific*.
    It sits next to the veteran panel and never replaces it. Its popover shows the ranking
    formula.
-7. **Actions**, grouped *Pre-event (3–7 days out)* / *During event* / *Actions*. The text is
-   copied verbatim from the reviewed card.
+7. **Actions**, both phases from the card. The phase that applies at the as-of time (and
+   any phase-agnostic actions) is at full strength with **applies now**; the other phase is
+   dimmed and marked **reference**. The text is copied verbatim from the reviewed card.
 8. **Safety line**, for any card that selects on medication: "Don't stop your medication —
    contact your care team." It is never collapsed.
-9. **Escalation triggers**, **sources**, and the **carbon panel** (display-only estimates of
+9. **Escalate** block, always open, with each response in bold; then **sources**, the
+   **carbon panel** (display-only estimates of
    the card's therapies, with their disclaimer; never used for triggering or ranking).
 10. **Status**: `issued` → `acknowledged` → `completed`. An item replaced by a stronger
     event becomes `superseded` and disappears from the default views. If that stronger
     event goes away, the item comes back with the progress it had.
 
 ## 6. Patient view (`/demo/patient-view`)
+
+A light, print-ready card (black on white, one card per page when printed; **Print** and
+**Copy text** beside it). `&view=pair` sets the care-team block beside each patient card so a
+reviewer sees both renderings of the same item. The headline is the card title: the design
+mock's plain-language headline is not reviewed content, so it is not used.
 
 A read-only rendering of what a patient or caregiver would receive for one card at one
 facility: the verbatim patient sentences, any caregiver note, the safety line, and the
@@ -167,11 +184,15 @@ raw value kept).
 
 ## 8. Playback (`/playback`)
 
-![Winter Storm Uri in playback](images/playback-uri.png)
+![Winter Storm Uri in playback, browse layout](images/playback-uri.png)
 
-*Uri at 2021-02-16 15:00Z. Texas counties are shaded by cold (cyan) and power outage
-(amber, deeper where more customers are out); state borders show the storm stops at the
-Texas line. Card chips sit above the stations. The timeline has one lane per product.*
+*Browse layout, Uri at 2021-02-16 15:00Z (peak hour). Active hazards as pills top-left, the
+legend bottom-right, the rail on the right, and the timeline with its playhead.*
+
+![Card focus layout](images/playback-card-focus.png)
+
+*Card focus: Card 6 (dialysis) is the reading column; the map is a 190px inset scoped to the
+card's counties; the rail lists where it fires (bars ∝ panel) and what triggered it.*
 
 **How to use it.**
 
@@ -182,40 +203,62 @@ Texas line. Card chips sit above the stations. The timeline has one lane per pro
 | ◀ ▶, or **← →** | Pause and step back or forward |
 | **Step** | Step size: 1 h, 3 h (default), 6 h, 12 h, 1 day |
 | Click or drag the timeline | Jump to that moment |
-| Click an event bar or an event in the side panel | Select that event |
-| Click a facility dot or a facility in the side panel | Open that facility |
-| Click a card in the legend or side panel | Isolate that card on the map and open it |
-| **×**, **Escape**, or the breadcrumb | Close one level of selection |
+| Click an event bar or an event in the rail | Select that event (stays in browse) |
+| Click a card in the rail or the legend | Open the card focus layout |
+| Click a facility in the focus rail | Show the card for that facility (nested) |
+| Click a facility dot or a facility in the browse rail | Open the facility in focus |
+| **×**, **Escape**, the breadcrumb, or **expand map ⤢** | Step out one level (expand map returns to browse) |
 
 **How it is meant to work.**
 
-- **One clock.** The map, the side panel and the timeline all describe the moment *t*.
-  A replay starts at its peak hour.
+- **Two layouts on one clock.** The layout is derived from the selection, never a separate
+  mode: nothing selected → **browse** (big map, rail, timeline); a card or facility selected
+  → **focus** (the card in a reading column, the map demoted to an inset fitted to the
+  selection's counties). The swap is instant and the map is resized after it.
+- **Header.** View, transport, the clock (19px, with *UTC · peak hour* at a replay's busiest
+  hour), and step. The banner under it says replay or live; live keeps the per-feed
+  freshness and "absence of items is not an all-clear when a feed is stale".
 - **County shading.** Each county takes the colour of its most severe active event type.
   Opacity deepens with CAP severity; power-outage counties deepen with the percent of
-  customers out instead (10 % faint, 60 % and above solid).
-- **State borders** are drawn above the county fill and below the facility dots, so you can
-  see which states an event covers and where it stops.
-- **Map fit.** The view fits the scenario's counties, preferring the lower 48 when events
-  also reach Alaska, Hawaii or the territories.
+  customers out instead (10 % faint, 60 % and above solid). State borders sit above.
 - **Facilities and card chips.** Circles are sized by panel. Above each station, a fanned
   stack of chips shows the cards firing there, one colour per card, the same colour on every
-  screen.
-- **Timeline.** One lane per product over the scenario window, one bar per event. AirNow
-  readings share a lane per pollutant. More than nine lanes collapse into "+N more".
-- **Side panel**, at *t*: **Cards firing now** (with the facilities count, the largest panel
-  and a short "triggered by" summary), **Events now**, and **Facilities by acuity**.
-- **Selections nest**: card → facility within that card. The breadcrumb shows the path, and
-  each close returns one level. With a card selected, the map answers "where is this card
-  firing?", and the card view shows its reviewed text, role toggle, facilities with panels,
-  and carbon panel. Card text comes from `/cards`, so no clinical wording lives in the
-  JavaScript.
+  screen. Hover names every card.
+- **Timeline.** One lane per product over the scenario window, labels in a fixed 168px
+  column, bars dimmer for weaker severities, and a playhead through every lane at *t*. More
+  than nine lanes collapse into "+N more".
+- **Browse rail**, at *t*: **Cards firing now** (facilities, largest panel, "triggered by"),
+  **Facilities by acuity**, **Events now**. A selected event shows above them.
+- **Card focus.** The reading column is the facility page's card block, fetched from the
+  server for (facility, card, *t*, audience) — for the facility with the largest panel unless
+  you pick one — so no clinical wording lives in the JavaScript. It is refetched only when
+  the items active at *t* change.
+- **Phone (under 900px).** One column: header, banner, a thin timeline strip (one row per
+  hazard colour), the map at 38vh, then the rail. Focus stacks breadcrumb, a 140px inset, the
+  card and the rail. Controls are at least 44px tall.
 
 ![Canadian smoke, July 2026](images/playback-smoke-2026.png)
 
 *The July 2026 smoke replay. Smoke (tan) and AirNow AQI (purple) cover the Midwest and
 Northeast while the heat dome (red) fires the heat cards. Eight timeline lanes; Card 8's
 trigger summary reads "AirNow AQI (PM2.5), HMS smoke (Heavy), HMS smoke (Medium)".*
+
+## 8a. Data sources (`/sources`)
+
+![Data sources page](images/sources.png)
+
+**How to use it.** Read the amber call-outs at the top first: they name every source whose
+live coverage is partial (today **EAGLE-I: Georgia and Ohio only**, and AirNow: only where
+monitors exist) and any feed that failed or went stale. Each card below then says what the
+source provides, which cards it drives, its live coverage, which replays carry it (click a
+chip to open that replay in playback), access, cadence and limits. **details ↗** opens the
+source's section of the data-sources guide.
+
+**How it is meant to work.** The descriptions come from `data/sources.yaml`; everything that
+changes is read at request time: each live feed's last run from the run log (the same one
+the live banner uses), the replay chips from the fixtures, and the VA facility counts
+(facilities, stations, VISNs, states) from the database. The **Not yet connected** list is
+the `backlog` rows of `data/hazard_sources.yaml`, so the backlog lives in one place.
 
 ## 9. Visual language
 
@@ -224,7 +267,7 @@ trigger summary reads "AirNow AQI (PM2.5), HMS smoke (Heavy), HMS smoke (Medium)
 | County colours | Heat red · extreme cold / winter storm cyan · hurricane / flood blue · wildfire smoke tan · air pollution purple · power outage amber · no event dark |
 | County opacity | CAP severity (Minor faint → Extreme strong); outages by percent out |
 | Light outline | State border |
-| Card colours | 1 blue · 2 red · 3 green · 4 amber · 5 purple · 6 pink · 7 cyan · 8 brown |
+| Card colours | 1 blue · 2 red · 3 green · 4 amber · 5 purple · 6 pink · 7 cyan · 8 brown (`--card-N` in `static/app.css`) |
 | White-ringed circle | Facility with a card firing, sized by panel |
 | Grey dot | Facility with nothing firing |
 | Severity tag | CAP severity of the triggering event |
@@ -234,6 +277,9 @@ trigger summary reads "AirNow AQI (PM2.5), HMS smoke (Heavy), HMS smoke (Medium)
 
 Every tag carries text as well as colour. The card chips on the playback map are colour-only;
 the legend and the hover text name them.
+
+Tokens, type (self-hosted IBM Plex Sans and Mono) and every shared component live in one
+stylesheet, `src/xevents/web/static/app.css`.
 
 ## 10. Live and replay
 

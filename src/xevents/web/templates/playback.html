@@ -1,119 +1,61 @@
-<!doctype html>
+{% from "macros.html" import pair_script %}<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Playback · med-extreme-events</title>
 <link rel="stylesheet" href="/static/vendor/leaflet.css?v={{ asset_v }}">
+<link rel="stylesheet" href="/static/app.css?v={{ asset_v }}">
 <script src="/static/vendor/leaflet.js?v={{ asset_v }}"></script>
+<script src="/static/vendor/htmx.min.js?v={{ asset_v }}"></script>
 <script src="/static/map.js?v={{ asset_v }}"></script>
-<style>
-  :root { --bg:#0f1419; --panel:#161d26; --ink:#e6edf3; --muted:#8b98a5; --line:#2a3440; --accent:#4c8dff;
-          --heat:#e4572e; --flood:#3d7fdc; --smoke:#8c6d3f; --air:#a05cd6; --outage:#d9a41a; --idle:#5b6673; }
-  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui, sans-serif; overflow:hidden; }
-  a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
-  #app { display:grid; grid-template-rows:auto 1fr auto; grid-template-columns:1fr 400px; height:100vh; }
-  header { grid-column:1/3; display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:8px 14px; border-bottom:1px solid var(--line); background:var(--panel); }
-  header h1 { font-size:15px; margin:0 8px 0 0; font-weight:600; }
-  select, button, input { background:#0f1419; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:5px 9px; font:inherit; }
-  button { cursor:pointer; } button:hover { border-color:#4c5d70; }
-  button.primary { border-color:var(--accent); color:var(--accent); min-width:104px; }
-  #map { grid-row:2; grid-column:1; }
-  .leaflet-container { background:#0b1015; }
-  .leaflet-tooltip { background:#161d26; border:1px solid var(--line); color:var(--ink); }
-  aside { grid-row:2; grid-column:2; overflow:auto; border-left:1px solid var(--line); background:var(--panel); padding:12px 14px; }
-  footer { grid-column:1/3; border-top:1px solid var(--line); background:var(--panel); padding:4px 14px 8px; }
-  .muted { color:var(--muted); }
-  .legend span.sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 4px 0 10px; vertical-align:-1px; }
-  .row { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); cursor:pointer; }
-  .row:hover { background:#1c2531; } .row.on { background:#1c2531; outline:1px solid #37506f; }
-  .row .loc { display:block; font-size:11px; color:var(--muted); }
-  .swatch { display:inline-block; width:9px; height:12px; border-radius:2px; margin-right:5px; vertical-align:-1px;
-            border:1px solid rgba(0,0,0,.6); }
-  .clear { font-size:11px; margin-left:8px; font-weight:normal; text-transform:none; letter-spacing:0; }
-  /* Card badge: a small fanned stack of chips above the facility dot, so a card reads as a
-     card and is never confused with the circular facility marker or the weather shading. */
-  .card-badge { background:none; border:none; }
-  .card-badge .cards { display:flex; align-items:flex-end; justify-content:center; line-height:0; }
-  .card-badge .cards i { display:block; width:8px; height:12px; border-radius:2px; margin-right:-1px;
-    border:1px solid rgba(0,0,0,.7); box-shadow:0 1px 2px rgba(0,0,0,.55); transform-origin:50% 100%; }
-  .card-badge .cards.one i { width:11px; height:15px; border-color:#fff; }
-  .card-badge .cards b { color:#e6edf3; font-size:9px; margin-left:2px; text-shadow:0 1px 2px #000; }
-  #map-legend { position:absolute; right:10px; bottom:10px; z-index:500; background:rgba(22,29,38,.94);
-    border:1px solid var(--line); border-radius:8px; padding:7px 9px; font-size:11px; max-width:270px; }
-  #map-legend div { display:flex; align-items:center; gap:6px; margin:2px 0; cursor:pointer; }
-  #map-legend i { width:9px; height:12px; border-radius:2px; border:1px solid rgba(0,0,0,.6); flex:none; }
-  #map-legend .hdr { color:var(--muted); cursor:default; margin:6px 0 3px; text-transform:uppercase; letter-spacing:.04em; font-size:10px; }
-  #map-legend .hdr:first-child { margin-top:0; }
-  #map-legend .note { color:var(--muted); font-style:italic; margin-top:3px; display:block; }
-  #map-legend span:last-child { margin-left:auto; }
-  #map-legend i.card-chip { height:13px; border-color:rgba(0,0,0,.7); }
-  table.carbon { width:100%; border-collapse:collapse; font-size:11px; margin-top:4px; }
-  table.carbon th { text-align:left; color:var(--muted); font-weight:500; padding:3px 5px; border-bottom:1px solid var(--line); }
-  table.carbon td { padding:4px 5px; border-bottom:1px solid var(--line); vertical-align:top; }
-  table.carbon td:last-child { white-space:nowrap; }
-  .tag { font-size:11px; padding:1px 6px; border-radius:10px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; }
-  .tag.sev-4 { border-color:#c0392b; color:#ff8a80; } .tag.sev-3 { border-color:#b9770e; color:#ffcf6b; }
-  h2 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:16px 0 6px; }
-  h2:first-child { margin-top:0; }
-  .card { border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin:8px 0; }
-  .card h3 { margin:0 0 4px; font-size:14px; }
-  .card ul { margin:4px 0 0 18px; padding:0; } .card li { margin:2px 0; }
-  .prov { font-size:12px; color:var(--muted); }
-  .roles { display:inline-flex; gap:4px; margin:6px 0; }
-  .roles button { padding:3px 8px; color:var(--muted); } .roles button.on { color:var(--ink); border-color:#4c5d70; }
-  /* Detail panel chrome: a breadcrumb back to the level above, plus an explicit close.
-     Sticky so the way out stays on screen while the panel scrolls. */
-  .crumbs { display:flex; align-items:center; gap:5px; flex-wrap:wrap; position:sticky; top:-12px;
-    background:var(--panel); padding:8px 0 6px; margin:-12px 0 4px; border-bottom:1px solid var(--line); z-index:2; }
-  .crumbs .crumb { font-size:12px; color:var(--accent); }
-  .crumbs .crumb.on { color:var(--ink); font-weight:600; }
-  .crumbs .sep { color:var(--muted); font-size:12px; }
-  .crumbs .closebtn { margin-left:auto; background:#0f1419; border:1px solid var(--line); color:var(--muted);
-    border-radius:6px; width:24px; height:24px; line-height:1; font-size:15px; cursor:pointer; padding:0; flex:none; }
-  .crumbs .closebtn:hover { color:var(--ink); border-color:#4c5d70; }
-  details summary { cursor:pointer; color:var(--muted); font-size:12px; }
-  .warn { background:#3a2a12; border:1px solid #6b4d1c; border-radius:6px; padding:6px 8px; font-size:12px; margin-top:8px; }
-  #timeline { width:100%; display:block; user-select:none; cursor:crosshair; }
-  #timeline text { font:10px system-ui, sans-serif; fill:#8b98a5; }
-  #timeline .lane-label { font-size:10px; }
-  #timeline rect.bar { cursor:pointer; }
-  #timeline rect.bar:hover { stroke:#fff; stroke-width:1; }
-  .clock { font-variant-numeric:tabular-nums; font-size:15px; font-weight:600; }
-</style>
 </head>
-<body>
+<body class="playback">
 <div id="app">
-  <header>
-    <h1>playback</h1>
-    <label>View <select id="scenario"></select></label>
-    <button id="play" class="primary">▶ Play</button>
-    <button id="step-back" title="back one step (←)">◀</button>
-    <button id="step-fwd" title="forward one step (→)">▶</button>
-    <label>Step <select id="speed">
+  <header class="appbar">
+    <a class="brand" href="/">med-extreme-events</a>
+    <label class="grp"><span class="lbl">View</span> <select id="scenario"></select></label>
+    <div class="grp transport">
+      <button id="step-back" class="icon-btn" title="back one step (←)" aria-label="back one step">◀</button>
+      <button id="play" class="primary" title="play / pause (Space)">▶ Play</button>
+      <button id="step-fwd" class="icon-btn" title="forward one step (→)" aria-label="forward one step">▶</button>
+    </div>
+    <div class="clock-grp"><span class="clock" id="clock">—</span><span class="lbl" id="clock-note">UTC</span></div>
+    <label class="grp"><span class="lbl">Step</span> <select id="speed">
       <option value="1">1 h</option><option value="3" selected>3 h</option>
       <option value="6">6 h</option><option value="12">12 h</option><option value="24">1 day</option>
     </select></label>
-    <span class="clock" id="clock">—</span>
-    <span class="legend muted"><span class="sw" style="background:var(--idle)"></span>grey dot = facility with no card firing</span>
-    <span style="margin-left:auto">
-      <a id="nav-dashboard" href="/">Dashboard</a> ·
-      <a id="nav-events" href="/dashboard/events">Events</a> ·
-      <span class="muted">Playback</span>
-      <span id="status" class="muted" style="margin-left:10px"></span>
-    </span>
+    <nav>
+      <a id="nav-dashboard" href="/">Dashboard</a>
+      <a id="nav-events" href="/dashboard/events">Events</a>
+      <span class="on">Playback</span>
+      <a href="/docs">API</a>
+      <a href="/sources">Sources</a>
+    </nav>
   </header>
-  <div id="map" style="position:relative"><div id="map-legend" hidden></div></div>
-  <aside id="side"><div class="muted">Loading…</div></aside>
-  <footer>
-    <div class="muted" style="display:flex; justify-content:space-between; font-size:12px; padding:2px 0">
-      <span id="t-start">—</span>
-      <span>Timeline — each bar is an event's active window (UTC). Click to jump; click a bar to inspect that event.</span>
-      <span id="t-end">—</span>
+  <div class="banner" id="banner">
+    <span class="pill" id="mode-pill">Replay</span>
+    <span id="banner-text"></span>
+    <span id="status" class="aside mono faint" style="font-size:11px"></span>
+  </div>
+  <div id="pb-body" class="browse">
+    <nav id="crumbs" class="crumbs" aria-label="selection"></nav>
+    <div id="reading" aria-live="polite"></div>
+    <div id="map-wrap">
+      <div id="map"></div>
+      <div id="hazards" class="map-pills" aria-label="active hazards"></div>
+      <div id="map-legend" hidden></div>
+      <div id="inset-label"></div>
+      <button id="expand-map" type="button" title="Back to the full map (Esc)">expand map ⤢</button>
     </div>
-    <svg id="timeline" height="150" role="img" aria-label="event timeline"></svg>
+    <aside id="side"><div class="empty">Loading…</div></aside>
+  </div>
+  <footer class="timeline">
+    <div class="tl-bounds"><span class="b" id="t-start">—</span><span class="mid">one lane per product · bar = active window · click to jump</span><span class="b" id="t-end">—</span></div>
+    <div id="timeline" role="group" aria-label="event timeline"></div>
   </footer>
 </div>
 <script src="/static/playback.js?v={{ asset_v }}"></script>
+{{ pair_script() }}
 </body>
 </html>

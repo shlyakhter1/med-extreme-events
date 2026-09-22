@@ -8,36 +8,30 @@
 {% block content %}
 <div class="grid">
   <section>
-    <h2 style="margin:0 0 6px">Event board <span class="muted" style="font-weight:normal">— {{ board|length }} facilities · {{ item_count }} open action items · {{ event_count }} active events</span></h2>
-    <div class="muted" style="margin-bottom:8px">{% for name, n in event_counts %}{{ name }} ×{{ n }}{{ ' · ' if not loop.last }}{% else %}No active events at this moment.{% endfor %}</div>
-    {% if open_queue %}<div class="banner stale">Outreach queue: <b>{{ open_queue }}</b> high-acuity (dialysis / clozapine) items not yet acknowledged.</div>{% endif %}
-    <table>
-      <thead><tr><th>#</th><th>Facility</th><th>Top acuity</th><th>Cards</th><th>Max panel</th><th>Severity</th></tr></thead>
-      <tbody>
-      {% for row in board %}
-        <tr>
-          <td class="muted">{{ loop.index }}</td>
-          <td><a href="/dashboard/facilities/{{ row.facility.id }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">{{ row.facility.name if row.facility else '?' }}</a> <span class="muted">{{ row.facility.city ~ ', ' if row.facility and row.facility.city }}{{ row.facility.state if row.facility else '' }} · VISN {{ row.facility.visn if row.facility else '?' }}</span></td>
-          <td><span class="tag">rank {{ row.acuity_rank }}</span></td>
-          <td>{{ row.cards|length }}: {{ row.cards.values()|join(' · ') }}</td>
-          <td title="largest affected panel across fired cards">≈ {{ '{:,.0f}'.format(row.panel) }}</td>
-          <td><span class="tag sev-{{ row.severity }}">{{ ['—','Minor','Moderate','Severe','Extreme'][row.severity] }}</span></td>
-        </tr>
-      {% else %}
-        <tr><td colspan="6" class="muted">No action items active at {{ as_of_iso }}.
-          {% if mode == 'live' %}Ingest current feeds with <code>EVENT_MODE=live make ingest match</code>, or switch to a replay scenario above.{% endif %}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <h2 class="page-h">Event board <span class="muted">— {{ board|length }} facilities · {{ item_count }} open action items · {{ event_count }} active events</span></h2>
+    <div class="muted" style="margin-bottom:10px; font-size:12.5px">{% for name, n in event_counts %}{{ name }} ×{{ n }}{{ ' · ' if not loop.last }}{% else %}No active events at this moment.{% endfor %}</div>
+    {% if open_queue %}<div class="notice">Outreach queue: <b>{{ open_queue }}</b> high-acuity (dialysis / clozapine) items not yet acknowledged.</div>{% endif %}
+    <div class="rank-list" style="border-radius:9px; overflow:hidden; border:1px solid var(--line)">
+    {% for row in board %}
+      <a class="rank-row" href="/dashboard/facilities/{{ row.facility.id if row.facility else '' }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">
+        <span class="r1"><span class="faint mono num" style="font-size:11px; width:22px; flex:none">{{ loop.index }}</span><span class="name">{{ row.facility.name if row.facility else '?' }}</span><span class="fig" title="largest affected panel across fired cards">≈ {{ '{:,.0f}'.format(row.panel) }}</span></span>
+        <span class="r2" style="padding-left:30px"><span class="clamp" title="{{ row.cards.values()|join(' · ') }}">{{ row.facility.city ~ ', ' if row.facility and row.facility.city }}{{ row.facility.state if row.facility else '' }} · VISN {{ row.facility.visn if row.facility else '?' }} · {{ row.cards|length }} card{{ 's' if row.cards|length != 1 }}: {{ row.cards.values()|join(' · ') }}</span>
+          <span class="right chips" style="gap:5px"><span class="tag" title="acuity rank {{ row.acuity_rank }}">{{ row.acuity_class }}</span><span class="tag sev-{{ row.severity }}">{{ ['—','Minor','Moderate','Severe','Extreme'][row.severity] }}</span></span></span>
+      </a>
+    {% else %}
+      <div class="rank-row muted">No action items active at {{ as_of_iso }}.
+        {% if mode == 'live' %}Ingest current feeds with <code>EVENT_MODE=live make ingest match</code>, or switch to a replay scenario above.{% endif %}</div>
+    {% endfor %}
+    </div>
   </section>
   <section>
-    <h2 style="margin:0 0 6px">Facilities <span class="muted" style="font-weight:normal">— colored by active event, sized by affected panel</span></h2>
+    <h2 class="page-h">Facilities <span class="muted">— colored by active event, sized by affected panel</span></h2>
     <div style="position:relative"><div id="map"></div><div id="map-legend" hidden></div></div>
     <div class="muted" style="margin-top:6px">Counties under an active event are shaded. Click a facility for its fired cards; every number links to its formula and sources.</div>
   </section>
 </div>
 
-<h2 style="margin:22px 0 6px">Active events <span class="muted" style="font-weight:normal">— {{ events_total }} at {{ as_of_iso }} (UTC)</span>
+<h2 class="page-h" style="margin-top:26px">Active events <span class="muted">— {{ events_total }} at {{ as_of_iso }} (UTC)</span>
   <a style="font-size:13px; font-weight:normal" href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">explore all events →</a>
   <a style="font-size:13px; font-weight:normal" href="/playback?scenario={{ scenario or 'live' }}">play through time →</a></h2>
 <table>
@@ -87,7 +81,7 @@
   legend.innerHTML =
     XMap.legendHtml(Object.fromEntries(Object.entries(counties).map(([k, v]) => [k, v.size]))) +
     `<div class="hdr">Facilities</div>
-     <div><i class="dot" style="background:#fff"></i><span>card firing</span><span class="muted">size ∝ panel</span></div>
+     <div><i class="dot" style="background:#fff"></i><span>card firing</span><span>size ∝ panel</span></div>
      <div><i class="dot" style="background:#5b6673"></i><span class="muted">no card firing</span><span></span></div>`;
   const byFacility = new Map();
   for (const i of items.items) { const a = byFacility.get(i.facility_id) || []; a.push(i); byFacility.set(i.facility_id, a); }

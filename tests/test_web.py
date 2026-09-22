@@ -230,17 +230,24 @@ def test_playback_shows_card_content_and_map_symbols(client: TestClient) -> None
     """Selecting a card must show the card itself, and cards need their own map symbol —
     a fanned chip stack — so they are not confused with the circular facility markers."""
     js = client.get("/static/playback.js").text
-    for piece in ("renderCardDetail", "loadCardSample", "drawBadges", "badgeHtml", "renderLegend"):
+    for piece in ("renderCardDetail", "loadCardBlock", "drawBadges", "badgeHtml", "renderLegend"):
         assert piece in js, piece
-    assert "facilities firing this card" in js, "card detail lists where it is firing"
-    assert "escalation triggers" in js and "sources (" in js, "card detail carries provenance"
-    assert 'data-role="' in js, "card detail has the care team / patient / caregiver toggle"
-    assert "/cards" in js, "card text comes from the card library, not from strings in JS"
+    assert "Firing at" in js and "Triggered by" in js, "card focus lists where and why it fires"
+    assert "[data-role]" in js, "the audience toggle in the card block switches role"
+    assert "/cards" in js, "card definitions come from the card library"
+    # The card block is the server partial, not a string builder in JS: no action text,
+    # escalation or carbon rows are assembled here.
+    assert "/dashboard/facilities/${encodeURIComponent(fid)}/cards?" in js
+    assert 'embed: "1"' in js
+    for builder in ("actions.care_team", "actions.patient", "def.escalation", "kg_co2e_per"):
+        assert builder not in js, builder
 
     page = client.get("/playback").text
     assert 'id="map-legend"' in page, "the map needs a legend"
+    assert "/static/app.css" in page and "<style>" not in page, "one shared stylesheet"
+    css = client.get("/static/app.css").text
     for rule in (".card-badge .cards i", ".card-badge .cards.one i", "#map-legend"):
-        assert rule in page, rule
+        assert rule in css, rule
 
 
 def test_playback_script_defines_everything_it_calls(client: TestClient) -> None:
@@ -264,13 +271,13 @@ def test_playback_script_defines_everything_it_calls(client: TestClient) -> None
         "function selectCard",
         "function selectEvent",
         "function selectFacility",
-        "function loadCardSample",
+        "function loadCardBlock",
+        "function renderBrowse",
+        "function renderCardFocus",
+        "function applyLayout",
         "function renderCardDetail",
         "function renderEventDetail",
         "function renderFacilityDetail",
-        "function roleToggle",
-        "function roleContent",
-        "function carbonBlock",
         "function cardsAt",
         "function badgeHtml",
     ]
@@ -281,7 +288,7 @@ def test_playback_script_defines_everything_it_calls(client: TestClient) -> None
 
     defined = set(re.findall(r"function (\w+)\(", js))
     for call in re.findall(r"(?<![.\w])(select\w+|render\w+|draw\w+|load\w+|focus\w+)\(", js):
-        assert call in defined or call.startswith(("loadScenario", "loadCardSample")), call
+        assert call in defined or call.startswith("loadScenario"), call
 
 
 def test_playback_detail_can_be_closed(client: TestClient) -> None:
@@ -306,6 +313,10 @@ def test_playback_detail_can_be_closed(client: TestClient) -> None:
     assert close_fn.index("selectedFacility") < close_fn.index("selectedCard")
     # nothing selected leaves an empty panel rather than a stale one
     assert 'else $("detail").innerHTML = "";' in js
+    # the layout is derived from the selection, and every way out leads back to browse
+    assert 'state.selectedCard || state.selectedFacility ? "focus" : "browse"' in js
+    assert '$("expand-map").addEventListener("click", () => clearSelection())' in js
+    assert "invalidateSize" in js, "Leaflet must be told when its container changes size"
 
 
 def test_playback_switching_views_does_not_leak_paint(client: TestClient) -> None:
@@ -318,9 +329,9 @@ def test_playback_switching_views_does_not_leak_paint(client: TestClient) -> Non
     assert "lastCountyPaint = new Map()" not in load
     assert "lastFacilityPaint = new Map()" not in load
 
-    page = client.get("/playback").text
+    css = client.get("/static/app.css").text
     for rule in (".crumbs", ".crumbs .closebtn", ".crumbs .crumb.on"):
-        assert rule in page, rule
+        assert rule in css, rule
 
 
 def test_map_legend_explains_the_colours(client: TestClient) -> None:
@@ -382,17 +393,49 @@ def test_carbon_panel_on_the_facility_page(client: TestClient) -> None:
     assert "ui_disclaimer" in doc
 
 
-def test_playback_carbon_and_two_audiences(client: TestClient) -> None:
+def test_playback_card_block_carbon_and_two_audiences(client: TestClient) -> None:
+    """The playback card focus fetches the same partial as the facility page, filtered to one
+    card; it carries the carbon table and both audiences, and the phase that applies now."""
+    base = {"scenario": "heat_dome_2021", "at": AT, "card": "heat-lithium", "embed": "1"}
+    html = client.get("/dashboard/facilities/vha_648/cards", params=base).text
+    assert "Extreme Heat × Bipolar Disorder on Lithium" in html
+    assert "must not be added together" in html and "never for clinical decisions" in html
+    assert "patient &amp; caregiver" in html, "patient and caregiver are one audience"
+    assert 'data-role="patient"' in html and "hx-get" not in html.split("cb-foot")[0], (
+        "embedded, the audience toggle is driven by playback.js, not htmx"
+    )
+    assert "applies now" in html and "Escalate" in html, "escalation is never collapsed"
+    patient = client.get(
+        "/dashboard/facilities/vha_648/cards", params={**base, "role": "patient"}
+    ).text
+    assert "patient-card" in patient and "Heat can push your lithium" in patient
+    assert "Generate the lithium roster" not in patient
     js = client.get("/static/playback.js").text
-    assert "carbonBlock" in js and "ui_disclaimer" in js
-    assert "must not be added together" in js
-    assert 'label: "patient & caregiver"' in js, "patient and caregiver are one audience"
-    assert '"/carbon"' in js
     # the detail panel must sit above the long lists or a selection is never seen
     detail = js.index('`<div id="detail"></div>`')
     cards_heading = js.index("Cards firing now")
     facilities_heading = js.index("Facilities by acuity")
     assert detail < cards_heading < facilities_heading
+
+
+def test_card_colours_match_the_stylesheet(client: TestClient) -> None:
+    """Map chips (playback.js) and server-rendered chips (app.css) must agree per card."""
+    js = client.get("/static/playback.js").text
+    css = client.get("/static/app.css").text
+    palette = js.split("const CARD_COLORS = [")[1].split("]")[0].replace('"', "").split(",")
+    for n, colour in enumerate(palette, start=1):
+        assert f"--card-{n}:{colour.strip()}" in css, n
+
+
+def test_patient_view_pair_and_print(client: TestClient) -> None:
+    params = {"facility": "vha_648", "scenario": "heat_dome_2021", "at": AT}
+    card = client.get("/demo/patient-view", params=params).text
+    assert "patient-card" in card and "data-print-card" in card
+    pair = client.get("/demo/patient-view", params={**params, "view": "pair"}).text
+    assert "Generate the lithium roster" in pair, "care-team block beside the patient card"
+    assert "Heat can push your lithium" in pair
+    css = client.get("/static/app.css").text
+    assert "@media print" in css and "body.print-one" in css
 
 
 def test_feeds_and_scenario_peak(client: TestClient) -> None:
@@ -509,3 +552,43 @@ def test_live_banner_shows_provider_runs_and_outage_coverage(tmp_path: Path) -> 
     assert event_group("AQI forecast Unhealthy for Sensitive Groups (OZONE)") == (
         "AirNow AQI forecast (OZONE)"
     )
+
+
+def test_sources_page_lists_every_source_and_live_limits(tmp_path: Path) -> None:
+    """The Sources tab shows every registered source, states partial live coverage plainly
+    (EAGLE-I: Georgia and Ohio only), joins each live feed's last run, and lists the replays
+    that carry a source from the fixtures rather than from hand-written text."""
+    from xevents.sources import load_backlog, load_registry
+    from xevents.store import record_feed_run
+
+    eng = make_engine(f"sqlite:///{tmp_path / 'src.db'}")
+    init_db(eng)
+    record_feed_run(eng, "hms", "hms", "ok", 6)
+    record_feed_run(eng, "eagle_i", "eagle_i", "ok", 0, "coverage GA, OH (public state mirrors)")
+    record_feed_run(eng, "airnow (files)", "airnow", "failed", 0, "HTTP 502")
+    c = TestClient(create_app(eng))
+    r = c.get("/sources")
+    assert r.status_code == 200
+    html = r.text
+    registry = load_registry()
+    for s in registry.sources:
+        assert f'id="{s.id}"' in html, s.id
+    assert {"va_facilities", "eagle_i", "nws", "airnow"} <= {s.id for s in registry.sources}
+    assert "Georgia and Ohio only" in html, "the live EAGLE-I limit is stated"
+    assert "live coverage is partial" in html
+    assert "6 live events" in html and "last run failed" in html and "HTTP 502" in html
+    assert "not an all-clear" in html, "a failed feed carries the all-clear caveat"
+    assert "Electric customer outage data provided by EAGLE-I, Department of Energy." in html
+    assert "Medicare proxy" in html, "emPOWER is labelled a proxy"
+    assert "/playback?scenario=uri_2021" in html, "replays carrying EAGLE-I are computed"
+    assert "facilities" in html and "stations" in html
+    backlog = load_backlog()
+    assert backlog and all(b.id in html for b in backlog), "backlog comes from hazard_sources"
+    assert 'href="/sources' in c.get("/").text, "the tab is in the shared header"
+    assert 'href="/sources"' in c.get("/playback").text
+    # every live provider name in the registry is one that ingest actually records
+    ingest = (Path(__file__).resolve().parents[1] / "scripts" / "ingest.py").read_text()
+    for s in registry.sources:
+        for name in s.live.runs:
+            stem = name.split(" (")[0]
+            assert f'"{stem}' in ingest or f"'{stem}" in ingest, name

@@ -4,95 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}med-extreme-events{% endblock %}</title>
+<link rel="stylesheet" href="/static/app.css?v={{ asset_v }}">
 <script src="/static/vendor/htmx.min.js?v={{ asset_v }}"></script>
 {% block head %}{% endblock %}
-<style>
-  :root { --bg:#0f1419; --panel:#161d26; --ink:#e6edf3; --muted:#8b98a5; --line:#2a3440; --accent:#4c8dff;
-          --heat:#e4572e; --flood:#3d7fdc; --smoke:#8c6d3f; --air:#a05cd6; --outage:#d9a41a; --idle:#5b6673; }
-  html,body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui, sans-serif; }
-  a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
-  header { display:flex; gap:14px; align-items:center; flex-wrap:wrap; padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel); }
-  header h1 { font-size:15px; margin:0 8px 0 0; font-weight:600; }
-  header form { display:flex; gap:8px; align-items:center; }
-  select, input, button { background:#0f1419; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:5px 8px; font:inherit; }
-  button { cursor:pointer; } button.primary { border-color:var(--accent); color:var(--accent); }
-  nav a { margin-left:12px; }
-  main { padding:16px; max-width:1400px; margin:0 auto; }
-  .muted { color:var(--muted); }
-  .banner { padding:8px 12px; border-radius:6px; margin:0 0 12px; font-size:13px; }
-  .tag.temporality.forecast { border-color:#3d7fdc; color:#9cc0ff; }
-  .tag.temporality.imminent { border-color:#d9a41a; color:#f0cf6a; }
-  .tag.temporality.observed { border-color:#e4572e; color:#ff9c82; }
-  .tag.compounding { border-color:#d9a41a; background:#3a2a12; color:#f0cf6a; }
-  .banner.ok { background:#12301f; border:1px solid #1f5a38; } .banner.stale { background:#3a2a12; border:1px solid #6b4d1c; }
-  .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; } @media (max-width:1000px) { .grid { grid-template-columns:1fr; } }
-  table { width:100%; border-collapse:collapse; } th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
-  th { color:var(--muted); font-weight:500; font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
-  .tag { font-size:11px; padding:1px 6px; border-radius:10px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; }
-  .tag.sev-4 { border-color:#c0392b; color:#ff8a80; } .tag.sev-3 { border-color:#b9770e; color:#ffcf6b; }
-  .card { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:10px 0; background:var(--panel); }
-  .card h3 { margin:0 0 4px; font-size:15px; }
-  .prov { font-size:12px; color:var(--muted); }
-  details summary { cursor:pointer; color:var(--muted); font-size:12px; }
-  .warn { background:#3a2a12; border:1px solid #6b4d1c; border-radius:6px; padding:6px 8px; font-size:13px; margin-top:8px; }
-  .roles a, .roles span { margin-right:8px; padding:3px 8px; border:1px solid var(--line); border-radius:6px; } .roles .on { border-color:#4c5d70; color:var(--ink); }
-  ul.actions { margin:6px 0 0 18px; padding:0; } ul.actions li { margin:3px 0; }
-  .status { font-size:11px; padding:1px 6px; border-radius:10px; border:1px solid var(--line); }
-  .status.issued { color:#ffcf6b; border-color:#7a5b12; } .status.acknowledged, .status.completed, .status.delivered { color:#7bd88f; border-color:#2f6b3d; }
-  #map { height:460px; border:1px solid var(--line); border-radius:8px; background:#0b1015; }
-  #map-legend { position:absolute; right:10px; bottom:10px; z-index:500; background:rgba(22,29,38,.94);
-    border:1px solid var(--line); border-radius:8px; padding:7px 9px; font-size:11px; max-width:250px; }
-  #map-legend div { display:flex; align-items:center; gap:6px; margin:2px 0; }
-  #map-legend i { width:9px; height:12px; border-radius:2px; border:1px solid rgba(0,0,0,.6); flex:none; }
-  #map-legend i.dot { width:9px; height:9px; border-radius:50%; }
-  #map-legend .hdr { color:var(--muted); margin:6px 0 3px; text-transform:uppercase; letter-spacing:.04em; font-size:10px; }
-  #map-legend .hdr:first-child { margin-top:0; }
-  #map-legend .note { color:var(--muted); font-style:italic; margin-top:3px; }
-  #map-legend span:last-child { margin-left:auto; }
-  .leaflet-container { background:#0b1015; }
-  .leaflet-tooltip { background:#161d26; border:1px solid var(--line); color:var(--ink); }
-  .leaflet-tooltip::before { border-top-color:var(--line); }
-  .patient { max-width:720px; font-size:16px; line-height:1.55; }
-  table.carbon { width:100%; border-collapse:collapse; font-size:12px; margin-top:4px; }
-  table.carbon th { text-align:left; color:var(--muted); font-weight:500; padding:3px 6px; border-bottom:1px solid var(--line); }
-  table.carbon td { padding:5px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
-  table.carbon td:last-child { white-space:nowrap; }
-  .patient p.big { font-size:18px; }
-</style>
 </head>
-<body>
-<header>
-  <h1><a href="/">med-extreme-events</a></h1>
-  <form method="get" action="{{ request.url.path }}">
-    <label>Scenario
+<body class="{% block body_class %}{% endblock %}">
+{% set path = request.url.path %}
+<header class="appbar">
+  <a class="brand" href="/">med-extreme-events</a>
+  <form method="get" action="{{ path }}">
+    <label class="grp"><span class="lbl">View</span>
       <select name="scenario" onchange="this.form.submit()">
         <option value="live" {% if not scenario %}selected{% endif %}>live (now)</option>
         {% for s in scenarios %}<option value="{{ s.id }}" {% if scenario == s.id %}selected{% endif %}>{{ s.id }} — replay</option>{% endfor %}
       </select>
     </label>
-    <label>As of <input type="datetime-local" name="at" value="{{ as_of_input }}" step="3600"></label>
+    <label class="grp"><span class="lbl">As of</span> <input type="datetime-local" name="at" value="{{ as_of_input }}" step="3600"></label>
     <button type="submit">Go</button>
     {% for k, v in request.query_params.items() if k not in ('scenario', 'at') %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
   </form>
-  <nav style="margin-left:auto">
-    <a href="/?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">Dashboard</a>
-    <a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">Events</a>
-    <a href="/playback">Playback</a>
+  <nav>
+    {% set q = 'scenario=' ~ (scenario or 'live') ~ '&at=' ~ as_of_input %}
+    {% if path == '/' or path.startswith('/dashboard/facilities') or path.startswith('/demo') %}<span class="on">Dashboard</span>{% else %}<a href="/?{{ q }}">Dashboard</a>{% endif %}
+    {% if path.startswith('/dashboard/events') %}<span class="on">Events</span>{% else %}<a href="/dashboard/events?{{ q }}">Events</a>{% endif %}
+    <a href="/playback?scenario={{ scenario or 'live' }}">Playback</a>
     <a href="/docs">API</a>
+    {% if path.startswith('/sources') %}<span class="on">Sources</span>{% else %}<a href="/sources?{{ q }}">Sources</a>{% endif %}
   </nav>
 </header>
-<main>
 {% if mode == 'live' %}
-  <div class="banner {{ 'stale' if any_stale else 'ok' }}">
-    <b>Live mode</b> · as of {{ as_of_iso }} (all times UTC) ·
+  <div class="banner{{ ' stale' if any_stale }}">
+    <span class="pill{{ ' stale' if any_stale }}">Live</span>
+    <span><b>Live mode</b> · as of <span class="mono">{{ as_of_iso }}</span> (all times UTC) ·
     {% if runs %}{% for r in runs %}<span title="{{ r.detail or '' }}">{{ r.provider }}: {% if r.status == 'ok' %}{{ r.events }} events{% elif r.status == 'failed' %}<b>failed</b>{% else %}off{% endif %} ({{ r.run_hhmm }}){% if r.stale %} <b>(stale)</b>{% endif %}</span>{{ ' · ' if not loop.last }}{% endfor %}
-      {% set eg = runs|selectattr('provider', 'equalto', 'eagle_i')|list %}{% if eg and eg[0].status == 'ok' %}<div style="font-size:12px;margin-top:3px">Power outages (EAGLE-I): {{ eg[0].detail }}.</div>{% endif %}
     {% elif feeds %}{% for f in feeds %}{{ f.source }}: {{ f.events }} events, last ingest {{ f.last_ingested_at or 'never' }}{% if f.stale %} <b>(stale)</b>{% endif %}{{ ' · ' if not loop.last }}{% endfor %}{% else %}no live events ingested yet — run <code>EVENT_MODE=live make ingest match</code>{% endif %}
-    · absence of items is not an all-clear when a feed is stale.
+    · absence of items is not an all-clear when a feed is stale.</span>
+    {% set eg = runs|selectattr('provider', 'equalto', 'eagle_i')|list %}{% if eg and eg[0].status == 'ok' %}<span style="flex-basis:100%">Power outages (EAGLE-I): {{ eg[0].detail }}.</span>{% endif %}
   </div>
 {% else %}
-  <div class="banner ok"><b>Replay</b> · {{ scenario }} · as of {{ as_of_iso }} (all times UTC) (default is the scenario's peak hour; change it above or use <a href="/playback">Playback</a>)</div>
+  <div class="banner"><span class="pill">Replay</span><span><span class="hi">{{ scenario }}</span> · as of <span class="mono">{{ as_of_iso }}</span> (all times UTC) · default is the scenario's peak hour; change it above or use <a href="/playback?scenario={{ scenario }}">Playback</a></span></div>
 {% endif %}
+<main>
 {% block content %}{% endblock %}
 </main>
 </body>

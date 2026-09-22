@@ -15,6 +15,8 @@ COPY cards/ ./cards/
 COPY profiles/ ./profiles/
 COPY scripts/ ./scripts/
 COPY fixtures/ ./fixtures/
+# source registry read by the /sources page
+COPY data/ ./data/
 # The carbon table is display data read at runtime (docs/carbon-footprint.md has the methods).
 COPY docs/carbon.yaml ./docs/carbon.yaml
 
