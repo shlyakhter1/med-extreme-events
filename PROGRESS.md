@@ -2,6 +2,54 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-22 — welcome / about screen + guided tour
+
+Built the welcome screen from `design_handoff_welcome/README.md` in the existing stack
+(Jinja2 + `static/app.css` + vanilla JS, no new dependencies). The bundled
+`Welcome Screen.dc.html` was a visual reference only and is not shipped.
+
+**Done.** `make lint test` green (283 passed, 9 skipped).
+- `templates/_about.html`: one partial, three surfaces — the modal `<dialog id="welcome">`
+  rendered server-side into every page, the plain `/about` page (no-JS visitors and search),
+  and the About pill in the nav. Copy is verbatim from the handoff.
+- `static/welcome.js` (~250 lines): `showModal()` on a first visit, dismissal via ×, Esc,
+  backdrop click, "or explore on your own" or any Try-it link, and the four-step tour.
+  Dismissal writes `localStorage['mxe.welcome.seen'] = WELCOME_VERSION`; a one-time hint
+  under the About button says where the screen went. `?about=1` forces it open, `?tour=1`
+  starts the tour.
+- The tour dims the Monitor with four panels around the step's target rather than lowering
+  the app's z-index: the target stays visible and clickable, and no stacking context has to
+  be rearranged. Placement is recomputed on resize and docks to the bottom on phones. ←/→
+  and Esc are captured so the Monitor's own bindings for those keys stay put while it runs.
+- Header: an About pill on every page, including the standalone `playback.html` (Monitor
+  does not extend `base.html`, so both templates include the partial).
+
+**Decisions.**
+- `WELCOME_VERSION = "2026-09"` lives in `views.py` and is rendered into `data-version`;
+  bumping it re-shows the screen to everyone once. `tour_url` is a Jinja global so the Uri
+  peak-hour deep link is written once.
+- Coming next carries two items beyond the handoff's four, at the user's request:
+  "Implement Simulation Mode" and "Review Climate Rx Cards with Medical KG and Medical
+  LLMs". The second keeps "Medical KG", which breaks this screen's no-acronyms copy rule —
+  flagged and kept at the user's direction.
+- The Uri Try-it link drops the handoff's `card=outage-dialysis`: with it, Monitor opened
+  that card's reading view and a shrunken inset map, not the map you get by switching the
+  View menu to uri_2021. `URI_URL` in `views.py` is now the single definition of that deep
+  link, and `TOUR_URL` is built from it, so the peak hour is written once.
+- The tour overlay sits at `z-index:1200`: Leaflet's control container is 1000 and was
+  painting its zoom buttons over the coachmark.
+- `@media (max-height:800px)` tightens the dialog instead of letting it scroll, so it fits a
+  1366×768 laptop with the footer visible (verified in a real browser).
+
+**Follow-ups.**
+- Both Try-it link targets and the map-vs-card-detail difference were checked in a real
+  browser; the dismissal hint and the localStorage round-trip were reasoned through, not
+  exercised in one: headless Chrome here cannot click, and its viewport clamps at 500 px wide, so
+  phone widths were checked at 500 px rather than 390 px.
+- `docs/` screenshots still show the pre-About header.
+
+**Next:** back to the implementation plan (M6 → M10).
+
 ## 2026-09-22 — hosted performance (Render free CPU)
 
 **Measured on Render** (before): Scenarios 26–29 s every time, Cards ~8.4 s every time,

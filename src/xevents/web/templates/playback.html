@@ -1,4 +1,4 @@
-{% from "macros.html" import pair_script %}<!doctype html>
+{% from "macros.html" import pair_script %}{% from "_about.html" import about_pill, about_dialog %}<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -32,6 +32,7 @@
       <a href="/card-library">Cards</a>
       <a href="/sources">Sources</a>
       <a href="/docs">API</a>
+      {{ about_pill() }}
     </nav>
   </header>
   <div class="banner" id="banner">
@@ -58,5 +59,6 @@
 </div>
 <script src="/static/playback.js?v={{ asset_v }}"></script>
 {{ pair_script() }}
+{{ about_dialog(asset_v) }}
 </body>
 </html>

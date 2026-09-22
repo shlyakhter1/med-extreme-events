@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "_about.html" import about_panel %}
+{% block title %}About · med-extreme-events{% endblock %}
+{#- The same panel as the dialog, as a page: what a visitor without JS sees, and what a search
+    engine indexes. No dialog is rendered here, so the ids stay unique. -#}
+{% block content %}
+<div class="about-page">{{ about_panel('about-title', closable=false) }}</div>
+{% endblock %}

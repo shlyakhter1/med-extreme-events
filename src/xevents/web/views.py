@@ -68,6 +68,19 @@ def asset_version() -> str:
 
 ASSET_V = asset_version()
 
+# The welcome screen is shown once per version of its text: bump this when the copy changes
+# materially and every visitor sees it one more time. Read by welcome.js from data-version.
+WELCOME_VERSION = "2026-09"
+# Uri at its peak hour, the replay the welcome screen sends people to. No card is selected:
+# the link should land on the map, exactly as switching the View menu to uri_2021 would.
+# The tour narrates that same view, so it needs the event loaded too.
+URI_URL = "/?scenario=uri_2021&at=2021-02-16T15:00Z"
+TOUR_URL = f"{URI_URL}&tour=1"
+
+templates.env.globals["welcome_version"] = WELCOME_VERSION
+templates.env.globals["uri_url"] = URI_URL
+templates.env.globals["tour_url"] = TOUR_URL
+
 # Two audiences, not three: caregiver wording is the same guidance addressed to whoever is
 # helping, so it is shown beside the patient text rather than behind a third tab.
 DISPLAY_ROLES: list[tuple[str, str]] = [
@@ -213,6 +226,23 @@ def monitor(request: Request) -> HTMLResponse:
         request,
         "playback.html",
         {"request": request, "asset_v": ASSET_V, "anchors": _anchor_classifications()},
+    )
+
+
+@router.get("/about", response_class=HTMLResponse)
+def about_page(request: Request) -> HTMLResponse:
+    """The welcome screen as a page: the same partial the dialog renders, for visitors without
+    JS and for search. The dialog is left out so its ids stay unique on this page."""
+    return templates.TemplateResponse(
+        request,
+        "about.html",
+        {
+            "request": request,
+            "asset_v": ASSET_V,
+            "show_asof": False,
+            "show_banner": False,
+            "hide_about_dialog": True,
+        },
     )
 
 

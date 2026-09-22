@@ -359,6 +359,146 @@ footer.timeline { background:var(--panel); border-top:1px solid var(--line); pad
 @media (max-width:899px) { .tl-now { left:calc(100% * var(--nw)); bottom:0; } .tl-now span { display:none; } }
 #timeline.empty { padding:6px 0; color:var(--faint); font-size:12px; }
 
+/* ------------------------------------------------------------------ welcome / about
+
+   One panel on three surfaces: the modal dialog over any page, the /about page, and (the
+   light card) the guided tour. Colours that appear only here are literals rather than new
+   tokens — nothing else in the app uses them. The dialog must fit a 1366×768 laptop without
+   scrolling, which the max-height query at the end of this section keeps true. */
+
+.about-wrap { position:relative; display:inline-flex; }
+.about-pill { display:inline-flex; align-items:center; gap:6px; background:var(--bg); color:var(--ink);
+  border:1px solid var(--line); border-radius:20px; padding:3px 11px 3px 5px; font-size:13px; min-height:0; }
+.about-pill:hover { border-color:var(--accent); }
+.about-pill.on { background:var(--accent-bg); border-color:var(--accent); }
+.about-pill .i { display:flex; align-items:center; justify-content:center; width:18px; height:18px; flex:none;
+  border-radius:50%; background:var(--accent-bg); color:var(--accent-ink); font-size:11px; font-weight:600; }
+.about-hint { position:absolute; top:calc(100% + 10px); right:0; z-index:35; width:240px; padding:10px 13px;
+  background:#f6f4f1; color:#1b2026; border-radius:10px; box-shadow:0 14px 34px rgba(0,0,0,.45); font-size:13px; line-height:1.45; }
+.about-hint::before { content:""; position:absolute; top:-6px; right:22px; width:12px; height:12px; background:#f6f4f1; transform:rotate(45deg); }
+.about-hint b { font-weight:600; }
+
+dialog.about-dialog { width:100%; max-width:920px; max-height:calc(100vh - 72px); margin:36px auto; padding:0;
+  border:0; background:transparent; color:var(--ink); font:14px/1.45 var(--sans); overflow:auto; }
+dialog.about-dialog::backdrop { background:rgba(6,9,13,.62); }
+/* The app behind the dialog, minus the dialog itself: the point of the blur is that the
+   welcome text is the only thing in focus until it is dismissed. */
+body.welcome-open > :not(dialog):not(script) { filter:blur(2px) saturate(.8); }
+
+.about-panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden;
+  box-shadow:0 30px 70px rgba(0,0,0,.55); }
+.about-panel.flat { box-shadow:none; }
+.about-page { max-width:920px; margin:0 auto; }
+
+.about-top { display:flex; align-items:center; gap:10px; padding:14px 22px; border-bottom:1px solid var(--line); }
+.about-kicker { font-family:var(--mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); }
+.about-x { margin-left:auto; width:30px; height:30px; min-height:0; padding:0; line-height:1; font-size:16px;
+  background:transparent; color:var(--muted); border-radius:7px; }
+.about-x:hover { color:var(--ink); border-color:var(--line-hi); }
+
+.about-cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); }
+.about-main, .about-ctx { display:flex; flex-direction:column; padding:24px 26px 26px; min-width:0; }
+.about-main { gap:20px; }
+.about-ctx { gap:22px; background:#10161d; border-left:1px solid var(--line); }
+.about-lbl { display:block; margin-bottom:9px; }
+
+.about-lede h1 { margin:0; font-size:28px; line-height:1.15; font-weight:600; letter-spacing:-.02em; text-wrap:balance; }
+.about-lede h1:focus { outline:none; }
+.about-lede p { margin:12px 0 0; font-size:16px; line-height:1.55; color:#cfd8e1; text-wrap:pretty; }
+.about-lede p + p { margin-top:10px; }
+
+.about-try-list { display:grid; gap:8px; }
+.about-try { display:flex; align-items:center; gap:12px; padding:11px 14px; background:#0f151c; color:var(--ink);
+  border:1px solid var(--line); border-radius:10px; }
+.about-try:hover { background:#121c27; border-color:var(--accent-line); text-decoration:none; color:var(--ink); }
+.about-try > i { display:block; width:10px; height:14px; border-radius:2px; flex:none; background:var(--chip, var(--accent)); }
+.about-try .t { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.about-try .t b { font-size:14px; font-weight:600; }
+.about-try .t span { font-size:12.5px; color:var(--muted); text-wrap:pretty; }
+.about-try .go { margin-left:auto; flex:none; color:var(--accent); }
+
+.about-cta { display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap; }
+.about-goto { display:inline-flex; align-items:center; height:36px; padding:0 14px; border-radius:8px;
+  background:var(--accent-bg); border:1px solid var(--accent-line); color:var(--accent-ink); font-size:13.5px; font-weight:500; }
+.about-goto:hover { background:#1b3d61; text-decoration:none; color:var(--accent-ink); }
+.about-skip { background:transparent; border:0; padding:0; min-height:0; color:var(--ink-2); font-size:13.5px; }
+.about-skip:hover { color:var(--ink); }
+
+.about-modes { display:grid; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.about-mode { display:grid; grid-template-columns:86px minmax(0,1fr); gap:12px; background:var(--panel); padding:10px 13px; }
+.about-mode .n { display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+.about-mode .n b { font-size:13.5px; font-weight:600; }
+.about-mode .d { font-size:13px; color:var(--ink-2); text-wrap:pretty; }
+/* Two states, not the app's severities: what already runs and what is written down as next. */
+.tag.working { background:#101c17; border-color:#2a4438; color:var(--ok-ink); }
+.tag.planned { background:#16202b; border-color:#2b4a6b; color:var(--accent-ink); }
+
+.about-next { margin:0; padding:0; list-style:none; display:grid; gap:7px; }
+.about-next li { display:flex; gap:10px; font-size:13.5px; color:#cfd8e1; text-wrap:pretty; }
+.about-next li::before { content:"—"; color:var(--accent); flex:none; }
+
+.about-note { background:#1c1a12; border:1px solid #4d4222; border-radius:10px; padding:12px 14px; }
+.about-note .lbl { color:var(--warn-ink); display:block; margin-bottom:6px; }
+.about-note p { margin:0; font-size:13px; line-height:1.55; color:#e6dcc0; text-wrap:pretty; }
+
+.about-foot { display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:13px 22px;
+  background:#11171e; border-top:1px solid var(--line); font-size:13px; color:var(--ink-2); }
+.about-foot .aside { margin-left:auto; font-size:12px; color:var(--faint); }
+.about-foot .aside b { color:var(--ink-2); font-weight:500; }
+
+/* the guided tour: a light card over a dimmed Monitor, with a hole cut for the step's target
+   so the app stays visible and clickable underneath */
+.tour { position:fixed; inset:0; z-index:1200; pointer-events:none; }  /* over leaflet's controls (1000) */
+.tour-dim { position:absolute; background:rgba(6,9,13,.58); }
+.tour-ring { position:absolute; border:2px solid var(--accent-ink); border-radius:8px; }
+.tour-card { position:absolute; width:320px; max-width:calc(100% - 32px); padding:16px 17px 14px; pointer-events:auto;
+  background:#f6f4f1; color:#1b2026; border-radius:12px; box-shadow:0 20px 50px rgba(0,0,0,.5); font:14px/1.45 var(--sans); }
+.tour-card .tc-top { display:flex; align-items:center; gap:8px; }
+.tour-card .tc-n { font-size:11px; color:#6b6257; }
+.tour-card h3 { margin:8px 0 0; font-size:17px; font-weight:600; line-height:1.3; }
+.tour-card .tc-text { margin:6px 0 0; font-size:14px; line-height:1.5; color:#3a3f45; text-wrap:pretty; }
+.tour-card .tc-foot { display:flex; align-items:center; gap:8px; margin-top:14px; }
+.tour-card .tc-dots { display:flex; gap:5px; }
+.tour-card .tc-dots i { display:block; width:7px; height:7px; border-radius:50%; background:#cfc7bb; }
+.tour-card .tc-dots i.on { background:var(--accent-bg); }
+.tour-card button { font:inherit; }
+.tour-card .tc-skip { margin-left:auto; background:transparent; border:0; padding:0; min-height:0; color:#6b6257; font-size:12.5px; }
+.tour-card .tc-skip:hover { color:#1b2026; }
+.tour-card .tc-back { margin-left:auto; height:32px; min-height:0; padding:0 12px; background:transparent;
+  color:#1b2026; border:1px solid #cfc7bb; border-radius:7px; font-size:13px; }
+.tour-card .tc-back:disabled { opacity:.4; cursor:default; }
+.tour-card .tc-next { height:32px; min-height:0; padding:0 14px; background:var(--accent-bg); color:#fff;
+  border:0; border-radius:7px; font-size:13px; font-weight:500; }
+.tour-card .tc-next:hover { background:#1f4570; }
+
+/* a 768px-tall laptop, once the browser chrome is gone: tighten rather than scroll */
+@media (max-height:800px) {
+  dialog.about-dialog { margin:16px auto; max-height:calc(100vh - 32px); }
+  .about-main, .about-ctx { padding:16px 22px; gap:14px; }
+  .about-lbl { margin-bottom:7px; }
+  .about-lede h1 { font-size:24px; }
+  .about-lede p { font-size:15px; line-height:1.5; margin-top:9px; }
+  .about-lede p + p { margin-top:7px; }
+  .about-try-list { gap:7px; }
+  .about-try { padding:9px 14px; }
+  .about-cta { margin-top:10px; }
+  .about-mode { padding:8px 13px; }
+  .about-next { gap:6px; }
+  .about-note { padding:10px 14px; }
+  .about-top { padding:9px 22px; } .about-foot { padding:9px 22px; }
+}
+
+@media (max-width:899px) {
+  dialog.about-dialog { width:100%; max-width:none; max-height:100vh; height:100vh; margin:0; }
+  .about-panel { border:0; border-radius:0; min-height:100%; box-sizing:border-box; }
+  .about-cols { grid-template-columns:minmax(0,1fr); }
+  .about-ctx { border-left:0; border-top:1px solid var(--line); }
+  .about-try { min-height:44px; }
+  .about-goto { height:44px; }
+  .about-foot .aside { margin-left:0; }
+  .about-x { width:44px; height:44px; }
+}
+
 /* ------------------------------------------------------------------ phone */
 
 @media (max-width:1000px) { .grid, .pair-page { grid-template-columns:minmax(0,1fr); } }

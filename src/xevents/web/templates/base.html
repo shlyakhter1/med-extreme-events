@@ -1,4 +1,4 @@
-<!doctype html>
+{% from "_about.html" import about_pill, about_dialog %}<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -31,6 +31,7 @@
     {% if path.startswith('/card-library') %}<span class="on">Cards</span>{% else %}<a href="/card-library">Cards</a>{% endif %}
     {% if path.startswith('/sources') %}<span class="on">Sources</span>{% else %}<a href="/sources">Sources</a>{% endif %}
     <a href="/docs">API</a>
+    {{ about_pill(path == '/about') }}
   </nav>
 </header>
 {% if not show_banner %}
@@ -49,5 +50,6 @@
 <main>
 {% block content %}{% endblock %}
 </main>
+{% if not hide_about_dialog %}{{ about_dialog(asset_v) }}{% endif %}
 </body>
 </html>

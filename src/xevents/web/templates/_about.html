@@ -1,0 +1,124 @@
+{#- The welcome / about screen. One panel on three surfaces: the modal dialog that opens over
+    any page on a first visit, the plain /about page for visitors without JS and for search,
+    and the About pill that reopens it from the header.
+
+    Copy rule for this screen: no acronyms. The app itself keeps them; this is the one place a
+    visitor is told what the thing is, so it is written for someone who has never seen it. -#}
+
+{#- ``active`` is the /about page, which renders the panel itself and loads no dialog: the pill
+    is the current page there, so it is a marker rather than a button that would do nothing. -#}
+{% macro about_pill(active=false) -%}
+<span class="about-wrap">
+  {%- if active %}
+  <span class="about-pill on" aria-current="page"><span class="i" aria-hidden="true">i</span>About</span>
+  {%- else %}
+  <button type="button" id="about-btn" class="about-pill" aria-haspopup="dialog" data-tour-url="{{ tour_url }}"><span class="i" aria-hidden="true">i</span>About</button>
+  <span id="about-hint" class="about-hint" role="status" hidden>What this is and how to use it are always under <b>About</b>.</span>
+  {%- endif %}
+</span>
+{%- endmacro %}
+
+{#- ``closable`` draws the × and the dismiss affordances that only make sense in the dialog.
+    ``title_id`` is what ``aria-labelledby`` points at, so the page and the dialog never
+    render the same id twice. -#}
+{% macro about_panel(title_id='welcome-title', closable=true) -%}
+<div class="about-panel{{ '' if closable else ' flat' }}">
+
+  <div class="about-top">
+    <span class="about-kicker">Research prototype · demo</span>
+    {% if closable %}<button type="button" class="about-x" aria-label="Close" data-about-close>×</button>{% endif %}
+  </div>
+
+  <div class="about-cols">
+    <div class="about-main">
+      <div class="about-lede">
+        <h1 id="{{ title_id }}" tabindex="-1">Medical alerts for extreme weather</h1>
+        <p>Heatwaves, hurricanes, wildfire smoke and power outages are far more dangerous for some patients, because of their condition or the medicines they take. For example, someone on dialysis can't miss treatment when the power goes out, and some heart and psychiatric medicines make heat much harder to tolerate.</p>
+        <p>This prototype watches public weather, air-quality and outage data. When an event hits an area, it estimates how many at-risk patients each nearby hospital serves and issues an alert card: practical steps for the care team, and plain-language guidance for patients and caregivers.</p>
+      </div>
+
+      <div>
+        <div class="lbl about-lbl">Try it</div>
+        <div class="about-try-list">
+          <a class="about-try" style="--chip:var(--card-6)" data-about-go href="{{ uri_url }}">
+            <i aria-hidden="true"></i>
+            <span class="t"><b>Replay Winter Storm Uri, Texas 2021</b><span>Freezing cold and days-long power outages. Opens at the peak hour, with the dialysis card at the top of the list.</span></span>
+            <span class="go" aria-hidden="true">→</span>
+          </a>
+          <a class="about-try" style="--chip:var(--card-4)" data-about-go
+             href="/demo/patient-view?facility=vha_648">
+            <i aria-hidden="true"></i>
+            <span class="t"><b>See what a patient receives</b><span>The same alert, written for a patient or caregiver.</span></span>
+            <span class="go" aria-hidden="true">→</span>
+          </a>
+          <a class="about-try" style="--chip:var(--card-7)" data-about-go href="/card-library">
+            <i aria-hidden="true"></i>
+            <span class="t"><b>Browse the eight alert cards</b><span>Every hazard × condition pairing, with its sources.</span></span>
+            <span class="go" aria-hidden="true">→</span>
+          </a>
+        </div>
+        {% if closable %}
+        <div class="about-cta">
+          <a class="about-goto" data-about-go href="{{ tour_url }}">Take the 1-minute tour</a>
+          <button type="button" class="about-skip" data-about-close>or explore on your own</button>
+        </div>
+        {% else %}
+        <div class="about-cta"><a class="about-goto" href="{{ tour_url }}">Take the 1-minute tour</a></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="about-ctx">
+      <div>
+        <div class="lbl about-lbl">Three modes</div>
+        <div class="about-modes">
+          <div class="about-mode">
+            <div class="n"><b>Live</b><span class="tag working">working</span></div>
+            <span class="d">Today's warnings and outages from public U.S. feeds, updated as they arrive.</span>
+          </div>
+          <div class="about-mode">
+            <div class="n"><b>Playback</b><span class="tag working">working</span></div>
+            <span class="d">Replays five past events, including Hurricane Ian and the Pacific Northwest heat dome, hour by hour.</span>
+          </div>
+          <div class="about-mode">
+            <div class="n"><b>Simulated</b><span class="tag planned">planned</span></div>
+            <span class="d">Estimates how many alert cards a given population can expect under an extreme-event scenario, and how they are distributed.</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="lbl about-lbl">Coming next</div>
+        <ul class="about-next">
+          <li>More data sources</li>
+          <li>More alert cards</li>
+          <li>Card review with a medical knowledge graph and LLMs</li>
+          <li>What happens after the alert: patient interaction</li>
+          <li>Implement Simulation Mode</li>
+          <li>Review Climate Rx Cards with Medical KG and Medical LLMs</li>
+        </ul>
+      </div>
+
+      <div class="about-note">
+        <div class="lbl">Good to know</div>
+        <p>Not for clinical use. This demo uses only public, aggregate data and no patient records. Patient counts are estimates, and each one shows how it was calculated. The first profile uses U.S. Department of Veterans Affairs hospitals. Other health systems can be added as profiles.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-foot">
+    <span>Feedback on usefulness, and collaborators on data or clinical content, are welcome.</span>
+    <a href="https://github.com/shlyakhter1/med-extreme-events" target="_blank" rel="noopener">Source &amp; issues on GitHub ↗</a>
+    <span class="aside">Reopen anytime from <b>About</b> in the header.</span>
+  </div>
+</div>
+{%- endmacro %}
+
+{#- Rendered once per page, last in <body> so welcome.js finds the dialog already parsed and
+    can read the query string before playback.js rewrites it from its own state. -#}
+{% macro about_dialog(asset_v) -%}
+<dialog id="welcome" class="about-dialog" aria-labelledby="welcome-title" data-version="{{ welcome_version }}">
+  {{ about_panel() }}
+</dialog>
+<script src="/static/welcome.js?v={{ asset_v }}"></script>
+{%- endmacro %}

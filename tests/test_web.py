@@ -808,3 +808,122 @@ def test_cache_warm_up_fills_the_entries_monitor_reads(client: TestClient) -> No
     js = client.get("/static/playback.js").text
     assert "getJSON(`/events?${q}compact=1`)" in js
     assert "getJSON(`/action-items?${q}include_superseded=true`)" in js
+
+
+def test_welcome_is_reachable_from_every_page(client: TestClient) -> None:
+    """The one screen that says what this is. It opens itself on a first visit, the About pill
+    reopens it forever after, and ?about=1 forces it open in a link someone was sent."""
+    for path in ("/", "/replays", "/card-library", "/sources", "/dashboard/events"):
+        html = client.get(path).text
+        assert 'id="about-btn"' in html, path
+        assert '<dialog id="welcome"' in html, path
+        assert 'data-version="2026-09"' in html, path
+        assert "/static/welcome.js" in html, path
+
+
+def test_about_page_renders_the_same_panel_without_the_dialog(client: TestClient) -> None:
+    """/about is the no-JS and search surface. It must not also render the dialog, or the page
+    would carry two elements with the same ids."""
+    html = client.get("/about").text
+    assert '<dialog id="welcome"' not in html
+    assert 'id="about-title"' in html
+    assert html.count('class="about-panel') == 1
+    assert "Medical alerts for extreme weather" in html
+    # No dialog means no welcome.js: the pill must not be a button that does nothing.
+    assert "/static/welcome.js" not in html
+    assert 'id="about-btn"' not in html
+    assert '<span class="about-pill on" aria-current="page">' in html
+
+
+def test_welcome_copy_is_the_reviewed_text(client: TestClient) -> None:
+    """The welcome copy is reviewed content, written for someone who has never seen the app:
+    no acronyms, and every claim about what works is one of the three modes."""
+    html = client.get("/about").text
+    for line in (
+        "Medical alerts for extreme weather",
+        "someone on dialysis can't miss treatment when the power goes out",
+        "it estimates how many at-risk patients each nearby hospital serves",
+        "Replay Winter Storm Uri, Texas 2021",
+        "See what a patient receives",
+        "Browse the eight alert cards",
+        "Replays five past events, including Hurricane Ian and the Pacific Northwest heat dome",
+        "Estimates how many alert cards a given population can expect",
+        "Implement Simulation Mode",
+        "Review Climate Rx Cards with Medical KG and Medical LLMs",
+        "Not for clinical use.",
+        "Feedback on usefulness, and collaborators on data or clinical content, are welcome.",
+    ):
+        assert line in html, line
+    for acronym in ("VISN", "ESRD", "EAGLE-I", "emPOWER"):
+        assert acronym not in html, acronym
+    assert html.count("<li>") >= 6, "six Coming next items"
+
+
+def test_welcome_try_it_buttons_are_real_links(client: TestClient) -> None:
+    """Each Try-it is a link to a view that exists, not a stub: Uri at its peak hour, the
+    patient rendering, and the card library. The Uri link carries no card= — it opens the map
+    the View menu would give you, not one card's detail view."""
+    import re
+
+    html = client.get("/about").text
+    hrefs = re.findall(r'class="about-try"[^>]*?href="([^"]+)"', html.replace("\n", " "))
+    assert hrefs == [
+        "/?scenario=uri_2021&amp;at=2021-02-16T15:00Z",
+        "/demo/patient-view?facility=vha_648",
+        "/card-library",
+    ], hrefs
+    assert "card=" not in hrefs[0]
+    for href in hrefs:
+        assert client.get(href.replace("&amp;", "&")).status_code == 200, href
+    from xevents.providers.replay import list_scenarios
+
+    assert "uri_2021" in set(list_scenarios())
+    assert "outage-dialysis" in {c.id for c in load_cards(CARDS_DIR)}
+
+
+def test_welcome_script_remembers_and_tours(client: TestClient) -> None:
+    """Structural guard on welcome.js: the dismissal key, the four tour steps and the Monitor
+    selectors they point at. A renamed selector would leave the tour ringing nothing."""
+    js = client.get("/static/welcome.js").text
+    for name in (
+        "function openWelcome",
+        "function dismissWelcome",
+        "function showHint",
+        "function startTour",
+        "function endTour",
+        "function stepTour",
+        "function drawTour",
+        "function placeCard",
+        "function targetRect",
+    ):
+        assert name in js, name
+    assert '"mxe.welcome.seen"' in js
+    assert js.count("title:") == 4, "four tour steps"
+    monitor = client.get("/").text
+    for selector, marker in (
+        (".grp.transport", 'class="grp transport"'),
+        (".clock-grp", 'class="clock-grp"'),
+        ("#map-wrap", 'id="map-wrap"'),
+        ("#side", 'id="side"'),
+        ("footer.timeline", '<footer class="timeline">'),
+    ):
+        assert selector in js, selector
+        assert marker in monitor, marker
+
+
+def test_welcome_styles_exist_for_the_dialog_and_the_tour(client: TestClient) -> None:
+    """The dialog blurs the app behind it and the tour cuts a hole in its own dim layer; both
+    live in app.css, since the templates carry no style attributes of their own."""
+    css = client.get("/static/app.css").text
+    for rule in (
+        "dialog.about-dialog",
+        "dialog.about-dialog::backdrop",
+        "body.welcome-open >",
+        ".about-pill",
+        ".about-hint",
+        ".tour-dim",
+        ".tour-ring",
+        ".tour-card",
+        "@media (max-height:800px)",
+    ):
+        assert rule in css, rule
