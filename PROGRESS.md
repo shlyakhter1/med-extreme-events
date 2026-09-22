@@ -2,6 +2,27 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-22 — live events restored (self-refreshing); playback display fixes
+
+- **Why live events vanished:** live rows exist only in a running instance's database. The
+  `mee` container was replaced twice on 2026-09-21 to pick up v2, dropping its live events,
+  and Render never ran ingestion. Live ingest itself was fine (verified: 685–737 events).
+- **Fix:** `src/xevents/live_refresh.py` — with `LIVE_REFRESH_MINUTES` > 0 the web app's
+  lifespan starts a daemon thread that runs `scripts/ingest.py --mode live` then
+  `scripts/match.py --mode live` as subprocesses, 5 s after startup and then every N minutes;
+  output goes to the host log. The image defaults to 60 min with a repo-URL `NWS_USER_AGENT`;
+  `render.yaml` sets both. SQLite now opens in WAL with a 10 s busy timeout so pages keep
+  reading during refresh writes. EAGLE-I is skipped (with a message) when neither
+  `EAGLEI_TOKEN` nor `EAGLEI_FEATURE_URL` is set, instead of failing every refresh.
+  Verified in the rebuilt container: first refresh finished ~7 s after start, 737 live
+  events, 58 active, 4/4 keyless providers; container at ~60 MB afterwards.
+- **Display:** AirNow names carry the reading ("AQI 220 (PM2.5)"); a shared grouping rule
+  (`XMap.eventGroup` / `views.event_group`) turns them into "AirNow AQI (PM2.5)" for the
+  timeline rows (231 rows → 8 on `smoke_canada_2026`), the capped "triggered by" text, and
+  the dashboard event summary. Maps fit the lower 48 when events also reach Alaska, Hawaii
+  or the territories (HMS smoke over Alaska had shrunk the US), on playback, the dashboard
+  and event pages.
+
 ## 2026-09-21 — state borders; GitHub → Render deployment
 
 - **State borders on every map:** `scripts/build_state_boundaries.py` →

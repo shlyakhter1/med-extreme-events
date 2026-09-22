@@ -61,9 +61,7 @@
   const ctx = await XMap.create("map");
   const paint = new Map(fips.map((f) => [f, { color, opacity: XMap.eventOpacity(ev, {{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[event.severity.value] }}) }]));
   XMap.paintCounties(ctx, paint);
-  const bounds = [];
-  ctx.byFips.forEach((layer, f) => { if (paint.has(f)) bounds.push(layer.getBounds()); });
-  if (bounds.length) ctx.map.fitBounds(bounds.reduce((a, b) => a.extend(b)).pad(0.15));
+  XMap.fitCounties(ctx, new Set(paint.keys()), 0.15);
 })();
 </script>
 {% endblock %}

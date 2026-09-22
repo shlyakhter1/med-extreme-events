@@ -174,9 +174,7 @@
   function fitToEvents() {
     const fips = new Set();
     for (const e of state.events) for (const c of e.geography.county_fips) fips.add(c);
-    const bounds = [];
-    ctx.byFips.forEach((layer, f) => { if (fips.has(f)) bounds.push(layer.getBounds()); });
-    if (bounds.length) ctx.map.fitBounds(bounds.reduce((a, b) => a.extend(b)).pad(0.1));
+    XMap.fitCounties(ctx, fips, 0.1);
   }
 
   // ------------------------------------------------------------------ transport
@@ -215,7 +213,7 @@
   function lanes() {
     const byName = new Map();
     for (const e of state.events) {
-      const key = e.event_name;
+      const key = XMap.eventGroup(e.event_name);  // one AirNow row per pollutant, not per reading
       if (!byName.has(key)) byName.set(key, { name: key, type: e.event_type, events: [], first: e._t0 });
       const lane = byName.get(key);
       lane.events.push(e);
@@ -661,7 +659,7 @@
         const on = state.selectedCard === c.id ? " on" : "";
         return `<div class="row${on}" data-card="${esc(c.id)}">
           <span><span class="swatch" style="background:${cardColor(c.id)}"></span><b>${esc(c.title)}</b>
-            <span class="loc">${c.facilities.size} facilit${c.facilities.size === 1 ? "y" : "ies"} · triggered by ${esc([...c.events].join(", "))}</span></span>
+            <span class="loc">${c.facilities.size} facilit${c.facilities.size === 1 ? "y" : "ies"} · triggered by ${esc(XMap.summarizeNames(c.events))}</span></span>
           <span><span class="tag">${esc(c.acuityClass)}</span> <span class="tag">≈${Math.round(c.panel).toLocaleString()}</span></span></div>`;
       }).join("") || `<div class="muted">No cards fire at this time.</div>`,
 
@@ -820,7 +818,7 @@
       <h3><span class="swatch" style="background:${cardColor(def.id)}"></span>${esc(def.title)}</h3>
       <div class="prov">${esc(def.id)} v${esc(def.version)} · acuity ${esc(def.acuity_class)} · evidence ${esc(def.evidence_tier)}</div>
       <div class="prov"><b>When:</b> fires ${def.window_days.min}–${def.window_days.max} days ahead · active at ${fmt(state.t)} UTC</div>
-      <div class="prov"><b>Where now:</b> ${facs.length} facilit${facs.length === 1 ? "y" : "ies"} · triggered by ${esc([...summary.events].join(", "))}</div>
+      <div class="prov"><b>Where now:</b> ${facs.length} facilit${facs.length === 1 ? "y" : "ies"} · triggered by ${esc(XMap.summarizeNames(summary.events, 6))}</div>
       <div class="prov"><b>Estimated panel across those facilities:</b> ≈ ${Math.round(totalPanel).toLocaleString()} veterans</div>
       <p>${esc(def.summary)}</p>
       ${roleToggle()}`;

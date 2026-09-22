@@ -458,3 +458,22 @@ def test_maps_draw_state_borders(client: TestClient) -> None:
     assert "ctx.stateLayer.bringToFront()" in js, "borders stay above repainted counties"
     assert "state border" in js, "the legend keys the outline"
     assert "fill: false" in js, "outlines never hide an event colour"
+
+
+def test_airnow_readings_group_by_pollutant(client: TestClient) -> None:
+    """AirNow names carry the reading; summaries and timelines group them per pollutant, and
+    maps fit the lower 48 when events also reach Alaska/Hawaii/territories."""
+    from xevents.web.views import event_group
+
+    assert event_group("AQI 220 (PM2.5)") == "AirNow AQI (PM2.5)"
+    assert event_group("AQI 101 (OZONE)") == "AirNow AQI (OZONE)"
+    assert event_group("HMS smoke (Heavy)") == "HMS smoke (Heavy)"
+    js = client.get("/static/map.js").text
+    assert "const eventGroup" in js and "function summarizeNames" in js
+    assert "function fitCounties" in js and 'NON_CONUS_STATE_FIPS = new Set(["02", "15"' in js
+    pb = client.get("/static/playback.js").text
+    assert "XMap.eventGroup(e.event_name)" in pb, "timeline rows group AirNow readings"
+    assert "XMap.summarizeNames(c.events)" in pb, "card trigger text is capped"
+    assert "XMap.fitCounties(ctx, fips" in pb
+    dash = client.get("/", params={"scenario": "heat_dome_2021", "at": AT}).text
+    assert "XMap.fitPoints(ctx, bounds" in dash

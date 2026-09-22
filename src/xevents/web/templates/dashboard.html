@@ -107,7 +107,7 @@
       layer.on("click", () => { window.location = `/dashboard/facilities/${f.properties.id}?scenario=${scenario || "live"}&at=${encodeURIComponent(atInput)}`; });
     },
   }).addTo(ctx.map);
-  if (bounds.length) ctx.map.fitBounds(L.latLngBounds(bounds).pad(0.3));
+  XMap.fitPoints(ctx, bounds, 0.3);
 })();
 </script>
 {% endblock %}

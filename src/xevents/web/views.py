@@ -7,6 +7,7 @@ acknowledge), ``/demo/patient-view`` read-only patient/caregiver rendering.
 
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -92,6 +93,16 @@ def _engine(request: Request) -> Engine:
 
 
 _COUNTY_NAMES: dict[str, str] | None = None
+
+
+_AQI_NAME = re.compile(r"^AQI \d+ \((.+)\)$")
+
+
+def event_group(name: str) -> str:
+    """AirNow event names carry the reading ("AQI 220 (PM2.5)"); group them by pollutant
+    for summaries. The same rule is ``XMap.eventGroup`` in map.js."""
+    m = _AQI_NAME.match(name)
+    return f"AirNow AQI ({m.group(1)})" if m else name
 
 
 def county_names() -> dict[str, str]:
@@ -211,7 +222,8 @@ def dashboard(
     ranked = sorted(board.values(), key=board_key)
     event_counts: dict[str, int] = {}
     for e in events:
-        event_counts[e.event_name] = event_counts.get(e.event_name, 0) + 1
+        group = event_group(e.event_name)
+        event_counts[group] = event_counts.get(group, 0) + 1
     ctx.update(
         board=ranked,
         events=sorted(events, key=lambda e: (e.onset, e.event_key))[:25],

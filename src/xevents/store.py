@@ -13,7 +13,17 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, Engine, Float, String, Text, create_engine, select
+from sqlalchemy import (
+    JSON,
+    DateTime,
+    Engine,
+    Float,
+    String,
+    Text,
+    create_engine,
+    event,
+    select,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 from xevents.engine import rank_key
@@ -82,7 +92,18 @@ class FacilityRow(Base):
 
 def make_engine(database_url: str | None = None) -> Engine:
     url = database_url or os.environ.get("DATABASE_URL") or DEFAULT_DATABASE_URL
-    return create_engine(url, future=True)
+    engine = create_engine(url, future=True)
+    if engine.dialect.name == "sqlite":
+        # WAL lets the web process keep reading while the live refresher writes, and the
+        # busy timeout makes a colliding writer wait instead of failing.
+        @event.listens_for(engine, "connect")
+        def _sqlite_pragmas(dbapi_conn: Any, _record: Any) -> None:
+            cur = dbapi_conn.cursor()
+            cur.execute("PRAGMA journal_mode=WAL")
+            cur.execute("PRAGMA busy_timeout=10000")
+            cur.close()
+
+    return engine
 
 
 def init_db(engine: Engine) -> None:

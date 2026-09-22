@@ -17,3 +17,7 @@ services:
         value: replay
       - key: DATABASE_URL
         value: sqlite:////app/demo.db   # baked into the image at build time
+      - key: LIVE_REFRESH_MINUTES      # live events refresh at startup and hourly
+        value: "60"
+      - key: NWS_USER_AGENT
+        value: med-extreme-events demo (https://github.com/shlyakhter1/med-extreme-events)

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
@@ -15,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy import Engine
 
-from xevents import __version__
+from xevents import __version__, live_refresh
 from xevents.carbon import load_carbon
 from xevents.cards import load_cards
 from xevents.denominators import PanelEstimator, ReferenceTables
@@ -114,8 +116,17 @@ def _parse_at(value: str | None) -> datetime | None:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@asynccontextmanager
+async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Start the background live refresh when LIVE_REFRESH_MINUTES > 0 (hosted demo)."""
+    minutes = live_refresh.minutes_from_env()
+    if minutes:
+        live_refresh.start(minutes)
+    yield
+
+
 def create_app(engine: Engine | None = None) -> FastAPI:
-    app = FastAPI(title="med-extreme-events", version=__version__)
+    app = FastAPI(title="med-extreme-events", version=__version__, lifespan=_lifespan)
     app.add_middleware(GZipMiddleware, minimum_size=1024)
     app.state.engine = engine or make_engine()
 

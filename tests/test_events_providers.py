@@ -407,6 +407,7 @@ def test_live_ingest_isolates_a_transport_failure(
     monkeypatch.setattr(ingest, "EagleIProvider", lambda *a, **k: Boom())
     monkeypatch.setattr(ingest, "load_customers", lambda: {})
     monkeypatch.delenv("AIRNOW_API_KEY", raising=False)
+    monkeypatch.setenv("EAGLEI_FEATURE_URL", "https://example.test/FeatureServer/0")
     engine = make_engine(f"sqlite:///{tmp_path / 'live.db'}")
     init_db(engine)
     rc = ingest.ingest_live(engine, days_ahead=1, lookback_days=1)
@@ -480,3 +481,42 @@ def test_empower_builder_refuses_swapped_layers() -> None:
     mod.expect_layer_name(mod.COUNTY_LAYER, "Electricity Dependent DME – ALL – CountyLevel")
     with pytest.raises(SystemExit, match="expected a county-level layer"):
         mod.expect_layer_name(mod.COUNTY_LAYER, "Electricity Dependent DME – ALL – ZipLevel")
+
+
+def test_live_ingest_skips_eaglei_without_credentials(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import importlib.util
+
+    from xevents.store import init_db, make_engine
+
+    spec = importlib.util.spec_from_file_location(
+        "ingest", Path(__file__).parents[1] / "scripts" / "ingest.py"
+    )
+    assert spec and spec.loader
+    ingest = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ingest)
+    built: list[str] = []
+
+    class Empty:
+        def fetch(self, window: TimeWindow) -> list[Event]:
+            return []
+
+        def close(self) -> None:
+            pass
+
+    for name in ("NWSAlertsProvider", "IEMArchiveProvider", "OpenFEMAProvider", "HMSSmokeProvider"):
+        monkeypatch.setattr(ingest, name, lambda *a, **k: Empty())
+
+    def eagle(*a: Any, **k: Any) -> Empty:
+        built.append("eagle")
+        return Empty()
+
+    monkeypatch.setattr(ingest, "EagleIProvider", eagle)
+    for var in ("EAGLEI_TOKEN", "EAGLEI_FEATURE_URL", "AIRNOW_API_KEY"):
+        monkeypatch.delenv(var, raising=False)
+    engine = make_engine(f"sqlite:///{tmp_path / 'skip.db'}")
+    init_db(engine)
+    assert ingest.ingest_live(engine, days_ahead=1, lookback_days=1) == 0
+    assert built == [], "no FEMA request is made without a token or mirror"
+    assert "eagle_i: skipped" in capsys.readouterr().out

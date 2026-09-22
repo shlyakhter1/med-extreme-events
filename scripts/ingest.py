@@ -113,7 +113,13 @@ def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
         ),
     ]
     outage_threshold = min_outage_pct(load_cards())
-    if outage_threshold is not None:
+    eaglei_configured = bool(os.environ.get("EAGLEI_TOKEN") or os.environ.get("EAGLEI_FEATURE_URL"))
+    if outage_threshold is not None and not eaglei_configured:
+        print(
+            "eagle_i: skipped (FEMA's partner layer is token-gated; set EAGLEI_TOKEN, or "
+            "EAGLEI_FEATURE_URL to a public EAGLE-I mirror)"
+        )
+    elif outage_threshold is not None:
         providers.append(
             (
                 "eagle_i",
@@ -151,7 +157,7 @@ def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
     stored_live = [e for e in list_events(engine, source="nws") if e.scenario is None]  # type: ignore[arg-type]
     events, dropped = dedupe(events, existing=stored_live)
     if dropped:
-        print(f"de-duplicated {dropped} archive copies of alerts already held from the CAP feed")
+        print(f"de-duplicated {dropped} duplicate copies of the same NWS alerts")
     n = upsert_events(engine, events)  # type: ignore[arg-type]
     print(f"live: {n} events upserted from {len(providers) - failures}/{len(providers)} providers")
     return 1 if failures == len(providers) else 0

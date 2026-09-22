@@ -92,21 +92,10 @@ Notes:
     -e NWS_USER_AGENT="med-extreme-events (contact: you@example.com)" med-extreme-events:demo
   ```
 
-  The image bakes only the replays. Live events ingested into the old container are lost,
-  so re-run live ingestion inside the new one if you need them:
-  `docker exec mee sh -c 'python scripts/ingest.py --mode live && python scripts/match.py --mode live'`.
-
-### Prefer pip over uv?
-
-`requirements.txt` is generated from the lockfile with pinned hashes:
-
-```sh
-python3.12 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-export PYTHONPATH=src DATABASE_URL=sqlite:///demo.db
-python scripts/load_reference.py && python scripts/ingest.py && python scripts/match.py
-uvicorn xevents.api:app --port 8000
-```
+  The image bakes only the replays. Live events are not in the image: the app refreshes
+  them itself at startup and then hourly (`LIVE_REFRESH_MINUTES`, default 60 in the image;
+  `0` turns it off), so a replaced container repopulates its live view within about a
+  minute. Watch it with `docker logs -f mee | grep "live refresh"`.
 
 Regenerate it after changing dependencies:
 
@@ -185,8 +174,11 @@ Notes:
 - The site is public and has no login. The data is aggregate (no PHI), but the acknowledge
   and complete buttons are open to anyone; their changes are discarded on every redeploy,
   because the database is rebuilt into each image.
-- Replay mode only. Live mode needs a persistent disk (a paid Render feature) and a scheduled
-  ingest job — see §4.
+- Live events refresh inside the app at startup and hourly (`LIVE_REFRESH_MINUTES` in
+  `render.yaml`). They are not persistent: a redeploy or a wake from sleep starts from the
+  image and refills within about a minute. NWS, the IEM archive, OpenFEMA and NOAA smoke need
+  no key; EAGLE-I is skipped unless `EAGLEI_TOKEN` or `EAGLEI_FEATURE_URL` is set, and AirNow
+  unless `AIRNOW_API_KEY` is (set secrets in the Render dashboard, not in `render.yaml`).
 
 ### Google Cloud Run — scales to zero, generous free tier
 

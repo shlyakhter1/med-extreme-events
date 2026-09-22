@@ -27,5 +27,10 @@ RUN python scripts/load_reference.py \
 
 EXPOSE 8000
 ENV PORT=8000
+# Live events are not baked into the image; the app refreshes them itself at startup and then
+# hourly (src/xevents/live_refresh.py). NWS requires a contact string; the public repository
+# is that contact. Override either at run time; LIVE_REFRESH_MINUTES=0 turns refresh off.
+ENV LIVE_REFRESH_MINUTES=60 \
+    NWS_USER_AGENT="med-extreme-events demo (https://github.com/shlyakhter1/med-extreme-events)"
 # Render and Railway inject $PORT; Fly uses the internal_port in fly.toml.
 CMD ["sh", "-c", "exec uvicorn xevents.api:app --host 0.0.0.0 --port ${PORT:-8000}"]

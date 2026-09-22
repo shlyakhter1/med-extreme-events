@@ -65,6 +65,41 @@ window.XMap = (() => {
     return { map, countyLayer: layer, stateLayer, byFips, baseStyle: BASE_STYLE };
   }
 
+  /* AirNow names carry the reading ("AQI 220 (PM2.5)"), so a smoke week yields hundreds of
+     distinct names. Group them by pollutant for timelines and summaries; every other source
+     already uses a stable product name. The same rule lives in views.event_group. */
+  const AQI_NAME = /^AQI \d+ \((.+)\)$/;
+  const eventGroup = (name) => {
+    const m = AQI_NAME.exec(name || "");
+    return m ? `AirNow AQI (${m[1]})` : name;
+  };
+  /* "A, B, C and 4 more": grouped, de-duplicated, capped. */
+  function summarizeNames(names, max = 3) {
+    const groups = [...new Set([...names].map(eventGroup))].sort();
+    if (groups.length <= max) return groups.join(", ");
+    return `${groups.slice(0, max).join(", ")} and ${groups.length - max} more`;
+  }
+
+  /* Fit to the lower 48 when an event set also reaches Alaska, Hawaii or the territories
+     (HMS smoke over Alaska made the whole US tiny); fit to everything only when nothing is in
+     the lower 48. */
+  const NON_CONUS_STATE_FIPS = new Set(["02", "15", "60", "66", "69", "72", "78"]);
+  const isConusFips = (fips) => !NON_CONUS_STATE_FIPS.has(String(fips).slice(0, 2));
+  const isConusLatLng = (ll) => ll.lat >= 24 && ll.lat <= 50 && ll.lng >= -125 && ll.lng <= -66;
+  function fitCounties(ctx, fipsSet, pad = 0.1) {
+    const all = [...fipsSet].filter((f) => ctx.byFips.has(f));
+    const conus = all.filter(isConusFips);
+    const use = conus.length ? conus : all;
+    if (!use.length) return;
+    const bounds = use.map((f) => ctx.byFips.get(f).getBounds());
+    ctx.map.fitBounds(bounds.reduce((a, b) => a.extend(b)).pad(pad));
+  }
+  function fitPoints(ctx, latlngs, pad = 0.3) {
+    const conus = latlngs.filter(isConusLatLng);
+    const use = conus.length ? conus : latlngs;
+    if (use.length) ctx.map.fitBounds(L.latLngBounds(use).pad(pad));
+  }
+
   /* Paint a subset of counties; everything else returns to the base style. State outlines
      are brought back on top afterwards, so a painted county edge never covers a border. */
   function paintCounties(ctx, colorByFips) {
@@ -93,5 +128,5 @@ window.XMap = (() => {
       ((countsByType || {}).power_outage ? `<div class="note">${EAGLEI_ATTRIBUTION}</div>` : "");
   }
 
-  return { create, paintCounties, counties, legendHtml, EVENT_TYPES, EVENT_COLORS, SEVERITY_RANK, fillOpacity, outageOpacity, eventOpacity, temporalityBadge, IDLE_COLOR };
+  return { create, paintCounties, counties, legendHtml, eventGroup, summarizeNames, fitCounties, fitPoints, isConusFips, EVENT_TYPES, EVENT_COLORS, SEVERITY_RANK, fillOpacity, outageOpacity, eventOpacity, temporalityBadge, IDLE_COLOR };
 })();
