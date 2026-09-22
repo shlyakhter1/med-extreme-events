@@ -202,6 +202,16 @@ def item_window_start(event: Event, card: Card) -> datetime:
     return event.onset - timedelta(days=card.window_days.max)
 
 
+def item_window_end(event: Event) -> datetime:
+    """An outage reading is current from its run up to, but not including, the next run.
+    Poll events are contiguous (one expires when the next begins, which the debounce chain
+    relies on), so the item ends one second earlier: at an hour boundary exactly one reading
+    is current instead of two."""
+    if event.event_type is EventType.POWER_OUTAGE and event.temporality is Temporality.OBSERVED:
+        return max(event.onset, event.expires - timedelta(seconds=1))
+    return event.expires
+
+
 def _item_id(event_key: str, card_id: str, facility_id: str, role: Role) -> str:
     return f"{event_key}|{card_id}|{facility_id}|{role.value}"
 
@@ -256,7 +266,7 @@ def _build_item(
         acuity_class=card.acuity_class,
         acuity_rank=profile.acuity_rank(card.acuity_class),
         window_start=item_window_start(event, card),
-        window_end=event.expires,
+        window_end=item_window_end(event),
         scenario=event.scenario,
         created_at=now,
     )

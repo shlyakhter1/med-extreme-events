@@ -176,7 +176,8 @@ Notes:
   because the database is rebuilt into each image.
 - Live events refresh inside the app at startup and hourly (`LIVE_REFRESH_MINUTES` in
   `render.yaml`). They are not persistent: a redeploy or a wake from sleep starts from the
-  image and refills within about a minute. No provider needs a key: NWS, the IEM archive,
+  image and refills in about three minutes on the free plan (provider runs appear in the
+  banner first; events and items land when ingest and matching finish). No provider needs a key: NWS, the IEM archive,
   OpenFEMA, NOAA smoke, AirNow (public file feed: hourly monitors and forecasts) and EAGLE-I
   for Georgia and Ohio (public state mirrors, listed in `EAGLEI_FEATURE_URL`). A FEMA token
   in `EAGLEI_TOKEN` would add national outage coverage; set secrets in the Render dashboard,

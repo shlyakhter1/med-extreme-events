@@ -115,7 +115,7 @@ Each block has, top to bottom:
    **during-event** actions. Phase-agnostic actions always show. The window of an observed
    event's item starts at the observation (it has no lead time); a forecast or imminent
    event's item opens the card's lead window, days ahead. So in a replay each outage reading
-   is current only during its own hour.
+   is current from its own time up to, not including, the next reading.
 3. **Outage attribution** (outage cards only): "Electric customer outage data provided by
    EAGLE-I, Department of Energy" and "customers are meters, not people".
 4. **Compounding chip** (heat and cold cards only, when it applies): **compounding · acuity
@@ -244,7 +244,8 @@ the legend and the hover text name them.
   **Georgia and Ohio only** (the public state mirrors; national coverage needs a FEMA token).
   An AirNow forecast of "Unhealthy for Sensitive Groups" or worse fires Card 8 with
   **pre-event** actions. Live data is rebuilt from the feeds after each restart or redeploy;
-  the first refresh lands within about a minute. After a restart an outage needs two
+  the first refresh lands within seconds locally and within about three minutes on Render's
+  free tier (a fraction of a CPU); until then the live board is empty. After a restart an outage needs two
   consecutive hourly readings over the threshold before Cards 3, 5 and 6 fire.
 - A live board fills with the items of alerts active now. Items whose window has passed are
   expired automatically; replay items never expire.
@@ -271,5 +272,3 @@ the legend and the hover text name them.
 - **Status buttons have no login.** Anyone on the public demo can acknowledge or complete an
   item; changes reset on every redeploy.
 - **Card chips are colour-only** on the playback map.
-- At an exact hour boundary two consecutive outage readings can both be active; the pages
-  show the stronger one.

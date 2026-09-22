@@ -220,11 +220,12 @@ def test_each_poll_is_current_only_during_its_own_hour() -> None:
     assert all(i.status is ActionItemStatus.ISSUED for i in insulin), "readings coexist in time"
     for i in insulin:
         ev = next(e for e in events if e.event_key == i.event_key)
-        assert i.window_start == ev.onset and i.window_end == ev.expires, "no lead window"
-    for k in (1, 2, 3):  # half past each poll hour: exactly that poll's item is active
-        t = T0 + timedelta(hours=k, minutes=30)
-        active = [i for i in insulin if i.window_start <= t <= i.window_end]
-        assert [i.event_key for i in active] == [events[k].event_key]
+        assert i.window_start == ev.onset, "no lead window"
+        assert i.window_end == ev.expires - timedelta(seconds=1), "ends before the next run"
+    for k in (1, 2, 3):  # on the hour and half past: exactly that poll's item is active
+        for t in (T0 + timedelta(hours=k), T0 + timedelta(hours=k, minutes=30)):
+            active = [i for i in insulin if i.window_start <= t <= i.window_end]
+            assert [i.event_key for i in active] == [events[k].event_key], t
     severities = [i.event_severity for i in sorted(insulin, key=lambda i: i.window_start)]
     assert severities == [CapSeverity.SEVERE, CapSeverity.SEVERE, CapSeverity.MODERATE], (
         "each hour keeps its own severity (30% then 12%)"

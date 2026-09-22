@@ -30,6 +30,13 @@ Short dated entries, newest first. One milestone per session (M0 → M5, then M6
   (public state mirrors); 0 county readings ≥ 10 %"); live coverage joins the EAGLE-I
   caveats wherever outage numbers render. `/feeds` returns the runs.
 - Verified in the rebuilt container: 6/6 providers ok, 742 live events, ~58 MB memory.
+- **Outage readings end one second before the next run** (`engine.item_window_end`): poll
+  events stay contiguous for the debounce chain, but at an hour boundary exactly one reading
+  is current (replay as-of times fall on the hour, so two were often shown).
+- **Render, verified:** 6/6 providers, 741 live events, 1,152 live items; Card 8 pre-event at
+  Dallas and Houston from the ozone forecasts, during-event across the Midwest and Northeast
+  from NOAA smoke. The first refresh after a deploy takes about three minutes on the free
+  plan (runs show in the banner before events land).
 
 ## 2026-09-22 — live events restored (self-refreshing); playback display fixes
 
