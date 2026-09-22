@@ -5,8 +5,9 @@ the same scale and vintage as ``counties.geojson``, so state lines sit exactly o
 edges. The raw zip is kept under ``fixtures/reference/raw/``.
 
 Output: GeoJSON FeatureCollection, one feature per state/territory, properties ``state_fips``,
-``state`` (USPS) and ``name``. Coordinates are rounded to 4 decimals (~11 m) and consecutive
-duplicate points dropped: the layer is an outline overlay, not a join key.
+``state`` (USPS) and ``name``. Coordinates are rounded to 3 decimals (~110 m) and consecutive
+duplicate points dropped: the layer is an outline overlay drawn at national zoom, not a join
+key, so a point every 110 m is already finer than a pixel.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ RAW_DIR = REPO_ROOT / "fixtures" / "reference" / "raw"
 OUT = REPO_ROOT / "fixtures" / "reference" / "states.geojson"
 VINTAGE = "2023"
 URL = f"https://www2.census.gov/geo/tiger/GENZ{VINTAGE}/shp/cb_{VINTAGE}_us_state_5m.zip"
-NDIGITS = 4
+NDIGITS = 3
 
 
 def _ring(points: Any) -> list[list[float]]:

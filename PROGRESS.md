@@ -2,6 +2,54 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-22 — boundary payloads: revalidation and map precision
+
+Chased a report that the "20 second delay switching tabs" was back after the welcome-screen
+deploy. It was not a regression from that commit, which touched no API and no data path.
+**Measured on Render**: the server-rendered pages were fine (Monitor 0.44–0.79 s, Scenarios
+2.3–2.5 s, Cards 1.4–1.9 s, Sources 1.0 s). The delay is the map's boundary files —
+`/reference/counties` 1.59 MB in 21.8 s and `/reference/states` 0.52 MB in 7.3 s, about
+100 KB/s out of the free instance. They carry `max-age=86400`, so the cost is paid once per
+browser per day and is invisible afterwards; a hard refresh to look at the new screen put it
+back on the cold path. The 3–4 s on later switches is `/events` + `/action-items`, which are
+never browser-cached. 830d761 fixed the server-side compute, not the download.
+
+**Done.** `make lint test` green (286 passed, 9 skipped). Served bytes 2.11 → 1.32 MB (−37%),
+about 29 s → 18 s cold on the hosted instance, and 0 bytes on revalidation.
+- `_cached` now hashes each body (blake2b of the raw bytes) and sends `ETag`, with
+  `Last-Modified` on the boundary files, and answers `If-None-Match` with a 304. The key
+  already determines the body, so the digest cannot go stale. The gzip and identity
+  representations get different tags, so a 304 is never sent for a body the client has not
+  seen — there is a test for exactly that.
+- `counties.display.geojson`: the browser's copy, `id` + geometry only, coordinates at 3
+  decimals (~110 m) with the consecutive duplicates that rounding creates dropped. 1.59 →
+  0.94 MB gzipped. Built by `build_county_boundaries.py`, which now writes both files
+  (`--display-only` rederives it from the committed source without re-fetching Census).
+- `states.geojson` is display-only — nothing joins against it — so it was rebuilt in place at
+  3 decimals instead of 4: 0.52 → 0.38 MB.
+
+**Decisions.**
+- **`counties.geojson` itself is untouched.** `CountyIndex` ray-casts facilities against it
+  with a per-feature bbox prefilter, so rounding it to ~110 m could silently move a facility
+  near a county line into the wrong county, and with it that facility's panel. Two copies is
+  the point: the map gets outlines, the engine keeps the geometry. A test asserts the served
+  copy has no bbox or properties and the join file still does.
+- Generated at build time, not per request: the transform is 1.4 s and 76 MB of heap here,
+  which is roughly 19 s on the free instance's shared CPU — it would move the cost rather
+  than remove it. The file is a rebuildable fixture like the others.
+- `max-age` stays at 86400. A longer window would leave a deploy's boundary changes unseen,
+  since the URL carries no version; the ETag is what makes the daily expiry cheap now.
+
+**Follow-ups.**
+- Cloudflare in front of Render answers `cf-cache-status: DYNAMIC` for these — it does not
+  edge-cache `application/geo+json`, so every cold browser still pulls from the origin.
+- Real geometry simplification (Douglas–Peucker) would beat precision rounding by a lot at
+  this zoom, but it changes the outlines and needs checking against the rendered map.
+- `/events` and `/action-items` now carry an ETag too, but no `Cache-Control`; giving the
+  replay responses a short one would turn the 3–4 s Monitor revisit into a 304.
+
+**Next:** back to the implementation plan (M6 → M10).
+
 ## 2026-09-22 — welcome / about screen + guided tour
 
 Built the welcome screen from `design_handoff_welcome/README.md` in the existing stack

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import gzip
+import hashlib
 import json
 import math
 import threading
@@ -10,6 +11,7 @@ import time
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
+from email.utils import format_datetime
 from functools import lru_cache, partial
 from pathlib import Path
 from typing import Any
@@ -52,6 +54,8 @@ from xevents.timeparse import BadTimestamp, parse_at
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 COUNTIES_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "counties.geojson"
+# Map-precision copy of the above, built alongside it; see _static_geo.
+COUNTIES_DISPLAY_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "counties.display.geojson"
 STATES_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "states.geojson"
 COUNTRIES_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "countries.geojson"
 WEB_DIR = Path(__file__).resolve().parent / "web"
@@ -164,15 +168,16 @@ def _warm(engine: Engine) -> None:
         print(f"cache warm-up failed: {type(exc).__name__}: {exc}", flush=True)
 
 
-_BODY_CACHE: dict[tuple[object, ...], tuple[bytes, bytes]] = {}
+_BODY_CACHE: dict[tuple[object, ...], tuple[bytes, bytes, str]] = {}
 
 
-def _cache_body(key: tuple[object, ...], build: Callable[[], bytes]) -> tuple[bytes, bytes]:
-    """The (raw, gzipped) body for ``key``, built and compressed once."""
+def _cache_body(key: tuple[object, ...], build: Callable[[], bytes]) -> tuple[bytes, bytes, str]:
+    """The (raw, gzipped, digest) body for ``key``, built, compressed and hashed once. The
+    digest is the ETag: the key already determines the body, so a changed body is a new key."""
     hit = _BODY_CACHE.get(key)
     if hit is None:
         raw = build()
-        hit = (raw, gzip.compress(raw, 6))
+        hit = (raw, gzip.compress(raw, 6), hashlib.blake2b(raw, digest_size=16).hexdigest())
         if len(_BODY_CACHE) > 64:
             _BODY_CACHE.clear()
         _BODY_CACHE[key] = hit
@@ -226,25 +231,48 @@ def _cached(
     build: Callable[[], bytes],
     media_type: str = "application/json",
     max_age: int | None = None,
+    last_modified: datetime | None = None,
 ) -> Response:
     """Serve a body built once per ``key``, gzipped once. For responses that do not change
     between deploys or re-matches: replay scenarios (keyed on ``replay_version``) and the
     reference boundary files (keyed on file mtime). Encoding a 15 MB replay and gzipping it
     on every request is what made the hosted demo take tens of seconds."""
-    raw, gz = _cache_body(key, build)
-    headers = {"Vary": "Accept-Encoding"}
+    raw, gz, digest = _cache_body(key, build)
+    as_gzip = "gzip" in request.headers.get("accept-encoding", "")
+    # Per-representation, so a cached gzip body is never matched against an identity one.
+    etag = f'"{digest}{"-gz" if as_gzip else ""}"'
+    headers = {"Vary": "Accept-Encoding", "ETag": etag}
     if max_age:
         headers["Cache-Control"] = f"public, max-age={max_age}"
-    if "gzip" in request.headers.get("accept-encoding", ""):
+    if last_modified is not None:
+        headers["Last-Modified"] = format_datetime(last_modified, usegmt=True)
+    # Once max-age lapses the browser revalidates; without a validator that meant downloading
+    # the whole boundary file again just to learn it had not changed.
+    if etag in {t.strip() for t in request.headers.get("if-none-match", "").split(",")}:
+        return Response(status_code=304, headers=headers)
+    if as_gzip:
         return Response(gz, media_type=media_type, headers={**headers, "Content-Encoding": "gzip"})
     return Response(raw, media_type=media_type, headers=headers)
 
 
-def _static_geo(request: Request, path: Path) -> Response:
+def _static_geo(request: Request, path: Path, display: Path | None = None) -> Response:
     """A reference boundary file, gzipped once and cacheable by the browser for a day (the
-    files change only with a deploy): the map no longer re-downloads 2 MB on every visit."""
-    key = ("geo", str(path), path.stat().st_mtime_ns)
-    return _cached(request, key, path.read_bytes, "application/geo+json", max_age=86400)
+    files change only with a deploy): the map no longer re-downloads 2 MB on every visit.
+
+    ``display`` is a smaller copy for the browser — geometry at map precision, without the
+    bbox and properties only the server's county lookup reads. The full file stays the one
+    ``CountyIndex`` joins facilities against, so thinning it cannot move a county line."""
+    served = display if display is not None and display.exists() else path
+    stat = served.stat()
+    key = ("geo", str(served), stat.st_mtime_ns)
+    return _cached(
+        request,
+        key,
+        served.read_bytes,
+        "application/geo+json",
+        max_age=86400,
+        last_modified=datetime.fromtimestamp(stat.st_mtime, UTC),
+    )
 
 
 def compact_item(i: Any) -> dict[str, Any]:
@@ -555,7 +583,7 @@ def create_app(engine: Engine | None = None) -> FastAPI:
 
     @app.get("/reference/counties")
     def counties(request: Request) -> Response:
-        return _static_geo(request, COUNTIES_GEOJSON)
+        return _static_geo(request, COUNTIES_GEOJSON, display=COUNTIES_DISPLAY_GEOJSON)
 
     @app.get("/reference/states")
     def states(request: Request) -> Response:

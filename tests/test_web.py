@@ -927,3 +927,57 @@ def test_welcome_styles_exist_for_the_dialog_and_the_tour(client: TestClient) ->
         "@media (max-height:800px)",
     ):
         assert rule in css, rule
+
+
+def test_boundary_files_revalidate_instead_of_redownloading(client: TestClient) -> None:
+    """The map's boundary files are the largest thing the demo sends (about 1.3 MB gzipped,
+    ~18 s on the free hosted instance). They are cacheable for a day; when that lapses the
+    browser must be able to revalidate, or it downloads the whole file again to be told it
+    has not changed."""
+    for path in ("/reference/counties", "/reference/states", "/reference/countries"):
+        r = client.get(path, headers={"Accept-Encoding": "gzip"})
+        assert r.status_code == 200, path
+        assert "max-age=86400" in r.headers["cache-control"], path
+        etag = r.headers.get("etag")
+        assert etag and r.headers.get("last-modified"), path
+        again = client.get(path, headers={"Accept-Encoding": "gzip", "If-None-Match": etag})
+        assert again.status_code == 304, path
+        assert not again.content, path
+        assert again.headers.get("etag") == etag, path
+        # a stale validator still gets the body
+        fresh = client.get(path, headers={"Accept-Encoding": "gzip", "If-None-Match": '"nope"'})
+        assert fresh.status_code == 200 and fresh.content, path
+
+
+def test_gzip_and_identity_do_not_share_an_etag(client: TestClient) -> None:
+    """One URL, two representations. Handing the gzip body's validator to a client that asked
+    for identity (or the reverse) would answer 304 for a body it has never seen."""
+    gz = client.get("/reference/states", headers={"Accept-Encoding": "gzip"}).headers["etag"]
+    plain = client.get("/reference/states", headers={"Accept-Encoding": "identity"}).headers["etag"]
+    assert gz != plain
+    crossed = client.get(
+        "/reference/states", headers={"Accept-Encoding": "identity", "If-None-Match": gz}
+    )
+    assert crossed.status_code == 200
+
+
+def test_counties_are_served_at_map_precision_but_joined_at_full(client: TestClient) -> None:
+    """Two copies on purpose. The browser gets outlines only, rounded to ~110 m — finer than a
+    pixel at national zoom. ``CountyIndex`` keeps ray-casting facilities against the full file,
+    so thinning what the map draws can never move a facility into another county."""
+    import json
+
+    from xevents.api import COUNTIES_DISPLAY_GEOJSON, COUNTIES_GEOJSON
+
+    served = client.get("/reference/counties").json()
+    full = json.loads(COUNTIES_GEOJSON.read_text(encoding="utf-8"))
+    assert [f["id"] for f in served["features"]] == [f["id"] for f in full["features"]]
+    # map.js styles by feature.id; bbox and properties are the server's, and are not sent
+    assert all("bbox" not in f and "properties" not in f for f in served["features"])
+    assert all("bbox" in f and "properties" in f for f in full["features"]), (
+        "the join file keeps what CountyIndex reads"
+    )
+    assert COUNTIES_DISPLAY_GEOJSON.stat().st_size < COUNTIES_GEOJSON.stat().st_size
+    assert CountyIndex.load().source, "the index still loads the full file"
+    js = client.get("/static/map.js").text
+    assert 'fetch("/reference/counties")' in js and "feature.id" in js
