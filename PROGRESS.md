@@ -2,6 +2,35 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-22 — keyless AirNow live, EAGLE-I GA/OH mirrors, observed-event windows
+
+- **Observed events have no lead window** (`engine.item_window_start`): an observed item
+  starts at the observation; forecast/imminent items keep the card's lead. Consecutive
+  outage readings no longer supersede each other — each is current only in its own poll
+  window. Fixes the Uri replay showing the Feb 18 reading as current on Feb 16. In Ian the
+  chain is now watch → warning (same family) → observed outage, with real timing; before,
+  outages reached back seven days and superseded watches that had already expired. Four
+  goldens regenerated (heat dome unchanged). The compounding chip names three events and
+  counts the rest.
+- **AirNow without a key** (`AirNowFilesProvider`): newest `HourlyAQObs_<yyyymmddhh>.dat`
+  (walks back up to 4 h) for per-monitor PM2.5/ozone AQI, and `today/reportingarea.dat`
+  forecast rows for today onward (category-only forecasts use the category floor, recorded
+  in `metrics.aqi_basis`; county = reporting-area centre). Forecasts are temporality
+  *forecast*, so Card 8 fires pre-event. First live run: Dallas–Fort Worth and Houston ozone
+  forecasts at USG → Card 8 pre-event items at both stations. The key-based API remains an
+  optional second path.
+- **EAGLE-I for Georgia and Ohio**: `EAGLEI_FEATURE_URL` takes several layers; the image and
+  `render.yaml` list the only two public mirrors with current data (GEMA, Ohio). Per-layer
+  fetch, merge per county, skip layers older than 6 h, fail only when none is current; only
+  the outage fields are requested (the GA layer also holds emergency-manager contacts); a
+  FEMA token goes only to `gis.fema.gov`. National live coverage still needs `EAGLEI_TOKEN`.
+- **Feed runs** (`feed_runs` table, `record_feed_run` / `latest_feed_runs`): every live
+  provider run is recorded, including empty and skipped ones. The live banner lists them
+  (events / failed / off, time, stale) and states the outage coverage ("coverage GA, OH
+  (public state mirrors); 0 county readings ≥ 10 %"); live coverage joins the EAGLE-I
+  caveats wherever outage numbers render. `/feeds` returns the runs.
+- Verified in the rebuilt container: 6/6 providers ok, 742 live events, ~58 MB memory.
+
 ## 2026-09-22 — live events restored (self-refreshing); playback display fixes
 
 - **Why live events vanished:** live rows exist only in a running instance's database. The

@@ -477,3 +477,35 @@ def test_airnow_readings_group_by_pollutant(client: TestClient) -> None:
     assert "XMap.fitCounties(ctx, fips" in pb
     dash = client.get("/", params={"scenario": "heat_dome_2021", "at": AT}).text
     assert "XMap.fitPoints(ctx, bounds" in dash
+
+
+def test_live_banner_shows_provider_runs_and_outage_coverage(tmp_path: Path) -> None:
+    """Every provider run is visible, including one that produced nothing, and the EAGLE-I
+    coverage (which states) is stated wherever outage caveats appear."""
+    from xevents.store import record_feed_run
+
+    eng = make_engine(f"sqlite:///{tmp_path / 'runs.db'}")
+    init_db(eng)
+    record_feed_run(eng, "hms", "hms", "ok", 6)
+    record_feed_run(
+        eng,
+        "eagle_i",
+        "eagle_i",
+        "ok",
+        0,
+        "coverage GA, OH (public state mirrors); 0 county readings ≥ 10% of customers out",
+    )
+    record_feed_run(eng, "airnow (files)", "airnow", "failed", 0, "HTTP 502")
+    c = TestClient(create_app(eng))
+    html = c.get("/").text
+    assert "hms: 6 events" in html and "eagle_i: 0 events" in html
+    assert "airnow (files): <b>failed</b>" in html
+    assert "Power outages (EAGLE-I): coverage GA, OH (public state mirrors)" in html
+    assert 'class="banner stale"' in html, "a failed provider makes the banner amber"
+    runs = c.get("/feeds").json()["runs"]
+    assert {r["provider"] for r in runs} == {"hms", "eagle_i", "airnow (files)"}
+    from xevents.web.views import event_group
+
+    assert event_group("AQI forecast Unhealthy for Sensitive Groups (OZONE)") == (
+        "AirNow AQI forecast (OZONE)"
+    )

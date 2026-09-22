@@ -33,6 +33,7 @@ from xevents.store import (
     get_action_item,
     get_event,
     get_facility,
+    latest_feed_runs,
     list_action_items,
     list_events,
     list_facilities,
@@ -208,7 +209,12 @@ def create_app(engine: Engine | None = None) -> FastAPI:
             age_h = (now - datetime.fromisoformat(last)).total_seconds() / 3600 if last else None
             r["age_hours"] = round(age_h, 1) if age_h is not None else None
             r["stale"] = age_h is None or age_h > STALE_AFTER_HOURS
-        return {"as_of": now.isoformat(), "stale_after_hours": STALE_AFTER_HOURS, "feeds": rows}
+        return {
+            "as_of": now.isoformat(),
+            "stale_after_hours": STALE_AFTER_HOURS,
+            "feeds": rows,
+            "runs": latest_feed_runs(_engine(request)),
+        }
 
     @app.get("/events")
     def events(

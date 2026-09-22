@@ -31,6 +31,9 @@ ENV PORT=8000
 # hourly (src/xevents/live_refresh.py). NWS requires a contact string; the public repository
 # is that contact. Override either at run time; LIVE_REFRESH_MINUTES=0 turns refresh off.
 ENV LIVE_REFRESH_MINUTES=60 \
-    NWS_USER_AGENT="med-extreme-events demo (https://github.com/shlyakhter1/med-extreme-events)"
+    NWS_USER_AGENT="med-extreme-events demo (https://github.com/shlyakhter1/med-extreme-events)" \
+    EAGLEI_FEATURE_URL="https://services1.arcgis.com/2iUE8l8JKrP2tygQ/arcgis/rest/services/Join_Features_to_GEMA_All_Hazards_and_Master_Contacts_Layer_view/FeatureServer/0 https://services6.arcgis.com/zxOMWqh0yAD6mMsJ/arcgis/rest/services/power_outages_eagle_i/FeatureServer/0"
+# EAGLEI_FEATURE_URL: the only public EAGLE-I mirrors with live data (Georgia GEMA, Ohio), so
+# live outages cover GA and OH until a FEMA token (EAGLEI_TOKEN) gives national coverage.
 # Render and Railway inject $PORT; Fly uses the internal_port in fly.toml.
 CMD ["sh", "-c", "exec uvicorn xevents.api:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -98,29 +98,50 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
   requests per hour, so the provider fetches one bounding box per call and caches every
   response.
 - **Used for:** air-pollution events. Monitors are mapped to counties by point-in-polygon.
-  Live mode only, and skipped when there is no key.
+  Optional second live path, used only when `AIRNOW_API_KEY` is set.
+- **Live route (no key, the default):** `AirNowFilesProvider` reads AirNow's public file
+  feed. Observations: the newest
+  `https://files.airnowtech.org/airnow/<yyyy>/<yyyymmdd>/HourlyAQObs_<yyyymmddhh>.dat`
+  (per-monitor PM2.5 and ozone AQI with coordinates, UTC, posted a little after each hour;
+  the provider walks back up to four hours). Forecasts:
+  `https://files.airnowtech.org/airnow/today/reportingarea.dat`, forecast rows (`F`) for
+  today onward. Forecasts often give only a category; the AQI is then the category's lower
+  bound (`metrics.aqi_basis` says so), and the county is the one holding the reporting
+  area's centre. Forecast events carry temporality *forecast*, so Card 8 shows pre-event
+  actions before the air turns. One event per county, day and pollutant at AQI ≥ 101. No
+  key, no request quota. Verified live 2026-09-22 (Dallas–Fort Worth and Houston ozone
+  forecasts at "Unhealthy for Sensitive Groups").
 - **Historical route (no key):** the AirNow public file archive
   `https://files.airnowtech.org/airnow/<yyyy>/<yyyymmdd>/daily_data_v2.dat` gives one daily
   AQI per site and parameter (PM2.5 24-h, ozone 8-h) with coordinates;
   `parse_daily_data_v2` maps it onto the same observation rows, so replay fixtures
   (`smoke_canada_2026`) carry AirNow events without a key.
 - **Code:** `src/xevents/providers/airnow.py`.
-- **Limits:** the **response shape has not been verified against a real key**. Check the
-  first live pull in `fixtures/live/raw/airnow_data_*.json`. None of the scenarios contain
-  AirNow data.
+- **Limits:** the key-based API's **response shape has not been verified against a real
+  key**; the keyless files are what live mode relies on. AirNow data are preliminary and
+  unvalidated. `smoke_canada_2026` carries AirNow events from the daily archive.
 
 ### EAGLE-I county power outages (`providers/eagle_i.py`)
 
 - **What:** customers without power per county, collected by ORNL's EAGLE-I program for DOE
-  from utilities' public outage maps. Live: an ArcGIS FeatureServer table carrying the
-  EAGLE-I API fields (`currentOutage`, `currentOutageRunStartTime`, `countyFIPSCode`,
-  `coveredCustomers`, `modelCount` …), polled hourly; FEMA's partner service
-  (`gis.fema.gov/arcgis/rest/services/Partner/PowerOutages_EAGLE_I`) is the default but
-  answered *Token Required* on 2026-09-21, so set `EAGLEI_TOKEN`, or point
-  `EAGLEI_FEATURE_URL` at a public mirror with the same fields (state emergency-management
-  agencies publish them). Replay: the ORNL yearly county CSVs (15-minute cadence,
-  2014–2025, figshare doi:10.6084/m9.figshare.24237376), sliced per scenario and resampled
-  to hourly maxima.
+  from utilities' public outage maps, read from ArcGIS layers that carry the EAGLE-I fields
+  (`currentOutage`, `currentOutageRunStartTime`, `countyFIPSCode`, `coveredCustomers`,
+  `modelCount` …). Only those fields are requested.
+- **Live, today: Georgia and Ohio.** FEMA's national partner layer
+  (`gis.fema.gov/arcgis/rest/services/Partner/PowerOutages_EAGLE_I`) needs a token
+  (`EAGLEI_TOKEN`; sent only to FEMA's host, never to mirrors). Until one is available, the
+  image and `render.yaml` list the only two public state mirrors with current data
+  (verified 2026-09-22): Georgia GEMA and Ohio's watch office, in `EAGLEI_FEATURE_URL`
+  (several layers, separated by spaces or commas). Each layer is fetched on its own and
+  merged per county (latest reading wins); a failing layer, or one whose newest reading is
+  more than six hours old, is skipped and reported; the run fails only when no layer gave a
+  current snapshot. The live banner states the coverage ("coverage GA, OH (public state
+  mirrors)") and how many county readings cleared the lowest card threshold, so a quiet
+  day reads as "polled, nothing over 10 %" rather than a dead feed. The mirrors are
+  unofficial copies: they can change or stop without notice.
+- **Replay:** the ORNL yearly county CSVs (15-minute cadence, 2014–2025, figshare
+  doi:10.6084/m9.figshare.24237376), sliced per scenario and resampled to hourly maxima —
+  national, no credentials.
 - **Denominator:** `fixtures/reference/eaglei_customers.csv` (Moehl et al. modeled county
   customers, 2022), so live and replay compute `outage_pct` the same way; the feed's own
   coverage fields are kept in `metrics` as `feed_*` for cross-checks.

@@ -176,9 +176,11 @@ Notes:
   because the database is rebuilt into each image.
 - Live events refresh inside the app at startup and hourly (`LIVE_REFRESH_MINUTES` in
   `render.yaml`). They are not persistent: a redeploy or a wake from sleep starts from the
-  image and refills within about a minute. NWS, the IEM archive, OpenFEMA and NOAA smoke need
-  no key; EAGLE-I is skipped unless `EAGLEI_TOKEN` or `EAGLEI_FEATURE_URL` is set, and AirNow
-  unless `AIRNOW_API_KEY` is (set secrets in the Render dashboard, not in `render.yaml`).
+  image and refills within about a minute. No provider needs a key: NWS, the IEM archive,
+  OpenFEMA, NOAA smoke, AirNow (public file feed: hourly monitors and forecasts) and EAGLE-I
+  for Georgia and Ohio (public state mirrors, listed in `EAGLEI_FEATURE_URL`). A FEMA token
+  in `EAGLEI_TOKEN` would add national outage coverage; set secrets in the Render dashboard,
+  not in `render.yaml`.
 
 ### Google Cloud Run — scales to zero, generous free tier
 

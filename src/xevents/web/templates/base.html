@@ -85,7 +85,9 @@
 {% if mode == 'live' %}
   <div class="banner {{ 'stale' if any_stale else 'ok' }}">
     <b>Live mode</b> · as of {{ as_of_iso }} (all times UTC) ·
-    {% if feeds %}{% for f in feeds %}{{ f.source }}: {{ f.events }} events, last ingest {{ f.last_ingested_at or 'never' }}{% if f.stale %} <b>(stale)</b>{% endif %}{{ ' · ' if not loop.last }}{% endfor %}{% else %}no live events ingested yet — run <code>EVENT_MODE=live make ingest match</code>{% endif %}
+    {% if runs %}{% for r in runs %}<span title="{{ r.detail or '' }}">{{ r.provider }}: {% if r.status == 'ok' %}{{ r.events }} events{% elif r.status == 'failed' %}<b>failed</b>{% else %}off{% endif %} ({{ r.run_hhmm }}){% if r.stale %} <b>(stale)</b>{% endif %}</span>{{ ' · ' if not loop.last }}{% endfor %}
+      {% set eg = runs|selectattr('provider', 'equalto', 'eagle_i')|list %}{% if eg and eg[0].status == 'ok' %}<div style="font-size:12px;margin-top:3px">Power outages (EAGLE-I): {{ eg[0].detail }}.</div>{% endif %}
+    {% elif feeds %}{% for f in feeds %}{{ f.source }}: {{ f.events }} events, last ingest {{ f.last_ingested_at or 'never' }}{% if f.stale %} <b>(stale)</b>{% endif %}{{ ' · ' if not loop.last }}{% endfor %}{% else %}no live events ingested yet — run <code>EVENT_MODE=live make ingest match</code>{% endif %}
     · absence of items is not an all-clear when a feed is stale.
   </div>
 {% else %}

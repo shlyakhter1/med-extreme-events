@@ -21,3 +21,7 @@ services:
         value: "60"
       - key: NWS_USER_AGENT
         value: med-extreme-events demo (https://github.com/shlyakhter1/med-extreme-events)
+      - key: EAGLEI_FEATURE_URL        # public EAGLE-I state mirrors: Georgia (GEMA), Ohio
+        value: >-
+          https://services1.arcgis.com/2iUE8l8JKrP2tygQ/arcgis/rest/services/Join_Features_to_GEMA_All_Hazards_and_Master_Contacts_Layer_view/FeatureServer/0
+          https://services6.arcgis.com/zxOMWqh0yAD6mMsJ/arcgis/rest/services/power_outages_eagle_i/FeatureServer/0

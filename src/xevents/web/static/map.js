@@ -69,7 +69,10 @@ window.XMap = (() => {
      distinct names. Group them by pollutant for timelines and summaries; every other source
      already uses a stable product name. The same rule lives in views.event_group. */
   const AQI_NAME = /^AQI \d+ \((.+)\)$/;
+  const AQI_FORECAST_NAME = /^AQI forecast .+ \((.+)\)$/;
   const eventGroup = (name) => {
+    const f = AQI_FORECAST_NAME.exec(name || "");
+    if (f) return `AirNow AQI forecast (${f[1]})`;
     const m = AQI_NAME.exec(name || "");
     return m ? `AirNow AQI (${m[1]})` : name;
   };

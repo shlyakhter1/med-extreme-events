@@ -257,7 +257,31 @@ def parse_features(features: list[dict[str, Any]]) -> list[OutagePoll]:
     return polls
 
 
+# Public state mirrors of the EAGLE-I feed with the same fields, verified live 2026-09-22 (the
+# only two found with current data). Used when no FEMA token is available.
+STATE_MIRRORS: dict[str, str] = {
+    "GA": "https://services1.arcgis.com/2iUE8l8JKrP2tygQ/arcgis/rest/services/"
+    "Join_Features_to_GEMA_All_Hazards_and_Master_Contacts_Layer_view/FeatureServer/0",
+    "OH": "https://services6.arcgis.com/zxOMWqh0yAD6mMsJ/arcgis/rest/services/"
+    "power_outages_eagle_i/FeatureServer/0",
+}
+FEMA_HOST = "gis.fema.gov"
+MAX_MIRROR_AGE_HOURS = 6.0
+
+
+def feature_urls_from_env(value: str | None = None) -> list[str]:
+    """``EAGLEI_FEATURE_URL`` may list several layers, separated by commas or whitespace."""
+    raw = os.environ.get("EAGLEI_FEATURE_URL", "") if value is None else value
+    return [u.strip().rstrip("/") for u in raw.replace(",", " ").split() if u.strip()]
+
+
 class EagleIProvider(EventProvider):
+    """Polls one or more ArcGIS layers carrying the EAGLE-I county fields: FEMA's national
+    partner layer (token), or public state mirrors. Each layer is fetched on its own; a
+    failing or stale layer is skipped and reported, and the run fails only when no layer
+    produced a current snapshot. ``coverage`` and ``notes`` describe the last run for the
+    feed-status banner."""
+
     source = EventSource.EAGLE_I
 
     def __init__(
@@ -265,21 +289,27 @@ class EagleIProvider(EventProvider):
         customers: dict[str, int],
         *,
         threshold_pct: float,
+        feature_urls: list[str] | None = None,
         feature_url: str | None = None,
         token: str | None = None,
         raw_dir: Path | None = None,
         poll_minutes: int = LIVE_POLL_MINUTES,
+        max_age_hours: float = MAX_MIRROR_AGE_HOURS,
+        now: datetime | None = None,
         timeout: float = 120.0,
         transport: httpx.BaseTransport | None = None,
     ) -> None:
         self.customers = customers
         self.threshold_pct = threshold_pct
-        self.feature_url = (
-            feature_url or os.environ.get("EAGLEI_FEATURE_URL") or FEMA_FEATURE_URL
-        ).rstrip("/")
+        urls = feature_urls or ([feature_url] if feature_url else feature_urls_from_env())
+        self.feature_urls = [u.rstrip("/") for u in (urls or [FEMA_FEATURE_URL])]
         self.token = token or os.environ.get("EAGLEI_TOKEN") or None
         self.raw_dir = raw_dir
         self.poll_minutes = poll_minutes
+        self.max_age_hours = max_age_hours
+        self._now = now
+        self.coverage: list[str] = []
+        self.notes: list[str] = []
         self._client = httpx.Client(
             headers={"User-Agent": os.environ.get("NWS_USER_AGENT") or "med-extreme-events"},
             timeout=timeout,
@@ -287,23 +317,29 @@ class EagleIProvider(EventProvider):
             follow_redirects=True,
         )
 
+    @property
+    def feature_url(self) -> str:  # the first layer, for messages and older callers
+        return self.feature_urls[0]
+
     def close(self) -> None:
         self._client.close()
 
-    def _page(self, offset: int) -> dict[str, Any]:
+    def _page(self, url: str, offset: int) -> dict[str, Any]:
         params: dict[str, str] = {
             "where": "1=1",
-            "outFields": "*",
+            # only the outage fields: some mirrors join EAGLE-I to layers holding contact
+            # details of emergency managers, which we have no reason to copy
+            "outFields": ",".join(FIELDS.values()),
             "returnGeometry": "false",
             "resultOffset": str(offset),
             "resultRecordCount": str(PAGE_SIZE),
             "f": "json",
         }
-        if self.token:
-            params["token"] = self.token
-        r = self._client.get(f"{self.feature_url}/query", params=params)
+        if self.token and httpx.URL(url).host == FEMA_HOST:
+            params["token"] = self.token  # never send a FEMA token to third-party mirrors
+        r = self._client.get(f"{url}/query", params=params)
         if r.status_code != 200:
-            raise ProviderError(f"EAGLE-I {self.feature_url}: HTTP {r.status_code} {r.text[:200]}")
+            raise ProviderError(f"EAGLE-I {url}: HTTP {r.status_code} {r.text[:200]}")
         doc: dict[str, Any] = r.json()
         if "error" in doc:
             err = doc["error"]
@@ -313,27 +349,76 @@ class EagleIProvider(EventProvider):
                 if err.get("code") in (498, 499)
                 else ""
             )
-            raise ProviderError(f"EAGLE-I {self.feature_url}: {err.get('message')}{hint}")
+            raise ProviderError(f"EAGLE-I {url}: {err.get('message')}{hint}")
         return doc
 
-    def fetch_polls(self) -> tuple[list[OutagePoll], str | None]:
+    def _layer_features(self, url: str) -> list[dict[str, Any]]:
         features: list[dict[str, Any]] = []
         offset = 0
-        while True:
-            doc = self._page(offset)
+        for _ in range(100):  # a layer that ignores resultOffset must not loop forever
+            doc = self._page(url, offset)
             page = doc.get("features", [])
             features.extend(page)
             if not doc.get("exceededTransferLimit") or not page:
                 break
             offset += len(page)
+        return features
+
+    def fetch_polls(self) -> tuple[list[OutagePoll], str | None]:
+        """Latest reading per county across every layer that answered with current data."""
+        now = self._now or datetime.now(UTC)
+        latest: dict[str, OutagePoll] = {}
+        raw: dict[str, list[dict[str, Any]]] = {}
+        self.notes = []
+        errors: list[str] = []
+        for url in self.feature_urls:
+            host = httpx.URL(url).host
+            try:
+                features = self._layer_features(url)
+                polls = parse_features(features)
+            except (ProviderError, httpx.HTTPError, ValueError) as exc:
+                errors.append(str(exc))
+                self.notes.append(f"{host}: failed")
+                continue
+            raw[url] = features
+            if not polls:
+                self.notes.append(f"{host}: empty")
+                continue
+            age_h = (now - max(p.run_start for p in polls)).total_seconds() / 3600
+            if age_h > self.max_age_hours:
+                self.notes.append(f"{host}: stale ({age_h:.0f} h old), skipped")
+                continue
+            for p in polls:
+                cur = latest.get(p.county_fips)
+                if cur is None or p.run_start > cur.run_start:
+                    latest[p.county_fips] = p
+        polls = [latest[k] for k in sorted(latest)]
+        self.coverage = sorted({p.state for p in polls if p.state})
         raw_ref = None
-        if self.raw_dir is not None:
+        if self.raw_dir is not None and raw:
             self.raw_dir.mkdir(parents=True, exist_ok=True)
             stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
             out = self.raw_dir / f"eaglei_outages_{stamp}.json"
-            out.write_text(json.dumps({"features": features}), encoding="utf-8")
+            out.write_text(json.dumps(raw), encoding="utf-8")
             raw_ref = str(out)
-        return parse_features(features), raw_ref
+        if not polls:
+            reason = "; ".join(errors + self.notes) or "no layer answered"
+            raise ProviderError(f"EAGLE-I: no current outage snapshot ({reason})")
+        return polls, raw_ref
+
+    def status_detail(self, events: int) -> str:
+        """One line for the feed banner: coverage, counties polled and what cleared a card."""
+        where = ", ".join(self.coverage) or "none"
+        kind = (
+            "national (FEMA)"
+            if any(FEMA_HOST in u for u in self.feature_urls)
+            else ("public state mirrors")
+        )
+        extra = f"; {'; '.join(self.notes)}" if self.notes else ""
+        return (
+            f"coverage {where} ({kind}); {events} county readings ≥ "
+            f"{self.threshold_pct:g}% of customers out{extra}"
+        )
 
     def fetch(self, window: TimeWindow) -> list[Event]:
         """The current snapshot (one run per county); the store accumulates polls over time."""

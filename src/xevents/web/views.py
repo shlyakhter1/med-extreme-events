@@ -34,6 +34,7 @@ from xevents.store import (
     feed_status,
     get_event,
     get_facility,
+    latest_feed_runs,
     list_action_items,
     list_events,
     list_facilities,
@@ -96,11 +97,14 @@ _COUNTY_NAMES: dict[str, str] | None = None
 
 
 _AQI_NAME = re.compile(r"^AQI \d+ \((.+)\)$")
+_AQI_FORECAST_NAME = re.compile(r"^AQI forecast .+ \((.+)\)$")
 
 
 def event_group(name: str) -> str:
-    """AirNow event names carry the reading ("AQI 220 (PM2.5)"); group them by pollutant
-    for summaries. The same rule is ``XMap.eventGroup`` in map.js."""
+    """AirNow event names carry the reading ("AQI 220 (PM2.5)", "AQI forecast Unhealthy
+    (OZONE)"); group them by pollutant for summaries. Same rule: ``XMap.eventGroup``."""
+    if m := _AQI_FORECAST_NAME.match(name):
+        return f"AirNow AQI forecast ({m.group(1)})"
     m = _AQI_NAME.match(name)
     return f"AirNow AQI ({m.group(1)})" if m else name
 
@@ -131,6 +135,7 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
     chosen = scenario if scenario not in (None, "", "live") else None
     if chosen is not None and chosen not in {s["id"] for s in scenarios}:
         raise HTTPException(status_code=404, detail=f"unknown scenario {chosen}")
+    runs: list[dict[str, Any]] = []
     if chosen is None:
         as_of = _parse_at(at) or datetime.now(UTC)
         feeds = feed_status(_engine(request))
@@ -139,10 +144,19 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
             age = (as_of - datetime.fromisoformat(last)).total_seconds() / 3600 if last else None
             f["age_hours"] = round(age, 1) if age is not None else None
             f["stale"] = age is None or age > STALE_AFTER_HOURS
+        runs = latest_feed_runs(_engine(request))
+        for r in runs:
+            age = (as_of - datetime.fromisoformat(r["run_at"])).total_seconds() / 3600
+            r["run_hhmm"] = datetime.fromisoformat(r["run_at"]).strftime("%m-%d %H:%MZ")
+            r["stale"] = r["status"] == "ok" and age > STALE_AFTER_HOURS
     else:
         summary = next(s for s in scenarios if s["id"] == chosen)
         as_of = _parse_at(at) or datetime.fromisoformat(summary["peak_at"])
         feeds = []
+    eaglei_caveats = [CUSTOMERS_CAVEAT, COVERAGE_CAVEAT]
+    eaglei_run = next((r for r in runs if r["provider"] == "eagle_i"), None)
+    if eaglei_run and eaglei_run["status"] == "ok" and eaglei_run["detail"]:
+        eaglei_caveats.append(f"Live {eaglei_run['detail'].split(';')[0]}.")
     return {
         "request": request,
         "asset_v": ASSET_V,
@@ -153,10 +167,15 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
         "as_of_iso": as_of.isoformat(),
         "as_of_input": to_input_value(as_of),
         "feeds": feeds,
-        "any_stale": any(f["stale"] for f in feeds) if feeds else chosen is None,
+        "runs": runs,
+        "any_stale": (
+            any(r["stale"] or r["status"] == "failed" for r in runs)
+            if runs
+            else (any(f["stale"] for f in feeds) if feeds else chosen is None)
+        ),
         "eaglei": {
             "attribution": EAGLEI_ATTRIBUTION,
-            "caveats": [CUSTOMERS_CAVEAT, COVERAGE_CAVEAT],
+            "caveats": eaglei_caveats,
             "denominator": DENOMINATOR_SOURCE,
             "overcount": OVERCOUNT_CAVEAT,
         },

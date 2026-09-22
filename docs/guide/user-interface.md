@@ -45,9 +45,13 @@ a station, and its panel is an estimate with its formula attached.
   the hour with the most simultaneously active events. Live opens at now.
 - **The banner** under the header says which mode you are in.
   - *Replay*: the scenario and the as-of time.
-  - *Live*: each feed's event count and last ingest time, marked **(stale)** after six
-    hours. It always adds "absence of items is not an all-clear when a feed is stale": an
-    empty board with a stale feed means "we don't know", not "nothing is happening".
+  - *Live*: every provider's last run — events it produced, **failed**, or *off* — with
+    its time, marked **(stale)** when the last good run is more than six hours old; hover a
+    provider for its detail. A second line states the power-outage coverage ("coverage GA,
+    OH (public state mirrors); 0 county readings ≥ 10 % of customers out"). The banner
+    turns amber when any provider failed or went stale, and always adds "absence of items is
+    not an all-clear when a feed is stale": an empty board then means "we don't know", not
+    "nothing is happening".
 - **All times are UTC**, everywhere.
 - The header links (Dashboard, Events, Playback, API) keep the current scenario and time.
 
@@ -55,9 +59,9 @@ a station, and its panel is an estimate with its formula attached.
 
 ![Live dashboard](images/dashboard-live.png)
 
-*Live mode on 2026-09-22: 58 active events and 10 stations with open items, driven mostly
-by flood products firing Card 3. The banner lists the three live feeds and their last
-ingest.*
+*Live mode on 2026-09-22: 59 active events and 12 stations with open items. Flood products
+fire Card 3; AirNow ozone forecasts for Dallas–Fort Worth and Houston fire Card 8 (purple
+on the map). The banner lists every provider's last run and the outage coverage (GA, OH).*
 
 **How to use it.** Read the **Event board** from the top: it is the order in which to act.
 Click a facility name for its cards. The **Outreach queue** banner counts the highest-acuity
@@ -89,8 +93,10 @@ to open it. The **Active events** table lists what is driving the items.
 ![Houston VAMC during Winter Storm Uri](images/facility-uri.png)
 
 *Houston VAMC in the Uri replay at 2021-02-16 15:00Z. The outage cards (dialysis, insulin)
-carry the EAGLE-I attribution, the veteran panel and the emPOWER line, and show during-event
-actions. The cold card carries the compounding chip and pre-event actions.*
+show the 15:00 reading (window 15:00–16:00), the EAGLE-I attribution, the veteran panel
+and the emPOWER line, and during-event actions; their chip names the cold warning they
+co-occur with. The cold card carries the boost chip (three outage readings "and 11 more")
+and pre-event actions.*
 
 **How to use it.** Toggle **care team** / **patient & caregiver** to switch between the
 clinician checklist and the patient wording. Expand **how was this number computed?** under
@@ -106,11 +112,14 @@ Each block has, top to bottom:
 2. **Provenance line**: event key, the item's window, card id and version, evidence tier,
    and **temporality → phase**. The temporality of the event decides which actions apply:
    *forecast* and *imminent* events show **pre-event** actions, *observed* events show
-   **during-event** actions. Phase-agnostic actions always show.
+   **during-event** actions. Phase-agnostic actions always show. The window of an observed
+   event's item starts at the observation (it has no lead time); a forecast or imminent
+   event's item opens the card's lead window, days ahead. So in a replay each outage reading
+   is current only during its own hour.
 3. **Outage attribution** (outage cards only): "Electric customer outage data provided by
    EAGLE-I, Department of Energy" and "customers are meters, not people".
 4. **Compounding chip** (heat and cold cards only, when it applies): **compounding · acuity
-   +1**, followed by the outage events it co-occurs with. It means an observed power outage
+   +1**, followed by the first three outage events it co-occurs with and a count of the rest. It means an observed power outage
    in the same county, above a card threshold and sustained for two polls, overlaps this
    event. The item was moved up one acuity class. Outage items show the chip too, as an
    annotation without the bump.
@@ -230,9 +239,13 @@ the legend and the hover text name them.
 
 - **Replay** scenarios are computed ahead of time from archived sources and never change.
 - **Live** events are pulled from the feeds when the app starts and then hourly: NWS alerts
-  plus a two-week archive backfill, OpenFEMA declarations and NOAA smoke. EAGLE-I outages and
-  AirNow air quality join when their credentials are configured. Live data is rebuilt from the
-  feeds after each restart or redeploy; the first refresh lands within about a minute.
+  plus a two-week archive backfill, OpenFEMA declarations, NOAA smoke, AirNow hourly monitor
+  AQI and next-day forecasts (keyless public files), and EAGLE-I county outages for
+  **Georgia and Ohio only** (the public state mirrors; national coverage needs a FEMA token).
+  An AirNow forecast of "Unhealthy for Sensitive Groups" or worse fires Card 8 with
+  **pre-event** actions. Live data is rebuilt from the feeds after each restart or redeploy;
+  the first refresh lands within about a minute. After a restart an outage needs two
+  consecutive hourly readings over the threshold before Cards 3, 5 and 6 fire.
 - A live board fills with the items of alerts active now. Items whose window has passed are
   expired automatically; replay items never expire.
 
@@ -251,16 +264,12 @@ the legend and the hover text name them.
 
 ## 12. Known issues
 
-- **Replay can show a later outage measurement as current.** Items take a lead window from
-  their card (days before the event), and observed outage polls inherit it. At 2021-02-16
-  15:00 in the Uri replay, Houston's outage cards show the 2021-02-18 03:00 measurement and
-  its severity. Observed events should have no lead window; this is an engine change.
 - **Replay supersession is time-independent.** Statuses are computed once over the whole
   scenario, so before a warning is issued its watch can already appear superseded.
-- **The compounding chip lists every co-occurring poll** (14 on the Houston cold card). It
-  should show the first few and a count.
+- **Live outage coverage is Georgia and Ohio only**, from unofficial public mirrors of
+  EAGLE-I; everywhere else a live power outage is invisible until a FEMA token is set.
 - **Status buttons have no login.** Anyone on the public demo can acknowledge or complete an
   item; changes reset on every redeploy.
 - **Card chips are colour-only** on the playback map.
-- At an exact hour boundary two consecutive outage polls can both be active; the pages show
-  the stronger one.
+- At an exact hour boundary two consecutive outage readings can both be active; the pages
+  show the stronger one.

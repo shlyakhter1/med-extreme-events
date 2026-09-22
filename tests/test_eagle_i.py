@@ -56,6 +56,7 @@ from xevents.store import (
 )
 
 FIX = Path(__file__).parent / "fixtures" / "events"
+SAMPLE_NOW = datetime(2026, 9, 21, 22, tzinfo=UTC)  # an hour after the saved snapshot's runs
 T0 = datetime(2022, 9, 28, 18, tzinfo=UTC)
 LEE, PINELLAS = "12071", "12103"
 CUSTOMERS = {LEE: 600_000, PINELLAS: 360_000}
@@ -266,9 +267,10 @@ def test_provider_pages_caches_and_filters(tmp_path: Path) -> None:
     provider = EagleIProvider(
         customers,
         threshold_pct=10,
-        feature_url="https://example.test/arcgis/rest/services/eagle/FeatureServer/0/",
+        feature_url="https://gis.fema.gov/arcgis/rest/services/eagle/FeatureServer/0/",
         token="t0k",
         raw_dir=tmp_path,
+        now=SAMPLE_NOW,
         transport=httpx.MockTransport(handler),
     )
     window = TimeWindow(
@@ -286,8 +288,9 @@ def test_provider_pages_caches_and_filters(tmp_path: Path) -> None:
         EagleIProvider(
             customers,
             threshold_pct=10,
-            feature_url="https://example.test/x/FeatureServer/0",
+            feature_url="https://gis.fema.gov/x/FeatureServer/0",
             token="t0k",
+            now=SAMPLE_NOW,
             transport=httpx.MockTransport(handler),
         ).fetch(far)
         == []
@@ -457,3 +460,108 @@ def test_outage_renders_with_attribution_and_footnotes(tmp_path: Path) -> None:
     assert facility.status_code == 200
     assert ATTRIBUTION in facility.text and "observed → during_event actions" in facility.text
     assert "Hurricane/Power Outage × Dialysis-Dependent ESRD" in facility.text
+
+
+# --------------------------------------------------------------------------- state mirrors
+
+
+def _layer(state: str, fips: str, out: int, run: datetime) -> dict[str, Any]:
+    return {
+        "features": [
+            {
+                "attributes": {
+                    "currentOutage": out,
+                    "currentOutageRunStartTime": int(run.timestamp() * 1000),
+                    "countyFIPSCode": fips,
+                    "countyName": "X",
+                    "stateName": state,
+                    "coveredCustomers": 10_000,
+                    "modelCount": 10_000,
+                }
+            }
+        ]
+    }
+
+
+def test_mirrors_merge_skip_stale_and_keep_the_token_home() -> None:
+    """Several layers: each fetched on its own, merged per county; a stale layer is skipped
+    and reported; only outage fields are requested; a FEMA token never goes to a mirror."""
+    now = datetime(2026, 9, 22, 12, tzinfo=UTC)
+    layers = {
+        "ga.example": _layer("GA", "13121", 2_000, now - timedelta(minutes=20)),
+        "oh.example": _layer("OH", "39113", 1_500, now - timedelta(minutes=40)),
+        "stale.example": _layer("KY", "21111", 9_000, now - timedelta(hours=30)),
+    }
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(200, json=layers[request.url.host])
+
+    provider = EagleIProvider(
+        {"13121": 10_000, "39113": 10_000, "21111": 10_000},
+        threshold_pct=10,
+        feature_urls=[f"https://{h}/FeatureServer/0" for h in layers],
+        token="fema-secret",
+        now=now,
+        transport=httpx.MockTransport(handler),
+    )
+    polls, _ = provider.fetch_polls()
+    assert sorted(p.county_fips for p in polls) == ["13121", "39113"], "stale layer skipped"
+    assert provider.coverage == ["GA", "OH"]
+    assert any("stale.example: stale" in n for n in provider.notes)
+    assert all("token" not in r.url.params for r in seen), "no FEMA token to mirrors"
+    fields = set(seen[0].url.params["outFields"].split(","))
+    assert fields == {
+        "currentOutage",
+        "currentOutageRunStartTime",
+        "countyFIPSCode",
+        "countyName",
+        "stateName",
+        "coveredCustomers",
+        "modelCount",
+    }, "never outFields=* (a mirror joins contact details of emergency managers)"
+    events = provider.fetch(TimeWindow(start=now - timedelta(days=1), end=now + timedelta(days=1)))
+    assert [e.geography.county_fips for e in events] == [["13121"], ["39113"]]
+    detail = provider.status_detail(len(events))
+    assert detail.startswith("coverage GA, OH (public state mirrors); 2 county readings")
+
+
+def test_all_mirrors_failing_or_stale_is_a_failed_run() -> None:
+    now = datetime(2026, 9, 22, 12, tzinfo=UTC)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "down.example":
+            return httpx.Response(502, text="bad gateway")
+        return httpx.Response(200, json=_layer("OH", "39113", 1, now - timedelta(days=2)))
+
+    provider = EagleIProvider(
+        {"39113": 10_000},
+        threshold_pct=10,
+        feature_urls=[
+            "https://down.example/FeatureServer/0",
+            "https://old.example/FeatureServer/0",
+        ],
+        now=now,
+        transport=httpx.MockTransport(handler),
+    )
+    with pytest.raises(ProviderError, match="no current outage snapshot"):
+        provider.fetch_polls()
+
+
+def test_feature_urls_from_env_and_the_shipped_mirrors() -> None:
+    from xevents.providers.eagle_i import STATE_MIRRORS, feature_urls_from_env
+
+    assert feature_urls_from_env("a/FeatureServer/0/, b/FeatureServer/0  c") == [
+        "a/FeatureServer/0",
+        "b/FeatureServer/0",
+        "c",
+    ]
+    assert feature_urls_from_env("") == []
+    assert set(STATE_MIRRORS) == {"GA", "OH"}
+    root = Path(__file__).parents[1]
+    import yaml
+
+    svc = yaml.safe_load((root / "render.yaml").read_text(encoding="utf-8"))["services"][0]
+    env = {e["key"]: e["value"] for e in svc["envVars"]}
+    assert feature_urls_from_env(env["EAGLEI_FEATURE_URL"]) == list(STATE_MIRRORS.values())

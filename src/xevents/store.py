@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 from collections.abc import Iterator
 from contextlib import contextmanager
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import (
@@ -285,6 +285,68 @@ def feed_status(engine: Engine) -> list[dict[str, Any]]:
         }
         for src, n, last in rows
     ]
+
+
+class FeedRunRow(Base):
+    """One row per live provider run: what it did even when it produced no events, so the
+    banner can say "polled GA and OH, nothing over 10 %" instead of showing a dead feed."""
+
+    __tablename__ = "feed_runs"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    provider: Mapped[str] = mapped_column(String(64), index=True)
+    source: Mapped[str] = mapped_column(String(16))
+    run_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    status: Mapped[str] = mapped_column(String(16))  # ok | failed | skipped
+    events: Mapped[int] = mapped_column(default=0)
+    detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+FEED_RUN_KEEP_DAYS = 7
+
+
+def record_feed_run(
+    engine: Engine,
+    provider: str,
+    source: str,
+    status: str,
+    events: int = 0,
+    detail: str | None = None,
+    run_at: datetime | None = None,
+) -> None:
+    now = run_at or datetime.now(UTC)
+    with session_scope(engine) as s:
+        s.add(
+            FeedRunRow(
+                provider=provider,
+                source=source,
+                run_at=now,
+                status=status,
+                events=events,
+                detail=detail,
+            )
+        )
+        cutoff = now - timedelta(days=FEED_RUN_KEEP_DAYS)
+        for old in s.scalars(select(FeedRunRow).where(FeedRunRow.run_at < cutoff)):
+            s.delete(old)
+
+
+def latest_feed_runs(engine: Engine) -> list[dict[str, Any]]:
+    """The most recent run per provider, in the order providers first appeared."""
+    with Session(engine) as s:
+        rows = list(s.scalars(select(FeedRunRow).order_by(FeedRunRow.run_at.desc())))
+    seen: dict[str, dict[str, Any]] = {}
+    for r in rows:
+        if r.provider not in seen:
+            seen[r.provider] = {
+                "provider": r.provider,
+                "source": r.source,
+                "run_at": _aware(r.run_at).isoformat(),
+                "status": r.status,
+                "events": r.events,
+                "detail": r.detail,
+            }
+    return sorted(seen.values(), key=lambda r: r["provider"])
 
 
 def get_event(engine: Engine, event_key: str) -> Event | None:

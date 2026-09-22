@@ -1,0 +1,37 @@
+09/21/26|09/20/26||PDT|-1|Y|Y|Aberdeen|WA|47.1076|-123.7837|PM2.5|24|Good|No||Olympic Region Clean Air Agency
+09/21/26|09/21/26|23:00|PDT|0|O|Y|Aberdeen|WA|47.1076|-123.7837|PM2.5|16|Good|No||Olympic Region Clean Air Agency
+09/21/26|09/21/26||PDT|0|F|Y|Aberdeen|WA|47.1076|-123.7837|PM2.5|22|Good|No||Olympic Region Clean Air Agency
+09/21/26|09/22/26||PDT|1|F|Y|Aberdeen|WA|47.1076|-123.7837|PM2.5|22|Good|No||Olympic Region Clean Air Agency
+09/21/26|09/23/26||PDT|2|F|Y|Aberdeen|WA|47.1076|-123.7837|PM2.5|22|Good|No||Olympic Region Clean Air Agency
+09/21/26|09/24/26||PDT|3|F|Y|Aberdeen|WA|47.1076|-123.7837|PM2.5|22|Good|No||Olympic Region Clean Air Agency
+09/21/26|09/25/26||PDT|4|F|Y|Aberdeen|WA|47.1076|-123.7837|PM2.5|22|Good|No||Olympic Region Clean Air Agency
+09/21/26|09/26/26||PDT|5|F|Y|Aberdeen|WA|47.1076|-123.7837|PM2.5|22|Good|No||Olympic Region Clean Air Agency
+09/22/26|09/21/26||CDT|-1|Y|Y|Dallas-Fort Worth|TX|32.7670|-96.7830|OZONE|126|Unhealthy for Sensitive Groups|No||Texas Commission on Environmental Quality
+09/22/26|09/21/26||CDT|-1|Y|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM2.5|51|Moderate|No||Texas Commission on Environmental Quality
+09/22/26|09/21/26||CDT|-1|Y|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM10|27|Good|No||Texas Commission on Environmental Quality
+09/22/26|09/22/26|1:00|CDT|0|O|Y|Dallas-Fort Worth|TX|32.7670|-96.7830|PM2.5|51|Moderate|No||Texas Commission on Environmental Quality
+09/22/26|09/22/26|1:00|CDT|0|O|N|Dallas-Fort Worth|TX|32.7670|-96.7830|OZONE|44|Good|No||Texas Commission on Environmental Quality
+09/22/26|09/22/26|1:00|CDT|0|O|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM10|21|Good|No||Texas Commission on Environmental Quality
+09/21/26|09/22/26||CDT|1|F|Y|Dallas-Fort Worth|TX|32.7670|-96.7830|OZONE||Unhealthy for Sensitive Groups|Yes|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/22/26||CDT|1|F|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM2.5||Moderate|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/22/26||CDT|1|F|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM10||Good|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/23/26||CDT|2|F|Y|Dallas-Fort Worth|TX|32.7670|-96.7830|OZONE||Unhealthy for Sensitive Groups|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/23/26||CDT|2|F|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM2.5||Moderate|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/23/26||CDT|2|F|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM10||Good|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/24/26||CDT|3|F|Y|Dallas-Fort Worth|TX|32.7670|-96.7830|OZONE||Moderate|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/24/26||CDT|3|F|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM2.5||Moderate|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/24/26||CDT|3|F|N|Dallas-Fort Worth|TX|32.7670|-96.7830|PM10||Good|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/22/26|09/21/26||CDT|-1|Y|Y|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM2.5|51|Moderate|No||Texas Commission on Environmental Quality
+09/22/26|09/21/26||CDT|-1|Y|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM10|33|Good|No||Texas Commission on Environmental Quality
+09/22/26|09/22/26|1:00|CDT|0|O|Y|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM2.5|47|Good|No||Texas Commission on Environmental Quality
+09/22/26|09/22/26|1:00|CDT|0|O|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|OZONE|33|Good|No||Texas Commission on Environmental Quality
+09/22/26|09/22/26|1:00|CDT|0|O|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM10|24|Good|No||Texas Commission on Environmental Quality
+09/21/26|09/22/26||CDT|1|F|Y|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|OZONE||Unhealthy for Sensitive Groups|Yes|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/22/26||CDT|1|F|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM2.5||Moderate|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/22/26||CDT|1|F|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM10||Good|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/23/26||CDT|2|F|Y|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|OZONE||Unhealthy for Sensitive Groups|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/23/26||CDT|2|F|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM2.5||Moderate|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/23/26||CDT|2|F|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM10||Good|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/24/26||CDT|3|F|Y|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|OZONE||Moderate|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/24/26||CDT|3|F|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM2.5||Moderate|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality
+09/21/26|09/24/26||CDT|3|F|N|Houston-Galveston-Brazoria|TX|29.7510|-95.3510|PM10||Good|No|https://www.tceq.texas.gov/airquality/monops/forecast_today.html|Texas Commission on Environmental Quality

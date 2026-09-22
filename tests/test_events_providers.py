@@ -405,6 +405,7 @@ def test_live_ingest_isolates_a_transport_failure(
     monkeypatch.setattr(ingest, "OpenFEMAProvider", lambda *a, **k: Boom())
     monkeypatch.setattr(ingest, "HMSSmokeProvider", lambda *a, **k: Fine())
     monkeypatch.setattr(ingest, "EagleIProvider", lambda *a, **k: Boom())
+    monkeypatch.setattr(ingest, "AirNowFilesProvider", lambda *a, **k: Boom())
     monkeypatch.setattr(ingest, "load_customers", lambda: {})
     monkeypatch.delenv("AIRNOW_API_KEY", raising=False)
     monkeypatch.setenv("EAGLEI_FEATURE_URL", "https://example.test/FeatureServer/0")
@@ -414,6 +415,12 @@ def test_live_ingest_isolates_a_transport_failure(
     assert rc == 0, "some providers succeeded"
     stored = [e for e in list_events(engine) if e.scenario is None]
     assert [e.event_key for e in stored] == ["hms:ok"]
+    from xevents.store import latest_feed_runs
+
+    runs = {r["provider"]: r for r in latest_feed_runs(engine)}
+    assert runs["hms"]["status"] == "ok" and runs["hms"]["events"] == 1
+    assert runs["openfema"]["status"] == "failed" and "timed out" in runs["openfema"]["detail"]
+    assert runs["airnow (files)"]["status"] == "failed"
 
 
 def test_openfema_pages_until_a_short_page() -> None:
@@ -505,7 +512,13 @@ def test_live_ingest_skips_eaglei_without_credentials(
         def close(self) -> None:
             pass
 
-    for name in ("NWSAlertsProvider", "IEMArchiveProvider", "OpenFEMAProvider", "HMSSmokeProvider"):
+    for name in (
+        "NWSAlertsProvider",
+        "IEMArchiveProvider",
+        "OpenFEMAProvider",
+        "HMSSmokeProvider",
+        "AirNowFilesProvider",
+    ):
         monkeypatch.setattr(ingest, name, lambda *a, **k: Empty())
 
     def eagle(*a: Any, **k: Any) -> Empty:
@@ -520,3 +533,113 @@ def test_live_ingest_skips_eaglei_without_credentials(
     assert ingest.ingest_live(engine, days_ahead=1, lookback_days=1) == 0
     assert built == [], "no FEMA request is made without a token or mirror"
     assert "eagle_i: skipped" in capsys.readouterr().out
+
+
+# --------------------------------------------------------------------------- AirNow files
+
+
+def test_parse_hourly_aq_obs_sample(counties: CountyIndex) -> None:
+    """Real HourlyAQObs rows (IL/NY monitors) plus one row marked SYNTHETIC with PM2.5 AQI
+    180: only the exceedance becomes an event, keyed per county-day and pollutant."""
+    from xevents.providers.airnow import aqi_category, parse_hourly_aq_obs
+
+    text = (FIX / "airnow_HourlyAQObs_sample.dat").read_text(encoding="utf-8")
+    rows = parse_hourly_aq_obs(text)
+    assert rows and {r["Parameter"] for r in rows} <= {"PM2.5", "OZONE"}
+    assert all(r["UTC"].endswith(":00") for r in rows), "hourly UTC stamps"
+    events = parse_observations(rows, counties, raw_ref="x")
+    assert len(events) == 1
+    e = events[0]
+    assert e.metrics["aqi"] == 180 and e.metrics["parameter"] == "PM2.5"
+    assert e.temporality is Temporality.OBSERVED and e.severity is CapSeverity.SEVERE
+    assert (aqi_category(50), aqi_category(101), aqi_category(151), aqi_category(301)) == (
+        1,
+        3,
+        4,
+        6,
+    )
+
+
+def test_parse_reporting_area_forecasts(counties: CountyIndex) -> None:
+    """Real reporting-area rows: Dallas-Fort Worth and Houston ozone forecasts at
+    'Unhealthy for Sensitive Groups' (AQI blank, category only) become forecast events at
+    the category floor; 'Good' forecasts and past days do not."""
+    from xevents.providers.airnow import parse_reporting_area_forecasts
+
+    text = (FIX / "airnow_reportingarea_sample.dat").read_text(encoding="utf-8")
+    events = parse_reporting_area_forecasts(text, counties, today=date(2026, 9, 22))
+    assert events and all(e.temporality is Temporality.FORECAST for e in events)
+    assert {e.geography.county_fips[0] for e in events} == {"48113", "48201"}  # Dallas, Harris
+    e = events[0]
+    assert e.metrics["aqi"] == 101 and str(e.metrics["aqi_basis"]).startswith("category floor")
+    assert e.event_name == "AQI forecast Unhealthy for Sensitive Groups (OZONE)"
+    assert e.onset == datetime(2026, 9, 22, 5, tzinfo=UTC), "local (CDT) midnight in UTC"
+    assert e.source_id.startswith("forecast:2026-09-2")
+    assert parse_reporting_area_forecasts(text, counties, today=date(2026, 9, 30)) == []
+
+
+def test_airnow_files_provider_walks_back_to_the_latest_hour(
+    counties: CountyIndex, tmp_path: Path
+) -> None:
+    from xevents.providers.airnow import AirNowFilesProvider
+
+    hourly = (FIX / "airnow_HourlyAQObs_sample.dat").read_text(encoding="utf-8")
+    forecast = (FIX / "airnow_reportingarea_sample.dat").read_text(encoding="utf-8")
+    now = datetime(2026, 9, 22, 6, 20, tzinfo=UTC)
+    asked: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        asked.append(request.url.path)
+        if request.url.path.endswith("HourlyAQObs_2026092204.dat"):
+            return httpx.Response(200, text=hourly)
+        if request.url.path.endswith("reportingarea.dat"):
+            return httpx.Response(200, text=forecast)
+        return httpx.Response(403, text="<Error>AccessDenied</Error>")  # not posted yet
+
+    provider = AirNowFilesProvider(
+        counties, raw_dir=tmp_path, now=now, transport=httpx.MockTransport(handler)
+    )
+    window = TimeWindow(start=now - timedelta(days=2), end=now + timedelta(days=7))
+    events = provider.fetch(window)
+    assert [p.rsplit("/", 1)[-1] for p in asked[:3]] == [
+        "HourlyAQObs_2026092206.dat",
+        "HourlyAQObs_2026092205.dat",
+        "HourlyAQObs_2026092204.dat",
+    ]
+    temps = {e.temporality for e in events}
+    assert temps == {Temporality.OBSERVED, Temporality.FORECAST}
+    assert "hourly monitors 2026-09-22 04:00Z" in provider.status_detail(len(events))
+    assert list(tmp_path.glob("airnow_*.dat"))
+
+
+def test_airnow_forecast_fires_card_8_pre_event(counties: CountyIndex) -> None:
+    """The point of forecasts: Card 8 fires with pre-event actions before smoke or ozone."""
+    from xevents.cards import load_cards
+    from xevents.engine import match
+    from xevents.models import Estimate, Facility, OperatingStatusCode
+    from xevents.profiles import PROFILES_DIR, load_profile
+    from xevents.providers.airnow import parse_reporting_area_forecasts
+
+    text = (FIX / "airnow_reportingarea_sample.dat").read_text(encoding="utf-8")
+    events = parse_reporting_area_forecasts(text, counties, today=date(2026, 9, 22))
+    dallas = Facility(
+        id="vha_549",
+        name="Dallas",
+        facility_type="va_health_facility",
+        lat=32.7,
+        lon=-96.8,
+        operating_status=OperatingStatusCode.NORMAL,
+        county_fips="48113",
+        visn="17",
+        classification="VA Medical Center (VAMC)",
+    )
+    items = match(
+        events,
+        load_cards(),
+        [dallas],
+        load_profile(PROFILES_DIR / "va.yaml"),
+        lambda fid, card: Estimate(label="p", value=100, formula="t", inputs={}),
+        now=datetime(2026, 9, 22, tzinfo=UTC),
+    ).items
+    card8 = [i for i in items if i.card_id == "smoke-copd-asthma"]
+    assert card8 and all(i.phase.value == "pre_event" for i in card8)

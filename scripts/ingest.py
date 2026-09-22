@@ -3,10 +3,11 @@
 ``EVENT_MODE=replay`` (default): load every scenario under ``fixtures/events/`` (or
 ``--scenario NAME``), replacing that scenario's rows. ``EVENT_MODE=live``: pull current NWS
 alerts, OpenFEMA declarations, HMS smoke (last 2 days), the EAGLE-I county outage snapshot
-(threshold = the lowest ``outage_pct_min`` any card asks for; needs ``EAGLEI_TOKEN`` for the
-FEMA partner service or a public mirror in ``EAGLEI_FEATURE_URL``) and, when
-``AIRNOW_API_KEY`` is set, AirNow observations for the next 7 days' window; upsert by natural
-key. Both modes land in the same ``events`` table.
+(threshold = the lowest ``outage_pct_min`` any card asks for; ``EAGLEI_TOKEN`` for the FEMA
+partner layer, or public mirrors listed in ``EAGLEI_FEATURE_URL``), AirNow hourly monitor AQI
+and forecasts from the keyless public files, and — when ``AIRNOW_API_KEY`` is set — the AirNow
+API as well; upsert by natural key. Every provider run is recorded (``feed_runs``) for the
+banner, including runs that produced nothing. Both modes land in the same ``events`` table.
 """
 
 from __future__ import annotations
@@ -24,7 +25,7 @@ from xevents.cards import load_cards
 from xevents.geography.counties import CountyIndex
 from xevents.geography.nws_zones import UgcResolver
 from xevents.models import Event, TimeWindow
-from xevents.providers.airnow import AirNowProvider
+from xevents.providers.airnow import AirNowFilesProvider, AirNowProvider
 from xevents.providers.base import ProviderError
 from xevents.providers.eagle_i import EagleIProvider, load_customers, min_outage_pct
 from xevents.providers.hms import HMSSmokeProvider
@@ -37,6 +38,7 @@ from xevents.store import (
     init_db,
     list_events,
     make_engine,
+    record_feed_run,
     upsert_events,
 )
 
@@ -112,13 +114,16 @@ def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
             TimeWindow(start=now - timedelta(days=2), end=now),
         ),
     ]
+    skipped: list[tuple[str, str]] = []
     outage_threshold = min_outage_pct(load_cards())
     eaglei_configured = bool(os.environ.get("EAGLEI_TOKEN") or os.environ.get("EAGLEI_FEATURE_URL"))
     if outage_threshold is not None and not eaglei_configured:
-        print(
-            "eagle_i: skipped (FEMA's partner layer is token-gated; set EAGLEI_TOKEN, or "
-            "EAGLEI_FEATURE_URL to a public EAGLE-I mirror)"
+        reason = (
+            "FEMA's partner layer is token-gated; set EAGLEI_TOKEN, or EAGLEI_FEATURE_URL to "
+            "public EAGLE-I mirrors"
         )
+        print(f"eagle_i: skipped ({reason})")
+        skipped.append(("eagle_i", reason))
     elif outage_threshold is not None:
         providers.append(
             (
@@ -129,20 +134,23 @@ def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
                 window,
             )
         )
-    if os.environ.get("AIRNOW_API_KEY"):
+    # AirNow without a key: hourly monitor AQI and next-day forecasts from the public files
+    providers.append(
+        ("airnow (files)", lambda: AirNowFilesProvider(counties, raw_dir=LIVE_RAW), window)
+    )
+    if os.environ.get("AIRNOW_API_KEY"):  # optional: the key-based API as a second path
         providers.append(
             (
-                "airnow",
+                "airnow (api)",
                 lambda: AirNowProvider(counties, raw_dir=LIVE_RAW),
                 TimeWindow(start=now - timedelta(hours=6), end=now),
             )
         )
-    else:
-        print("airnow: skipped (AIRNOW_API_KEY not set)")
 
     for name, factory, w in providers:
         # One feed must never take the others down: transport errors (httpx exceptions are
         # not OSError), malformed JSON and validation errors are all caught per provider.
+        source = name.split(" ")[0]
         try:
             provider = factory()
             got = provider.fetch(w)
@@ -150,9 +158,16 @@ def ingest_live(engine: object, days_ahead: int, lookback_days: int) -> int:
         except (ProviderError, OSError, httpx.HTTPError, ValueError) as exc:
             failures += 1
             print(f"{name}: FAILED {type(exc).__name__}: {exc}", file=sys.stderr)
+            record_feed_run(engine, name, source, "failed", 0, str(exc)[:500])  # type: ignore[arg-type]
             continue
         print(f"{name}: {len(got)} events")
+        detail = provider.status_detail(len(got)) if hasattr(provider, "status_detail") else None
+        if detail:
+            print(f"{name}: {detail}")
+        record_feed_run(engine, name, source, "ok", len(got), detail)  # type: ignore[arg-type]
         events.extend(got)
+    for name, reason in skipped:
+        record_feed_run(engine, name, name.split(" ")[0], "skipped", 0, reason)  # type: ignore[arg-type]
 
     stored_live = [e for e in list_events(engine, source="nws") if e.scenario is None]  # type: ignore[arg-type]
     events, dropped = dedupe(events, existing=stored_live)
