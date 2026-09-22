@@ -6,7 +6,7 @@
 <script src="/static/map.js?v={{ asset_v }}"></script>
 {% endblock %}
 {% block content %}
-<p><a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">← All events</a></p>
+<p><a href="/dashboard/events?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">← All events</a> · <a href="/?scenario={{ event.scenario or 'live' }}&at={{ as_of_input }}Z&event={{ event.event_key|urlencode }}">open in Monitor at this time →</a></p>
 <h2 style="margin:0">{{ event.event_name }}
   <span class="tag sev-{{ {'Extreme':4,'Severe':3,'Moderate':2,'Minor':1,'Unknown':0}[event.severity.value] }}">{{ event.severity.value }}</span>
   <span class="tag temporality {{ event.temporality.value }}">{{ event.temporality.value }}</span>
@@ -45,7 +45,7 @@
     <h3 style="margin:0 0 6px">Action items produced <span class="muted" style="font-weight:normal">— {{ item_count }} items ({{ superseded }} superseded) at {{ facilities|length }} facilities</span></h3>
     <table><thead><tr><th>Facility</th><th>Cards</th></tr></thead><tbody>
     {% for row in facilities[:40] %}
-      <tr><td><a href="/dashboard/facilities/{{ row.facility.id }}?scenario={{ scenario or 'live' }}&at={{ as_of_input }}">{{ row.facility.name if row.facility else '?' }}</a>
+      <tr><td><a href="/?scenario={{ scenario or 'live' }}&at={{ as_of_input }}Z&facility={{ row.facility.id }}">{{ row.facility.name if row.facility else '?' }}</a>
         <span class="muted">{{ row.facility.state if row.facility else '' }}</span></td>
         <td>{{ row.cards.values()|join(' · ') }}</td></tr>
     {% else %}<tr><td colspan="2" class="muted">No action items: no card's trigger matches this event, or no facility sits in its counties.</td></tr>{% endfor %}

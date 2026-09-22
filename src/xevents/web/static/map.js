@@ -34,12 +34,25 @@ window.XMap = (() => {
      "this state", and a multi-state one shows where it crosses borders. No fill, so they
      never hide an event colour. */
   const STATE_STYLE = { weight: 1.2, color: "#7d8fa6", opacity: 0.9, fill: false };
+  /* Neighbouring countries (Canada, Mexico, Cuba, the Bahamas): muted land under the US so the
+     map is not an island. Backdrop only — no events are drawn outside the US. */
+  const COUNTRY_STYLE = { weight: 1, color: "#46586d", fillColor: "#18212b", fillOpacity: 1 };
   let countiesPromise = null;
   let statesPromise = null;
+  let countriesPromise = null;
 
   function counties() {
     if (!countiesPromise) countiesPromise = fetch("/reference/counties").then((r) => r.json());
     return countiesPromise;
+  }
+
+  function countries() {
+    if (!countriesPromise) {
+      countriesPromise = fetch("/reference/countries")
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null);  // optional backdrop: never block the map on it
+    }
+    return countriesPromise;
   }
 
   function states() {
@@ -54,13 +67,14 @@ window.XMap = (() => {
       preferCanvas: true,
       ...opts,
     }).setView(opts.center || [38.5, -96], opts.zoom || 4);
-    const [geo, stateGeo] = await Promise.all([counties(), states()]);
+    const [geo, stateGeo, countryGeo] = await Promise.all([counties(), states(), countries()]);
+    if (countryGeo) L.geoJSON(countryGeo, { style: () => ({ ...COUNTRY_STYLE }), interactive: false }).addTo(map);
     const layer = L.geoJSON(geo, { style: () => ({ ...BASE_STYLE }), interactive: false }).addTo(map);
     const byFips = new Map();
     layer.eachLayer((l) => byFips.set(l.feature.id, l));
     const stateLayer = L.geoJSON(stateGeo, { style: () => ({ ...STATE_STYLE }), interactive: false }).addTo(map);
     L.control.attribution({ prefix: false })
-      .addAttribution("County and state boundaries: US Census Bureau (1:5m)")
+      .addAttribution("County and state boundaries: US Census Bureau (1:5m) · neighbours: Natural Earth")
       .addTo(map);
     return { map, countyLayer: layer, stateLayer, byFips, baseStyle: BASE_STYLE };
   }

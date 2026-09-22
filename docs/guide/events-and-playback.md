@@ -117,6 +117,12 @@ archive and HMS providers (see `_common.py`) and writes `events.json` with
 badges, outage shading, state borders, grouped AirNow lanes), is
 [user-interface.md](user-interface.md). This section keeps the event-layer view of it.*
 
+> **Since 2026-09-22** the Dashboard, the facility page and Playback are one view,
+> **Monitor** at `/` (live first, replays in the same menu; a facility or card opens in its
+> focus layout), with **Scenarios** (`/replays`) and **Sources** (`/sources`) tabs beside it.
+> `/playback` and `/dashboard/facilities/{id}` redirect there. The text and screenshots below
+> describe the earlier pages; [user-interface.md](user-interface.md) is current.
+
 `/playback` is the layer's main screen: a US map, a side panel and a timeline, all driven by
 one time cursor *t*.
 

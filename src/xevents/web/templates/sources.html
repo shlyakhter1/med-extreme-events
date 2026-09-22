@@ -40,7 +40,7 @@
       {% endif %}
       <dl class="src-dl">
         <dt>Drives</dt><dd>{{ s.drives }}</dd>
-        {% if s.replay or r.replays %}<dt>Replay</dt><dd>{{ s.replay or '' }}{% if r.replays %}<span class="chips" style="margin-top:4px">{% for sc in r.replays %}<a class="chip" href="/playback?scenario={{ sc }}">{{ sc }}</a>{% endfor %}</span>{% endif %}</dd>{% endif %}
+        {% if s.replay or r.replays %}<dt>Replay</dt><dd>{{ s.replay or '' }}{% if r.replays %}<span class="chips" style="margin-top:4px">{% for sc in r.replays %}<a class="chip" href="/?scenario={{ sc }}">{{ sc }}</a>{% endfor %}</span>{% endif %}</dd>{% endif %}
         <dt>Access</dt><dd>{{ s.auth }}</dd>
         <dt>Cadence</dt><dd>{{ s.cadence }}</dd>
       </dl>

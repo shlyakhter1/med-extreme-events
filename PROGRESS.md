@@ -2,6 +2,72 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-22 — Monitor (one main view), Scenarios and Cards tabs, neighbouring countries
+
+Decided with the user in a grilling session (plan: one live-first view; details below).
+`make lint test` green (274 passed); verified end-to-end in Chrome on a fresh DB with a real
+live ingest.
+
+**Done.**
+- **Monitor at `/`** replaces the Dashboard and Playback tabs (playback.html + playback.js).
+  Nav on every page: **Monitor · Scenarios · Sources · API**. Events tab removed from nav; the
+  events table and event pages stay (rail link "all events in this window →"; event pages
+  link "open in Monitor at this time →"). `/playback` and `/dashboard/facilities/{id}`
+  307-redirect into Monitor with scenario/at (and `facility=`). `dashboard.html` and
+  `facility.html` deleted; `/dashboard/facilities/{id}/cards` (the card block) stays.
+- **URL holds the view** (`scenario, at, card, facility, event`): replaceState while
+  scrubbing (throttled), pushState on selection/scenario changes, popstate restores. Live
+  at now omits `at`. URL/typed times without a zone are UTC (`parseUtc`).
+- **Typed time**: click the clock → datetime-local input (UTC). **Live window**: now − 14 d …
+  furthest forecast/lead end, capped at now + 7 d, opens at now; dashed "now" marker and a
+  Now button.
+- **Outreach chip** in the banner (care-team items, acuity rank ≤ 1, still issued; class
+  names from the items); click filters rail and badges. Acknowledge/Complete in the card
+  block updates the prefetched item via `htmx:afterRequest`, so the count drops at once.
+- **Rail ranking** matches the old board: acuity, severity × rank_score, stations first
+  (anchor classes passed from the profile as `data-anchors`), name.
+- **Scenarios tab (`/replays`)** — `/scenarios` is the JSON API. `data/scenarios.yaml`
+  (loader `src/xevents/scenario_guide.py`): story, "what it exercises", guided moments per
+  replay, plus cataloged-not-built rows from `fixtures/events/CATALOG.md`. Stats computed.
+  `tests/test_golden.py::test_scenario_guide_moments_fire` runs every replay and checks each
+  moment's card fires at `at`. **Narratives are Claude's draft — user review pending.**
+- **Neighbouring countries**: `scripts/build_countries.py` → `fixtures/reference/countries.geojson`
+  (Natural Earth 1:50m, public domain; Canada, Mexico, Cuba, Bahamas; 195 KB; raw zip in
+  `raw/`), `/reference/countries`, drawn under the counties in `map.js` (optional fetch).
+  Added to `make reference`, the reference README and `data/sources.yaml`.
+- Docs: `user-interface.md` restructured (§4 Monitor, §5 card block, §8 Scenarios), guide
+  index, README and deploy URL tables; dated notes in `medical-layer.md` and
+  `events-and-playback.md`. Screenshots recaptured: monitor-live, playback-uri, card focus, cards, card-detail,
+  facility-uri, smoke-2026, scenarios, sources; `dashboard-live.png` removed.
+
+- **Cards tab** (`/card-library`, `/card-library/{id}`; `/cards` is the JSON API), between
+  Scenarios and Sources. Overview: 8 tiles (acuity position from the profile, evidence tier,
+  lead window, triggers in plain words, selection, "fires in" replay chips deep-linking to
+  each card's peak hour, live-now count). Detail: the whole card verbatim — triggers,
+  population codes and sub-panels, actions by phase, patient/caregiver text, safety line,
+  escalation (null → profile default), hooks, evidence claims with tiers, sources, carbon
+  (unscaled), where it fires. The safety line now comes from `engine.safety_message`, shared
+  by the engine and the page; the carbon table is a `macros.html` macro used by both the card
+  block and the card page. A test checks every action, sentence, sign, claim and source of
+  every card appears verbatim on its page.
+
+- **Live on the Scenarios page and as Monitor's default.** The Monitor tab is a plain `/`
+  (live, now) on every page — it used to carry the current page's scenario and time. The
+  Scenarios page opens with a Live card: description from `data/scenarios.yaml` (`live:`),
+  numbers computed per request (`views._live_summary`: events in the −14 d…+7 d window by
+  source, active now, cards and facilities now, over the window, forecasts ahead, last feed
+  run, partial-coverage sources from `data/sources.yaml`).
+- Heat triggers: cards 1/2/4 fire on NWS heat products (connected, live and replay); their
+  second trigger, NWS HeatRisk (gridded forecast raster), has no provider yet.
+
+**Decisions.** Tab named **Monitor** (user's choice). Facility-only selection opens focus.
+Scenarios page URL `/replays`. The outreach threshold (`acuity_rank <= 1`) is the old
+dashboard's rule, unchanged.
+
+**Pending.** User review of the scenario narratives. Still-old screenshots:
+`dashboard-heat-dome.png` (medical-layer.md), `playback-heat-dome*.png`
+(events-and-playback.md). Push to `main` on the user's go.
+
 ## 2026-09-22 — Sources tab, `make container`, design bundle
 
 - **Sources tab** (`/sources`, after API in both headers): one card per source the demo

@@ -68,6 +68,11 @@ button.primary:hover { background:#1b3d61; }
 .appbar #play { min-width:96px; height:32px; }
 .clock { font-family:var(--mono); font-size:19px; font-weight:500; letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
 .clock-grp { display:flex; align-items:baseline; gap:10px; }
+button.clock { background:none; border:0; padding:0; min-height:0; color:var(--ink); cursor:text; border-bottom:1px dashed transparent; }
+button.clock:hover { border-bottom-color:var(--line-hi); }
+.clock-input { font-family:var(--mono); font-size:15px; min-height:32px; }
+.chip.outreach { cursor:pointer; font:inherit; font-size:11.5px; min-height:0; }
+.chip.outreach.on { background:var(--warn-line); color:#fff3cf; }
 .appbar nav { display:flex; align-items:center; gap:16px; margin-left:auto; font-size:13px; }
 .appbar nav .on { color:var(--ink); font-weight:500; border-bottom:2px solid var(--accent); padding-bottom:2px; }
 
@@ -348,6 +353,10 @@ footer.timeline { background:var(--panel); border-top:1px solid var(--line); pad
 .tl-playhead { position:absolute; top:0; bottom:14px; width:2px; margin-left:-1px; background:var(--alarm-ink); pointer-events:none;
   left:calc(178px + (100% - 178px) * var(--ph)); }
 .tl-playhead span { position:absolute; top:100%; left:50%; transform:translateX(-50%); margin-top:2px; font-family:var(--mono); font-size:10px; color:var(--alarm-ink); white-space:nowrap; }
+.tl-now { position:absolute; top:0; bottom:14px; width:0; border-left:1px dashed var(--accent-ink); pointer-events:none;
+  left:calc(178px + (100% - 178px) * var(--nw)); opacity:.8; }
+.tl-now span { position:absolute; top:-14px; left:3px; font-family:var(--mono); font-size:10px; color:var(--accent-ink); }
+@media (max-width:899px) { .tl-now { left:calc(100% * var(--nw)); bottom:0; } .tl-now span { display:none; } }
 #timeline.empty { padding:6px 0; color:var(--faint); font-size:12px; }
 
 /* ------------------------------------------------------------------ phone */

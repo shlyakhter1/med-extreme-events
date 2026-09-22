@@ -225,7 +225,8 @@ def test_compounding_chip_renders(cards: list[Card], profile: Profile, tmp_path:
     upsert_action_items(eng, result.items)
     client = TestClient(create_app(eng))
     html = client.get(
-        f"/dashboard/facilities/{FACILITY.id}", params={"at": (T0 + timedelta(hours=8)).isoformat()}
+        f"/dashboard/facilities/{FACILITY.id}/cards",
+        params={"at": (T0 + timedelta(hours=8)).isoformat()},
     ).text
     assert "compounding · acuity +1" in html
     assert outage[1].event_key in html, "the chip names the compounding outage"
@@ -261,7 +262,7 @@ def test_compounding_chip_shows_three_and_a_count(
     html = (
         TestClient(create_app(eng))
         .get(
-            f"/dashboard/facilities/{FACILITY.id}",
+            f"/dashboard/facilities/{FACILITY.id}/cards",
             params={"at": (T0 + timedelta(hours=5)).isoformat()},
         )
         .text

@@ -155,10 +155,12 @@ def test_events_carry_event_key(client: TestClient) -> None:
 
 def test_pages_have_no_external_asset_dependencies(client: TestClient) -> None:
     """The demo must render with no CDN: assets are vendored and cache-busted."""
-    for path in ("/", "/playback"):
+    for path in ("/", "/sources", "/replays", "/dashboard/events"):
         html = client.get(path).text
         assert "unpkg.com" not in html and "cartocdn" not in html, path
-        assert "/static/vendor/leaflet.js?v=" in html, path
+        assert "fonts.googleapis" not in html, "fonts are self-hosted"
+        assert "/static/app.css?v=" in html, path
+    assert "/static/vendor/leaflet.js?v=" in client.get("/").text
     for asset in (
         "/static/vendor/leaflet.js",
         "/static/vendor/leaflet.css",
@@ -175,9 +177,9 @@ def test_cards_reference_and_playback(client: TestClient) -> None:
     assert len(cards) == 8 and cards[0]["id"] == "heat-lithium"
     r = client.get("/reference/counties")
     assert r.status_code == 200 and r.json()["type"] == "FeatureCollection"
-    page = client.get("/playback")
+    page = client.get("/")
     assert page.status_code == 200
-    assert "<title>Playback · med-extreme-events</title>" in page.text
+    assert "<title>Monitor · med-extreme-events</title>" in page.text
     assert 'id="timeline"' in page.text, "the scrubbable timeline is the point of the page"
     js = client.get("/static/playback.js")
     assert js.status_code == 200 and "activeItems" in js.text

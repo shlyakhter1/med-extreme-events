@@ -33,14 +33,14 @@ flowchart LR
     F[Feeds<br/>NWS · IEM archive · HMS · OpenFEMA · AirNow] --> P[Providers<br/>live + replay]
     P --> ES[(events)]
     G1[(Counties · NWS zones)] --> P
-    ES --> PB[Playback · Events pages]
+    ES --> PB[Monitor · event pages]
   end
   subgraph MED[Medical layer]
     FAC[(Facilities · catchments)] --> ENG[Matching engine]
     CARDS[(Cards · VA profile)] --> ENG
     DEN[(VetPop · PLACES)] --> PAN[Panel estimator] --> ENG
     ENG --> AI[(action_items)]
-    AI --> UI[Dashboard · facility page · patient view]
+    AI --> UI[Monitor card focus · patient view]
   end
   ES -- Event model, county FIPS --> ENG
   AI -. overlay .-> PB
@@ -69,10 +69,12 @@ After about a minute, open:
 
 | Page | For |
 | --- | --- |
-| <http://localhost:8000/playback> | Scrub a scenario through time on the US map (event layer, with card overlay) |
+| <http://localhost:8000/> | Monitor: live now (last two weeks, forecasts ahead) or a replay, on one clock — map, cards firing, facilities by acuity, outreach queue, timeline |
+| <http://localhost:8000/?scenario=heat_dome_2021&facility=vha_648> | One facility's fired cards, panels and checklist, in Monitor's focus layout |
+| <http://localhost:8000/replays> | Scenarios: each replay's story, stats and guided moments |
+| <http://localhost:8000/card-library> | The eight playbook cards: triggers, population, actions, evidence, where each fires |
+| <http://localhost:8000/sources> | Every data source: coverage, limits, last live run |
 | <http://localhost:8000/dashboard/events> | Every event, with its window, geography and metrics (event layer) |
-| <http://localhost:8000/> | Care-team dashboard: event board, outreach queue, map (medical layer) |
-| <http://localhost:8000/dashboard/facilities/vha_648> | One facility's fired cards, panels and checklist (medical layer) |
 | <http://localhost:8000/demo/patient-view?facility=vha_648> | What a patient or caregiver would see (medical layer) |
 | <http://localhost:8000/docs> | Interactive API reference |
 
@@ -132,8 +134,8 @@ These come from `CLAUDE.md`, and tests enforce most of them.
 
 ## Where to go next
 
-- [user-interface.md](user-interface.md): how to use the dashboard, facility pages, events
-  and playback, and how each is meant to work.
+- [user-interface.md](user-interface.md): how to use Monitor, the Scenarios and Sources
+  tabs, event pages and the patient view, and how each is meant to work.
 - `docs/card-reference-for-frontend.md`: API shapes and rendering rules for anyone building
   a UI on the action items.
 - `docs/card-library.md` and `docs/card-library-additions.md`: the clinical source of truth for all eight cards.

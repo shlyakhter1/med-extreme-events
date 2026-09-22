@@ -8,20 +8,21 @@ acknowledge), ``/demo/patient-view`` read-only patient/caregiver rendering.
 from __future__ import annotations
 
 import re
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import Engine
 
 from xevents.carbon import CarbonTable, load_carbon
 from xevents.cards import load_cards
+from xevents.engine import safety_message
 from xevents.geography.catchment import is_anchor
 from xevents.geography.counties import CountyIndex
-from xevents.models import ActionItem, ActionItemStatus, Event, EventSource, Role
+from xevents.models import ActionItem, ActionItemStatus, Event, Role
 from xevents.profiles import PROFILES_DIR, load_profile
 from xevents.providers.eagle_i import ATTRIBUTION as EAGLEI_ATTRIBUTION
 from xevents.providers.eagle_i import (
@@ -31,6 +32,7 @@ from xevents.providers.eagle_i import (
     OVERCOUNT_CAVEAT,
 )
 from xevents.providers.replay import list_scenarios
+from xevents.scenario_guide import load_guide
 from xevents.sources import load_backlog, load_registry
 from xevents.store import (
     TransitionError,
@@ -163,6 +165,8 @@ def _context(request: Request, scenario: str | None, at: str | None) -> dict[str
     return {
         "request": request,
         "asset_v": ASSET_V,
+        "show_asof": True,
+        "show_banner": True,
         "scenarios": scenarios,
         "scenario": chosen,
         "mode": "replay" if chosen else "live",
@@ -193,74 +197,36 @@ def _items_at(
     )
 
 
+def _anchor_classifications() -> list[str]:
+    return list(load_profile(PROFILES_DIR / "va.yaml").catchment.anchor_classifications)
+
+
 @router.get("/", response_class=HTMLResponse)
-def dashboard(
-    request: Request,
-    scenario: str | None = Query(default=None),
-    at: str | None = Query(default=None),
-) -> HTMLResponse:
-    ctx = _context(request, scenario, at)
-    engine = _engine(request)
-    items = _items_at(request, ctx["scenario"], ctx["as_of"])
-    events = list_events(
-        engine,
-        scenario=ctx["scenario"],
-        active_at=ctx["as_of"],
-        live_only=ctx["scenario"] is None,
+def monitor(request: Request) -> HTMLResponse:
+    """Monitor: the one live-first map view (live now, the last two weeks, and the replays).
+    Scenario, time and selection come from the query string and are read by playback.js.
+    Rendered through Jinja only for ``asset_v`` and the station classes used in ranking."""
+    return templates.TemplateResponse(
+        request,
+        "playback.html",
+        {"request": request, "asset_v": ASSET_V, "anchors": _anchor_classifications()},
     )
-    facilities = {f.id: f for f in list_facilities(engine)}
-    board: dict[str, dict[str, Any]] = {}
-    for it in items:
-        row = board.setdefault(
-            it.scope_id,
-            {
-                "facility": facilities.get(it.scope_id),
-                "cards": {},
-                "panel": 0.0,
-                "rank_score": 0.0,
-                "severity": 0,
-                "acuity_rank": 99,
-                "acuity_class": "",
-                "events": set(),
-            },
-        )
-        row["cards"].setdefault(it.card_id, it.card_title)
-        row["panel"] = max(row["panel"], it.panel.value if it.panel else 0.0)
-        row["rank_score"] = max(row["rank_score"], it.rank_score)
-        row["severity"] = max(row["severity"], SEVERITY_RANK[it.event_severity.value])
-        if it.acuity_rank < row["acuity_rank"]:
-            row["acuity_rank"], row["acuity_class"] = it.acuity_rank, it.acuity_class
-        row["events"].add(it.event_name)
 
-    def board_key(r: dict[str, Any]) -> tuple[int, float, int, str]:
-        f = r["facility"]
-        cls = (f.classification or "") if f else ""
-        station_first = 0 if cls.startswith(("VA Medical Center", "Health Care Center")) else 1
-        return (
-            r["acuity_rank"],
-            -(r["severity"] * r["rank_score"]),
-            station_first,
-            f.name if f else "",
-        )
 
-    ranked = sorted(board.values(), key=board_key)
-    event_counts: dict[str, int] = {}
-    for e in events:
-        group = event_group(e.event_name)
-        event_counts[group] = event_counts.get(group, 0) + 1
-    ctx.update(
-        board=ranked,
-        events=sorted(events, key=lambda e: (e.onset, e.event_key))[:25],
-        events_total=len(events),
-        has_outage=any(e.source is EventSource.EAGLE_I for e in events),
-        item_count=len(items),
-        event_count=len(events),
-        event_counts=sorted(event_counts.items(), key=lambda kv: -kv[1]),
-        open_queue=sum(
-            1 for i in items if i.status is ActionItemStatus.ISSUED and i.acuity_rank <= 1
-        ),
-    )
-    return templates.TemplateResponse(request, "dashboard.html", ctx)
+def _monitor_url(request: Request, **extra: str | None) -> str:
+    """``/`` with the caller's scenario/at plus ``extra``; empty values dropped."""
+    from urllib.parse import urlencode
+
+    q = {k: v for k, v in request.query_params.items() if k in ("scenario", "at")}
+    q.update({k: v for k, v in extra.items() if v})
+    q = {k: v for k, v in q.items() if v}
+    return "/" + (f"?{urlencode(q)}" if q else "")
+
+
+@router.get("/playback")
+def playback(request: Request) -> RedirectResponse:
+    """Playback is now Monitor at ``/``; old links keep their scenario and time."""
+    return RedirectResponse(_monitor_url(request), status_code=307)
 
 
 def _display_role(role: str) -> Role:
@@ -311,30 +277,13 @@ def _facility_cards(
     return cards
 
 
-@router.get("/dashboard/facilities/{facility_id}", response_class=HTMLResponse)
-def facility_page(
-    request: Request,
-    facility_id: str,
-    scenario: str | None = None,
-    at: str | None = None,
-    role: str = "care_team",
-) -> HTMLResponse:
-    ctx = _context(request, scenario, at)
-    facility = get_facility(_engine(request), facility_id)
-    if facility is None:
+@router.get("/dashboard/facilities/{facility_id}")
+def facility_page(request: Request, facility_id: str) -> RedirectResponse:
+    """A facility is read in Monitor's focus layout; the old page URL lands there with the
+    same scenario and time."""
+    if get_facility(_engine(request), facility_id) is None:
         raise HTTPException(status_code=404, detail=f"unknown facility {facility_id}")
-    if role not in {r for r, _ in DISPLAY_ROLES}:
-        raise HTTPException(status_code=422, detail=f"unknown role {role}")
-    role_enum = _display_role(role)
-    cards = _facility_cards(request, facility_id, ctx["scenario"], ctx["as_of"], role_enum)
-    ctx.update(
-        facility=facility,
-        cards=cards,
-        role=role,
-        display_roles=DISPLAY_ROLES,
-        carbon_disclaimer=carbon_table().ui_disclaimer,
-    )
-    return templates.TemplateResponse(request, "facility.html", ctx)
+    return RedirectResponse(_monitor_url(request, facility=facility_id), status_code=307)
 
 
 @router.get("/dashboard/facilities/{facility_id}/cards", response_class=HTMLResponse)
@@ -530,7 +479,7 @@ def sources_page(
         for src in s.get("sources", []):
             replays.setdefault(src, []).append(s["id"])
     facilities = list_facilities(engine)
-    anchors = load_profile(PROFILES_DIR / "va.yaml").catchment.anchor_classifications
+    anchors = _anchor_classifications()
     facility_facts = {
         "total": len(facilities),
         "stations": sum(1 for f in facilities if is_anchor(f, anchors)),
@@ -561,6 +510,7 @@ def sources_page(
         ),
     ]
     ctx.update(
+        show_asof=False,
         guide=registry.guide,
         layers=[
             (key, title, blurb, [r for r in rows if r["src"].layer == key])
@@ -576,9 +526,179 @@ def sources_page(
     return templates.TemplateResponse(request, "sources.html", ctx)
 
 
-@router.get("/playback", response_class=HTMLResponse)
-def playback(request: Request) -> HTMLResponse:
-    """The time-scrubbed map view. Rendered through Jinja only so it picks up ``asset_v``."""
-    return templates.TemplateResponse(
-        request, "playback.html", {"request": request, "asset_v": ASSET_V}
+def _live_summary(engine: Engine, cards: dict[str, Any]) -> dict[str, Any]:
+    """What the live scenario holds right now, computed from the live rows: the Monitor window
+    (two weeks back, up to a week ahead), events in it by source, what fires now and what
+    fired over the window, and when the feeds last ran."""
+    now = datetime.now(UTC)
+    start, end = now - timedelta(days=14), now + timedelta(days=7)
+    events = [
+        e for e in list_events(engine, live_only=True) if e.expires >= start and e.onset <= end
+    ]
+    by_source: dict[str, int] = {}
+    for e in events:
+        by_source[e.source.value] = by_source.get(e.source.value, 0) + 1
+    items = [
+        i
+        for i in list_action_items(engine, live_only=True, role=Role.CARE_TEAM.value)
+        if i.window_end >= start and i.window_start <= end
+    ]
+    now_items = [i for i in items if i.window_start <= now <= i.window_end]
+
+    def by_number(ids: set[str]) -> list[Any]:
+        return sorted((cards[c] for c in ids if c in cards), key=lambda c: c.number)
+
+    runs = latest_feed_runs(engine)
+    last = max((r["run_at"] for r in runs), default=None)
+    return {
+        "window_start": start,
+        "window_end": end,
+        "events": len(events),
+        "events_now": sum(1 for e in events if e.onset <= now <= e.expires),
+        "forecast_ahead": sum(1 for e in events if e.onset > now),
+        "by_source": sorted(by_source.items(), key=lambda kv: -kv[1]),
+        "cards_now": by_number({i.card_id for i in now_items}),
+        "cards_window": by_number({i.card_id for i in items}),
+        "facilities_now": len({i.scope_id for i in now_items}),
+        "facilities_window": len({i.scope_id for i in items}),
+        "last_run": datetime.fromisoformat(last) if last else None,
+        "problems": [r["provider"] for r in runs if r["status"] == "failed"],
+        "partial": [s for s in load_registry().sources if s.live.coverage_level == "partial"],
+    }
+
+
+@router.get("/replays", response_class=HTMLResponse)
+def replays_page(request: Request) -> HTMLResponse:
+    """Scenarios: what each replay is, what it exercises, and moments worth looking at, each
+    a deep link into Monitor. Stats are computed from the fixtures and stored items."""
+    ctx = _context(request, None, None)
+    engine = _engine(request)
+    guide = load_guide()
+    summaries = {s["id"]: s for s in ctx["scenarios"]}
+    cards = {c.id: c for c in load_cards()}
+    rows: list[dict[str, Any]] = []
+    for r in guide.replays:
+        summary = summaries.get(r.id)
+        if summary is None:
+            continue
+        items = list_action_items(engine, scenario=r.id, include_superseded=True)
+        fired = sorted(
+            {i.card_id for i in items}, key=lambda c: cards[c].number if c in cards else 99
+        )
+        rows.append(
+            {
+                "guide": r,
+                "summary": summary,
+                "cards": [cards[c] for c in fired if c in cards],
+                "facilities": len({i.scope_id for i in items}),
+                "item_count": sum(1 for i in items if i.status is not ActionItemStatus.SUPERSEDED),
+            }
+        )
+    ctx.update(
+        show_asof=False,
+        show_banner=False,
+        replays=rows,
+        cataloged=guide.cataloged,
+        cards_by_id=cards,
+        live=_live_summary(engine, cards),
+        live_guide=guide.live,
     )
+    return templates.TemplateResponse(request, "replays.html", ctx)
+
+
+_FIRING_CACHE: dict[tuple[str, int], dict[str, dict[str, Any]]] = {}
+
+
+def _card_firing(
+    engine: Engine, scenario: str, window_start: datetime
+) -> dict[str, dict[str, Any]]:
+    """card id → where and when it fires in one replay: facilities reached, first time, and
+    the peak hour (most facilities at once) — the moment Monitor should open on. Care-team
+    items only, superseded ones excluded, as Monitor shows them. Cached per replay (keyed by
+    item count, so a re-match refreshes it)."""
+    items = [
+        i
+        for i in list_action_items(engine, scenario=scenario, role=Role.CARE_TEAM.value)
+        if i.status is not ActionItemStatus.SUPERSEDED
+    ]
+    key = (scenario, len(items))
+    if key in _FIRING_CACHE:
+        return _FIRING_CACHE[key]
+    by_card: dict[str, list[ActionItem]] = {}
+    for i in items:
+        by_card.setdefault(i.card_id, []).append(i)
+    out: dict[str, dict[str, Any]] = {}
+    for card_id, its in by_card.items():
+        # candidate moments: each item's opening hour, not before the replay's first onset
+        # (Monitor's timeline starts there)
+        starts = sorted(
+            {max(i.window_start, window_start).replace(minute=0, second=0) for i in its}
+        )
+        best, best_n = starts[0], -1
+        for t in starts:
+            n = len({i.scope_id for i in its if i.window_start <= t <= i.window_end})
+            if n > best_n:
+                best, best_n = t, n
+        out[card_id] = {
+            "facilities": len({i.scope_id for i in its}),
+            "first": min(i.window_start for i in its),
+            "peak": best,
+            "peak_facilities": best_n,
+        }
+    if len(_FIRING_CACHE) > 32:
+        _FIRING_CACHE.clear()
+    _FIRING_CACHE[key] = out
+    return out
+
+
+def _cards_context(request: Request) -> dict[str, Any]:
+    """Shared by the card overview and detail pages: the card models plus what the system
+    computes about them (acuity position, hooks, where each fires, live now)."""
+    ctx = _context(request, None, None)
+    engine = _engine(request)
+    profile = load_profile(PROFILES_DIR / "va.yaml")
+    cards = sorted(load_cards(), key=lambda c: c.number)
+    firing: dict[str, list[dict[str, Any]]] = {c.id: [] for c in cards}
+    for s in ctx["scenarios"]:
+        start = datetime.fromisoformat(s["window_start"])
+        for card_id, f in _card_firing(engine, s["id"], start).items():
+            firing.setdefault(card_id, []).append({"scenario": s["id"], **f})
+    now = datetime.now(UTC)
+    live: dict[str, set[str]] = {}
+    for i in list_action_items(engine, live_only=True, active_at=now, role=Role.CARE_TEAM.value):
+        live.setdefault(i.card_id, set()).add(i.scope_id)
+    ctx.update(
+        show_asof=False,
+        show_banner=False,
+        cards=cards,
+        firing=firing,
+        live_now={k: len(v) for k, v in live.items()},
+        acuity_order=profile.acuity_order,
+        hooks=profile.hooks,
+        escalation_default=profile.escalation_default,
+        carbon_disclaimer=carbon_table().ui_disclaimer,
+    )
+    return ctx
+
+
+@router.get("/card-library", response_class=HTMLResponse)
+def card_library(request: Request) -> HTMLResponse:
+    """Cards: the eight playbook cards at a glance — what triggers each, whom it selects, how
+    strong its evidence is, and where it fires in the replays and live now."""
+    return templates.TemplateResponse(request, "card_library.html", _cards_context(request))
+
+
+@router.get("/card-library/{card_id}", response_class=HTMLResponse)
+def card_detail(request: Request, card_id: str) -> HTMLResponse:
+    """One card in full, verbatim from its YAML: triggers, population, both audiences'
+    actions, escalation, evidence with tiers, sources, carbon, and where it fires."""
+    ctx = _cards_context(request)
+    card = next((c for c in ctx["cards"] if c.id == card_id), None)
+    if card is None:
+        raise HTTPException(status_code=404, detail=f"unknown card {card_id}")
+    ctx.update(
+        card=card,
+        carbon=carbon_for(card.number),
+        safety=safety_message(card, load_profile(PROFILES_DIR / "va.yaml")),
+    )
+    return templates.TemplateResponse(request, "card_detail.html", ctx)

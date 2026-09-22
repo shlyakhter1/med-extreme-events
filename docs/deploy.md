@@ -29,8 +29,10 @@ It takes about a minute and needs no network access. Then open:
 
 | Page | What it is |
 | --- | --- |
-| <http://localhost:8000/> | Care-team dashboard: event board, map, active events |
-| <http://localhost:8000/playback> | Time-scrubbed playback of a scenario on the US map |
+| <http://localhost:8000/> | Monitor: live now (last 2 weeks) or a replay, on one clock |
+| <http://localhost:8000/replays> | Scenarios: what each replay shows, with guided moments |
+| <http://localhost:8000/card-library> | Cards: the eight playbook cards in full |
+| <http://localhost:8000/sources> | Data sources: coverage, limits and last live run |
 | <http://localhost:8000/dashboard/events> | Every event, with windows, geography and metrics |
 | <http://localhost:8000/demo/patient-view?facility=vha_648> | What a patient or caregiver sees |
 | <http://localhost:8000/docs> | Interactive API reference (OpenAPI) |
@@ -220,7 +222,7 @@ needs writable storage and outbound network access.
    # and set DATABASE_URL=sqlite:////data/live.db
    ```
 
-4. Refresh on a schedule — the feeds update continuously and the dashboard banner marks a
+4. Refresh on a schedule — the feeds update continuously and the live banner marks a
    feed stale after six hours:
 
    ```sh

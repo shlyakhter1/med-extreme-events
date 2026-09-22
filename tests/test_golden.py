@@ -327,3 +327,31 @@ def test_smoke_nyc_2023_golden(world: tuple[list[Card], list, PanelEstimator]) -
     assert all(i.phase.value == "during_event" for i in items), "HMS is observed"
     assert all(i.panel and i.panel.value > 0 for i in items)
     assert all(i.compounding_events == [] for i in items), "no outage in this fixture"
+
+
+def test_scenario_guide_moments_fire(world: tuple[list[Card], list, PanelEstimator]) -> None:  # type: ignore[type-arg]
+    """Every built replay has a Scenarios-page entry, and every guided moment deep-links to a
+    card that really fires then (a current, non-superseded item whose window holds ``at``) —
+    so the moments cannot silently rot when fixtures or the engine change."""
+    from xevents.providers.replay import list_scenarios
+    from xevents.scenario_guide import load_guide
+
+    guide = load_guide()
+    assert {r.id for r in guide.replays} == set(list_scenarios())
+    assert guide.live.title and guide.live.story, "the live scenario is described too"
+    card_ids = {c.id for c in world[0]}
+    for replay in guide.replays:
+        assert replay.moments, replay.id
+        items = run_scenario(replay.id, world).items
+        onsets = [e.onset for e in load_scenario(replay.id)]
+        for m in replay.moments:
+            assert m.card in card_ids, (replay.id, m.card)
+            assert min(onsets) <= m.at, (replay.id, m.at, "before the playback window")
+            firing = [
+                i
+                for i in items
+                if i.card_id == m.card
+                and i.status.value != "superseded"
+                and i.window_start <= m.at <= i.window_end
+            ]
+            assert firing, (replay.id, m.at.isoformat(), m.card, "does not fire then")

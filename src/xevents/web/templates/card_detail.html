@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "macros.html" import trigger_text, carbon_table %}
+{% block title %}Card {{ card.number }} · {{ card.title }}{% endblock %}
+{% macro codings(list) -%}
+<ul class="src-limits" style="color:var(--ink-2); font-size:12.5px">{% for x in list %}<li>{{ x.display }} <span class="faint mono" style="font-size:11px">{{ x.system }} {{ x.code }}</span></li>{% endfor %}</ul>
+{%- endmacro %}
+{% block content %}
+{% set c = card %}{% set phase_label = {'pre_event': 'Pre-event · ' ~ c.window_days.min ~ '–' ~ c.window_days.max ~ ' days out', 'during_event': 'During event', 'any': 'Any phase'} %}
+<nav class="crumbs" aria-label="breadcrumb">
+  <a class="crumb" href="/card-library">Cards</a><span class="sep">/</span><span class="crumb on">Card {{ c.number }}</span>
+  <a class="closebtn" href="/card-library" title="Back to all cards" aria-label="Close" style="display:flex;align-items:center;justify-content:center;text-decoration:none">×</a>
+</nav>
+<article class="card-block" style="--card-color:var(--card-{{ c.number }}); border-bottom:0">
+  <div class="cb-title"><i class="cb-chip" aria-hidden="true"></i><h2>{{ c.title }}</h2></div>
+  <div class="chips">
+    <span class="chip">Card {{ c.number }}</span>
+    <span class="chip">acuity: {{ c.acuity_class.replace('_', ' ') }} · {{ acuity_order.index(c.acuity_class) + 1 }} of {{ acuity_order|length }}</span>
+    <span class="chip">evidence: {{ c.evidence_tier.value.replace('_', ' ') }}</span>
+    <span class="chip">fires {{ c.window_days.min }}–{{ c.window_days.max }} days ahead</span>
+    {% if live_now.get(c.id) %}<a class="chip alarm" href="/?scenario=live&card={{ c.id }}">live now at {{ live_now[c.id] }} facilit{{ 'y' if live_now[c.id] == 1 else 'ies' }} →</a>{% endif %}
+  </div>
+  <div class="cb-prov">card {{ c.id }} v{{ c.version }} · cards/{{ '%02d' % c.number }}-*.yaml</div>
+  <p class="cb-summary" style="font-size:15px">{{ c.summary }}</p>
+
+  <div class="phase-h"><span class="t">When it fires</span><span class="rule"></span><span class="s">any one trigger</span></div>
+  <ul class="action-list">{% for t in c.event_triggers %}<li><span>{{ trigger_text(t) }}</span></li>{% endfor %}</ul>
+  <p class="prov" style="margin-top:10px">Forecast and imminent events open the card's lead window ({{ c.window_days.min }}–{{ c.window_days.max }} days ahead) with pre-event actions; observed events apply during-event actions from the observation. Phase-agnostic actions always apply.</p>
+
+  <div class="phase-h"><span class="t">Who it selects</span><span class="rule"></span><span class="s">denominator: {{ c.population_selector.denominator_key }}</span></div>
+  <div class="lbl">Conditions</div>{{ codings(c.population_selector.condition_codes) }}
+  {% if c.population_selector.med_classes %}<div class="lbl" style="margin-top:10px">Medication classes</div>{{ codings(c.population_selector.med_classes) }}{% endif %}
+  {% if c.population_selector.device_classes %}<div class="lbl" style="margin-top:10px">Devices</div>{{ codings(c.population_selector.device_classes) }}{% endif %}
+  {% if c.population_selector.flags %}<div class="chips" style="margin-top:10px">{% for f in c.population_selector.flags %}<span class="tag">{{ f.replace('_', ' ') }}</span>{% endfor %}</div>{% endif %}
+  {% if c.population_selector.denominator_note %}<p class="prov" style="margin-top:10px">{{ c.population_selector.denominator_note }}</p>{% endif %}
+  {% for sp in c.population_selector.sub_panels %}
+    <div class="stat-block" style="margin-top:12px"><div class="lbl">Sub-panel · {{ sp.label }}</div>
+      {% if sp.condition_codes %}{{ codings(sp.condition_codes) }}{% endif %}{% if sp.med_classes %}{{ codings(sp.med_classes) }}{% endif %}{% if sp.device_classes %}{{ codings(sp.device_classes) }}{% endif %}
+      <div class="q">{% if sp.denominator_key %}denominator: {{ sp.denominator_key }}{% endif %}{% if sp.note %} · {{ sp.note }}{% endif %}</div></div>
+  {% endfor %}
+
+  {% for phase in ['pre_event', 'during_event', 'any'] %}{% set grp = c.actions.care_team|selectattr('phase.value', 'equalto', phase)|list %}{% if grp %}
+  <div class="phase-h"><span class="t">Care team · {{ phase_label[phase] }}</span><span class="rule"></span><span class="s">{{ grp|length }}</span></div>
+  <ul class="action-list">{% for a in grp %}<li>{{ a.text }}</li>{% endfor %}</ul>
+  {% endif %}{% endfor %}
+
+  <div class="phase-h"><span class="t">Patient &amp; caregiver</span><span class="rule"></span><span class="s">verbatim, in card order</span></div>
+  <ul class="action-list">{% for a in c.actions.patient %}<li>{{ a.text }}</li>{% endfor %}</ul>
+  {% if c.actions.caregiver %}<div class="lbl" style="margin-top:12px">For a caregiver</div><ul class="action-list">{% for a in c.actions.caregiver %}<li>{{ a.text }}</li>{% endfor %}</ul>
+  {% else %}<p class="prov" style="margin-top:10px">Caregiver wording is not yet written for this card; the patient guidance above is what a caregiver would be given.</p>{% endif %}
+
+  {% if safety %}<div class="escalate safety">{{ safety }}</div>{% endif %}
+  <div class="escalate">
+    <div class="h">Escalate</div>
+    <ul>{% for e in c.escalation %}<li>{{ e.signs }} <b>→ {{ e.response or escalation_default }}</b>{% if e.emergency and 'emergenc' not in (e.response or '')|lower %} <b>(emergency)</b>{% endif %}</li>{% endfor %}</ul>
+  </div>
+  {% if c.care_system_hooks %}
+  <div class="lbl" style="margin-top:14px">Care-system hooks</div>
+  <ul class="src-limits" style="color:var(--ink-2); font-size:12.5px">{% for k in c.care_system_hooks %}{% set h = hooks.get(k) %}<li>{% if h %}<b>{{ h.name }}</b> — {{ h.description }}{% if h.phone %} · {{ h.phone }}{% endif %}{% if h.url %} · <a href="{{ h.url }}">link ↗</a>{% endif %}{% else %}{{ k }}{% endif %}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <div class="phase-h"><span class="t">Evidence</span><span class="rule"></span><span class="s">card tier: {{ c.evidence_tier.value.replace('_', ' ') }}</span></div>
+  <p style="font-size:14px; color:var(--ink-2); margin:0 0 10px">{{ c.evidence.mechanism }}</p>
+  <ul class="action-list ref" style="opacity:1">{% for cl in c.evidence.claims %}<li><span>{{ cl.text }} <span class="chip{{ ' ok' if cl.tier.value == 'strong' else '' }}" style="margin-left:4px">{{ cl.tier.value.replace('_', ' ') }}</span> {% for sid in cl.source_ids %}<a class="mono" style="font-size:11px" href="#src-{{ sid }}">[{{ sid }}]</a> {% endfor %}</span></li>{% endfor %}</ul>
+  {% if c.evidence.caveats %}<div class="lbl" style="margin-top:12px">Caveats</div><ul class="src-limits">{% for x in c.evidence.caveats %}<li>{{ x }}</li>{% endfor %}</ul>{% endif %}
+
+  <div class="phase-h"><span class="t">Sources</span><span class="rule"></span><span class="s">{{ c.sources|length }}</span></div>
+  <ol style="margin:0 0 0 20px; padding:0; font-size:12.5px; color:var(--ink-2); display:grid; gap:5px">{% for s in c.sources %}<li id="src-{{ s.id }}"><span class="mono faint" style="font-size:11px">{{ s.id }}</span> — {{ s.citation }}{% if s.url %} <a href="{{ s.url }}">↗</a>{% endif %}</li>{% endfor %}</ol>
+
+  {% if carbon %}
+  <div class="phase-h"><span class="t">Carbon footprint of its therapies</span><span class="rule"></span><span class="s">display only</span></div>
+  <p class="prov" style="margin:0 0 6px">Drugs on a card are alternatives, so rows are separate scenarios and must not be added together. Monitor's card view scales these to a facility's panel.</p>
+  {{ carbon_table(carbon, none) }}
+  <div class="warn" style="margin-top:6px">{{ carbon_disclaimer }}</div>
+  {% endif %}
+
+  <div class="phase-h"><span class="t">Where it fires</span><span class="rule"></span><span class="s">care-team items</span></div>
+  {% set fired = firing.get(c.id, []) %}
+  {% if fired %}
+  <div class="rank-list" style="border-radius:7px; overflow:hidden; border:1px solid var(--line)">
+    {% for f in fired %}
+    <a class="rank-row" href="/?scenario={{ f.scenario }}&at={{ f.peak.strftime('%Y-%m-%dT%H:%MZ') }}&card={{ c.id }}">
+      <span class="r1"><span class="name">{{ f.scenario }}</span><span class="fig">{{ f.facilities }} facilit{{ 'y' if f.facilities == 1 else 'ies' }}</span></span>
+      <span class="r2"><span>first {{ f.first.strftime('%Y-%m-%d %H:%MZ') }} · peak {{ f.peak.strftime('%Y-%m-%d %H:%MZ') }} ({{ f.peak_facilities }} at once) · open in Monitor →</span></span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}<p class="muted">No replay fires this card yet.</p>{% endif %}
+  <p class="prov" style="margin-top:10px">Live now: {% if live_now.get(c.id) %}<a href="/?scenario=live&card={{ c.id }}">{{ live_now[c.id] }} facilit{{ 'y' if live_now[c.id] == 1 else 'ies' }} →</a>{% else %}not firing.{% endif %}</p>
+</article>
+{% endblock %}

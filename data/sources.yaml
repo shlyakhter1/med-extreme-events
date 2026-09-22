@@ -167,6 +167,20 @@ sources:
     code: src/xevents/geography/nws_zones.py
     anchor: nws-zone-county-correlation-file
 
+  - id: countries
+    name: Natural Earth countries (1:50m)
+    layer: shared
+    provides: Outlines of Canada, Mexico, Cuba and the Bahamas, drawn as muted land around the US.
+    drives: The map backdrop only.
+    live:
+      mode: display
+      coverage: The US's neighbours; no events are drawn outside the US.
+      coverage_level: full
+    auth: None (public domain).
+    cadence: Static vintage; rebuilt with make reference.
+    limits:
+      - Backdrop only — smoke plumes and alerts beyond the border are not shown.
+
   # ------------------------------------------------------------------ medical layer
   - id: va_facilities
     name: VA Lighthouse Facilities API (v1)

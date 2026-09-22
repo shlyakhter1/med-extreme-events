@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "macros.html" import trigger_text %}
+{% block title %}Cards · med-extreme-events{% endblock %}
+{% block content %}
+<h1 style="margin:0; font-size:25px; line-height:1.2; font-weight:600; letter-spacing:-.01em">Cards</h1>
+<p class="muted" style="max-width:820px; margin:6px 0 0">Each card pairs a hazard with a group of patients at risk from it. When one of its triggers matches an event near a station, the card issues action items for the care team and wording for patients. All text below is the reviewed card content, shown as written; ordered by card number.</p>
+
+<div class="src-grid" style="margin-top:22px; grid-template-columns:repeat(auto-fill,minmax(440px,1fr))">
+{% for c in cards %}{% set fired = firing.get(c.id, []) %}
+  <article class="src-card" id="{{ c.id }}" style="--card-color:var(--card-{{ c.number }})">
+    <div class="src-h">
+      <h2 style="display:flex; gap:9px; align-items:flex-start"><i class="swatch" style="background:var(--card-{{ c.number }}); width:12px; height:16px; margin-top:2px"></i><a href="/card-library/{{ c.id }}" style="color:var(--ink)">Card {{ c.number }} · {{ c.title }}</a></h2>
+    </div>
+    <div class="chips" style="margin-top:10px">
+      <span class="chip" title="acuity order {{ acuity_order.index(c.acuity_class) + 1 }} of {{ acuity_order|length }} (profiles/va.yaml)">acuity: {{ c.acuity_class.replace('_', ' ') }} · {{ acuity_order.index(c.acuity_class) + 1 }}/{{ acuity_order|length }}</span>
+      <span class="chip">evidence: {{ c.evidence_tier.value.replace('_', ' ') }}</span>
+      <span class="chip">fires {{ c.window_days.min }}–{{ c.window_days.max }} days ahead</span>
+      {% if c.safety.do_not_stop_medication %}<span class="chip warn">medication card</span>{% endif %}
+    </div>
+    <p class="src-provides">{{ c.summary }}</p>
+    <div class="lbl" style="margin-top:12px">Triggers (any one)</div>
+    <ul class="src-limits" style="color:var(--ink-2); font-size:12.5px">{% for t in c.event_triggers %}<li>{{ trigger_text(t) }}</li>{% endfor %}</ul>
+    <dl class="src-dl">
+      <dt>Selects</dt><dd>{{ c.population_selector.condition_codes|map(attribute='display')|join('; ') }}{% if c.population_selector.med_classes %} · on {{ c.population_selector.med_classes|map(attribute='display')|join('; ') }}{% endif %}</dd>
+      <dt>Fires in</dt><dd>{% if fired %}<span class="chips">{% for f in fired %}<a class="chip" href="/?scenario={{ f.scenario }}&at={{ f.peak.strftime('%Y-%m-%dT%H:%MZ') }}&card={{ c.id }}" title="peak {{ f.peak.strftime('%Y-%m-%d %H:%MZ') }}: {{ f.peak_facilities }} facilities at once">{{ f.scenario }} · {{ f.facilities }}</a>{% endfor %}</span>{% else %}<span class="muted">no replay yet</span>{% endif %}</dd>
+      <dt>Live now</dt><dd>{% if live_now.get(c.id) %}<a href="/?scenario=live&card={{ c.id }}">{{ live_now[c.id] }} facilit{{ 'y' if live_now[c.id] == 1 else 'ies' }} →</a>{% else %}<span class="muted">not firing</span>{% endif %}</dd>
+    </dl>
+    <div class="src-foot"><span><code>{{ c.id }}</code> v{{ c.version }}</span><a href="/card-library/{{ c.id }}">full card →</a></div>
+  </article>
+{% endfor %}
+</div>
+{% endblock %}

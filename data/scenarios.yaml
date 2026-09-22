@@ -1,0 +1,142 @@
+# scenarios.yaml — the replay scenarios as shown on the Scenarios page (/replays).
+# DRAFT narratives (2026-09-22), written from fixtures/events/CATALOG.md, the golden tests and
+# PROGRESS.md — for the user's review. They describe the events and what the demo exercises;
+# they carry no clinical guidance (that comes only from cards/*.yaml).
+#
+# Counts, windows, peak hour, sources, cards fired and facilities reached are NOT written
+# here: the page computes them from the fixtures and stored items. Each guided moment is a
+# deep link into Monitor; tests/test_golden.py checks that its card really fires at `at`.
+
+# The live scenario: its numbers (events, sources, what fires now, last refresh) are computed
+# on every request from the live rows in the database.
+live:
+  title: Live — the last two weeks and the week ahead
+  story: >-
+    What the public feeds report now. Monitor opens here: two weeks of history (NWS alerts
+    with a 14-day archive backfill, smoke, air quality, declared disasters, power outages) and
+    whatever forecasts and lead windows reach ahead, up to a week. Refreshed when the app
+    starts and every hour; nothing here is curated, so a quiet map can simply mean a quiet day.
+  notes:
+    - Forecast products (NWS watches, AirNow forecasts) fire cards at pre-event, days ahead.
+    - A live power outage is visible only where EAGLE-I coverage exists — see Sources.
+    - Absence of items is not an all-clear when a feed is stale.
+
+replays:
+  - id: uri_2021
+    title: Winter Storm Uri
+    region: Texas and the southern Plains
+    dates: Feb 10–20, 2021
+    story: >-
+      An Arctic outbreak pushed record cold deep into Texas. The ERCOT grid shed load and
+      millions of customers lost power for days — the largest outage in the EAGLE-I record —
+      while temperatures stayed well below freezing. Cold warnings arrive first, then outages
+      stack on top of the cold.
+    exercises:
+      - Extreme cold (Card 7) from legacy NWS product names (Wind Chill Warning → Extreme Cold Warning)
+      - Observed power outages from EAGLE-I firing the dialysis and insulin cards
+      - The cold × outage co-occurrence boost (acuity +1) and its compounding chip
+    moments:
+      - at: 2021-02-13T12:00Z
+        card: cold-cardio-respiratory
+        caption: Cold warnings ahead of the storm — Card 7 at pre-event, days before the grid fails.
+      - at: 2021-02-16T15:00Z
+        card: outage-dialysis
+        caption: Peak hour. Observed outages across Texas fire the dialysis card at every station in reach.
+      - at: 2021-02-16T15:00Z
+        card: outage-insulin
+        caption: The same outages fire the insulin card, ranked by outage share × electricity-dependent beneficiaries.
+
+  - id: ian_2022
+    title: Hurricane Ian
+    region: Southwest and Central Florida
+    dates: Sep 23–30, 2022
+    story: >-
+      Ian strengthened to a Category 4 and made landfall near Fort Myers on September 28,
+      then crossed the peninsula with catastrophic surge, inland flooding and widespread power
+      loss. Watches become warnings, and warnings give way to observed outages.
+    exercises:
+      - Forecast → imminent → observed temporality, switching cards from pre-event to during-event actions
+      - Supersession — a watch replaced by a warning, a warning by an observed outage
+      - EAGLE-I outage readings for Florida
+      - OpenFEMA declarations as context
+    moments:
+      - at: 2022-09-26T12:00Z
+        card: outage-dialysis
+        caption: Tropical storm and hurricane watches — the dialysis card is pre-event (early dialysis before landfall).
+      - at: 2022-09-28T21:00Z
+        card: hurricane-delivery-interruption
+        caption: Landfall evening. The delivery-interruption card (clozapine, LAIs, methadone) is in force at every station.
+      - at: 2022-09-29T04:00Z
+        card: outage-dialysis
+        caption: After landfall, observed outages take over from the warnings — during-event actions apply.
+
+  - id: heat_dome_2021
+    title: Pacific Northwest heat dome
+    region: Washington and Oregon
+    dates: Jun 25 – Jul 1, 2021
+    story: >-
+      A persistent ridge sent Portland to 116 °F and Seattle to 108 °F in a region where
+      few homes have air conditioning. Excessive Heat Warnings covered western Washington and
+      Oregon for days; heat deaths ran into the hundreds.
+    exercises:
+      - The heat cards (lithium, antipsychotics, heart failure) at pre-event
+      - A historical NWS product name (Excessive Heat Warning, renamed Extreme Heat Warning in 2025)
+      - Watch → warning supersession
+    moments:
+      - at: 2021-06-26T18:00Z
+        card: heat-lithium
+        caption: Warnings in force — the lithium card at pre-event across the region.
+      - at: 2021-06-29T18:00Z
+        card: heat-heart-failure
+        caption: Peak hour — the heart-failure card at the same stations.
+
+  - id: smoke_nyc_2023
+    title: Canadian wildfire smoke over New York
+    region: New York and the Northeast
+    dates: Jun 6–8, 2023
+    story: >-
+      Smoke from Quebec wildfires turned the New York sky orange on June 7, with some of the
+      worst air quality ever measured in the city. Satellite smoke analysis shows dense plumes
+      over the whole Northeast corridor.
+    exercises:
+      - NOAA HMS smoke polygons (Medium and Heavy density) resolved to counties
+      - The smoke card (Card 8, COPD and asthma) during an event
+    moments:
+      - at: 2023-06-07T11:00Z
+        card: smoke-copd-asthma
+        caption: The orange-sky day — heavy smoke fires the COPD / asthma card at over a hundred facilities.
+
+  - id: smoke_canada_2026
+    title: Canadian smoke and a Midwest heat dome
+    region: Upper Midwest and Great Lakes → Northeast
+    dates: Jul 14–20, 2026
+    story: >-
+      Canadian wildfire smoke drifted south over the Great Lakes and on to the Mid-Atlantic,
+      with AQI above 200 in the Midwest and PM2.5 near 200 µg/m³ between Baltimore and
+      Washington on July 17, while a heat dome sat over the central US. Two hazards at once,
+      each firing its own cards.
+    exercises:
+      - AirNow monitor AQI from the keyless public file archive, alongside HMS plumes
+      - The smoke card and the heat cards firing in the same week
+      - Many facilities at once — the ranking decides where to look first
+    moments:
+      - at: 2026-07-14T12:00Z
+        card: smoke-copd-asthma
+        caption: Smoke arrives — AirNow readings fire the COPD / asthma card across the Midwest.
+      - at: 2026-07-15T18:00Z
+        card: heat-lithium
+        caption: The heat dome at the same time — heat cards fire alongside smoke.
+      - at: 2026-07-17T18:50Z
+        card: smoke-copd-asthma
+        caption: Peak hour, when the smoke reaches the Mid-Atlantic.
+
+# Feasible but not built (fixtures/events/CATALOG.md, status cataloged or partial).
+cataloged:
+  - {title: Hurricane Ida, dates: "Aug 26 – Sep 2, 2021", region: Louisiana and the Northeast, note: "Hurricane, near-total New Orleans outage, heat during the outage — a boost showcase."}
+  - {title: Hurricane Helene, dates: "Sep 24–30, 2024", region: "Florida, Georgia and North Carolina", note: "Hurricane, Appalachian outages, IV-fluid supply-chain narrative."}
+  - {title: Winter Storm Elliott, dates: "Dec 21–26, 2022", region: Central and eastern US, note: "Extreme cold and grid stress over the holidays."}
+  - {title: California PSPS event, dates: "Oct 26 – Nov 1, 2019", region: Northern California, note: "Planned (forecast) outages — the pre-event outage path; source data partner-gated."}
+  - {title: "Canadian smoke, Midwest wave", dates: "Jun 27–29, 2023", region: Chicago and Detroit, note: "Second 2023 smoke wave."}
+  - {title: Houston derecho and Beryl, dates: "May and Jul 2024", region: Texas, note: "Wind-driven mass outages in extreme heat — a boost showcase."}
+  - {title: Hurricane Sandy, dates: "Oct 2012", region: New York and New Jersey, note: "Partial: pre-2014, so no EAGLE-I outage layer; narrative use only."}
+  - {title: Hurricane Maria, dates: "Sep 2017", region: Puerto Rico, note: "Partial: Puerto Rico utility data is poor in early EAGLE-I years."}

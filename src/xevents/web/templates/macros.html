@@ -28,6 +28,42 @@
 </article>
 {%- endmacro %}
 
+{#- Carbon rows for a card's therapies. Drugs on a card are alternatives, so each row is a
+    separate scenario, never summed. With ``panel`` the last column scales to that panel;
+    with ``none`` (the card library) it is left out. -#}
+{% macro carbon_table(entries, panel) -%}
+<table class="carbon">
+  <thead><tr><th>Therapy</th><th>Per dose</th><th>Per patient-year</th><th>≈ car km/yr</th>{% if panel is not none %}<th>Panel t CO₂e/yr</th>{% endif %}</tr></thead>
+  <tbody>
+  {% for e in entries %}
+    {% set lo = e.kg_co2e_per_patient_year[0] %}{% set hi = e.kg_co2e_per_patient_year[1] %}
+    <tr>
+      <td>{{ e.drug }}<div class="prov">{{ e.assumed_dose }} · {{ e.basis.replace('_',' ') }} · confidence {{ e.confidence.replace('_','–') }}</div>
+        {% if e.note %}<div class="prov">{{ e.note }}</div>{% endif %}</td>
+      <td>{% if e.g_co2e_per_daily_dose %}{{ e.g_co2e_per_daily_dose[0] }}–{{ e.g_co2e_per_daily_dose[1] }} g{% elif e.kg_co2e_per_session %}{{ e.kg_co2e_per_session[0] }}–{{ e.kg_co2e_per_session[1] }} kg/session{% else %}—{% endif %}</td>
+      <td>{{ lo }}–{{ hi }} kg</td>
+      <td>{{ '{:,.0f}'.format(e.km_driven_equivalent_per_year[0]) }}–{{ '{:,.0f}'.format(e.km_driven_equivalent_per_year[1]) }} km</td>
+      {% if panel is not none %}<td><b>{{ '{:,.1f}'.format(panel * lo / 1000) }}–{{ '{:,.1f}'.format(panel * hi / 1000) }} t</b></td>{% endif %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{#- One trigger in plain words. Field names get labels; the values are the card's own. -#}
+{% macro trigger_text(t) -%}
+{%- set c = t.conditions -%}
+<b>{{ t.type.value.replace('_', ' ') }}</b>
+{%- if c.nws_events %} — NWS {{ c.nws_events|join(', ') }}{% endif %}
+{%- if c.outage_pct_min is not none %} — ≥ {{ c.outage_pct_min|round(0)|int }} % of customers out{% endif %}
+{%- if c.sustained_polls_min %}, sustained {{ c.sustained_polls_min }} polls{% endif %}
+{%- if c.aqi_min is not none %} — AQI ≥ {{ c.aqi_min }}{% endif %}
+{%- if c.smoke_density_min %} — smoke density ≥ {{ c.smoke_density_min.value }}{% endif %}
+{%- if c.heatrisk_min %} — HeatRisk ≥ {{ c.heatrisk_min.value }}{% endif %}
+{%- if c.fema_declared %} — FEMA declared{% endif %}
+{%- if c.temporality %} — {{ c.temporality.value }} only{% endif %}
+{%- endmacro %}
+
 {% macro pair_note() -%}
 <div class="pair-note no-print">
   <div class="lbl">Why it looks different</div>

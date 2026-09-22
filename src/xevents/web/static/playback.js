@@ -20,7 +20,12 @@
     cards: new Map(), lastBadges: new Map(), feeds: null,
     layout: "browse", browseView: null, focusFitKey: null,
     blockCache: new Map(), blockKey: null, blockSeq: 0, compact: false,
+    outreachOnly: false, restoring: false,
   };
+  // stations (VAMC/HCC) rank before clinics, as on the old dashboard board; the classes come
+  // from the profile via the page, never from this file
+  const ANCHORS = ((document.body && document.body.dataset && document.body.dataset.anchors) || "").split("|").filter(Boolean);
+  const isStation = (fid) => ANCHORS.some((a) => (facilityProps.get(fid)?.classification || "").startsWith(a));
   let ctx = null, facilityLayer = null, facilityById = new Map(), facilityProps = new Map();
   let badgeLayer = null;
   const cardMarkers = new Map();
@@ -30,6 +35,8 @@
   const fmtHM = (ms) => new Date(ms).toISOString().slice(11, 16) + "Z";
   const isoAt = (ms) => new Date(ms).toISOString().slice(0, 19) + "Z";
   const parse = (s) => Date.parse(s);
+  // times in URLs and forms are UTC; "2021-02-16T15:00" without a zone must not read as local
+  const parseUtc = (s) => (s ? Date.parse(/[zZ]|[+-]\d\d:?\d\d$/.test(s) ? s : `${s}Z`) : NaN);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   const num = (n) => Math.round(n || 0).toLocaleString("en-US");
@@ -112,11 +119,32 @@
     sel.innerHTML =
       `<option value="live">live (now) — last 2 weeks</option>` +
       scenarios.map((s) => `<option value="${s.id}">${s.id} — replay, ${s.events} events</option>`).join("");
-    sel.addEventListener("change", () => loadScenario(sel.value));
+    sel.addEventListener("change", async () => { await loadScenario(sel.value); writeUrl(true); });
     $("play").addEventListener("click", togglePlay);
     $("step-back").addEventListener("click", () => { pause(); step(-1); });
     $("step-fwd").addEventListener("click", () => { pause(); step(1); });
     $("expand-map").addEventListener("click", () => clearSelection());
+    $("clock").addEventListener("click", editClock);
+    $("now-btn").addEventListener("click", () => { pause(); setT(Date.now()); writeUrl(true); });
+    $("banner").addEventListener("click", (e) => {
+      if (e.target.closest && e.target.closest("#outreach")) {
+        state.outreachOnly = !state.outreachOnly;
+        invalidatePaint();
+        render();
+      }
+    });
+    // An Acknowledge / Mark completed in the card block changes the item on the server; mirror
+    // it in the prefetched items so the outreach count and the rail agree without a reload.
+    document.body.addEventListener("htmx:afterRequest", (e) => {
+      const path = (e.detail && (e.detail.pathInfo?.requestPath || e.detail.requestConfig?.path)) || "";
+      const m = /\/dashboard\/action-items\/(.+)\/status\?status=(\w+)/.exec(path);
+      if (!m || !e.detail.successful) return;
+      const id = decodeURIComponent(m[1]);
+      for (const i of state.items) if (i.id === id) i.status = m[2];
+      state.blockCache.clear();
+      render();
+    });
+    window.addEventListener("popstate", () => applyUrl(readUrl()));
     window.addEventListener("keydown", (e) => {
       const tag = e.target && e.target.tagName;
       if (tag === "SELECT" || tag === "INPUT" || tag === "TEXTAREA") return;
@@ -131,14 +159,89 @@
       if (ctx) ctx.map.invalidateSize();
     });
     initTimelineInput();
-    // Honour ?scenario= so the dashboard can hand off to the same view.
-    let initial = "live";
+    // The URL carries the whole view: ?scenario=&at=&card=&facility=&event=
+    await applyUrl(readUrl());
+    writeUrl(false);
+  }
+
+  // ------------------------------------------------------------------ URL state
+
+  function readUrl() {
+    try { return new URLSearchParams(window.location.search || ""); } catch { return new URLSearchParams(); }
+  }
+
+  /* Restore a view from the URL: scenario first (a load), then time and selection. */
+  async function applyUrl(q) {
+    state.restoring = true;
     try {
-      const want = new URLSearchParams(window.location.search || "").get("scenario");
-      if (want && (want === "live" || scenarios.some((s) => s.id === want))) initial = want;
-    } catch { /* no URL available (tests) */ }
-    sel.value = initial;
-    await loadScenario(initial);
+      const want = q.get("scenario") || "live";
+      const id = want === "live" || state.scenarios.some((s) => s.id === want) ? want : "live";
+      if (id !== $("scenario").value || !state.events.length) {
+        $("scenario").value = id;
+        await loadScenario(id);
+      }
+      state.selectedCard = q.get("card") || null;
+      state.selectedFacility = q.get("facility") || null;
+      state.selectedEvent = state.selectedCard || state.selectedFacility ? null : q.get("event") || null;
+      invalidatePaint();
+      drawTimeline(true);
+      const at = parseUtc(q.get("at"));
+      setT(Number.isFinite(at) ? at : state.startAt);
+      focusDetail();
+    } finally {
+      state.restoring = false;
+    }
+  }
+
+  /* Mirror the view into the URL: replace while scrubbing (throttled), push on a selection or
+     scenario change so Back steps out. Live at "now" leaves the time out, so a reload opens
+     on the new now rather than an old one. */
+  let urlTimer = null;
+  function writeUrl(push) {
+    if (state.restoring || !window.history || !window.history.replaceState) return;
+    const q = new URLSearchParams();
+    const id = $("scenario").value;
+    q.set("scenario", id);
+    const atNow = id === "live" && Math.abs(state.t - Date.now()) < HOUR / 2;
+    if (!atNow) q.set("at", new Date(state.t).toISOString().slice(0, 16) + "Z");
+    if (state.selectedCard) q.set("card", state.selectedCard);
+    if (state.selectedFacility) q.set("facility", state.selectedFacility);
+    if (state.selectedEvent) q.set("event", state.selectedEvent);
+    const url = `/?${q}`;
+    if (urlTimer) { clearTimeout(urlTimer); urlTimer = null; }
+    if (push) {
+      if (url !== window.location.pathname + window.location.search) window.history.pushState(null, "", url);
+    } else {
+      urlTimer = setTimeout(() => window.history.replaceState(null, "", url), 250);
+    }
+  }
+
+  /* Click the clock to type a time (UTC). Enter or leaving the field applies; Esc cancels. */
+  function editClock() {
+    const btn = $("clock");
+    const input = document.createElement("input");
+    input.type = "datetime-local";
+    input.className = "clock-input";
+    input.value = new Date(state.t).toISOString().slice(0, 16);
+    input.min = new Date(state.t0).toISOString().slice(0, 16);
+    input.max = new Date(state.t1).toISOString().slice(0, 16);
+    btn.hidden = true;
+    btn.after(input);
+    input.focus();
+    let done = false;
+    const finish = (apply) => {
+      if (done) return;
+      done = true;
+      const t = parseUtc(input.value);
+      input.remove();
+      btn.hidden = false;
+      if (apply && Number.isFinite(t)) { pause(); setT(t); writeUrl(true); }
+    };
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); finish(true); }
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); finish(false); btn.focus(); }
+    });
+    input.addEventListener("blur", () => finish(true));
   }
 
   async function loadScenario(id) {
@@ -151,7 +254,6 @@
       getJSON(`/action-items?${q}include_superseded=true`),
       live ? getJSON("/feeds").catch(() => null) : Promise.resolve(null),
     ]);
-    syncNav(id);
     state.feeds = feeds;
     state.events = ev.events.map((e) => ({ ...e, _t0: parse(e.onset), _t1: parse(e.expires) }));
     state.items = it.items.map((i) => ({ ...i, _t0: parse(i.window_start), _t1: parse(i.window_end) }));
@@ -170,7 +272,14 @@
     // incident period runs for weeks) should not squash the storm into a few pixels.
     const onsets = state.events.map((e) => e._t0);
     const shortEnds = state.events.filter((e) => e._t1 - e._t0 <= 14 * 24 * HOUR).map((e) => e._t1);
-    if (!onsets.length) {
+    if (live) {
+      // Live: the last two weeks, plus whatever forecasts and lead windows reach ahead
+      // (capped at a week), so you can scrub back through history and forward into forecasts.
+      const now = Date.now();
+      const ahead = [...state.events.map((e) => e._t1), ...state.items.map((i) => i._t1)].filter((t) => t > now);
+      state.t0 = now - 14 * 24 * HOUR;
+      state.t1 = clamp(ahead.length ? Math.max(...ahead) : now, now + HOUR, now + 7 * 24 * HOUR);
+    } else if (!onsets.length) {
       // No events (live mode before any ingest): Math.min() of nothing is Infinity and
       // formatting it throws, so anchor the window on the last 24 h and say why it is empty.
       state.t1 = Date.now();
@@ -190,14 +299,10 @@
     // Start where there is something to see: now for live, the busiest hour for a replay.
     const peak = live ? Date.now() : state.scenarios.find((s) => s.id === id)?.peak_at;
     state.peak = peak ? clamp(typeof peak === "number" ? peak : parse(peak), state.t0, state.t1) : null;
+    state.startAt = state.peak ?? state.t0;
+    $("now-btn").hidden = !live;
     fitToEvents();
-    setT(state.peak ?? state.t0);
-  }
-
-  function syncNav(id) {
-    const qs = `?scenario=${encodeURIComponent(id)}`;
-    $("nav-dashboard").href = `/${qs}`;
-    $("nav-events").href = `/dashboard/events${qs}`;
+    setT(state.startAt);
   }
 
   function fitToEvents() {
@@ -218,6 +323,7 @@
       : (state.peak !== null && Math.abs(state.t - state.peak) < HOUR / 2 ? "UTC · peak hour" : "UTC");
     $("clock-note").textContent = note;
     render();
+    writeUrl(false);
   }
   const stepMs = () => Number($("speed").value) * HOUR;
   function step(dir) { setT(state.t + dir * stepMs()); }
@@ -315,7 +421,10 @@
       return `<div class="tl-lane${lane.grouped ? " more" : ""}"><span class="lab" title="${esc(label)}">${esc(label)}</span>` +
         `<div class="tl-track">${bars}</div></div>`;
     });
-    el.innerHTML = rows.join("") + `<div class="tl-playhead"><span>${fmtHM(state.t)}</span></div>`;
+    const now = Date.now();
+    const nowMark = $("scenario").value === "live" && now >= state.t0 && now <= state.t1
+      ? `<div class="tl-now" style="--nw:${(pctOf(now) / 100).toFixed(4)}" title="now"><span>now</span></div>` : "";
+    el.innerHTML = rows.join("") + nowMark + `<div class="tl-playhead"><span>${fmtHM(state.t)}</span></div>`;
     movePlayhead();
   }
 
@@ -345,7 +454,9 @@
 
   function render() {
     const evs = activeEvents(state.t);
-    const items = activeItems(state.t);
+    const allItems = activeItems(state.t);
+    // the outreach chip narrows the rail and the badges to unacknowledged top-acuity items
+    const items = state.outreachOnly ? allItems.filter(isOutreach) : allItems;
 
     const paint = new Map();
     for (const e of evs) {
@@ -436,7 +547,7 @@
     drawBadges(byFacility);
     drawTimeline(false);
     const cards = cardsAt(items);
-    renderBanner(evs, cards, items);
+    renderBanner(evs, cards, items, allItems);
     renderHazards(evs);
     applyLayout(items);
     renderSide(evs, items, byFacility, cards);
@@ -500,11 +611,12 @@
     }
   }
 
-  function renderBanner(evs, cards, items) {
+  function renderBanner(evs, cards, items, allItems) {
     const live = $("scenario").value === "live";
     const pill = $("mode-pill");
     const facs = new Set(items.map((i) => i.facility_id)).size;
-    const counts = `<span class="hi">${plural(cards.length, "card", "cards")} firing</span> at ${plural(facs, "facility", "facilities")} · ${plural(evs.length, "event", "events")} active`;
+    const counts = outreachChip(allItems) +
+      `<span class="hi">${plural(cards.length, "card", "cards")} firing</span> at ${plural(facs, "facility", "facilities")} · ${plural(evs.length, "event", "events")} active`;
     if (!live) {
       const s = state.scenarios.find((x) => x.id === $("scenario").value);
       pill.textContent = "Replay";
@@ -531,6 +643,22 @@
     pill.className = anyStale ? "pill stale" : "pill";
     $("banner").classList.toggle("stale", anyStale);
     $("banner-text").innerHTML = `${counts} · ${feedText} · absence of items is not an all-clear when a feed is stale.`;
+  }
+
+  /* Outreach queue: care-team items in the top two acuity classes nobody has acknowledged
+     yet (the old dashboard's banner). Class names come from the items themselves. */
+  function isOutreach(i) {
+    return i.acuity_rank <= 1 && i.status === "issued" && i.role === "care_team";
+  }
+
+  function outreachChip(allItems) {
+    const open = allItems.filter(isOutreach);
+    if (!open.length && !state.outreachOnly) return "";
+    const classes = [...new Set(open.map((i) => i.acuity_class.replace(/_/g, " ")))].join(" / ");
+    const label = state.outreachOnly
+      ? `showing outreach only (${open.length}) · show all`
+      : `Outreach: ${open.length} unacknowledged high-acuity${classes ? ` (${esc(classes)})` : ""}`;
+    return `<button type="button" id="outreach" class="chip warn outreach${state.outreachOnly ? " on" : ""}" title="unacknowledged items in the top two acuity classes — click to ${state.outreachOnly ? "show everything" : "show only these"}">${label}</button> `;
   }
 
   function renderHazards(evs) {
@@ -635,9 +763,14 @@
       const top = its.reduce((b, i) => (i.acuity_rank < b.acuity_rank ? i : b), its[0]);
       const panel = Math.max(...its.map((i) => i.panel || 0));
       const sev = Math.max(...its.map((i) => SEV[i.event_severity] || 0));
+      const score = Math.max(...its.map((i) => i.rank_score || 0));
       const p = facilityProps.get(fid);
-      return { fid, name: p ? p.name : fid, cards: new Set(its.map((i) => i.card_id)).size, top, panel, sev };
-    }).sort((a, b) => a.top.acuity_rank - b.top.acuity_rank || b.sev * b.panel - a.sev * a.panel);
+      return { fid, name: p ? p.name : fid, cards: new Set(its.map((i) => i.card_id)).size, top, panel, sev, score, station: isStation(fid) };
+    }).sort((a, b) =>
+      // acuity class, then severity × rank score (panel, or outage % × emPOWER), stations
+      // before clinics, then name — the order the dashboard board used
+      a.top.acuity_rank - b.top.acuity_rank || b.sev * b.score - a.sev * a.score ||
+      Number(b.station) - Number(a.station) || a.name.localeCompare(b.name));
 
     const evList = [...evs].sort((a, b) => (SEV[b.severity] || 0) - (SEV[a.severity] || 0) || a.event_name.localeCompare(b.event_name));
 
@@ -672,6 +805,7 @@
           }).join("")}</div>`
         : `<div class="empty">No events active at this time.</div>`,
       evList.length > 25 ? `<div class="more">… ${evList.length - 25} more</div>` : "",
+      `<div class="more"><a href="/dashboard/events?${new URLSearchParams({ scenario: $("scenario").value, at: isoAt(state.t), window: "all" })}">all events in this window →</a></div>`,
     ].join("");
     const side = $("side");
     side.innerHTML = html;
@@ -758,6 +892,7 @@
     drawTimeline(true);
     render();
     focusDetail();
+    writeUrl(true);
   }
 
   /* Close one level: the facility drill-down first, then the card or event filter. */
@@ -770,6 +905,7 @@
     drawTimeline(true);
     render();
     focusDetail();
+    writeUrl(true);
     return true;
   }
 
@@ -779,6 +915,7 @@
     invalidatePaint();
     render();
     focusDetail();
+    writeUrl(true);
   }
 
   /* Called after any selection chrome writes its markup. */
@@ -894,7 +1031,7 @@
     ].join("");
     wireRail();
     const p = facilityProps.get(fid) || {};
-    const head = `<h1 class="fac-h">${esc(p.name || fid)}</h1><div class="fac-sub">${esc(p.classification || "")} · ${esc(facilityPlace(fid))} · county ${esc(p.county_fips || "?")} · as of ${fmt(state.t)} · <a href="/dashboard/facilities/${encodeURIComponent(fid)}?scenario=${encodeURIComponent($("scenario").value)}&at=${encodeURIComponent(isoAt(state.t))}">full page →</a></div>`;
+    const head = `<h1 class="fac-h">${esc(p.name || fid)}</h1><div class="fac-sub">${esc(p.classification || "")} · ${esc(facilityPlace(fid))} · county ${esc(p.county_fips || "?")} · as of ${fmt(state.t)} · <a href="/demo/patient-view?${new URLSearchParams({ facility: fid, scenario: $("scenario").value, at: isoAt(state.t) })}" target="_blank" rel="noopener">patient view ↗</a></div>`;
     if (!mine.length) {
       $("reading").innerHTML = head + `<div class="loading">No cards fire here at ${fmt(state.t)}.</div>`;
       state.blockKey = null;
@@ -993,6 +1130,7 @@
     drawTimeline(true);
     render();
     focusDetail();
+    writeUrl(true);
   }
 
   function selectEvent(key) {
@@ -1003,6 +1141,7 @@
     drawTimeline(true);
     render();
     focusDetail();
+    writeUrl(true);
   }
 
   /* Inside a card, a facility nests under it (breadcrumb gains a level); otherwise it opens
@@ -1015,6 +1154,7 @@
     invalidatePaint();
     render();
     focusDetail();
+    writeUrl(true);
   }
 
   init().catch((e) => {

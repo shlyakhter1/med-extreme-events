@@ -212,6 +212,13 @@ def item_window_end(event: Event) -> datetime:
     return event.expires
 
 
+def safety_message(card: Card, profile: Profile) -> str | None:
+    """The templated do-not-stop line for medication cards (constraint 5), else None."""
+    if not card.safety.do_not_stop_medication:
+        return None
+    return f"Don't stop your medication — {profile.escalation_default.rstrip('.').lower()}."
+
+
 def _item_id(event_key: str, card_id: str, facility_id: str, role: Role) -> str:
     return f"{event_key}|{card_id}|{facility_id}|{role.value}"
 
@@ -231,9 +238,7 @@ def _build_item(
     message = None
     if role in (Role.PATIENT, Role.CAREGIVER):
         message = " ".join(a.text for a in actions)
-    safety = None
-    if card.safety.do_not_stop_medication:
-        safety = f"Don't stop your medication — {profile.escalation_default.rstrip('.').lower()}."
+    safety = safety_message(card, profile)
     escalation = [
         e
         if e.response is not None

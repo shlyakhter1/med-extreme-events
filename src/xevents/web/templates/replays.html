@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Scenarios · med-extreme-events{% endblock %}
+{% block content %}
+<h1 style="margin:0; font-size:25px; line-height:1.2; font-weight:600; letter-spacing:-.01em">Scenarios</h1>
+<p class="muted" style="max-width:820px; margin:6px 0 0">Live first — what the feeds report now — then real past events, replayed from archived public data so the whole system can be seen working — alerts arriving, cards firing, outages compounding — on the same clock as live mode. Pick a moment to open it in Monitor at that time with that card selected.</p>
+
+<div class="src-grid" style="margin-top:22px; grid-template-columns:repeat(auto-fill,minmax(520px,1fr))">
+{% set L = live %}
+  <article class="src-card" id="live" style="border-color:var(--accent-line)">
+    <div class="src-h">
+      <h2 style="font-size:19px">{{ live_guide.title }}</h2>
+      <span class="chips" style="margin-left:auto"><span class="pill">Live</span></span>
+    </div>
+    <div class="prov" style="margin-top:3px">{{ L.window_start.strftime('%b %d') }} → {{ L.window_end.strftime('%b %d, %Y') }} · <code>live</code>{% if L.last_run %} · feeds last ran {{ L.last_run.strftime('%Y-%m-%d %H:%MZ') }}{% endif %}</div>
+    <p class="src-provides" style="font-size:14px">{{ live_guide.story }}</p>
+    {% if L.events %}
+    <div class="stats" style="margin-top:12px; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px">
+      {% for n, label in [(L.events, 'events in window'), (L.events_now, 'active now'), (L.cards_now|length, 'cards firing now'), (L.facilities_now, 'facilities now')] %}
+      <div class="stat-block" style="padding:9px 10px"><div class="v" style="margin:0"><b style="font-size:19px">{{ '{:,}'.format(n) }}</b></div><div class="q">{{ label }}</div></div>
+      {% endfor %}
+    </div>
+    <dl class="src-dl">
+      <dt>Sources</dt><dd><span class="chips">{% for src, n in L.by_source %}<a class="chip" href="/sources#{{ src }}">{{ src.replace('_', '-') }} · {{ n }}</a>{% endfor %}</span></dd>
+      <dt>Now</dt><dd>{% if L.cards_now %}<span class="chips">{% for c in L.cards_now %}<a class="chip" href="/?scenario=live&card={{ c.id }}" title="{{ c.title }}"><i class="swatch" style="background:var(--card-{{ c.number }}); width:8px; height:11px"></i>{{ c.number }} · {{ c.acuity_class.replace('_', ' ') }}</a>{% endfor %}</span>{% else %}<span class="muted">no card firing right now</span>{% endif %}</dd>
+      <dt>Window</dt><dd>{{ L.cards_window|length }} card{{ 's' if L.cards_window|length != 1 }} fired at {{ L.facilities_window }} facilit{{ 'y' if L.facilities_window == 1 else 'ies' }} over the window{% if L.forecast_ahead %} · {{ L.forecast_ahead }} forecast event{{ 's' if L.forecast_ahead != 1 }} start later{% endif %}</dd>
+    </dl>
+    {% else %}
+    <p class="notice" style="margin-top:12px">No live events ingested yet — the feeds refresh when the app starts and hourly{% if L.problems %}; last run failed for {{ L.problems|join(', ') }}{% endif %}.</p>
+    {% endif %}
+    <ul class="src-limits" style="color:var(--ink-2); font-size:12.5px; margin-top:12px">
+      {% for n in live_guide.notes %}<li>{{ n }}</li>{% endfor %}
+      {% for s in L.partial %}<li>Partial live coverage — <b>{{ s.name }}</b>: {{ s.live.coverage }}</li>{% endfor %}
+    </ul>
+    <div class="src-foot"><span>Refreshed from the live feeds; nothing here is curated.</span><a href="/">open in Monitor now →</a></div>
+  </article>
+
+{% for r in replays %}{% set g = r.guide %}{% set s = r.summary %}
+  <article class="src-card" id="{{ g.id }}">
+    <div class="src-h">
+      <h2 style="font-size:19px">{{ g.title }}</h2>
+      <span class="chips" style="margin-left:auto"><span class="chip">{{ g.dates }}</span></span>
+    </div>
+    <div class="prov" style="margin-top:3px">{{ g.region }} · <code>{{ g.id }}</code></div>
+    <p class="src-provides" style="font-size:14px">{{ g.story }}</p>
+
+    <div class="stats" style="margin-top:12px; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px">
+      {% for n, label in [(s.events, 'events'), (r.cards|length, 'cards fired'), (r.facilities, 'facilities'), (r.item_count, 'action items')] %}
+      <div class="stat-block" style="padding:9px 10px"><div class="v" style="margin:0"><b style="font-size:19px">{{ '{:,}'.format(n) }}</b></div><div class="q">{{ label }}</div></div>
+      {% endfor %}
+    </div>
+
+    <dl class="src-dl">
+      <dt>Window</dt><dd class="mono" style="font-size:12px">{{ s.window_start[:16].replace('T', ' ') }} → {{ s.window_end[:16].replace('T', ' ') }} UTC · peak {{ s.peak_at[:16].replace('T', ' ') }}</dd>
+      <dt>Sources</dt><dd><span class="chips">{% for src in s.sources %}<a class="chip" href="/sources#{{ 'eagle_i' if src == 'eagle_i' else src }}">{{ src.replace('_', '-') }}</a>{% endfor %}</span></dd>
+      <dt>Cards</dt><dd><span class="chips">{% for c in r.cards %}<span class="chip" title="{{ c.title }}"><i class="swatch" style="background:var(--card-{{ c.number }}); width:8px; height:11px"></i>{{ c.number }} · {{ c.acuity_class.replace('_', ' ') }}</span>{% endfor %}</span></dd>
+    </dl>
+
+    {% if g.exercises %}
+    <div class="lbl" style="margin-top:14px">What it exercises</div>
+    <ul class="src-limits" style="color:var(--ink-2); font-size:12.5px">{% for x in g.exercises %}<li>{{ x }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if g.moments %}
+    <div class="lbl" style="margin-top:14px">Moments to look at</div>
+    <div class="rank-list" style="margin-top:6px; border-radius:7px; overflow:hidden; border:1px solid var(--line)">
+      {% for m in g.moments %}{% set c = cards_by_id.get(m.card) %}
+      <a class="rank-row" href="/?scenario={{ g.id }}&at={{ m.at.strftime('%Y-%m-%dT%H:%MZ') }}&card={{ m.card }}">
+        <span class="r1"><span class="mono num" style="font-size:12px; color:var(--ink); flex:none">{{ m.at.strftime('%b %d %H:%MZ') }}</span>{% if c %}<span class="chip" style="margin-left:auto; flex:none"><i class="swatch" style="background:var(--card-{{ c.number }}); width:8px; height:11px"></i>Card {{ c.number }}</span>{% endif %}</span>
+        <span class="r2" style="font-size:12.5px; color:var(--ink-2)"><span>{{ m.caption }}</span></span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="src-foot"><span>Built from archived sources — <code>fixtures/events/{{ g.id }}/</code></span><a href="/?scenario={{ g.id }}">open in Monitor at peak →</a></div>
+  </article>
+{% endfor %}
+</div>
+
+{% if cataloged %}
+<section class="src-layer">
+  <div class="phase-h"><span class="t">Cataloged, not built</span><span class="rule"></span><span class="s">{{ cataloged|length }} candidates</span></div>
+  <p class="prov" style="margin:-4px 0 12px">Feasible replays with sources identified. EAGLE-I outage data starts in 2014, so earlier events can never carry a real outage layer.</p>
+  <div class="rank-list" style="border-radius:9px; overflow:hidden; border:1px solid var(--line); max-width:1100px">
+  {% for c in cataloged %}
+    <div class="rank-row">
+      <span class="r1"><span class="name">{{ c.title }}</span><span class="right" style="font-size:12px">{{ c.dates }} · {{ c.region }}</span></span>
+      <span class="r2"><span>{{ c.note }}</span></span>
+    </div>
+  {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

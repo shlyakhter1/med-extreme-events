@@ -54,72 +54,76 @@ def client(tmp_path_factory: pytest.TempPathFactory) -> TestClient:
     return TestClient(create_app(eng))
 
 
-def test_dashboard_replay_heat_dome(client: TestClient) -> None:
+def test_monitor_is_home_and_old_urls_land_there(client: TestClient) -> None:
+    """One main view: / is Monitor. Playback and facility URLs redirect into it with the same
+    scenario and time, so old links and bookmarks keep working."""
     r = client.get("/", params={"scenario": "heat_dome_2021", "at": AT})
     assert r.status_code == 200
     html = r.text
-    assert "Event board" in html and "Portland VA Medical Center" in html
-    assert "Excessive Heat Warning" in html
-    assert "Replay" in html and "heat_dome_2021" in html
-    assert "/dashboard/facilities/vha_648" in html
+    assert "<title>Monitor" in html and 'id="scenario"' in html and 'id="pb-body"' in html
+    assert "VA Medical Center (VAMC)" in html, "station classes come from the profile"
+    pb = client.get("/playback", params={"scenario": "ian_2022", "at": AT}, follow_redirects=False)
+    assert pb.status_code == 307 and pb.headers["location"].startswith("/?")
+    assert "scenario=ian_2022" in pb.headers["location"]
+    fac = client.get(
+        "/dashboard/facilities/vha_648",
+        params={"scenario": "heat_dome_2021", "at": AT},
+        follow_redirects=False,
+    )
+    assert fac.status_code == 307
+    loc = fac.headers["location"]
+    assert "facility=vha_648" in loc and "scenario=heat_dome_2021" in loc and "at=" in loc
+    assert client.get("/dashboard/facilities/vha_nope").status_code == 404
+    assert client.get("/", follow_redirects=False).status_code == 200
 
 
-def test_dashboard_defaults_to_peak_hour(client: TestClient) -> None:
-    r = client.get("/", params={"scenario": "ian_2022"})
+def test_events_table_defaults_to_peak_hour(client: TestClient) -> None:
+    r = client.get("/dashboard/events", params={"scenario": "ian_2022"})
     assert r.status_code == 200
-    assert "Bay Pines" in r.text or "Orlando" in r.text or "Tampa" in r.text
     assert 'value="2022-09-2' in r.text  # as-of defaulted inside the scenario window
+    assert "Replay" in r.text and "ian_2022" in r.text
 
 
-def test_dashboard_live_mode_has_freshness_banner(client: TestClient) -> None:
-    r = client.get("/")
+def test_live_pages_have_freshness_banner(client: TestClient) -> None:
+    r = client.get("/dashboard/events")
     assert r.status_code == 200
     assert "Live mode" in r.text and "no live events ingested yet" in r.text
     assert "absence of items is not an all-clear" in r.text
-    assert client.get("/", params={"scenario": "nope"}).status_code == 404
+    assert client.get("/dashboard/events", params={"scenario": "nope"}).status_code == 404
+    js = client.get("/static/playback.js").text
+    assert "absence of items is not an all-clear when a feed is stale." in js
+    assert '"/feeds"' in js, "Monitor shows each live feed's last run"
 
 
-def test_facility_page_roles_and_acknowledge(client: TestClient) -> None:
-    r = client.get("/dashboard/facilities/vha_648", params={"scenario": "heat_dome_2021", "at": AT})
-    assert r.status_code == 200
-    html = r.text
+def test_card_block_roles_and_acknowledge(client: TestClient) -> None:
+    """The card block (what Monitor shows for a card or facility) carries the verbatim
+    checklist, provenance, and the status workflow."""
+    base = {"scenario": "heat_dome_2021", "at": AT}
+    cards_url = "/dashboard/facilities/vha_648/cards"
+    html = client.get(cards_url, params=base).text
     assert "Extreme Heat × Bipolar Disorder on Lithium" in html
     assert "Generate the lithium roster" in html, "clinician checklist rendered verbatim"
     assert "how was this number computed?" in html and "veterans × rate (test)" in html
     assert "Acknowledge" in html
-    patient = client.get(
-        "/dashboard/facilities/vha_648/cards",
-        params={"scenario": "heat_dome_2021", "at": AT, "role": "patient"},
-    )
+    patient = client.get(cards_url, params={**base, "role": "patient"})
     assert patient.status_code == 200
     assert "Heat can push your lithium to a dangerous level." in patient.text
     assert "stop your medication" in patient.text  # apostrophe is HTML-escaped
-    caregiver = client.get(
-        "/dashboard/facilities/vha_648/cards",
-        params={"scenario": "heat_dome_2021", "at": AT, "role": "caregiver"},
-    )
+    caregiver = client.get(cards_url, params={**base, "role": "caregiver"})
     assert "No caregiver content" in caregiver.text
     item_id = html.split('hx-post="/dashboard/action-items/')[1].split("/status")[0]
     ack = client.post(
         f"/dashboard/action-items/{item_id}/status", params={"status": "acknowledged"}
     )
     assert ack.status_code == 200 and "acknowledged" in ack.text
-    again = client.get(
-        "/dashboard/facilities/vha_648", params={"scenario": "heat_dome_2021", "at": AT}
-    )
-    assert "Mark completed" in again.text
+    assert "Mark completed" in client.get(cards_url, params=base).text
     assert (
         client.post(
             f"/dashboard/action-items/{item_id}/status", params={"status": "issued"}
         ).status_code
         == 409
     )
-    assert (
-        client.get(
-            "/dashboard/facilities/vha_nope", params={"scenario": "heat_dome_2021"}
-        ).status_code
-        == 404
-    )
+    assert client.get("/dashboard/facilities/vha_nope/cards", params=base).status_code == 404
 
 
 def test_patient_view(client: TestClient) -> None:
@@ -161,9 +165,9 @@ def test_form_submitted_timestamp_is_accepted(client: TestClient) -> None:
         "2021-06-28T00:00",  # datetime-local
         "2021-06-28",
     ):
-        r = client.get("/", params={"scenario": "heat_dome_2021", "at": value})
+        r = client.get("/dashboard/events", params={"scenario": "heat_dome_2021", "at": value})
         assert r.status_code == 200, f"{value!r} → {r.status_code} {r.text[:120]}"
-    assert client.get("/", params={"at": "nonsense"}).status_code == 422
+    assert client.get("/dashboard/events", params={"at": "nonsense"}).status_code == 422
     # an offset is converted, never carried into the SQLite wall-clock comparison
     from xevents.timeparse import parse_at
 
@@ -178,8 +182,13 @@ def test_form_submitted_timestamp_is_accepted(client: TestClient) -> None:
     )
     assert r_off.json()["count"] == r_utc.json()["count"], "same instant, same events"
     # the header control must emit a value the form can submit back unchanged
-    html = client.get("/", params={"scenario": "heat_dome_2021", "at": "2021-06-28T00:00"}).text
+    html = client.get(
+        "/dashboard/events", params={"scenario": "heat_dome_2021", "at": "2021-06-28T00:00"}
+    ).text
     assert 'type="datetime-local" name="at" value="2021-06-28T00:00"' in html
+    # Monitor's URLs and typed times are UTC even without a zone suffix
+    js = client.get("/static/playback.js").text
+    assert "const parseUtc" in js and "`${s}Z`" in js
 
 
 def test_events_pages(client: TestClient) -> None:
@@ -206,24 +215,42 @@ def test_events_show_location_and_timestamps(client: TestClient) -> None:
     ), "every event row carries its temporality badge"
     assert "2022-09-2" in html, "timestamps are rendered"
     assert "FL" in html, "location is rendered"
-    dash = client.get("/", params=base).text
-    assert "<th>Where</th>" in dash
 
 
-def test_playback_offers_live_and_navigation(client: TestClient) -> None:
-    """You must be able to get from playback back to live without editing the URL."""
-    html = client.get("/playback").text
+def test_monitor_offers_live_navigation_and_url_state(client: TestClient) -> None:
+    """Live first, replays one menu away, and the URL holds the whole view (scenario, time,
+    selection) so reload, Back and shared links reopen the same moment."""
+    html = client.get("/").text
     js = client.get("/static/playback.js").text
     assert "if (!onsets.length)" in js and "no live events ingested yet" in js, (
         "live mode with no events must not compute Math.min() of nothing"
     )
-    assert 'id="nav-dashboard"' in html and 'id="nav-events"' in html
     assert 'id="scenario"' in html
-    js = client.get("/static/playback.js").text
     assert 'value="live"' in js, "the view selector offers live"
-    assert "Cards firing now" in js, "cards are surfaced in playback, not only on the dashboard"
+    assert "Cards firing now" in js, "cards are surfaced in the main view"
     assert "selectCard" in js and "cardColor" in js, "cards can be selected and shown on the map"
-    assert client.get("/playback", params={"scenario": "ian_2022"}).status_code == 200
+    for fn in (
+        "function readUrl",
+        "async function applyUrl",
+        "function writeUrl",
+        "function editClock",
+    ):
+        assert fn in js, fn
+    for key in ('q.get("card")', 'q.get("facility")', 'q.get("event")', 'q.get("at")'):
+        assert key in js, key
+    assert 'window.addEventListener("popstate"' in js, "Back restores the previous view"
+    assert "history.pushState" in js and "history.replaceState" in js
+    # live: the last two weeks plus forecasts ahead, capped at a week; a now marker and button
+    assert "now - 14 * 24 * HOUR" in js and "now + 7 * 24 * HOUR" in js
+    assert 'class="tl-now"' in js and 'id="now-btn"' in html
+    # outreach queue as a banner chip that filters the rail
+    assert "function isOutreach" in js and "state.outreachOnly" in js
+    assert 'i.acuity_rank <= 1 && i.status === "issued"' in js
+    # Acknowledge in the card block updates the prefetched items
+    assert "htmx:afterRequest" in js
+    # the rail keeps the old dashboard's ranking: acuity, severity × rank score, stations first
+    assert "b.sev * b.score - a.sev * a.score" in js and "isStation" in js
+    assert "all events in this window" in js
 
 
 def test_playback_shows_card_content_and_map_symbols(client: TestClient) -> None:
@@ -242,7 +269,7 @@ def test_playback_shows_card_content_and_map_symbols(client: TestClient) -> None
     for builder in ("actions.care_team", "actions.patient", "def.escalation", "kg_co2e_per"):
         assert builder not in js, builder
 
-    page = client.get("/playback").text
+    page = client.get("/").text
     assert 'id="map-legend"' in page, "the map needs a legend"
     assert "/static/app.css" in page and "<style>" not in page, "one shared stylesheet"
     css = client.get("/static/app.css").text
@@ -356,11 +383,10 @@ def test_map_legend_explains_the_colours(client: TestClient) -> None:
     assert "#8c6d3f" not in shared, "the old smoke brown read as unshaded at low opacity"
     assert "fillOpacity = (severityRank) => 0.34" in shared, "minor alerts must stay visible"
 
-    for path in ("/", "/playback"):
-        page = client.get(path).text
-        assert 'id="map-legend"' in page, path
-    dash = client.get("/", params={"scenario": "heat_dome_2021"}).text
-    assert "XMap.legendHtml" in dash and "no card firing" in dash
+    page = client.get("/").text
+    assert 'id="map-legend"' in page
+    js = client.get("/static/playback.js").text
+    assert "XMap.legendHtml" in js and "no card firing" in js
 
 
 def test_card_definitions_available_for_the_playback_panel(client: TestClient) -> None:
@@ -377,9 +403,9 @@ def test_card_definitions_available_for_the_playback_panel(client: TestClient) -
     assert palette.count("#") == 8, "one stable colour per card number"
 
 
-def test_carbon_panel_on_the_facility_page(client: TestClient) -> None:
+def test_carbon_panel_in_the_card_block(client: TestClient) -> None:
     base = {"scenario": "heat_dome_2021", "at": AT}
-    html = client.get("/dashboard/facilities/vha_648", params=base).text
+    html = client.get("/dashboard/facilities/vha_648/cards", params=base).text
     assert "carbon footprint of this card's therapies" in html
     assert "Lithium carbonate" in html and "900 mg/day PO" in html
     assert "never for clinical decisions" in html, "the disclaimer travels with the numbers"
@@ -518,8 +544,6 @@ def test_airnow_readings_group_by_pollutant(client: TestClient) -> None:
     assert "XMap.eventGroup(e.event_name)" in pb, "timeline rows group AirNow readings"
     assert "XMap.summarizeNames(c.events)" in pb, "card trigger text is capped"
     assert "XMap.fitCounties(ctx, fips" in pb
-    dash = client.get("/", params={"scenario": "heat_dome_2021", "at": AT}).text
-    assert "XMap.fitPoints(ctx, bounds" in dash
 
 
 def test_live_banner_shows_provider_runs_and_outage_coverage(tmp_path: Path) -> None:
@@ -540,7 +564,7 @@ def test_live_banner_shows_provider_runs_and_outage_coverage(tmp_path: Path) -> 
     )
     record_feed_run(eng, "airnow (files)", "airnow", "failed", 0, "HTTP 502")
     c = TestClient(create_app(eng))
-    html = c.get("/").text
+    html = c.get("/dashboard/events").text
     assert "hms: 6 events" in html and "eagle_i: 0 events" in html
     assert "airnow (files): <b>failed</b>" in html
     assert "Power outages (EAGLE-I): coverage GA, OH (public state mirrors)" in html
@@ -580,15 +604,124 @@ def test_sources_page_lists_every_source_and_live_limits(tmp_path: Path) -> None
     assert "not an all-clear" in html, "a failed feed carries the all-clear caveat"
     assert "Electric customer outage data provided by EAGLE-I, Department of Energy." in html
     assert "Medicare proxy" in html, "emPOWER is labelled a proxy"
-    assert "/playback?scenario=uri_2021" in html, "replays carrying EAGLE-I are computed"
+    assert "/?scenario=uri_2021" in html, "replays carrying EAGLE-I are computed"
     assert "facilities" in html and "stations" in html
     backlog = load_backlog()
     assert backlog and all(b.id in html for b in backlog), "backlog comes from hazard_sources"
-    assert 'href="/sources' in c.get("/").text, "the tab is in the shared header"
-    assert 'href="/sources"' in c.get("/playback").text
+    assert 'href="/sources' in c.get("/dashboard/events").text, "the tab is in the shared header"
+    assert 'href="/sources"' in c.get("/").text
     # every live provider name in the registry is one that ingest actually records
     ingest = (Path(__file__).resolve().parents[1] / "scripts" / "ingest.py").read_text()
     for s in registry.sources:
         for name in s.live.runs:
             stem = name.split(" (")[0]
             assert f'"{stem}' in ingest or f"'{stem}" in ingest, name
+
+
+def test_nav_is_monitor_scenarios_cards_sources_api(client: TestClient) -> None:
+    """One main view plus reference tabs; the Dashboard, Events and Playback tabs are gone."""
+    import re
+
+    for path in ("/", "/sources", "/replays", "/card-library", "/dashboard/events"):
+        html = client.get(path).text
+        nav = html.split("<nav", 1)[1].split("</nav>", 1)[0]
+        labels = re.findall(
+            r">(Monitor|Scenarios|Cards|Sources|API|Dashboard|Events|Playback)<", nav
+        )
+        assert labels == ["Monitor", "Scenarios", "Cards", "Sources", "API"], (path, labels)
+        if path != "/":
+            assert '<a href="/" title="live, now">Monitor</a>' in nav, (
+                "the tab always opens live now"
+            )
+
+
+def test_scenarios_page(client: TestClient) -> None:
+    """Every built replay is described, with computed stats and deep-linked guided moments."""
+    from xevents.providers.replay import list_scenarios
+    from xevents.scenario_guide import load_guide
+
+    r = client.get("/replays")
+    assert r.status_code == 200
+    html = r.text
+    for sid in list_scenarios():
+        assert f'id="{sid}"' in html, sid
+    guide = load_guide()
+    moment = guide.replays[0].moments[0]
+    at = moment.at.strftime("%Y-%m-%dT%H:%MZ")
+    link = f"/?scenario={guide.replays[0].id}&at={at}&card={moment.card}"
+    assert link in html, "moments deep-link into Monitor at that time and card"
+    assert "Cataloged, not built" in html and "Hurricane Ida" in html
+    assert "cards fired" in html and "facilities" in html
+    assert "Live mode" not in html, "the live banner is not shown on a reference page"
+    # the live scenario comes first; with no live rows it says so rather than showing zeros
+    assert html.index('id="live"') < html.index(f'id="{list_scenarios()[0]}"')
+    assert "open in Monitor now" in html and "No live events ingested yet" in html
+    assert "Georgia and Ohio only" in html, "partial live coverage is stated from the registry"
+
+
+def test_neighbouring_countries_backdrop(client: TestClient) -> None:
+    r = client.get("/reference/countries")
+    assert r.status_code == 200
+    doc = r.json()
+    assert {f["id"] for f in doc["features"]} >= {"CAN", "MEX"}
+    assert (
+        "Natural Earth" in doc["provenance"]["license"]
+        or "naturalearth" in doc["provenance"]["source"]
+    )
+    js = client.get("/static/map.js").text
+    assert 'fetch("/reference/countries")' in js and "COUNTRY_STYLE" in js
+    # drawn before (under) the county layer, and optional: a failed fetch never blocks the map
+    create = js[js.index("async function create") :]
+    assert create.index("countryGeo") < create.index("const layer = L.geoJSON(geo")
+    assert ".catch(() => null)" in js
+
+
+def test_card_library_overview(client: TestClient) -> None:
+    """The Cards tab lists all eight cards with triggers, evidence tier and where they fire."""
+    from markupsafe import escape
+
+    r = client.get("/card-library")
+    assert r.status_code == 200
+    html = r.text
+    cards = client.get("/cards").json()
+    assert len(cards) == 8
+    for c in cards:
+        assert f'href="/card-library/{c["id"]}"' in html, c["id"]
+        assert str(escape(c["title"])) in html, c["id"]
+    assert "Excessive Heat Warning" in html, "NWS trigger products are listed"
+    assert "≥ 10 % of customers out" in html and "sustained 2 polls" in html
+    # the web fixture matches heat_dome_2021 and ian_2022: their chips deep-link into Monitor
+    assert "/?scenario=heat_dome_2021&at=" in html and "&card=heat-lithium" in html
+    assert "/?scenario=ian_2022&at=" in html and "&card=outage-dialysis" in html
+    assert "Live mode" not in html
+
+
+def test_card_detail_is_verbatim_and_complete(client: TestClient) -> None:
+    """A card's page shows its YAML in full: every action and patient sentence verbatim,
+    escalation with the templated default, the safety line, every claim and source."""
+    from markupsafe import escape
+
+    from xevents.cards import load_cards
+    from xevents.engine import safety_message
+    from xevents.profiles import PROFILES_DIR, load_profile
+
+    profile = load_profile(PROFILES_DIR / "va.yaml")
+    for card in load_cards():
+        html = client.get(f"/card-library/{card.id}").text
+        for a in [*card.actions.care_team, *card.actions.patient, *card.actions.caregiver]:
+            assert str(escape(a.text)) in html, (card.id, a.text[:40])
+        for e in card.escalation:
+            assert str(escape(e.signs)) in html, (card.id, e.signs[:40])
+            assert str(escape(e.response or profile.escalation_default)) in html
+        for cl in card.evidence.claims:
+            assert str(escape(cl.text)) in html, (card.id, cl.text[:40])
+        for src in card.sources:
+            assert f'id="src-{src.id}"' in html and str(escape(src.citation)) in html
+        safety = safety_message(card, profile)
+        assert (safety is None) or str(escape(safety)) in html, card.id
+    lithium = client.get("/card-library/heat-lithium").text
+    assert "Generate the lithium roster" in lithium
+    assert "Heat can push your lithium to a dangerous level." in lithium
+    assert "Lithium carbonate" in lithium and "must not be added together" in lithium
+    assert "Panel t CO₂e/yr" not in lithium, "no panel to scale to on the card page"
+    assert client.get("/card-library/nope").status_code == 404

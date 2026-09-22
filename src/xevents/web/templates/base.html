@@ -12,6 +12,7 @@
 {% set path = request.url.path %}
 <header class="appbar">
   <a class="brand" href="/">med-extreme-events</a>
+  {% if show_asof %}
   <form method="get" action="{{ path }}">
     <label class="grp"><span class="lbl">View</span>
       <select name="scenario" onchange="this.form.submit()">
@@ -23,16 +24,17 @@
     <button type="submit">Go</button>
     {% for k, v in request.query_params.items() if k not in ('scenario', 'at') %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
   </form>
+  {% endif %}
   <nav>
-    {% set q = 'scenario=' ~ (scenario or 'live') ~ '&at=' ~ as_of_input %}
-    {% if path == '/' or path.startswith('/dashboard/facilities') or path.startswith('/demo') %}<span class="on">Dashboard</span>{% else %}<a href="/?{{ q }}">Dashboard</a>{% endif %}
-    {% if path.startswith('/dashboard/events') %}<span class="on">Events</span>{% else %}<a href="/dashboard/events?{{ q }}">Events</a>{% endif %}
-    <a href="/playback?scenario={{ scenario or 'live' }}">Playback</a>
+    <a href="/" title="live, now">Monitor</a>
+    {% if path.startswith('/replays') %}<span class="on">Scenarios</span>{% else %}<a href="/replays">Scenarios</a>{% endif %}
+    {% if path.startswith('/card-library') %}<span class="on">Cards</span>{% else %}<a href="/card-library">Cards</a>{% endif %}
+    {% if path.startswith('/sources') %}<span class="on">Sources</span>{% else %}<a href="/sources">Sources</a>{% endif %}
     <a href="/docs">API</a>
-    {% if path.startswith('/sources') %}<span class="on">Sources</span>{% else %}<a href="/sources?{{ q }}">Sources</a>{% endif %}
   </nav>
 </header>
-{% if mode == 'live' %}
+{% if not show_banner %}
+{% elif mode == 'live' %}
   <div class="banner{{ ' stale' if any_stale }}">
     <span class="pill{{ ' stale' if any_stale }}">Live</span>
     <span><b>Live mode</b> · as of <span class="mono">{{ as_of_iso }}</span> (all times UTC) ·
@@ -42,7 +44,7 @@
     {% set eg = runs|selectattr('provider', 'equalto', 'eagle_i')|list %}{% if eg and eg[0].status == 'ok' %}<span style="flex-basis:100%">Power outages (EAGLE-I): {{ eg[0].detail }}.</span>{% endif %}
   </div>
 {% else %}
-  <div class="banner"><span class="pill">Replay</span><span><span class="hi">{{ scenario }}</span> · as of <span class="mono">{{ as_of_iso }}</span> (all times UTC) · default is the scenario's peak hour; change it above or use <a href="/playback?scenario={{ scenario }}">Playback</a></span></div>
+  <div class="banner"><span class="pill">Replay</span><span><span class="hi">{{ scenario }}</span> · as of <span class="mono">{{ as_of_iso }}</span> (all times UTC) · default is the scenario's peak hour; change it above or open it in <a href="/?scenario={{ scenario }}&at={{ as_of_input }}">Monitor</a></span></div>
 {% endif %}
 <main>
 {% block content %}{% endblock %}

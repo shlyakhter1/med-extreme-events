@@ -451,13 +451,13 @@ def test_outage_renders_with_attribution_and_footnotes(tmp_path: Path) -> None:
     assert "customers_out ÷ county_customers × 100" in page.text
     assert "not covered" in page.text, "coverage-gap footnote"
 
-    dash = client.get("/", params={"at": at})
+    dash = client.get("/dashboard/events", params={"at": at})
     assert dash.status_code == 200
     assert "Power outage (EAGLE-I)" in dash.text and ATTRIBUTION in dash.text
     assert "eagle_i:" in dash.text, "the outage feed shows in the freshness banner"
 
     fid = result.items[0].scope_id
-    facility = client.get(f"/dashboard/facilities/{fid}", params={"at": at})
+    facility = client.get(f"/dashboard/facilities/{fid}/cards", params={"at": at})
     assert facility.status_code == 200
     assert ATTRIBUTION in facility.text and "observed → during-event" in facility.text
     assert "Hurricane/Power Outage × Dialysis-Dependent ESRD" in facility.text

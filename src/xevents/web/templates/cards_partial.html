@@ -3,7 +3,7 @@
     blocks → audience toggle → actions with the phase that applies now at full strength →
     escalation, never collapsed → sources / carbon / patient view. All clinical text is the
     action item's or the card's own verbatim YAML. -#}
-{% from "macros.html" import patient_card, pair_note %}
+{% from "macros.html" import patient_card, pair_note, carbon_table %}
 {% set phase_label = {'pre_event': 'Pre-event', 'during_event': 'During event', 'any': 'Any phase'} %}
 {% set fac_q = 'facility=' ~ (facility.id if facility else facility_id) ~ '&scenario=' ~ (scenario or 'live') ~ '&at=' ~ as_of_input %}
 {% if not cards %}<div class="muted">No cards fired for this facility at {{ as_of_iso }}.</div>{% endif %}
@@ -99,23 +99,7 @@
         <div>
         <div class="prov" style="margin:4px 0">Scaled to this facility's estimated panel of <b>{{ '{:,.0f}'.format(any.panel.value) if any.panel else '—' }}</b> patients.
           Drugs on a card are alternatives, so rows are separate scenarios and must not be added together.</div>
-        <table class="carbon">
-          <thead><tr><th>Therapy</th><th>Per dose</th><th>Per patient-year</th><th>≈ car km/yr</th><th>Panel t CO₂e/yr</th></tr></thead>
-          <tbody>
-          {% for e in c.carbon %}
-            {% set lo = e.kg_co2e_per_patient_year[0] %}{% set hi = e.kg_co2e_per_patient_year[1] %}
-            {% set n = any.panel.value if any.panel else 0 %}
-            <tr>
-              <td>{{ e.drug }}<div class="prov">{{ e.assumed_dose }} · {{ e.basis.replace('_',' ') }} · confidence {{ e.confidence.replace('_','–') }}</div>
-                {% if e.note %}<div class="prov">{{ e.note }}</div>{% endif %}</td>
-              <td>{% if e.g_co2e_per_daily_dose %}{{ e.g_co2e_per_daily_dose[0] }}–{{ e.g_co2e_per_daily_dose[1] }} g{% elif e.kg_co2e_per_session %}{{ e.kg_co2e_per_session[0] }}–{{ e.kg_co2e_per_session[1] }} kg/session{% else %}—{% endif %}</td>
-              <td>{{ lo }}–{{ hi }} kg</td>
-              <td>{{ '{:,.0f}'.format(e.km_driven_equivalent_per_year[0]) }}–{{ '{:,.0f}'.format(e.km_driven_equivalent_per_year[1]) }} km</td>
-              <td><b>{{ '{:,.1f}'.format(n * lo / 1000) }}–{{ '{:,.1f}'.format(n * hi / 1000) }} t</b></td>
-            </tr>
-          {% endfor %}
-          </tbody>
-        </table>
+        {{ carbon_table(c.carbon, any.panel.value if any.panel else 0) }}
         <div class="warn" style="margin-top:6px">{{ carbon_disclaimer }}</div>
         </div>
       </details>

@@ -20,8 +20,10 @@ About a minute, then open:
 
 | | |
 | --- | --- |
-| <http://localhost:8000/> | Care-team dashboard: event board, map, active events |
-| <http://localhost:8000/playback> | Scrub a scenario through time on the US map |
+| <http://localhost:8000/> | Monitor: live now (last 2 weeks) or a replay, on a map with cards, facilities and a timeline |
+| <http://localhost:8000/replays> | Scenarios: what each replay shows, with guided moments |
+| <http://localhost:8000/card-library> | Cards: the eight playbook cards in full |
+| <http://localhost:8000/sources> | Data sources: coverage, limits and last live run |
 | <http://localhost:8000/dashboard/events> | Every event, with its window, geography and metrics |
 | <http://localhost:8000/demo/patient-view?facility=vha_648> | What a patient or caregiver sees |
 | <http://localhost:8000/docs> | Interactive API reference |

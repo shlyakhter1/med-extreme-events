@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Playback · med-extreme-events</title>
+<title>Monitor · med-extreme-events</title>
 <link rel="stylesheet" href="/static/vendor/leaflet.css?v={{ asset_v }}">
 <link rel="stylesheet" href="/static/app.css?v={{ asset_v }}">
 <script src="/static/vendor/leaflet.js?v={{ asset_v }}"></script>
 <script src="/static/vendor/htmx.min.js?v={{ asset_v }}"></script>
 <script src="/static/map.js?v={{ asset_v }}"></script>
 </head>
-<body class="playback">
+<body class="playback" data-anchors="{{ anchors|join('|') }}">
 <div id="app">
   <header class="appbar">
     <a class="brand" href="/">med-extreme-events</a>
@@ -20,17 +20,18 @@
       <button id="play" class="primary" title="play / pause (Space)">▶ Play</button>
       <button id="step-fwd" class="icon-btn" title="forward one step (→)" aria-label="forward one step">▶</button>
     </div>
-    <div class="clock-grp"><span class="clock" id="clock">—</span><span class="lbl" id="clock-note">UTC</span></div>
+    <div class="clock-grp"><button type="button" class="clock" id="clock" title="type a time (UTC)">—</button><span class="lbl" id="clock-note">UTC</span>
+      <button type="button" id="now-btn" class="icon-btn" title="jump to now" hidden style="width:auto;padding:0 10px">Now</button></div>
     <label class="grp"><span class="lbl">Step</span> <select id="speed">
       <option value="1">1 h</option><option value="3" selected>3 h</option>
       <option value="6">6 h</option><option value="12">12 h</option><option value="24">1 day</option>
     </select></label>
     <nav>
-      <a id="nav-dashboard" href="/">Dashboard</a>
-      <a id="nav-events" href="/dashboard/events">Events</a>
-      <span class="on">Playback</span>
-      <a href="/docs">API</a>
+      <span class="on">Monitor</span>
+      <a href="/replays">Scenarios</a>
+      <a href="/card-library">Cards</a>
       <a href="/sources">Sources</a>
+      <a href="/docs">API</a>
     </nav>
   </header>
   <div class="banner" id="banner">

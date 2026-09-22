@@ -154,6 +154,12 @@ change, run `UPDATE_GOLDEN=<scenario> make test` (or `UPDATE_GOLDEN=all`) and re
 including the v2 additions (temporality → phase, the emPOWER line, the compounding chip,
 outage attribution), is [user-interface.md](user-interface.md).*
 
+> **Since 2026-09-22** the Dashboard, the facility page and Playback are one view,
+> **Monitor** at `/` (live first, replays in the same menu; a facility or card opens in its
+> focus layout), with **Scenarios** (`/replays`) and **Sources** (`/sources`) tabs beside it.
+> `/playback` and `/dashboard/facilities/{id}` redirect there. The text and screenshots below
+> describe the earlier pages; [user-interface.md](user-interface.md) is current.
+
 The header of every page carries a **scenario switcher** (the five replays and
 **live (now)**) and an **as of** time in UTC. A replay opens at its peak hour, the hour
 with the most simultaneously active events.

@@ -46,6 +46,7 @@ from xevents.timeparse import BadTimestamp, parse_at
 REPO_ROOT = Path(__file__).resolve().parents[2]
 COUNTIES_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "counties.geojson"
 STATES_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "states.geojson"
+COUNTRIES_GEOJSON = REPO_ROOT / "fixtures" / "reference" / "countries.geojson"
 WEB_DIR = Path(__file__).resolve().parent / "web"
 
 
@@ -384,6 +385,11 @@ def create_app(engine: Engine | None = None) -> FastAPI:
     def states() -> FileResponse:
         """State and territory outlines for the map overlay (Census 1:5m, as the counties)."""
         return FileResponse(STATES_GEOJSON, media_type="application/geo+json")
+
+    @app.get("/reference/countries")
+    def countries() -> FileResponse:
+        """Neighbouring countries (Natural Earth 1:50m) — a basemap backdrop, no data."""
+        return FileResponse(COUNTRIES_GEOJSON, media_type="application/geo+json")
 
     from xevents.web.views import router as web_router
 
