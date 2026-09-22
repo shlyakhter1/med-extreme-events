@@ -1,0 +1,19 @@
+# Render blueprint — public replay demo, deployed from GitHub (see docs/deploy.md §3).
+# One-time: Render dashboard → New → Blueprint → pick this repository → Apply.
+# After that every push to main that passes the GitHub "ci" workflow (lint + tests)
+# rebuilds and redeploys; a commit whose checks fail is never deployed.
+services:
+  - type: web
+    name: med-extreme-events
+    runtime: docker
+    plan: free            # 512 MB; the app peaks around 225 MB. Sleeps when idle.
+    region: virginia
+    branch: main
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: EVENT_MODE
+        value: replay
+      - key: DATABASE_URL
+        value: sqlite:////app/demo.db   # baked into the image at build time

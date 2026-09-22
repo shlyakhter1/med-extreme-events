@@ -162,13 +162,31 @@ fly open
 `auto_stop_machines` is on, so the machine sleeps when idle and wakes on the next request.
 A shared-CPU 1 GB machine is enough and costs roughly a few dollars a month at demo traffic.
 
-### Render — no CLI needed
+### Render from GitHub — the recommended public deployment
 
-1. Push this repository to GitHub.
-2. In Render, create a **Web Service** and point it at the repository.
-3. Runtime **Docker**; leave the build and start commands empty (the `Dockerfile` handles
-   both). Render injects `PORT`, which the image already honours.
-4. Deploy. The free instance type works; it sleeps when idle.
+`render.yaml` in the repository root is a Render blueprint: a Docker web service on the free
+plan, health-checked at `/health`, with `autoDeployTrigger: checksPass`. Every push to `main`
+runs the GitHub `ci` workflow (lint + the full test suite, goldens included); Render rebuilds
+and redeploys only when those checks pass, so a broken commit never reaches the public URL.
+
+One-time setup (about five minutes, no CLI):
+
+1. Sign in at [render.com](https://render.com) with the GitHub account that owns the repo.
+2. **New → Blueprint**, choose `shlyakhter1/med-extreme-events`, and **Apply**. Render reads
+   `render.yaml`, builds the image (the build bakes the replay database, about a minute) and
+   serves it at `https://med-extreme-events.onrender.com` (or a suffixed name if taken).
+3. Nothing else: from then on, `git push` to `main` is the deploy.
+
+Notes:
+
+- The free instance sleeps after about 15 minutes idle; the first request after that takes
+  roughly a minute to wake it. The paid Starter plan (change `plan:` in `render.yaml`) stays
+  warm.
+- The site is public and has no login. The data is aggregate (no PHI), but the acknowledge
+  and complete buttons are open to anyone; their changes are discarded on every redeploy,
+  because the database is rebuilt into each image.
+- Replay mode only. Live mode needs a persistent disk (a paid Render feature) and a scheduled
+  ingest job — see §4.
 
 ### Google Cloud Run — scales to zero, generous free tier
 

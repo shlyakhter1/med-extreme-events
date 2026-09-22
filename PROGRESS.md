@@ -2,6 +2,21 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-21 — state borders; GitHub → Render deployment
+
+- **State borders on every map:** `scripts/build_state_boundaries.py` →
+  `fixtures/reference/states.geojson` (Census 1:5m states, same scale/vintage as the counties;
+  56 features, ~500 KB gzipped), served at `/reference/states`, drawn by `XMap.create` as an
+  unfilled outline above the county fill and below facility markers; legend keys it.
+  Verified in headless Chrome on `uri_2021` (Texas outlined against its neighbours).
+- **Deployment:** `render.yaml` blueprint — Docker web service, free plan, `/health` check,
+  `autoDeployTrigger: checksPass`, so Render redeploys `main` only after the GitHub `ci`
+  workflow (lint + tests) passes. One-time "New → Blueprint" in the Render dashboard; see
+  `docs/deploy.md` §3. Public, replay-only; status buttons are unauthenticated and reset on
+  each redeploy.
+- **Local container note:** the `mee` container had been restarted, not rebuilt, so it served
+  the pre-v2 image (three scenarios, six cards). Rebuilt; a restart never picks up new code.
+
 ## 2026-09-21 — independent code review and fixes (five commits)
 
 Five read-only reviewers (engine/store, providers, denominators/cards, web, repo health)
