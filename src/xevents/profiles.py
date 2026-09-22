@@ -182,6 +182,19 @@ def check_cards_against_profile(cards: list[Card], profile: Profile) -> list[str
         sel = card.population_selector
         if sel.denominator_key not in profile.denominators:
             problems.append(f"{card.id}: denominator_key '{sel.denominator_key}' not in profile")
+        else:
+            den = profile.denominators[sel.denominator_key]
+            if den.empower_measure is not None:
+                problems.append(
+                    f"{card.id}: denominator_key '{sel.denominator_key}' is an emPOWER "
+                    "measure (Medicare proxy) — it may only size a sub-panel, never the "
+                    "card's veteran panel"
+                )
+            if den.share:
+                problems.append(
+                    f"{card.id}: denominator_key '{sel.denominator_key}' is a share, not a "
+                    "population panel"
+                )
         for sp in sel.sub_panels:
             if sp.denominator_key and sp.denominator_key not in profile.denominators:
                 problems.append(
@@ -199,5 +212,10 @@ def check_cards_against_profile(cards: list[Card], profile: Profile) -> list[str
         if mult.denominator_key not in profile.denominators:
             problems.append(
                 f"profile panel_multipliers[{card_id}]: unknown key '{mult.denominator_key}'"
+            )
+        elif not profile.denominators[mult.denominator_key].share:
+            problems.append(
+                f"profile panel_multipliers[{card_id}]: '{mult.denominator_key}' must be a "
+                "share (share: true) to multiply a condition panel"
             )
     return problems

@@ -214,3 +214,85 @@ def test_profile_keys_resolve(profile: Profile) -> None:
         profile.panel_multipliers["heat-heart-failure"].denominator_key
         == "hfref_ace_arb_arni_share"
     )
+
+
+# --------------------------------------------------------------------------- review fixes
+
+
+def test_unsized_sub_panels_are_declared_not_borrowed(estimator: PanelEstimator) -> None:
+    """Card 3's LAI and OUD sub-panels have no reviewed denominator; they used to render as
+    the whole schizophrenia panel (an opioid-use-disorder cohort sized as schizophrenia)."""
+    cards = {c.id: c for c in load_cards()}
+    panel = estimator.card_panel("vha_648", cards["hurricane-delivery-interruption"])
+    labels = [c.label for c in panel.components]
+    assert not any("LAI antipsychotic" in lbl or "OUD patients" in lbl for lbl in labels)
+    assert any("Clozapine" in lbl for lbl in labels), "the clozapine share is still sized"
+    assert panel.caveats[0].startswith("Not sized — no reviewed denominator")
+    assert "OUD patients on methadone" in panel.caveats[0]
+    assert "LAI antipsychotic" in panel.caveats[0]
+    assert panel.value == panel.components[0].value, "headline stays the condition panel"
+
+
+def test_multi_condition_card_headline_is_the_largest_panel(estimator: PanelEstimator) -> None:
+    """Card 7 selects CHD or HF or COPD or asthma: the headline is the largest single
+    condition panel, labelled a lower bound, not whichever key is listed first."""
+    cards = {c.id: c for c in load_cards()}
+    p7 = estimator.card_panel("vha_648", cards["cold-cardio-respiratory"])
+    subs = [c for c in p7.components[1:] if "sub-panel" in c.label]
+    assert p7.value == max(c.value for c in [p7.components[0], *subs])
+    assert p7.value > p7.components[0].value, "asthma outranks the CHD primary at Portland"
+    assert p7.formula.startswith("max(condition_panel, sub-panels) = Asthma")
+    assert p7.caveats[0].startswith("Lower bound")
+    assert not any("stands in for the class" in c for c in p7.caveats), "no class on Card 7"
+    p8 = estimator.card_panel("vha_648", cards["smoke-copd-asthma"])
+    assert p8.value >= p8.components[0].value
+    # a card with a medication class keeps the class wording
+    p1 = estimator.card_panel("vha_648", cards["heat-lithium"])
+    assert any("stands in for the medication/device class" in c for c in p1.caveats)
+    # cards 1-6 headline values are unchanged by the rule (no standalone sub-panels)
+    for cid in ("heat-lithium", "outage-dialysis", "outage-insulin"):
+        p = estimator.card_panel("vha_648", cards[cid])
+        assert (
+            p.value == p.components[0].value * (1 if cid != "heat-heart-failure" else 0.62)
+            or cid == "heat-heart-failure"
+        )
+
+
+def test_unknown_places_measure_fails_loudly(estimator: PanelEstimator, profile: Profile) -> None:
+    from xevents.profiles import Denominator
+
+    profile.denominators["bogus"] = Denominator(places_measure="nosuch", basis="x", source="y")
+    try:
+        with pytest.raises(ValueError, match="PLACES measure 'nosuch'"):
+            estimator.condition_panel("vha_648", "bogus")
+    finally:
+        del profile.denominators["bogus"]
+
+
+def test_missing_vetpop_year_fails_loudly(counties: CountyIndex) -> None:
+    with pytest.raises(ValueError, match="veterans_2031"):
+        ReferenceTables.load(2031, county_ids=counties.ids())
+
+
+def test_profile_check_rejects_a_measured_proxy_as_headline(profile: Profile) -> None:
+    from xevents.profiles import check_cards_against_profile
+
+    card = next(c for c in load_cards() if c.id == "outage-dialysis")
+    bad = card.model_copy(
+        update={
+            "population_selector": card.population_selector.model_copy(
+                update={"denominator_key": "empower_dme"}
+            )
+        }
+    )
+    problems = check_cards_against_profile([bad], profile)
+    assert any("emPOWER measure" in p for p in problems), problems
+    share = card.model_copy(
+        update={
+            "population_selector": card.population_selector.model_copy(
+                update={"denominator_key": "clozapine_share_of_schizophrenia"}
+            )
+        }
+    )
+    assert any("is a share" in p for p in check_cards_against_profile([share], profile))
+    assert check_cards_against_profile(load_cards(), profile) == []

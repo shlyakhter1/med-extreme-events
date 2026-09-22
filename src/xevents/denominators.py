@@ -72,6 +72,7 @@ class ReferenceTables:
     excluded: dict[str, int] = field(default_factory=dict)  # VetPop rows with no US county
     empower: dict[str, dict[str, int | None]] = field(default_factory=dict)  # FIPS → measure
     empower_source: str = field(default="HHS emPOWER public REST service")
+    places_measures: frozenset[str] = field(default_factory=frozenset)
 
     @classmethod
     def load(
@@ -86,7 +87,14 @@ class ReferenceTables:
         veterans: dict[str, int] = {}
         excluded: dict[str, int] = {}
         with vetpop_path.open(newline="", encoding="utf-8") as f:
-            for r in csv.DictReader(f):
+            reader = csv.DictReader(f)
+            if col not in (reader.fieldnames or []):
+                raise ValueError(
+                    f"{vetpop_path.name} has no column {col!r} (profile projection_year "
+                    f"{projection_year}); available: "
+                    f"{[c for c in reader.fieldnames or [] if c.startswith('veterans_')]}"
+                )
+            for r in reader:
                 if r.get(col):
                     veterans[r["county_fips"]] = int(r[col])
         if county_ids is not None:
@@ -113,6 +121,7 @@ class ReferenceTables:
             places=places,
             projection_year=projection_year,
             excluded=excluded,
+            places_measures=frozenset(measures),
             empower=empower,
             empower_source=f"HHS emPOWER public REST service ({empower_header})"
             if empower_header
@@ -296,6 +305,11 @@ class PanelEstimator:
         station, _ = self.station_for(facility_id)
         counties = self.catchment.get(station, [])
         measure = den.places_measure or ""
+        if measure not in self.tables.places_measures:
+            raise ValueError(
+                f"denominator '{key}': PLACES measure {measure!r} is not a column of the "
+                f"reference table (have {sorted(self.tables.places_measures)})"
+            )
         fallback = self.tables.national_places_rate(measure)
         total = 0.0
         missing = 0
@@ -345,15 +359,22 @@ class PanelEstimator:
             components=[base],
         )
 
-    def _upper_bound(self, label: str, base: Estimate, notes: list[str | None]) -> Estimate:
+    def _upper_bound(
+        self, label: str, base: Estimate, notes: list[str | None], *, has_class: bool = True
+    ) -> Estimate:
+        bound = (
+            "Upper bound: whole condition panel stands in for the medication/device class."
+            if has_class
+            else "Condition panel (the card selects on conditions, not on a medication class)."
+        )
         return Estimate(
             label=label,
             value=base.value,
-            formula="condition_panel (no medication/device-class share in the profile)",
+            formula="condition_panel"
+            + (" (no medication/device-class share in the profile)" if has_class else ""),
             inputs={"condition_panel": round(base.value, 1)},
             sources=base.sources,
-            caveats=[c for c in notes if c]
-            + ["Upper bound: whole condition panel stands in for the class.", ESTIMATE_CAVEAT],
+            caveats=[c for c in notes if c] + [bound, ESTIMATE_CAVEAT],
             components=[base],
         )
 
@@ -363,11 +384,13 @@ class PanelEstimator:
         sel = card.population_selector
         base = self.condition_panel(facility_id, sel.denominator_key)
         label = f"{card.title} — affected panel"
+        has_class = bool(sel.all_med_classes() or sel.device_classes)
         mult = self.profile.panel_multipliers.get(card.id)
         if mult is not None:
             panel = self._share_estimate(label, base, mult.denominator_key, [mult.note])
         else:
-            panel = self._upper_bound(label, base, [])
+            panel = self._upper_bound(label, base, [], has_class=has_class)
+        unsized: list[str] = []
         for sp in sel.sub_panels:
             sub_label = f"{sp.label} (sub-panel)"
             if sp.denominator_key and (
@@ -398,7 +421,48 @@ class PanelEstimator:
                     )
                 )
             else:
-                panel.components.append(self._upper_bound(sub_label, base, [sp.note]))
+                # No reviewed denominator for this sub-panel: say so rather than lend it the
+                # whole condition panel (the OUD sub-panel of Card 3 is not a schizophrenia
+                # count).
+                unsized.append(sp.label)
+        if unsized:
+            panel.caveats.insert(
+                0,
+                "Not sized — no reviewed denominator in the profile for: "
+                + "; ".join(unsized)
+                + ".",
+            )
+        # A card that selects on several conditions (Card 7: CHD or HF or COPD or asthma) has
+        # overlapping panels that cannot be summed; the headline is the largest single
+        # condition panel and says so, instead of whichever key happens to be primary.
+        standalone = (
+            [c for c in panel.components[1:] if c.unit == panel.unit and "sub-panel" in c.label]
+            if mult is None
+            else []
+        )
+        largest = max(standalone, key=lambda c: c.value, default=None)
+        if largest is not None and largest.value > panel.value:
+            panel = panel.model_copy(
+                update={
+                    "value": largest.value,
+                    "formula": (
+                        f"max(condition_panel, sub-panels) = "
+                        f"{largest.label.split(' (sub-panel)')[0]} ({largest.value:.0f}); "
+                        "conditions overlap, so the union is not estimable and this is a "
+                        "lower bound"
+                    ),
+                    "inputs": {
+                        **panel.inputs,
+                        "largest_panel": largest.label,
+                        "largest_value": round(largest.value, 1),
+                    },
+                    "caveats": [
+                        "Lower bound: the largest single-condition panel; the card's conditions "
+                        "overlap and no union estimate exists."
+                    ]
+                    + [c for c in panel.caveats if not c.startswith("Condition panel")],
+                }
+            )
         return panel
 
     # ------------------------------------------------------------------ sanity

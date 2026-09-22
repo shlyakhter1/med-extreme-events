@@ -2418,7 +2418,7 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3722
+"panel": 3907
 },
 {
 "event": "hms:2023-06-06:medium",
@@ -2427,7 +2427,7 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3722
+"panel": 3907
 },
 {
 "event": "hms:2023-06-06:medium",
@@ -5388,7 +5388,7 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3722
+"panel": 3907
 },
 {
 "event": "hms:2023-06-07:medium",
@@ -5397,7 +5397,7 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3722
+"panel": 3907
 },
 {
 "event": "hms:2023-06-07:medium",

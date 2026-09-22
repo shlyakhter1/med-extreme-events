@@ -5478,7 +5478,7 @@
 "role": "care_team",
 "status": "issued",
 "superseded_by": null,
-"panel": 3722
+"panel": 3907
 },
 {
 "event": "hms:2026-07-14:medium",
@@ -5487,7 +5487,7 @@
 "role": "patient",
 "status": "issued",
 "superseded_by": null,
-"panel": 3722
+"panel": 3907
 },
 {
 "event": "hms:2026-07-14:medium",

@@ -11,7 +11,7 @@
       <div class="prov">Affected panel ≈ <b style="color:var(--ink)">{{ '{:,.0f}'.format(any.panel.value) }}</b> {{ any.panel.unit }}
         <details><summary>how was this number computed?</summary>
           <div><b>{{ any.panel.label }}</b>: {{ any.panel.formula }}</div>
-          {% for comp in any.panel.components recursive %}<div style="margin-left:14px">↳ <b>{{ comp.label }}</b> = {{ '{:,.0f}'.format(comp.value) }}{% if comp.unit != 'veterans' %} {{ comp.unit }}{% endif %}: {{ comp.formula }}{% if comp.unit != 'veterans' %} · {{ comp.caveats[0] }}{% endif %}{% if comp.components %}{{ loop(comp.components) }}{% endif %}</div>{% endfor %}
+          {% for comp in any.panel.components recursive %}<div style="margin-left:14px">↳ <b>{{ comp.label }}</b> = {{ '{:,.0f}'.format(comp.value) }}{% if comp.unit != 'veterans' %} {{ comp.unit }}{% endif %}: {{ comp.formula }}{% if comp.caveats %} · {{ comp.caveats[0] }}{% endif %}{% if comp.components %}{{ loop(comp.components) }}{% endif %}</div>{% endfor %}
           <div>Caveats: {{ any.panel.caveats|join(' ') }}</div>
           <div>Sources: {{ any.panel.sources|join('; ') }}</div>
         </details>
