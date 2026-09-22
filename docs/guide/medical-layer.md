@@ -150,6 +150,10 @@ change, run `UPDATE_GOLDEN=<scenario> make test` (or `UPDATE_GOLDEN=all`) and re
 
 ## 6. Using the care-team pages
 
+*The complete, current description of the dashboard, facility page and patient view,
+including the v2 additions (temporality → phase, the emPOWER line, the compounding chip,
+outage attribution), is [user-interface.md](user-interface.md).*
+
 The header of every page carries a **scenario switcher** (the five replays and
 **live (now)**) and an **as of** time in UTC. A replay opens at its peak hour, the hour
 with the most simultaneously active events.

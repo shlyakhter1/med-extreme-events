@@ -113,6 +113,10 @@ archive and HMS providers (see `_common.py`) and writes `events.json` with
 
 ## 5. Using the playback view
 
+*The complete, current description of every screen, including the v2 additions (temporality
+badges, outage shading, state borders, grouped AirNow lanes), is
+[user-interface.md](user-interface.md). This section keeps the event-layer view of it.*
+
 `/playback` is the layer's main screen: a US map, a side panel and a timeline, all driven by
 one time cursor *t*.
 

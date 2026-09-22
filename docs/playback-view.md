@@ -2,6 +2,9 @@
 
 *Drafted 2026-09-20 during M2/M3; implemented with M4 (`/playback`, `src/xevents/web/`). Endpoints below exist as of M4.*
 
+> **Historical design draft.** Kept for the reasoning behind the playback view. For how the
+> interface works today, see [guide/user-interface.md](guide/user-interface.md).
+
 ## Goal
 
 Scrub through a replay scenario (or the live window) on a US map and watch events light up

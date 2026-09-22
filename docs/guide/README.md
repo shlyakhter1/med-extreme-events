@@ -13,6 +13,7 @@ The system has two layers that will be separated further, and each has its own d
 | [events-and-playback.md](events-and-playback.md) | **Event layer.** Pulls weather and environmental feeds, normalizes them into one event model, resolves them to counties, stores them, and plays them back on a map. It knows nothing about medicine. |
 | [medical-layer.md](medical-layer.md) | **Medical layer.** Holds the VA facilities, their catchments and estimated patient panels, and the eight clinical playbook cards. It matches events to cards and turns each match into action items for care teams and patients. |
 | [data-sources.md](data-sources.md) | Every external source: what it provides, how it is fetched and cached, which layer uses it, and its known gaps. |
+| [user-interface.md](user-interface.md) | **The web interface**, page by page: how to use each screen and the rule behind what it shows (ranking, badges, colours, provenance, playback controls), plus known UI issues. |
 
 ## The system in one paragraph
 
@@ -131,6 +132,8 @@ These come from `CLAUDE.md`, and tests enforce most of them.
 
 ## Where to go next
 
+- [user-interface.md](user-interface.md): how to use the dashboard, facility pages, events
+  and playback, and how each is meant to work.
 - `docs/card-reference-for-frontend.md`: API shapes and rendering rules for anyone building
   a UI on the action items.
 - `docs/card-library.md` and `docs/card-library-additions.md`: the clinical source of truth for all eight cards.
