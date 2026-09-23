@@ -2,6 +2,26 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-23 — guide review; medical references
+
+**Done.** `make lint test` green (288 passed, 9 skipped).
+- `docs/guide/medical-layer.md` covers all eight cards (triggers incl. observed outages, lead
+  windows, sub-panels, full acuity order), the v2 engine rules (phase from temporality,
+  co-occurrence boost, supersede families, outage ranking, no lead for observed events) and
+  per-scenario golden counts; §6 now maps the current UI instead of the retired pages. The
+  other four guide pages were checked against the code and corrected (keyless AirNow,
+  EAGLE-I, cold products, the About screen, live refresh, new reference layers).
+- `docs/medical-references.md`: the 42 sources the cards cite, card by card (a test fails if a
+  card cites an id the index lacks), and a verified entry for Setoguchi & Hennessy 2026
+  (Pharmacoepidemiol Drug Saf 35(8):e70437, doi:10.1002/pds.70437, PMC13427620).
+
+**For clinical review.** Card 4's claim "Extreme heat above the 97th–99th temperature
+percentiles is linked to roughly a 10–15% rise in HF-related deaths" cites only
+`setoguchi-hennessy-2026`, and the commentary contains no such figure (full text checked via
+Europe PMC). `card-library.md` gives that sentence no citation; the link was added at
+transcription. Card 5 lists the paper but no claim cites it, though its insulin-at-37 °C and
+outage sentences would support one. Card YAML was not changed.
+
 ## 2026-09-23 — cold start on the free instance: bake the caches into the image
 
 Report: on Render the Monitor took ~25 s to draw, Scenarios/Cards switches were very slow,

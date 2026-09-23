@@ -131,3 +131,11 @@ def test_duplicate_card_id_is_rejected(tmp_path: Path) -> None:
     shutil.copy(src, tmp_path / "b.yaml")
     with pytest.raises(CardValidationError, match="duplicate card id 'heat-lithium'"):
         load_cards(tmp_path)
+
+
+def test_medical_references_index_every_card_source(cards: list[Card]) -> None:
+    """docs/medical-references.md indexes the literature behind the cards. A source added to
+    a card without a line there would leave the reading list silently incomplete."""
+    doc = (CARDS_DIR.parent / "docs" / "medical-references.md").read_text(encoding="utf-8")
+    missing = sorted({s.id for c in cards for s in c.sources if f"`{s.id}`" not in doc})
+    assert not missing, f"add to docs/medical-references.md §2: {missing}"

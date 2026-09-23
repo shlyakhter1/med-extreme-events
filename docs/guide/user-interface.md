@@ -1,6 +1,6 @@
 # User interface: how to use it and how it is meant to work
 
-*Part of the [design and user guide](README.md). As of 2026-09-22, after iteration v2
+*Part of the [design and user guide](README.md). As of 2026-09-23, after iteration v2
 (temporality, EAGLE-I outages, emPOWER, Cards 7–8). Public demo:
 <https://med-extreme-events.onrender.com>.*
 
@@ -27,7 +27,8 @@ a station, and its panel is an estimate with its formula attached.
 
 ## 2. Pages at a glance
 
-The header has five tabs: **Monitor · Scenarios · Cards · Sources · API**.
+The header has five tabs, **Monitor · Scenarios · Cards · Sources · API**, and an **About**
+pill that reopens the welcome screen.
 
 | Page | URL | Use it to |
 | --- | --- | --- |
@@ -36,6 +37,7 @@ The header has five tabs: **Monitor · Scenarios · Cards · Sources · API**.
 | **Cards** | `/card-library` | Read the eight playbook cards: triggers, who they select, actions, patient wording, escalation, evidence, and where each fires. `/card-library/{id}` is one card in full. |
 | **Sources** | `/sources` | See every data source, what it drives, where it covers live, and its last run |
 | API | `/docs` | The JSON API behind every page (interactive OpenAPI) |
+| **About** | `/about`, or the About pill | What this is and how to use it. It opens by itself on a first visit; `?about=1` on any page opens it, `?tour=1` starts a four-step guided tour of Monitor on the Uri replay |
 | Patient view | `/demo/patient-view?facility=&card=` | The light, printable card a patient or caregiver would receive |
 | Events table | `/dashboard/events` | Every event in the view, active or whole window (linked from Monitor's rail) |
 | Event page | `/dashboard/events/{event_key}` | One event: its counties, fields, metrics and the items it produced |
@@ -154,8 +156,6 @@ HMS smoke (Medium)".*
 *Houston VAMC selected in the Uri replay at 2021-02-16 15:00Z: every card firing there, in
 the reading column; the rail lists the cards here and the events that triggered them.*
 
-
-
 Selecting a card or a facility in Monitor shows its card blocks in the reading column. The
 block is one server-rendered partial (`cards_partial.html`, also served at
 `/dashboard/facilities/{id}/cards`), so its clinical text never passes through JavaScript.
@@ -256,7 +256,7 @@ numbers (events, cards fired, facilities, action items, window, peak) are comput
 fixtures and stored items. A test runs every replay and checks that each moment's card
 really fires at that time, so a moment cannot quietly point at nothing.
 
-## 8b. Cards (`/card-library`)
+## 8a. Cards (`/card-library`)
 
 ![Cards overview](images/cards.png)
 
@@ -282,7 +282,7 @@ claim and source of every card appears on its page. The safety line comes from t
 function the engine uses (`engine.safety_message`). "Where it fires" is computed from the
 stored action items (care-team role, superseded items excluded, as Monitor shows them).
 
-## 8a. Data sources (`/sources`)
+## 8b. Data sources (`/sources`)
 
 ![Data sources page](images/sources.png)
 
@@ -323,15 +323,18 @@ stylesheet, `src/xevents/web/static/app.css`.
 ## 10. Live and replay
 
 - **Replay** scenarios are computed ahead of time from archived sources and never change.
-- **Live** events are pulled from the feeds when the app starts and then hourly: NWS alerts
+- **Live** events are pulled from the feeds when the app starts and then hourly, when
+  `LIVE_REFRESH_MINUTES` is set (it is in `.env.example`, the image and Render): NWS alerts
   plus a two-week archive backfill, OpenFEMA declarations, NOAA smoke, AirNow hourly monitor
   AQI and next-day forecasts (keyless public files), and EAGLE-I county outages for
   **Georgia and Ohio only** (the public state mirrors; national coverage needs a FEMA token).
   An AirNow forecast of "Unhealthy for Sensitive Groups" or worse fires Card 8 with
   **pre-event** actions. Live data is rebuilt from the feeds after each restart or redeploy;
   the first refresh lands within seconds locally and within about three minutes on Render's
-  free tier (a fraction of a CPU); until then the live board is empty. After a restart an outage needs two
-  consecutive hourly readings over the threshold before Cards 3, 5 and 6 fire.
+  free tier (a fraction of a CPU); until then the live board is empty. Replay pages do not
+  wait: their responses are computed when the image is built and loaded at startup. After a
+  restart an outage needs two consecutive hourly readings over the threshold before Cards 3,
+  5 and 6 fire.
 - A live board fills with the items of alerts active now. Items whose window has passed are
   expired automatically; replay items never expire.
 
@@ -344,8 +347,9 @@ stylesheet, `src/xevents/web/static/app.css`.
 4. **Measured proxies are labelled.** emPOWER counts are Medicare beneficiaries, not
    veterans, and say so. EAGLE-I counts are meters, not people, and carry the DOE attribution
    wherever they render, including the map legend.
-5. **No external assets.** Maps are drawn from the app's own county and state boundaries; the
-   interface works offline and needs no map key.
+5. **No external assets.** Maps are drawn from the app's own county and state boundaries,
+   with the neighbouring countries as a muted backdrop; the interface works offline and
+   needs no map key.
 6. **No patient data.** Items are per station; panels are estimates.
 
 ## 12. Known issues

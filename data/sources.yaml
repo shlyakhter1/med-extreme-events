@@ -180,6 +180,7 @@ sources:
     cadence: Static vintage; rebuilt with make reference.
     limits:
       - Backdrop only — smoke plumes and alerts beyond the border are not shown.
+    anchor: natural-earth-countries
 
   # ------------------------------------------------------------------ medical layer
   - id: va_facilities

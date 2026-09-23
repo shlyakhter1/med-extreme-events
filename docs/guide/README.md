@@ -1,6 +1,6 @@
 # Design and user guide
 
-*As of 2026-09-21, after the first demo.*
+*As of 2026-09-23.*
 
 This guide explains how the system is built and how to use it. It describes the code as it
 is today. The planning documents it grew from are `docs/requirements.md` (what the system
@@ -30,7 +30,7 @@ sources that produced it.
 ```mermaid
 flowchart LR
   subgraph EV[Event layer]
-    F[Feeds<br/>NWS · IEM archive · HMS · OpenFEMA · AirNow] --> P[Providers<br/>live + replay]
+    F[Feeds<br/>NWS · IEM archive · HMS · OpenFEMA · AirNow · EAGLE-I] --> P[Providers<br/>live + replay]
     P --> ES[(events)]
     G1[(Counties · NWS zones)] --> P
     ES --> PB[Monitor · event pages]
@@ -49,7 +49,7 @@ flowchart LR
 **The seam between the layers is the `Event` record** (`src/xevents/models.py`) and its
 list of county FIPS codes. The engine reads events and nothing else from the event layer.
 The event layer never reads cards, panels or action items, with one exception: the
-playback page overlays action items and cards on its map (see
+Monitor overlays action items and cards on its event map (see
 [events-and-playback.md §7](events-and-playback.md#7-what-couples-this-layer-to-the-medical-layer)).
 
 **Shared foundation.** Both layers use the county geography (`fixtures/reference/counties.geojson`,
@@ -63,9 +63,12 @@ no network: the reference data and replay scenarios are committed.
 
 ```sh
 make demo      # fresh SQLite → facilities + catchments → replay events → action items → serve
+make demo SCENARIO=heat_dome_2021   # the same, but open a replay instead of the live view
 ```
 
-After about a minute, open:
+After about a minute, `make demo` opens the live Monitor in your browser. With
+`LIVE_REFRESH_MINUTES` set (it is in `.env.example`), live events arrive a minute or so after
+startup; without it, the live view stays empty and the replays are the demo. Pages:
 
 | Page | For |
 | --- | --- |
@@ -76,6 +79,7 @@ After about a minute, open:
 | <http://localhost:8000/sources> | Every data source: coverage, limits, last live run |
 | <http://localhost:8000/dashboard/events> | Every event, with its window, geography and metrics (event layer) |
 | <http://localhost:8000/demo/patient-view?facility=vha_648> | What a patient or caregiver would see (medical layer) |
+| <http://localhost:8000/about> | What this is and how to use it (also the **About** pill on every page; `?about=1` opens it, `?tour=1` starts the guided tour) |
 | <http://localhost:8000/docs> | Interactive API reference |
 
 Every page states that **times are UTC**. For containers, hosting and live mode, see
@@ -91,12 +95,15 @@ Copy `.env.example` to `.env`, which is gitignored. Every `make` target loads it
 | `DATABASE_URL` | Postgres, or the SQLite fallback | `sqlite:///xevents.db` (`make demo` uses `demo.db`) |
 | `NWS_USER_AGENT` | Live NWS pulls. NWS blocks requests without a contact string | none |
 | `VA_FACILITIES_API_KEY` | Rebuilding `facilities.geojson` only (`make reference`) | none |
-| `AIRNOW_API_KEY` | Live air-quality events. Skipped when unset | none |
+| `AIRNOW_API_KEY` | Optional second AirNow path (the key-based API). Live AQI comes from AirNow's keyless public files without it | none |
 | `HUD_API_TOKEN` | Optional HUD ZIP↔county crosswalk. Census ZCTA is used otherwise | none |
 | `EAGLEI_TOKEN` | Live EAGLE-I outages from FEMA's partner FeatureServer, which is token-gated | none |
-| `EAGLEI_FEATURE_URL` | A public EAGLE-I mirror layer with the same fields, used instead of FEMA's | FEMA partner layer |
+| `EAGLEI_FEATURE_URL` | Public EAGLE-I mirror layers with the same fields, separated by spaces or commas, used instead of FEMA's. Live EAGLE-I is skipped when this and the token are both unset | the Georgia and Ohio mirrors, in `.env.example` |
+| `LIVE_REFRESH_MINUTES` | The app runs live ingest + match at startup and then every N minutes; 0 or empty = off | `60` in `.env.example` and the image |
+| `CACHE_SNAPSHOT` | A response-cache file baked at image build (`scripts/bake_cache.py`) and loaded at startup, so a new instance starts warm | set in the `Dockerfile` only |
 
-**Never commit a key.** `.env.example` must hold empty assignments only.
+**Never commit a key.** In `.env.example`, every key and token stays empty; only non-secret
+defaults (the NWS contact string, the EAGLE-I mirrors, the refresh interval) have values.
 `tests/test_secrets.py` fails the build if a tracked file assigns a credential-shaped value
 to a secret-named variable.
 
@@ -104,7 +111,8 @@ to a secret-named variable.
 
 | Target | Does |
 | --- | --- |
-| `make demo` | The whole replay pipeline into a fresh `demo.db`, then serves |
+| `make demo` | The whole replay pipeline into a fresh `demo.db`, then serves and opens the live Monitor (`SCENARIO=<id>` opens a replay) |
+| `make container` | Rebuilds the demo image and replaces the `mee` container on :8000, the same image Render runs |
 | `make load` | Loads reference data, attributes facilities to county and VISN, builds catchments |
 | `make ingest` | Loads events (`EVENT_MODE=replay`: all scenarios; `live`: real feeds) |
 | `make match` | Runs the engine over stored events and writes action items |
@@ -134,10 +142,12 @@ These come from `CLAUDE.md`, and tests enforce most of them.
 
 ## Where to go next
 
-- [user-interface.md](user-interface.md): how to use Monitor, the Scenarios and Sources
-  tabs, event pages and the patient view, and how each is meant to work.
+- [user-interface.md](user-interface.md): how to use Monitor, the Scenarios, Cards and
+  Sources tabs, the About screen, event pages and the patient view, and how each is meant to work.
 - `docs/card-reference-for-frontend.md`: API shapes and rendering rules for anyone building
   a UI on the action items.
 - `docs/card-library.md` and `docs/card-library-additions.md`: the clinical source of truth for all eight cards.
+- `docs/medical-references.md`: the literature behind the cards, card by card, and background
+  references.
 - `PROGRESS.md`: the dated log of what was built, what was decided, and what still needs a
   clinical reviewer.

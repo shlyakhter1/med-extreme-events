@@ -1,6 +1,6 @@
 # Data sources
 
-*Part of the [design and user guide](README.md). As of 2026-09-21. Retrieval dates are
+*Part of the [design and user guide](README.md). As of 2026-09-23. Retrieval dates are
 those of the cached copies in `fixtures/`.*
 
 The app's **Sources** tab (`/sources`) shows the same sources with their live status; its
@@ -21,8 +21,12 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
 | [NWS zone-county correlation](#nws-zone-county-correlation-file) | Forecast zone → county | Event | all NWS resolution | none | `fixtures/reference/nws_zone_county.csv` |
 | [NOAA HMS smoke](#noaa-hms-smoke-polygons) | Daily smoke plume polygons by density | Event | live, `smoke_nyc_2023`, `smoke_canada_2026` | none | `fixtures/events/smoke_*/raw/` |
 | [OpenFEMA](#openfema-disaster-declarations) | Disaster declarations by county | Event (context) | live, `ian_2022` | none | `fixtures/events/ian_2022/raw/` |
-| [AirNow](#airnow) | Monitor AQI observations | Event | live (API key); `smoke_canada_2026` via the keyless file archive | API key (live only) | `fixtures/live/raw/`, `fixtures/events/smoke_canada_2026/raw/` |
+| [AirNow](#airnow) | Monitor AQI observations and reporting-area forecasts | Event | live (keyless public files; API key optional); `smoke_canada_2026` via the file archive | none (key optional) | `fixtures/live/raw/`, `fixtures/events/smoke_canada_2026/raw/` |
+| [EAGLE-I](#eagle-i-county-power-outages-providerseagle_ipy) | County customers without power | Event | live (GA and OH public mirrors, or FEMA with a token); `uri_2021`, `ian_2022` | token, or public mirrors | `fixtures/live/raw/`, `fixtures/events/{uri_2021,ian_2022}/raw/` |
+| [HHS emPOWER](#hhs-empower-electricity-dependent-dme-reference-layer-denominatorspy) | Medicare beneficiaries with electricity-dependent equipment, by county | Medical (measured exposure) | Card 6 sub-panel, outage ranking | none | `fixtures/reference/empower_county.csv` |
 | [Census county boundaries](#census-county-boundaries) | County polygons, the join geometry and basemap | Shared | always | none | `fixtures/reference/counties.geojson` |
+| [Census state boundaries](#census-state-boundaries) | State outlines over the map | Shared (display) | map overlay | none | `fixtures/reference/states.geojson` |
+| [Natural Earth countries](#natural-earth-countries) | Canada, Mexico, Cuba and the Bahamas as a muted backdrop | Shared (display) | map backdrop | none | `fixtures/reference/countries.geojson` |
 | [VA Facilities API](#va-lighthouse-facilities-api) | 1,400 VA health facilities, location, VISN, status | Medical | reference build | API key | `fixtures/reference/facilities.geojson` |
 | [Census ZCTA ↔ county / HUD USPS](#zip--county-census-zcta-or-hud-usps) | ZIP → county fallback for facilities | Medical | reference build | HUD token optional | `fixtures/reference/zip_county.csv` |
 | [VA VetPop2023](#va-vetpop2023) | Living veterans per county, 2023–2030 | Medical | panel sizing | none | `fixtures/reference/vetpop_county.csv` |
@@ -39,7 +43,8 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
 - **Auth and etiquette:** no key, but a `User-Agent` with contact details is mandatory
   (`NWS_USER_AGENT`). Poll no more often than every 30 seconds. The system polls every
   15–30 minutes.
-- **Used for:** heat, tropical, surge, flood and Air Quality Alert products (the vocabulary
+- **Used for:** heat, cold and winter-storm, tropical, surge, flood and Air Quality Alert
+  products (the vocabulary
   in `NWS_EVENT_TYPES`). CAP `SAME` codes give county FIPS directly. UGC zones resolve
   through the correlation file.
 - **Code:** `src/xevents/providers/nws.py`.
@@ -122,7 +127,7 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
 - **Code:** `src/xevents/providers/airnow.py`.
 - **Limits:** the key-based API's **response shape has not been verified against a real
   key**; the keyless files are what live mode relies on. AirNow data are preliminary and
-  unvalidated. `smoke_canada_2026` carries AirNow events from the daily archive.
+  unvalidated.
 
 ### EAGLE-I county power outages (`providers/eagle_i.py`)
 
@@ -144,7 +149,7 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
   unofficial copies: they can change or stop without notice.
 - **Replay:** the ORNL yearly county CSVs (15-minute cadence, 2014–2025, figshare
   doi:10.6084/m9.figshare.24237376), sliced per scenario and resampled to hourly maxima —
-  national, no credentials.
+  national, no credentials. `uri_2021` holds 12,900 outage events and `ian_2022` 1,756.
 - **Denominator:** `fixtures/reference/eaglei_customers.csv` (Moehl et al. modeled county
   customers, 2022), so live and replay compute `outage_pct` the same way; the feed's own
   coverage fields are kept in `metrics` as `feed_*` for cross-checks.
@@ -192,6 +197,26 @@ needed only to **rebuild** the caches (`make reference`, `make scenarios`) or to
 - **Builder:** `scripts/build_county_boundaries.py`. **Code:** `src/xevents/geography/counties.py`.
 - **Limits:** generalized boundaries, so a facility within a few hundred metres of a county
   line can be attributed to the neighbouring county.
+- **Two copies.** The browser gets `counties.display.geojson`: the same outlines with only
+  `id` and geometry, at 3 decimals (~110 m). The full file stays the join geometry, so
+  thinning the map copy cannot move a facility across a county line. The builder writes both.
+
+### Census state boundaries
+
+- **Source:** the Census cartographic boundary file for states, 1:5m, vintage 2023, the same
+  scale and vintage as the counties, so state lines sit on county edges.
+- **Used for:** the state outlines drawn over every map, served at `/reference/states`.
+  Display only; nothing joins against it. Coordinates at 3 decimals.
+- **Builder:** `scripts/build_state_boundaries.py`.
+
+### Natural Earth countries
+
+- **Source:** Natural Earth 1:50m Admin 0 – Countries (public domain), keeping Canada,
+  Mexico, Cuba and the Bahamas.
+- **Used for:** a muted land backdrop around the US, served at `/reference/countries`.
+  It carries no data: events stay US-only, so smoke plumes and alerts beyond the border are
+  not drawn. Coordinates at 2 decimals (~1 km).
+- **Builder:** `scripts/build_countries.py`.
 
 ## Medical layer sources
 
@@ -256,7 +281,9 @@ Each card cites its evidence in `sources`, and each claim in `evidence.claims` c
 schizophrenia 3.6 %, heart failure 5 %, diabetes 25 % of VHA users, and 52,000 veterans on
 dialysis) come from the same literature, via `docs/card-library.md`. Guidance sources
 include FDA insulin-storage guidance, CDC heat-and-medications guidance, and KCER/ESRD
-network materials. The library's own reference list is authoritative.
+network materials. The library's own reference list is authoritative;
+[`docs/medical-references.md`](../medical-references.md) indexes every card's sources in one
+place, with background references such as Setoguchi & Hennessy 2026.
 
 ### Medication carbon estimates
 

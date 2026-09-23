@@ -83,7 +83,7 @@ demo: ## (SCENARIO=<id> to open a replay) fresh SQLite DB → reference data + c
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/load_reference.py
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/ingest.py --mode replay
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/match.py --mode replay
-	@echo "open $(DEMO_URL)  (replays: /?scenario=heat_dome_2021, /playback)"
+	@echo "open $(DEMO_URL)  (a replay: /?scenario=heat_dome_2021; all of them: /replays)"
 	-open "$(DEMO_URL)" 2>/dev/null || true
 	DATABASE_URL=$(DEMO_DB) $(RUN) uvicorn xevents.api:app --port $(PORT)
 

@@ -1,6 +1,6 @@
 # Event layer: feeds, event store and playback
 
-*Part of the [design and user guide](README.md). As of 2026-09-21.*
+*Part of the [design and user guide](README.md). As of 2026-09-23.*
 
 The event layer answers one question: **what hazardous weather or environmental event is
 active in which US counties, and when?** It pulls public feeds, normalizes them into one
@@ -15,8 +15,8 @@ borrows the CAP (Common Alerting Protocol) vocabulary that NWS already emits.
 
 | Field | Meaning |
 | --- | --- |
-| `source`, `source_id` | `nws`, `hms`, `openfema`, `airnow` (`replay` is reserved). Together they form the natural key `event_key` = `source:source_id` |
-| `event_type` | `heat`, `hurricane_flood`, `wildfire_smoke`, `air_pollution` or `power_outage` |
+| `source`, `source_id` | `nws`, `hms`, `openfema`, `airnow`, `eagle_i` (`replay` is reserved). Together they form the natural key `event_key` = `source:source_id` |
+| `event_type` | `heat`, `extreme_cold`, `hurricane_flood`, `wildfire_smoke`, `air_pollution` or `power_outage` |
 | `event_name` | The source's own vocabulary, e.g. `Excessive Heat Warning`, `Heavy smoke`. Card triggers match on it |
 | `severity`, `urgency`, `certainty` | CAP enums. Severity (`Extreme` > `Severe` > `Moderate` > `Minor` > `Unknown`) drives map shading and supersession |
 | `onset`, `expires` | The active window, stored in UTC |
@@ -54,14 +54,17 @@ replayed. Details of each source are in [data-sources.md](data-sources.md).
 | --- | --- | --- |
 | `NWSAlertsProvider` | NWS watches, warnings and advisories in force now (`/alerts/active`), filtered to the product names in `NWS_EVENT_TYPES` | live |
 | `IEMArchiveProvider` | The same NWS products from the Iowa State VTEC archive, for any past window | live (2-week backfill), scenario builders |
-| `HMSSmokeProvider` | One event per day per smoke density (Light, Medium, Heavy) from NOAA HMS polygons | live (last 2 days), `smoke_nyc_2023` |
+| `HMSSmokeProvider` | One event per day per smoke density (Light, Medium, Heavy) from NOAA HMS polygons | live (last 2 days), `smoke_nyc_2023`, `smoke_canada_2026` |
 | `OpenFEMAProvider` | Disaster declarations grouped per disaster, typed by incident | live, `ian_2022` |
-| `AirNowProvider` | Monitor observations mapped to counties as air-pollution events | live, only with `AIRNOW_API_KEY` |
+| `EagleIProvider` | Observed county power outages (percent of customers out), one event per county and poll | live (with `EAGLEI_TOKEN` or `EAGLEI_FEATURE_URL`), `uri_2021`, `ian_2022` |
+| `AirNowFilesProvider` | Hourly monitor AQI and next-day reporting-area forecasts from AirNow's keyless public files | live (always), `smoke_canada_2026` (daily archive) |
+| `AirNowProvider` | The same observations through the key-based API | live, optional second path with `AIRNOW_API_KEY` |
 | `ReplayProvider` | Reads a scenario's `events.json` | replay |
 
-**Event types with no producer yet.** No provider emits a `heatrisk` metric, so the
-HeatRisk triggers on the heat cards are dormant. Power outages come from EAGLE-I
-(`providers/eagle_i.py`), smoke and air pollution fire Card 8, cold products fire Card 7.
+**What each event type feeds.** Power outages come from EAGLE-I and fire Cards 3, 5 and 6;
+smoke and air pollution fire Card 8; cold and winter products fire Card 7. **The one trigger
+with no producer yet is HeatRisk:** no provider emits a `heatrisk` metric, so the HeatRisk
+triggers on the heat cards are dormant.
 
 ## 3. Live and replay modes
 
@@ -80,13 +83,19 @@ The providers run in this order, and a failure in one does not stop the others:
    no history, so the live view would go empty whenever the weather is calm.
 3. OpenFEMA declarations for the window.
 4. HMS smoke for the last 2 days.
-5. AirNow for the last 6 hours, if a key is set.
+5. EAGLE-I county outages, if `EAGLEI_TOKEN` or `EAGLEI_FEATURE_URL` is set; skipped and
+   reported otherwise.
+6. AirNow public files: the newest hourly monitor file and today's forecasts. No key.
+7. The AirNow API for the last 6 hours, only if `AIRNOW_API_KEY` is set.
 
 Because the same alert can arrive from both (1) and (2) under different ids, `dedupe()` in
 `scripts/ingest.py` drops archive copies that have the same product name, counties and onset
 hour, and keeps the live copy. Live rows are upserted by `event_key`, so re-running is safe.
-To keep live data current, run `ingest` and `match` on a schedule, every 15–30 minutes.
-[`docs/deploy.md`](../deploy.md) §4 covers this.
+To keep live data current, set `LIVE_REFRESH_MINUTES` (60 in `.env.example` and the
+image): the web app then runs live ingest and match itself, at startup and every N
+minutes, as low-priority subprocesses (`src/xevents/live_refresh.py`). Live events are not
+stored in the image, so a fresh instance shows them only after its first refresh.
+[`docs/deploy.md`](../deploy.md) §4 covers scheduling it externally instead.
 
 **Feed freshness.** `GET /feeds` reports per-source event counts and the time of the last
 ingest, and marks a feed **stale** after 6 hours. Live pages show it as a banner, so an
@@ -102,10 +111,10 @@ known gaps.
 | Scenario | Window (UTC) | Events | What it shows |
 | --- | --- | --- | --- |
 | `heat_dome_2021` | 2021-06-25 → 07-08 | 20 NWS heat products (watches → warnings) over 129 WA/OR/ID counties | Heat watches escalating to warnings across the Pacific Northwest |
-| `ian_2022` | 2022-09-23 → 11-04 | 66 NWS tropical, surge and flood products plus FEMA DR-4673, 70 FL counties | Hurricane landfall and flooding, with the declaration as context |
+| `ian_2022` | 2022-09-23 → 11-04 | 66 NWS tropical, surge and flood products, FEMA DR-4673 and 1,756 hourly EAGLE-I county outage events, FL | Hurricane landfall and flooding; watch items yield to observed outages; the declaration as context |
 | `smoke_nyc_2023` | 2023-06-06 → 06-09 | 9 HMS smoke events (3 days × 3 densities) | Canadian wildfire smoke over New York; Card 8 |
 | `uri_2021` | 2021-02-10 → 02-21 | 78 NWS cold/winter products (35 under legacy Wind Chill names) + 12,900 hourly EAGLE-I county outage events, TX | Legacy-name normalization, observed-outage thresholds, cold × outage boost |
-| `smoke_canada_2026` | 2026-07-13 → 07-21 | 21 HMS smoke events, 715 AirNow county-day AQI events, 82 NWS heat products | Smoke corridor with a concurrent heat dome; Card 8 plus the heat cards |
+| `smoke_canada_2026` | 2026-07-13 → 07-22 | 21 HMS smoke events, 715 AirNow county-day AQI events, 82 NWS heat products | Smoke corridor with a concurrent heat dome; Card 8 plus the heat cards |
 
 To add a scenario, create `fixtures/events/<name>/` with `raw/`, a `build.py` that uses the
 archive and HMS providers (see `_common.py`) and writes `events.json` with
@@ -119,12 +128,13 @@ badges, outage shading, state borders, grouped AirNow lanes), is
 
 > **Since 2026-09-22** the Dashboard, the facility page and Playback are one view,
 > **Monitor** at `/` (live first, replays in the same menu; a facility or card opens in its
-> focus layout), with **Scenarios** (`/replays`) and **Sources** (`/sources`) tabs beside it.
-> `/playback` and `/dashboard/facilities/{id}` redirect there. The text and screenshots below
-> describe the earlier pages; [user-interface.md](user-interface.md) is current.
+> focus layout), with **Scenarios** (`/replays`), **Cards** (`/card-library`) and
+> **Sources** (`/sources`) tabs beside it. `/playback` and `/dashboard/facilities/{id}`
+> redirect there. The screenshots below were taken on the earlier Playback page; the map,
+> timeline and controls work the same way in Monitor.
 
-`/playback` is the layer's main screen: a US map, a side panel and a timeline, all driven by
-one time cursor *t*.
+Monitor (`/`) is the layer's main screen: a US map, a side panel and a timeline, all driven
+by one time cursor *t*.
 
 ![Playback of the 2021 heat dome at 2021-07-02 00:00Z](images/playback-heat-dome.png)
 
@@ -141,8 +151,8 @@ map, and the side panel opens the card: when and where it fires, the estimated p
 across those stations, and the reviewed care-team text. The breadcrumb and × close it.*
 
 **Choosing what to watch.** Use the **View** selector to pick a replay scenario, or
-**live (now) — last 2 weeks**. The URL parameter `?scenario=` selects it directly, and the
-Dashboard and Events links in the header keep the same view.
+**live (now) — last 2 weeks**. The URL parameter `?scenario=` selects it directly, and
+`?at=` sets the time.
 
 **Moving through time.**
 
@@ -159,11 +169,11 @@ Dashboard and Events links in the header keep the same view.
 - **Counties** are shaded by the most severe event type active at *t*: heat, hurricane or
   flood, wildfire smoke, air pollution, or power outage. The shade deepens with CAP
   severity. The legend shows each type with its live county count. The basemap is drawn
-  from the app's own county boundaries, so there are no tile servers and no key, and the map
-  works offline.
+  from the app's own county and state boundaries, with Canada, Mexico, Cuba and the Bahamas
+  as a muted backdrop, so there are no tile servers and no key, and the map works offline.
 - **Facilities** (circles) and **card chips** (small fanned stacks above a facility) come
   from the medical layer's overlay. They are described in
-  [medical-layer.md §6](medical-layer.md#6-using-the-care-team-pages).
+  [medical-layer.md §6](medical-layer.md#6-where-the-medical-layer-shows-up-in-the-ui).
 
 **Reading the timeline.** The timeline has one lane per event type and one bar per event
 across its active window, with day gridlines and a playhead at *t*.
@@ -185,7 +195,9 @@ level at a time.
 | `GET /events/active?county=` | Live events active now |
 | `GET /events/detail?key=` | One event, including its polygon |
 | `GET /feeds` | Live feed freshness |
-| `GET /reference/counties` | County boundaries (GeoJSON, gzipped) for any map |
+| `GET /reference/counties` | County outlines at map precision (GeoJSON, gzipped, cacheable for a day with an ETag) |
+| `GET /reference/states` | State outlines, same caching |
+| `GET /reference/countries` | Neighbouring countries backdrop, same caching |
 
 `at=` accepts ISO-8601 with `Z`, an offset, a space in place of `+` (how a browser submits
 it), minute precision or a bare date. Naive values are read as UTC (`timeparse.py`).
@@ -198,8 +210,8 @@ when the layers are split.
 | Coupling | Where | Direction |
 | --- | --- | --- |
 | The `Event` model and `county_fips` | `models.py` → `engine.py` | Event → medical. **This is the intended seam.** Keep it as the single contract |
-| Playback overlays action items, cards, carbon and panels | `playback.js` fetches `/action-items`, `/cards`, `/carbon`, `/facilities/{id}/...` | Playback reads the medical layer |
-| Facilities are drawn on the event map | `playback.js`, `map.js` via `/facilities` | Playback reads the medical layer |
+| Monitor overlays action items, cards, carbon and panels | `playback.js` fetches `/action-items`, `/cards`, `/carbon`, `/facilities/{id}/...` | Monitor reads the medical layer |
+| Facilities are drawn on the event map | `playback.js`, `map.js` via `/facilities` | Monitor reads the medical layer |
 | The event detail page lists the action items an event produced | `web/views.py` | Event page reads the medical layer |
 | Shared models module, store and FastAPI app | `models.py`, `store.py`, `api.py` | Both |
 | `EventSource.REPLAY` exists but replay events keep their original source | `models.py` | Cosmetic |
@@ -213,7 +225,11 @@ engine and action items would stay on the medical side.
 ## 8. Known limits
 
 - County resolution from polygons is approximate (see §1).
-- NWS Air Quality Alerts are not in the VTEC archive, so historical smoke comes only from HMS.
-- The AirNow response shape has not been verified against a real key.
+- NWS Air Quality Alerts are not in the VTEC archive, so historical smoke comes from HMS
+  and, for `smoke_canada_2026`, the AirNow daily file archive.
+- The key-based AirNow API's response shape has not been verified against a real key; live
+  mode relies on the keyless files.
 - Live mode needs writable storage and outbound network. A replay image can be read-only.
-- There are no `power_outage` or HeatRisk producers yet (see §2).
+- There is no HeatRisk producer yet (see §2).
+- Live EAGLE-I covers only Georgia and Ohio until a FEMA token is available (see
+  [data-sources.md](data-sources.md#eagle-i-county-power-outages-providerseagle_ipy)).
