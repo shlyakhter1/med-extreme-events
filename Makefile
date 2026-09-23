@@ -74,14 +74,17 @@ scenarios: ## rebuild fixtures/events/*/events.json from their raw archived sour
 	$(RUN) python fixtures/events/smoke_canada_2026/build.py
 
 DEMO_DB ?= sqlite:///demo.db
+# Page `make demo` opens: empty = live view; e.g. SCENARIO=heat_dome_2021 for a replay.
+SCENARIO ?=
+DEMO_URL = http://localhost:$(PORT)/$(if $(SCENARIO),?scenario=$(SCENARIO),)
 
-demo: ## fresh SQLite DB → reference data + catchments → replay scenarios → action items → dashboard
+demo: ## (SCENARIO=<id> to open a replay) fresh SQLite DB → reference data + catchments → replay scenarios → action items → dashboard
 	rm -f demo.db
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/load_reference.py
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/ingest.py --mode replay
 	DATABASE_URL=$(DEMO_DB) $(RUN) python scripts/match.py --mode replay
-	@echo "open http://localhost:$(PORT)/?scenario=heat_dome_2021  (and /playback)"
-	-open "http://localhost:$(PORT)/?scenario=heat_dome_2021" 2>/dev/null || true
+	@echo "open $(DEMO_URL)  (replays: /?scenario=heat_dome_2021, /playback)"
+	-open "$(DEMO_URL)" 2>/dev/null || true
 	DATABASE_URL=$(DEMO_DB) $(RUN) uvicorn xevents.api:app --port $(PORT)
 
 container: ## rebuild the local demo image and replace the `mee` container on :8000 (code is baked in; restart is not enough)
