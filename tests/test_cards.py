@@ -1,4 +1,4 @@
-"""Card library: the six v1 cards load; malformed cards are rejected with useful errors."""
+"""Card library: the eight cards load; malformed cards are rejected with useful errors."""
 
 from __future__ import annotations
 
@@ -8,6 +8,13 @@ from pathlib import Path
 
 import pytest
 
+from tests.card_library import (
+    SHARED_MARKER,
+    flat,
+    library_text,
+    reference_index,
+    sources_by_card,
+)
 from tests.conftest import INVALID_CARDS
 from xevents.cards import CARDS_DIR, CardValidationError, load_card, load_cards
 from xevents.models import Card, EventType, EvidenceTier
@@ -70,18 +77,35 @@ def test_heat_cards_share_trigger_vocabulary(cards: list[Card]) -> None:
 
 
 def test_patient_strings_are_verbatim_from_card_library(cards: list[Card]) -> None:
-    """Every patient-facing sentence must appear verbatim in the reviewed card documents
-    (docs/card-library.md, or docs/card-library-additions.md for Cards 7-8 and the Card 6
-    addendum)."""
-    docs = CARDS_DIR.parent / "docs"
-    library = (docs / "card-library.md").read_text(encoding="utf-8") + (
-        docs / "card-library-additions.md"
-    ).read_text(encoding="utf-8")
-    flat = re.sub(r"\s+", " ", library)
+    """Every patient-facing sentence must appear verbatim in the reviewed card library
+    (docs/card-library.md), with library markup ([SHARED], claim markers) stripped."""
+    library = library_text()
     for card in cards:
         for action in card.actions.patient:
-            sentence = re.sub(r"\s+", " ", action.text)
-            assert sentence in flat, f"{card.id}: not verbatim: {sentence!r}"
+            sentence = flat(action.text)
+            assert sentence in library, f"{card.id}: not verbatim: {sentence!r}"
+
+
+def test_care_team_and_escalation_strings_are_verbatim(cards: list[Card]) -> None:
+    """Care-team actions, escalation signs/responses, claims and caveats are reviewed text
+    too; they must come from the library, not be rewritten at transcription."""
+    library = library_text()
+    for card in cards:
+        strings = [a.text for a in card.actions.care_team]
+        strings += [e.signs for e in card.escalation]
+        strings += [e.response for e in card.escalation if e.response]
+        strings += [c.text for c in card.evidence.claims]
+        strings += card.evidence.caveats
+        for s in strings:
+            assert flat(s) in library, f"{card.id}: not in the library: {s!r}"
+
+
+def test_no_rendered_string_carries_library_markup(cards: list[Card]) -> None:
+    """[SHARED] is library markup; it must never reach YAML strings (and so the UI)."""
+    for card in cards:
+        dumped = card.model_dump_json()
+        assert SHARED_MARKER not in dumped, card.id
+        assert "[strong |" not in dumped and "[inferential |" not in dumped, card.id
 
 
 # --------------------------------------------------------------------------- rejection
@@ -134,8 +158,60 @@ def test_duplicate_card_id_is_rejected(tmp_path: Path) -> None:
 
 
 def test_medical_references_index_every_card_source(cards: list[Card]) -> None:
-    """docs/medical-references.md indexes the literature behind the cards. A source added to
-    a card without a line there would leave the reading list silently incomplete."""
-    doc = (CARDS_DIR.parent / "docs" / "medical-references.md").read_text(encoding="utf-8")
-    missing = sorted({s.id for c in cards for s in c.sources if f"`{s.id}`" not in doc})
-    assert not missing, f"add to docs/medical-references.md §2: {missing}"
+    """Every id a card cites is in the medical-references §1 index (the loader's id set)."""
+    index = reference_index()
+    missing = sorted({s.id for c in cards for s in c.sources if s.id not in index})
+    assert not missing, f"add to docs/medical-references.md §1: {missing}"
+
+
+def test_card_sources_match_references_by_card_table(cards: list[Card]) -> None:
+    """medical-references §2 is the card-by-card view of the YAML; they must agree exactly."""
+    table = sources_by_card()
+    for card in cards:
+        assert {s.id for s in card.sources} == table[card.number], card.id
+
+
+def test_no_quantitative_claim_rests_on_pending_sources(cards: list[Card]) -> None:
+    """medical-references §5: pending sources support no quantitative claim until confirmed.
+    A claim with a figure in it must cite at least one verified source (Card 1's NSAID
+    figures cite finley-1995, verified, beside the pending class labeling)."""
+    index = reference_index()
+    for card in cards:
+        for claim in card.evidence.claims:
+            if not re.search(r"(?<![A-Za-z0-9.])\d", claim.text):  # a figure, not "PM2.5"
+                continue
+            verified = [s for s in claim.source_ids if index.get(s) == "verified"]
+            assert verified, f"{card.id}: figures rest on pending sources: {claim.text!r}"
+
+
+# TODO(after one green release): delete this assertion (implementation-plan-clinical M11 §1).
+REMOVED_SOURCE_IDS = {
+    "kelman-lurie-2015",
+    "va-sandy-dialysis-study",
+    "martin-latry",
+    "katrina-sandy-otp-studies",
+    "samhsa-otp-disaster-guidance",
+    "cms-kcer-emergency-diet",
+    "lithium-interaction-pharmacology",
+    "fda-clozapine-rems-elimination",
+    "clozapine-withdrawal-literature",
+    "morris-paliperidone",
+    "cdc-mmwr-72-34-2023",
+    "cdc-smoke-day-asthma-2023",
+    "cdc-co-texas-2021",
+    "ali-dogar-2025",
+    "cdc-mmwr-puerto-rico",
+}
+
+
+def test_no_card_cites_a_removed_source_id(cards: list[Card]) -> None:
+    for card in cards:
+        cited = {s.id for s in card.sources}
+        cited |= {i for c in card.evidence.claims for i in c.source_ids}
+        assert not cited & REMOVED_SOURCE_IDS, (card.id, sorted(cited & REMOVED_SOURCE_IDS))
+    assert not REMOVED_SOURCE_IDS & set(reference_index())
+
+
+def test_setoguchi_hennessy_only_on_card_5(cards: list[Card]) -> None:
+    citing = {c.number for c in cards if any(s.id == "setoguchi-hennessy-2026" for s in c.sources)}
+    assert citing == {5}

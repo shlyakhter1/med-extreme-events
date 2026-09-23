@@ -28,10 +28,11 @@
       <div class="stat-block">
         <div class="lbl">Affected panel</div>
         <div class="v"><b>≈ {{ '{:,.0f}'.format(any.panel.value) }}</b><span>{{ any.panel.unit }}</span></div>
-        <div class="q">{{ any.panel.label }}</div>
+        <div class="q">{{ any.panel.label }}{% if any.panel.kind %} · <span class="est-kind">{{ estimate_kind_labels[any.panel.kind.value] }}</span>{% endif %}</div>
         <details><summary>how was this number computed?</summary>
+          {% if any.panel.kind %}<div class="est-kind" data-kind="{{ any.panel.kind.value }}">{{ estimate_kind_labels[any.panel.kind.value] }}</div>{% endif %}
           <div><b>{{ any.panel.label }}</b>: {{ any.panel.formula }}</div>
-          {% for comp in any.panel.components recursive %}<div class="comp">↳ <b>{{ comp.label }}</b> = {{ '{:,.0f}'.format(comp.value) }}{% if comp.unit != 'veterans' %} {{ comp.unit }}{% endif %}: {{ comp.formula }}{% if comp.caveats %} · {{ comp.caveats[0] }}{% endif %}{% if comp.components %}{{ loop(comp.components) }}{% endif %}</div>{% endfor %}
+          {% for comp in any.panel.components recursive %}<div class="comp">↳ <b>{{ comp.label }}</b> = {{ '{:,.0f}'.format(comp.value) }}{% if comp.unit != 'veterans' %} {{ comp.unit }}{% endif %}: {{ comp.formula }}{% if comp.kind %} <span class="est-kind" data-kind="{{ comp.kind.value }}">[{{ estimate_kind_labels[comp.kind.value] }}]</span>{% endif %}{% if comp.caveats %} · {{ comp.caveats[0] }}{% endif %}{% if comp.components %}{{ loop(comp.components) }}{% endif %}</div>{% endfor %}
           <div>Caveats: {{ any.panel.caveats|join(' ') }}</div>
           <div>Sources: {{ any.panel.sources|join('; ') }}</div>
         </details>

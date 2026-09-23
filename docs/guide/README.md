@@ -146,8 +146,8 @@ These come from `CLAUDE.md`, and tests enforce most of them.
   Sources tabs, the About screen, event pages and the patient view, and how each is meant to work.
 - `docs/card-reference-for-frontend.md`: API shapes and rendering rules for anyone building
   a UI on the action items.
-- `docs/card-library.md` and `docs/card-library-additions.md`: the clinical source of truth for all eight cards.
-- `docs/medical-references.md`: the literature behind the cards, card by card, and background
-  references.
+- `docs/card-library.md`: the clinical source of truth for all eight cards.
+- `docs/medical-references.md`: the reference index behind the cards — sources with
+  verification status, card by card, and the cross-card consistency rules.
 - `PROGRESS.md`: the dated log of what was built, what was decided, and what still needs a
   clinical reviewer.

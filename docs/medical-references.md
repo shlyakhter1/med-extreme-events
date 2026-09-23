@@ -1,180 +1,121 @@
-# Medical references
+# Medical References for Cards
 
-*As of 2026-09-23. An index of the literature behind the playbook cards, plus background
-references read for the project. It is a reading list, not clinical content: nothing here is
-shown to patients or care teams.*
+*As of 2026-09-23. The authoritative reference index for the playbook cards. Every claim in
+[`card-library.md`](card-library.md) cites a source id from §1; the loader rejects unknown ids.
+This document states the best available citation for each id and its verification status. A
+status of **pending** means the citation has not yet been confirmed against the primary
+source; pending sources support no quantitative claim until confirmed.*
 
-**What this document is not.** The reviewed sources of truth for card wording and evidence
-are [`card-library.md`](card-library.md) (Cards 1–6) and
-[`card-library-additions.md`](card-library-additions.md) (Cards 7, 8 and the Card 6
-addendum). The cards cite sources by id in `cards/*.yaml`. To make a reference *support a
-card*, add it to the card library through clinical review first, then transcribe it into the
-card's `sources` and the claims' `source_ids` (the loader rejects unknown ids). Listing a
-paper here changes nothing the system says.
+## 1. Master reference list
 
-Medication carbon references are kept separately, in
-[`carbon-footprint.md`](carbon-footprint.md) §References.
+Status: **verified** = resolved and read, supporting text confirmed. **pending** = citation
+believed correct but not yet confirmed against the primary source.
 
-## 1. Key references
-
-### Setoguchi & Hennessy 2026 — Climate change and medications
-
-> Setoguchi S, Hennessy S. Climate Change and Medications: Implications for Clinical
-> Practice, Healthcare Sustainability, and Pharmacoepidemiology. *Pharmacoepidemiology and
-> Drug Safety* 2026;35(8):e70437. doi:[10.1002/pds.70437](https://doi.org/10.1002/pds.70437).
-> PMCID [PMC13427620](https://pmc.ncbi.nlm.nih.gov/articles/PMC13427620/). Published
-> 31 July 2026.
-
-- **Type:** commentary (a framework, not a primary study). Card id:
-  `setoguchi-hennessy-2026`; carbon table id: `setoguchi2026`.
-- **Framework:** two directions. *Downstream*, climate harms medications (stability, access,
-  and how drugs interact with heat). *Upstream*, medications contribute to climate change
-  (pharmaceutical emissions, inhalers, formulation choices).
-
-**What it says that bears on the cards** (quoted from the full text, checked 2026-09-23):
-
-| Point | Quote | Relevant to |
+| Source id | Citation | Status |
 | --- | --- | --- |
-| Insulin loses potency with heat, and outages threaten it | "unopened insulin loses potency within months at 37°C." "Power outages during extreme weather can therefore compromise insulin effectiveness during emergencies." | Card 5 (insulin × outage) |
-| Heat-sensitizing drug classes | "diuretics and angiotensin‐converting enzyme inhibitors may blunt thirst sensation, and selective serotonin reuptake inhibitors and anticholinergics impair sweating" | Card 4 (heart failure), Card 2 (antipsychotics, anticholinergic burden) |
-| Mail-order storage | Non-refrigerated drugs should be stored at 15–30 °C, "yet delivery trucks can reach 65°C" | Card 3 (delivery interruption), Card 5 |
-| Supply chains | Hurricane Helene flooded the Baxter plant that makes about 60 % of US IV fluids | Card 3 (hurricane) |
-| Preparedness | "Hospital systems and pharmacy networks should maintain backup power and emergency‐stock protocols"; "patient‐specific risk stratification for drug unavailability must consider age, chronic disease burden, and social support" | Cards 3, 5, 6; panel sizing |
-| Inhaler carbon | Metered-dose inhaler propellants have "global warming potentials of 1430 to 3220 times greater than CO₂"; dry powder and soft mist inhalers have 10–37 times lower carbon intensity | Card 8 carbon panel only |
-| Pharmacists | Pharmacists can "flag heat‐sensitizing combinations at medication reconciliation" | Care-team actions on Cards 1, 2, 4 |
+| `finley-1995` | Finley PR, Warner MD, Peabody CA. Clinical relevance of drug interactions with lithium. *Clin Pharmacokinet* 1995;29(3):172–91. DOI 10.2165/00003088-199529030-00004. PMID 8521679. | verified |
+| `nsaid-class-labeling` | NSAID class prescribing information, drug-interactions section (lithium): ~15% higher mean minimum lithium, ~20% lower clearance; individual reports up to 58%. Verify against ibuprofen/naproxen PI on DailyMed. | pending |
+| `fda-lithium-label` | Lithium carbonate prescribing information (DailyMed): decreased tolerance with protracted sweating/diarrhea; fluid-intake language applies to the initial stabilization period. | pending |
+| `cdc-heat-medications-2024` | CDC, "Heat and Medications — Guidance for Clinicians," June 2024 version (live page archived early 2025; cite the archived copy at restoredcdc.org). | verified (archived) |
+| `nordon-2009` | Nordon C et al. Risk of death related to psychotropic drug use in older people during the 2003 French heatwave. *Am J Geriatr Psychiatry* 2009;17(12):1059–67. DOI 10.1097/JGP.0b013e3181b7ef6e. PMID 20104062. | verified |
+| `martin-latry-2007` | Martin-Latry K et al. Psychotropic drugs use and risk of heat-related hospitalisation. *Eur Psychiatry* 2007;22(6):335–8. DOI 10.1016/j.eurpsy.2007.03.007. Bordeaux, August 2003; 56 admissions; mean age 83. | verified |
+| `chen-2025` | Chen SX et al. Antipsychotics and other risk factors for mortality among people with schizophrenia during an extreme heat event. *Sci Rep* 2025. DOI 10.1038/s41598-025-17591-0. 137 deaths vs 57,394 survivors (BC heat dome, 2021). | verified (OR 2.43); polypharmacy OR pending full text |
+| `bccdc-bcmj-2023` | BCCDC. Risk of mortality among people with schizophrenia during the 2021 heat dome. *BCMJ*. ~8% of heat-dome deaths vs ~1% population prevalence; do-not-discontinue guidance. | verified |
+| `heat-thermoregulation-meta-2024` | The effect of prescription and over-the-counter medications on core temperature in adults during heat stress: systematic review and meta-analysis. *eClinicalMedicine* 2024 (PIIS2589-5370(24)00465-6). Found no evidence antipsychotics alter physiological thermoregulation under heat stress. | verified |
+| `shannon-2025` | Shannon EM et al. Extreme Heat, Social Factors, and Mortality Among California Veterans With Cardiometabolic Disease. *JAMA Netw Open* 2025;8(11):e2545524. DOI 10.1001/jamanetworkopen.2025.45524. Population: veterans with cardiometabolic disease. | pending (figures unconfirmed) |
+| `fda-clozapine-rems-2025` | FDA Drug Safety Communication: FDA removes REMS program for clozapine, effective June 13, 2025 (enforcement discretion from Feb 24, 2025); FDA Clozapine REMS Modification FAQ: prescribers continue ANC monitoring per labeling. | verified |
+| `clozapine-pi` | Clozapine prescribing information (FDA, NDA 19758): 2 or more days missed → reinitiate at 12.5 mg once or twice daily and re-titrate; off 30+ days → monitor ANC as a new patient. | verified |
+| `shiovitz-1996` | Shiovitz TM et al. Cholinergic rebound and rapid-onset psychosis following abrupt clozapine withdrawal. *Schizophr Bull* 1996;22(4):591–5. PMID 8938913. | pending |
+| `weiden-2017` | Weiden PJ et al. Post-hoc relapse-timing comparison after discontinuation of oral paliperidone, PP1M, PP3M (50% relapse-free ≈2 / 6 / 13 months). *J Clin Psychiatry* 2017. Narrative-review confirmation: PMC8490677. | verified via review; primary DOI pending |
+| `maxwell-2009` | Maxwell JC, Podus D, Walsh D. Lessons from the evacuation of New Orleans: 567 hurricane-related treatment admissions in Texas after Katrina. *Subst Use Misuse* 2009;44(12):1681–94. DOI 10.3109/10826080902962011. | verified |
+| `mcclure-2014` | McClure B et al. After Sandy: >75% of patients at 112 NYC substance-use treatment programs had treatment interruptions. *J Urban Health* 2014;91:999–1008. PMID 25163931. | verified |
+| `griffin-2018` | Griffin AR et al. Manhattan VAMC opioid treatment program closure after Sandy: closed 5 months; emergency guest dosing arranged for ~100 veterans. *J Drug Issues* 2018. DOI 10.1177/0022042618779541. | verified |
+| `samhsa-42cfr8-2024` | HHS/SAMHSA. Medications for the Treatment of Opioid Use Disorder, final rule (42 CFR Part 8). *Federal Register* Feb 2, 2024 (2024-01693); effective Apr 2, 2024. Take-home flexibilities permanent: up to 7 doses days 1–14, 14 from day 15, 28 from day 31, by clinical judgment. | verified |
+| `va-pharmacy-disaster-relief-plan` | VA Pharmacy Disaster Relief Plan (va.gov): emergency fills at any VA pharmacy for displaced veterans. | verified (page) |
+| `alahmad-2023` | Alahmad B et al. Associations Between Extreme Temperatures and Cardiovascular Cause-Specific Mortality: Results From 27 Countries. *Circulation* 2023;147(1):35–46. DOI 10.1161/CIRCULATIONAHA.122.061832. PMID 36503273. PMC9794133. Heat days above the 97.5th percentile: 2.6 (95% eCI 2.4–2.8) excess deaths per 1,000 heart-failure deaths — the highest excess-death proportion among cardiovascular causes. | verified |
+| `layton-2020` | Layton JB et al. Heatwaves, medications, and heat-related hospitalization in older Medicare beneficiaries with chronic conditions. *PLoS One* 2020;15(12):e0243665. DOI 10.1371/journal.pone.0243665. PMID 33301532. Heat-related hospitalization increases of 21% (7–38%) to 33% (14–55%) across drug classes; drug and heatwave effects largely additive. | verified |
+| `hf-daily-weight-education` | AHA/HFSA heart-failure patient education: call thresholds of >2–3 lb gain in a day or >5 lb in a week. Attach the specific Heart.org/HFSA URL. | pending |
+| `setoguchi-hennessy-2026` | Setoguchi S, Hennessy S. Climate Change and Medications. *Pharmacoepidemiol Drug Saf* 2026;35(8):e70437. DOI 10.1002/pds.70437. PMC13427620. Commentary (framework, not primary data). Supports: unopened insulin loses potency within months at 37 °C; outages can compromise insulin effectiveness; mail-order trucks can reach 65 °C. | verified |
+| `fda-insulin-emergency` | FDA, "Information Regarding Insulin Storage and Switching Between Products in an Emergency" (content current as of 09/19/2017): vials/cartridges may be kept at 59–86 °F up to 28 days; pump reservoir insulin discarded after 48 h or after exposure above 98.6 °F; never use frozen insulin; replace extreme-exposed insulin as soon as proper storage is available. | verified |
+| `fonseca-2009` | Fonseca VA et al. Impact of a natural disaster on diabetes. *Diabetes Care* 2009;32(9):1632–8. DOI 10.2337/dc09-0670. PMID 19542210. n = 1,795; A1C rose 7.7%→8.3% at the safety-net system (MCLNO) but not among VA patients. | verified |
+| `ada-sick-day` | ADA sick-day/hyperglycemia guidance: check ketones when glucose >240 mg/dL or during illness. Attach the specific diabetes.org URL. | pending |
+| `anderson-2009` | Anderson AH et al. Missed dialysis sessions and hospitalization in hemodialysis patients after Hurricane Katrina. *Kidney Int* 2009;75(11):1202–8. DOI 10.1038/ki.2009.5. PMID 19212421. n = 386; 44% missed ≥1 session, ~17% missed ≥3; missing ≥3 vs none: adjusted OR 2.16 (1.05–4.43) for hospitalization. | verified |
+| `kelman-2015` | Kelman J et al. Dialysis care and death following Hurricane Sandy. *AJKD* 2015;65(1):109–15. DOI 10.1053/j.ajkd.2014.07.005. PMID 25156306. ED visits, hospitalizations and 30-day mortality elevated after Sandy. | verified |
+| `lurie-2015` | Lurie N et al. Early dialysis and adverse outcomes after Hurricane Sandy. *AJKD* 2015;66(3):507–12. DOI 10.1053/j.ajkd.2015.04.050. PMID 26120039. n = 13,836. Early dialysis: ED OR 0.80 (0.67–0.96); hospitalization OR 0.79 (0.66–0.94); 30-day mortality adjusted OR 0.72 (0.52–0.997; P = 0.048, borderline; unadjusted not significant). | verified |
+| `lukowsky-2019` | Lukowsky LR et al. Access to Care for VA Dialysis Patients During Superstorm Sandy. *J Prim Care Community Health* 2019;10. DOI 10.1177/2150132719863599. PMID 31347445. PMC6661787. Manhattan VAMC dialysis unit closed Oct 28, 2012–mid-March 2013; median 5-day gap between sessions (n = 47); Brooklyn campus absorbed most displaced care. | verified |
+| `nkf-emergency-diet` | National Kidney Foundation, Emergency Meal Planning for Patients on Dialysis: fluid limited to <500 cc (2 cups/16 oz) per day when dialysis is delayed. Consistent with DaVita emergency-preparedness guidance. | verified |
+| `ipro-khares` | IPRO ESRD Network, Kidney Health Assistance and Emergency Support (KHARES) program — CMS national kidney emergency support contractor effective May 1, 2026; 866-446-3507. Legacy KCER line 866-901-3773 still listed by NKF and CDC; keep both until the legacy line is confirmed retired. | verified |
+| `hhs-empower` | HHS emPOWER Program FAQ (empowerprogram.hhs.gov): >4.6M Medicare at-risk beneficiaries; >3M relying on electricity-dependent DME. Figures update monthly — treat as order-of-magnitude. | verified |
+| `gasparrini-2015` | Gasparrini A et al. Mortality risk attributable to high and low ambient temperature: a multicountry observational study. *Lancet* 2015;386(9991):369–75. DOI 10.1016/S0140-6736(14)62114-0. PMID 26003380. 74M deaths, 384 locations, 13 countries: 7.29% of deaths attributable to cold vs 0.42% to heat; most cold burden from moderate, not extreme, cold. | verified |
+| `texas-dshs-uri-2021` | Texas DSHS, February 2021 Winter Storm Related Deaths, final report (released Dec 31, 2021): 246 storm-related deaths; 161 (65.4%) from cold exposure, 158 of them hypothermia; 19 carbon-monoxide deaths. | verified (via DSHS report and contemporaneous reporting) |
+| `nws-scn23-44` | NWS Service Change Notice 23-44 (updated Mar 26, 2024): cold-product consolidation effective with the 2024–25 season — Extreme Cold Watch/Warning; Wind Chill Advisory → Cold Weather Advisory. | verified |
+| `cdc-co-guidance` | CDC carbon monoxide poisoning prevention guidance: never use generators, grills, camp stoves, or charcoal indoors or in a garage; keep generators outside away from windows; battery CO alarms. Attach the specific cdc.gov URL. | pending (URL) |
+| `aha-snow-shoveling` | AHA advisory on snow shoveling and cardiac risk. Attach the specific Heart.org URL. | pending (URL) |
+| `meek-2023` | Meek HC et al. Notes from the Field: Asthma-Associated ED Visits During a Wildfire Smoke Event — New York, June 2023. *MMWR* 2023;72(34):933–5. DOI 10.15585/mmwr.mm7234a6. PMID 37616254. New York State **excluding NYC** (134 EDs): +81.9% on June 7 vs the June 1–5 mean. | verified |
+| `cdc-smoke-asthma-2023` | CDC. Asthma-Associated ED Visits During the Canadian Wildfire Smoke Episodes — United States, April–August 2023. *MMWR* 2023;72(34) (mm7234a5). PMC10468220. Asthma ED visits 17% above expected across 19 smoke days (smoke day = AQI ≥101, Unhealthy for Sensitive Groups). | verified |
+| `epa-wildfire-smoke-guide` | EPA, Wildfire Smoke: A Guide for Public Health Officials; AirNow Fire & Smoke guidance: N95/P100 (not cloth/surgical) for smoke; recirculate indoor air with best available filtration; DIY box-fan (Corsi–Rosenthal) filters described as a temporary option. Attach specific URLs. | pending (URLs) |
+| `noaa-hms` | NOAA Hazard Mapping System smoke product documentation — basis of the smoke-density trigger. | verified |
+| `respiratory-action-plans` | GINA (asthma) / GOLD (COPD) written action-plan guidance. Attach specific URLs. | pending (URLs) |
+| `va-chf-prevalence`, `va-diabetes-prevalence`, `va-smi-prevalence`, `va-esrd-prevalence` | VA population prevalence anchors (CHF ~5%, diabetes ~25%, schizophrenia ~3.6%, bipolar ~3.0%, >52,000 on dialysis, clozapine ~4% of VHA schizophrenia). **Planning estimates only** — used for panel sizing, never in clinical text; each awaits its primary VA source. | pending (planning) |
 
-**Where it is cited today:** the `sources` of Cards 4 and 5, the source table in
-[`card-library.md`](card-library.md) ("Framework: climate–medication commentary"), and the
-carbon table ([`carbon.yaml`](carbon.yaml), [`carbon-footprint.md`](carbon-footprint.md)
-ref. 10) for the upstream framing.
+## 2. Sources by card
 
-**Citation check — open for clinical review.**
+| Card | Source ids |
+| --- | --- |
+| 1 Heat × lithium | finley-1995, nsaid-class-labeling, fda-lithium-label, cdc-heat-medications-2024, va-smi-prevalence |
+| 2 Heat × antipsychotics | nordon-2009, martin-latry-2007, chen-2025, bccdc-bcmj-2023, heat-thermoregulation-meta-2024, cdc-heat-medications-2024, va-smi-prevalence |
+| 3 Delivery interruption | fda-clozapine-rems-2025, clozapine-pi, shiovitz-1996, weiden-2017, maxwell-2009, mcclure-2014, griffin-2018, samhsa-42cfr8-2024, va-pharmacy-disaster-relief-plan |
+| 4 Heat × heart failure | alahmad-2023, layton-2020, cdc-heat-medications-2024, hf-daily-weight-education, shannon-2025, va-chf-prevalence |
+| 5 Outage × insulin | fda-insulin-emergency, setoguchi-hennessy-2026, fonseca-2009, ada-sick-day, va-diabetes-prevalence |
+| 6 Outage × dialysis (+DME) | anderson-2009, kelman-2015, lurie-2015, lukowsky-2019, nkf-emergency-diet, ipro-khares, hhs-empower, va-esrd-prevalence |
+| 7 Cold × CV/respiratory | gasparrini-2015, texas-dshs-uri-2021, nws-scn23-44, cdc-co-guidance, aha-snow-shoveling, fda-insulin-emergency |
+| 8 Smoke × COPD/asthma | meek-2023, cdc-smoke-asthma-2023, epa-wildfire-smoke-guide, noaa-hms, respiratory-action-plans |
 
-- **Card 4 attributes a claim to this paper that the paper does not make.** In
-  `cards/04-heat-heart-failure.yaml`, the claim "Extreme heat above the 97th–99th
-  temperature percentiles is linked to roughly a 10–15% rise in HF-related deaths" cites
-  only `setoguchi-hennessy-2026`. The commentary has no heart-failure mortality figures or
-  temperature percentiles. In `card-library.md` the same sentence carries no citation, so
-  the link was added when the card was transcribed. A reviewer should find the claim's
-  real source, or drop it.
-- **Card 5 lists the paper as a source, but none of its claims cites it.** The insulin
-  potency and outage sentences above would support a claim on that card.
-- **It does not support deprescribing advice to patients.** The paper recommends
-  clinician-led deprescribing of unnecessary drugs. This project never advises stopping or
-  changing a medication (CLAUDE.md, constraint 5), so that recommendation stays out of card
-  text.
+## 3. Cross-card consistency rules
 
-## 2. Sources cited by each card
+These rules exist because several cards address the same patient. A veteran with bipolar
+disorder and heart failure, or diabetes and ESRD, receives multiple cards at once; the cards
+must never contradict each other. Card text is written to satisfy these rules, and a test
+should enforce the shared sentences verbatim (see the implementation plan).
 
-Generated from the `sources` lists in `cards/*.yaml` (42 distinct sources). The claim-level
-tiers and `source_ids` in the YAML are engineering placeholders awaiting clinical review
-(see `PROGRESS.md`). A test checks that every source id in the cards appears here.
+1. **Fluid-limit precedence (Cards 1, 4, 6).** A prescribed fluid restriction always takes
+   precedence over any hydration encouragement. Shared sentence, verbatim in all three
+   patient texts: *"If a doctor has given you a fluid limit — for your heart or your kidneys —
+   keep to that limit and call us so we can make a heat plan that is safe for you."* Card 1
+   never quotes a liters-per-day target to patients; the lithium label's 2.5–3 L figure is
+   stabilization-period dosing guidance, not heat advice.
+2. **Carbon-monoxide line (Cards 5, 6, 7, 8 — any card whose event can involve an outage or
+   indoor heating).** Shared sentence, verbatim: *"Never use a generator, grill, camp stove,
+   or charcoal indoors or in a garage — even with the door open. Keep generators outside and
+   away from windows. Use a battery-powered CO alarm."*
+3. **Sealed-windows vs heat (Card 8 vs Cards 1, 2, 4).** Smoke guidance to keep windows
+   closed can cause dangerous indoor heat for heat-sensitive patients. Card 8 carries the
+   escape hatch: *"If it gets too hot inside, go to a cleaner-air or cooling center."*
+4. **Insulin: heat and freezing (Cards 5 and 7).** Card 5 covers heat; Card 7 carries the
+   winter mirror: insulin in an unheated home or car can freeze and must then be discarded.
+5. **Medication holds are clinician-directed (all cards).** Patient text never instructs
+   stopping or changing a medication. Where a hold is clinically indicated (e.g., NSAIDs with
+   lithium in heat), the care-team action reads "prescriber reviews"; the patient text says
+   "don't start" (over-the-counter) or "call us," never "stop."
 
-### Card 1 — `heat-lithium`
+## 4. Contested findings — present as contested
 
-*Extreme Heat × Bipolar Disorder on Lithium*
+- **Antipsychotic thermoregulation mechanism.** The 2024 eClinicalMedicine meta-analysis
+  found no evidence that antipsychotics alter physiological thermoregulation during heat
+  stress. The epidemiological association with heat-related death (Nordon, Martin-Latry,
+  Chen) is consistent and strong. Card 2 states the association firmly and the mechanism
+  tentatively.
+- **Early-dialysis mortality benefit.** Lurie 2015's 30-day mortality result is adjusted
+  OR 0.72 with CI 0.52–0.997 and P = 0.048 — borderline, and not significant unadjusted. The
+  ED-visit and hospitalization benefits are solid. Card 6 recommends early dialysis on the
+  utilization outcomes and does not claim a proven survival benefit.
 
-| Source id | Citation | Also cited by |
-| --- | --- | --- |
-| `cdc-heat-medications-2024` | [CDC "Heat and Medications — Guidance for Clinicians" (2024)](https://restoredcdc.org/www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html) — June 2024 version; page archived early 2025. | Card 2, Card 4 |
-| `fda-lithium-label` | FDA lithium prescribing information | — |
-| `ali-dogar-2025` | Ali & Dogar 2025 (BJPsych Open) | — |
-| `lithium-interaction-pharmacology` | NSAID/ACE-ARB lithium interaction pharmacology | — |
+## 5. Verification queue
 
-### Card 2 — `heat-antipsychotics`
-
-*Extreme Heat × Schizophrenia on Antipsychotics*
-
-| Source id | Citation | Also cited by |
-| --- | --- | --- |
-| `nordon-2009` | Nordon et al. 2009 (Am J Geriatr Psychiatry) | — |
-| `martin-latry` | [Martin-Latry et al. (European Psychiatry)](https://www.sciencedirect.com/science/article/abs/pii/S0924933807013089) | — |
-| `chen-2025` | Chen et al. 2025 (Scientific Reports) and BCCDC/BCMJ report | — |
-| `cdc-heat-medications-2024` | [CDC "Heat and Medications — Guidance for Clinicians" (2024)](https://restoredcdc.org/www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html) | Card 1, Card 4 |
-| `shannon-2025` | Shannon et al. 2025 (JAMA Network Open, 2545524) | — |
-
-### Card 3 — `hurricane-delivery-interruption`
-
-*Hurricane/Flood × Delivery Interruption: Clozapine, LAIs, Methadone*
-
-| Source id | Citation | Also cited by |
-| --- | --- | --- |
-| `fda-clozapine-rems-elimination` | FDA clozapine REMS elimination (June 13, 2025) | — |
-| `clozapine-withdrawal-literature` | Clozapine withdrawal-syndrome case literature | — |
-| `morris-paliperidone` | Morris et al. (paliperidone relapse timing) | — |
-| `samhsa-otp-disaster-guidance` | [SAMHSA OTP disaster take-home/guest-dosing guidance](https://www.pew.org/en/research-and-analysis/articles/2025/02/25/how-states-can-ensure-addiction-treatment-access-during-natural-disasters) | — |
-| `katrina-sandy-otp-studies` | Post-Katrina/Sandy OTP studies | — |
-| `cdc-mmwr-puerto-rico` | CDC MMWR Puerto Rico data | — |
-| `va-pharmacy-disaster-relief-plan` | [VA Pharmacy Disaster Relief Plan](https://www.va.gov/fayetteville-coastal-health-care/programs/pharmacy-disaster-relief-plan/) | — |
-
-### Card 4 — `heat-heart-failure`
-
-*Extreme Heat × Heart Failure on Diuretics / ACE-ARB-ARNI / Beta-blockers*
-
-| Source id | Citation | Also cited by |
-| --- | --- | --- |
-| `cdc-heat-medications-2024` | [CDC "Heat and Medications — Guidance for Clinicians" (2024)](https://restoredcdc.org/www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html) | Card 1, Card 2 |
-| `layton-2020` | [Layton et al., PLOS One 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7728169/) | — |
-| `setoguchi-hennessy-2026` | [Setoguchi & Hennessy, Pharmacoepidemiol Drug Saf 2026](https://pmc.ncbi.nlm.nih.gov/articles/PMC13427620/) | Card 5 |
-| `va-chf-prevalence` | VA CHF prevalence (JAMA Network Open VA cohort) | — |
-
-### Card 5 — `outage-insulin`
-
-*Hurricane/Power Outage × Insulin-Dependent Diabetes*
-
-| Source id | Citation | Also cited by |
-| --- | --- | --- |
-| `fda-insulin-emergency` | [FDA "Information Regarding Insulin Storage and Switching Between Products in an Emergency"](https://www.fda.gov/drugs/emergency-preparedness-drugs/information-regarding-insulin-storage-and-switching-between-products-emergency) | — |
-| `fonseca-2009` | [Fonseca et al., Diabetes Care 2009](https://pubmed.ncbi.nlm.nih.gov/19542210/) | — |
-| `setoguchi-hennessy-2026` | [Setoguchi & Hennessy 2026](https://pmc.ncbi.nlm.nih.gov/articles/PMC13427620/) | Card 4 |
-| `va-diabetes-prevalence` | VA diabetes prevalence (VA Office of Health Equity; Liu et al., Prev Chronic Dis) | — |
-| `cdc-ada-diabetes-disaster` | CDC/ADA diabetes disaster preparedness | — |
-
-### Card 6 — `outage-dialysis`
-
-*Hurricane/Power Outage × Dialysis-Dependent ESRD*
-
-| Source id | Citation | Also cited by |
-| --- | --- | --- |
-| `anderson-2009` | Anderson et al., Kidney International 2009 | — |
-| `kelman-lurie-2015` | [Kelman/Lurie et al., AJKD 2015](https://www.sciencedirect.com/science/article/abs/pii/S0272638614010592) | — |
-| `va-sandy-dialysis-study` | VA Sandy dialysis access study | — |
-| `cms-kcer-emergency-diet` | CMS/KCER 3-Day Emergency Diet and facility preparedness | — |
-| `hhs-empower` | [HHS emPOWER Program documentation (DME categories, REST service)](https://empowerprogram.hhs.gov/about.html) — Electricity-dependent DME sub-panel per docs/card-library-additions.md (Card 6 addendum). | — |
-| `va-ohe-esrd-2022` | VA Office of Health Equity ESRD data (2022) | — |
-
-### Card 7 — `cold-cardio-respiratory`
-
-*Extreme Cold / Winter Storm × Cardiovascular & Respiratory Disease*
-
-| Source id | Citation | Also cited by |
-| --- | --- | --- |
-| `gasparrini-2015` | Gasparrini et al., Lancet 2015 (mortality attributable to cold vs heat, 384 locations) | — |
-| `texas-dshs-uri-2021` | Texas DSHS Winter Storm Uri mortality report (2021) | — |
-| `cdc-co-texas-2021` | CDC carbon monoxide poisoning surveillance, Feb 2021 Texas | — |
-| `cdc-extreme-cold` | CDC extreme-cold clinical and public guidance | — |
-| `aha-cold-weather` | AHA cold-weather cardiovascular guidance | — |
-| `nws-scn23-44` | NWS SCN23-44 (cold-product taxonomy, Oct 2024) — Source of the current product names listed in event_triggers. | — |
-
-### Card 8 — `smoke-copd-asthma`
-
-*Wildfire Smoke × COPD / Asthma on Inhaled Therapies*
-
-| Source id | Citation | Also cited by |
-| --- | --- | --- |
-| `cdc-mmwr-72-34-2023` | CDC MMWR 72(34) 2023 (NY asthma ED surge) | — |
-| `cdc-smoke-day-asthma-2023` | CDC national smoke-day asthma analysis 2023 | — |
-| `epa-wildfire-smoke-guide` | EPA "Wildfire Smoke: A Guide for Public Health Officials" and AirNow Fire & Smoke guidance | — |
-| `nbc-2026-smoke` | NBC News data desk, July 2026 Canadian-wildfire smoke episode (rcna588051) | — |
-| `nasa-svs-5665` | NASA Scientific Visualization Studio | — |
-| `clarity-2026` | Clarity.io open-sensor network report, July 2026 | — |
-| `cnn-2026-07-17` | CNN, 2026/07/17 | — |
-| `noaa-hms` | NOAA HMS product documentation — Smoke-density trigger basis. | — |
-
-## 3. Other reference lists in the repo
-
-- [`card-library.md`](card-library.md) §Wave 2 Candidates & Sources: the sources table
-  with a one-line note of what each supports, and candidate cards not yet built.
-- [`carbon-footprint.md`](carbon-footprint.md): medication and treatment life-cycle carbon.
-- [`guide/data-sources.md`](guide/data-sources.md): the data behind events and panels
-  (VetPop, CDC PLACES, emPOWER, EAGLE-I and the rest), with retrieval dates.
+Pending items, in priority order: (1) fda-lithium-label sweating/fluid language;
+(2) nsaid-class-labeling exact PI text; (3) shannon-2025 figures and population framing;
+(4) shiovitz-1996 and the clozapine-withdrawal timing ("24–48 h"); (5) weiden-2017 primary
+DOI; (6) chen-2025 polypharmacy OR (≥2 antipsychotics) from full text; (7) URL attachments:
+cdc-co-guidance, aha-snow-shoveling, epa-wildfire-smoke-guide, ada-sick-day,
+respiratory-action-plans, hf-daily-weight-education; (8) all VA prevalence anchors. No
+quantitative claim in the card library rests on a pending source.

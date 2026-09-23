@@ -10,11 +10,11 @@
   <div class="where">{{ facility.name if facility else any.scope_id }} · until {{ any.window_end.strftime('%b %d, %H:%MZ') }}</div>
   {% if it and (it.actions or it.message) %}
     <ul class="say">
-      {% if it.actions %}{% for a in it.actions %}<li>{{ a.text }}</li>{% endfor %}{% else %}<li>{{ it.message }}</li>{% endif %}
+      {% if it.actions %}{% for a in it.actions %}<li>{{ a.text|tel_links }}</li>{% endfor %}{% else %}<li>{{ it.message|tel_links }}</li>{% endif %}
     </ul>
     {% if c.caregiver and c.caregiver.message %}
       <p class="cg">If you are helping someone with this:</p>
-      <ul class="say">{% for a in c.caregiver.actions %}<li>{{ a.text }}</li>{% endfor %}</ul>
+      <ul class="say">{% for a in c.caregiver.actions %}<li>{{ a.text|tel_links }}</li>{% endfor %}</ul>
     {% endif %}
     {% if it.safety_message %}<div class="safety">{{ it.safety_message }}</div>{% endif %}
     <div class="call">

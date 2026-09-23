@@ -704,12 +704,18 @@ def test_card_detail_is_verbatim_and_complete(client: TestClient) -> None:
     from xevents.cards import load_cards
     from xevents.engine import safety_message
     from xevents.profiles import PROFILES_DIR, load_profile
+    from xevents.web.views import tel_links
 
     profile = load_profile(PROFILES_DIR / "va.yaml")
     for card in load_cards():
         html = client.get(f"/card-library/{card.id}").text
-        for a in [*card.actions.care_team, *card.actions.patient, *card.actions.caregiver]:
+        for a in card.actions.care_team:
             assert str(escape(a.text)) in html, (card.id, a.text[:40])
+        for a in [
+            *card.actions.patient,
+            *card.actions.caregiver,
+        ]:  # phone numbers become tel: links
+            assert str(tel_links(a.text)) in html, (card.id, a.text[:40])
         for e in card.escalation:
             assert str(escape(e.signs)) in html, (card.id, e.signs[:40])
             assert str(escape(e.response or profile.escalation_default)) in html

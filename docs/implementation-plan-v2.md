@@ -41,7 +41,7 @@ Touch: `scripts/build_empower.py`, `fixtures/reference/empower.csv`, `src/xevent
 1. Build script pulls the public emPOWER REST service (ZIP + county), records vintage month in the header; cached reference data, manual refresh.
 2. `empower_dme` denominator source with county/ZIP → catchment rollup.
 3. Dual-denominator display + ranking rule (`outage_pct × empower_dme_count`) with formula provenance; Medicare-proxy label mandatory.
-4. Card 6: add `electricity_dependent_dme` sub-panel (device_classes `system: empower`), clinical strings transcribed verbatim from `docs/card-library-additions.md` §Card-6-addendum.
+4. Card 6: add `electricity_dependent_dme` sub-panel (device_classes `system: empower`), clinical strings transcribed verbatim from `docs/card-library.md` §Card 6 sub-panel (formerly card-library-additions.md).
 
 *Done when:* an outage item for a fixture county shows both numbers with correct provenance text; ranking test proves emPOWER multiplier ordering; Card 6 revalidates.
 
@@ -49,7 +49,7 @@ Touch: `scripts/build_empower.py`, `fixtures/reference/empower.csv`, `src/xevent
 
 Touch: `cards/07-cold-cardio-respiratory.yaml`, `cards/08-smoke-copd-asthma.yaml`, `src/xevents/engine.py` (boost), `profiles/va.yaml` (acuity classes for cold/smoke; `co_occurrence_boost` config), denominator keys (PLACES CHD/COPD/asthma already loaded in M3 — add any missing profile keys).
 
-1. Transcribe Cards 7 and 8 from `docs/card-library-additions.md` — clinical strings verbatim; tiered claims with sources; schema-valid.
+1. Transcribe Cards 7 and 8 from `docs/card-library.md` (formerly card-library-additions.md) — clinical strings verbatim; tiered claims with sources; schema-valid.
 2. Boost per requirements §4: acuity bump + `compounding_events` annotation (new optional ActionItem field, persisted through `store.py`), symmetric annotation, deterministic.
 3. Extend the NWS provider's accepted event set with the cold/winter products (normalized names).
 
@@ -73,7 +73,7 @@ Touch: `fixtures/events/uri_2021/`, `ian_2022/` (upgrade), `smoke_canada_2026/`,
 - Every `Event` must carry `temporality`; provider mapping tables are data, raw source values preserved in `metrics`.
 - EAGLE-I attribution string is mandatory wherever outage data renders: "Electric customer outage data provided by EAGLE-I, Department of Energy." Customers are meters, not people — say so in provenance.
 - emPOWER numbers are always labeled as measured Medicare proxy; they never replace veteran denominators.
-- Cards 7/8 clinical strings come only from `docs/card-library-additions.md`; legacy NWS cold-product names are normalized in the provider, never listed in cards.
+- Cards 7/8 clinical strings come only from `docs/card-library.md` (formerly card-library-additions.md); legacy NWS cold-product names are normalized in the provider, never listed in cards.
 - No compound trigger grammar — compounding is the engine boost only (backlog item for grammar).
 
 ## Risks

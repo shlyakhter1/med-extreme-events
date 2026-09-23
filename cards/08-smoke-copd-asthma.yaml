@@ -1,13 +1,14 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library-additions.md — Card 8. Clinical strings are verbatim; do not edit in code.
+# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 8. Clinical strings
+# are verbatim; do not edit in code. [SHARED] markers are library markup and are stripped.
 id: smoke-copd-asthma
-version: 1.0.0
+version: 1.1.0
 number: 8
 title: Wildfire Smoke × COPD / Asthma on Inhaled Therapies
 summary: >-
-  Wildfire smoke's fine particulate matter (PM2.5) triggers bronchoconstriction, airway
-  inflammation, and exacerbations in asthma/COPD, and cardiovascular events in susceptible
-  patients.
+  Wildfire smoke's principal hazard is PM2.5, which penetrates deep into the airways,
+  triggering bronchoconstriction, airway inflammation, and exacerbations in asthma/COPD, and
+  cardiovascular events in susceptible patients.
 
 event_triggers:
   - type: air_pollution
@@ -45,111 +46,113 @@ actions:
   care_team:
     - phase: pre_event
       text: >-
-        Generate the asthma/COPD roster; auto-message the smoke-forecast alert with
-        action-plan reminders.
+        Asthma/COPD roster; auto-message the smoke-forecast alert with action-plan reminders.
     - phase: pre_event
       text: >-
         Verify rescue-inhaler supply (push refills for anyone low); confirm controller
         adherence.
     - phase: pre_event
       text: >-
-        Distribute clean-air guidance: HEPA purifier or DIY box-fan filter, AC on
-        recirculate, windows closed; N95s for unavoidable outdoor time.
-    - phase: pre_event
+        Distribute clean-air guidance (below); flag outdoor workers and homeless patients for
+        respite/clean-air-shelter coordination; reschedule outdoor appointments and pulmonary
+        rehab.
+    - phase: during_event
       text: >-
-        Flag outdoor workers and homeless patients for respite/clean-air-shelter
-        coordination; reschedule outdoor appointments and pulmonary rehab.
-    - phase: during_event
-      text: Monitor AQI by facility ZIP.
-    - phase: during_event
-      text: Telehealth-first for respiratory complaints.
-    - phase: during_event
-      text: Low threshold for early exacerbation treatment per action plans.
-    - phase: during_event
-      text: Track ED-surge signal locally.
+        Monitor AQI by facility ZIP; telehealth-first for respiratory complaints; low
+        threshold for early exacerbation treatment per the patient's written action plan;
+        watch the local ED-surge signal.
   patient:
     - text: Wildfire smoke can set off your asthma or COPD even indoors.
     - text: >-
-        Stay inside with windows closed and the AC on recirculate; use an air purifier if
-        you have one.
+        When the air quality index is over 100, limit your time outside; over 150, stay
+        inside if you can.
+    - text: >-
+        Keep windows closed and run the AC on recirculate, with the best filter it takes.
+    - text: >-
+        A well-fitted N95 helps if you must go out — cloth and surgical masks don't block
+        smoke.
+    - text: >-
+        A box fan with a MERV-13 filter taped to it can help as a temporary fix; don't leave
+        it running unattended.
     - text: >-
         Keep your rescue inhaler with you and make sure it isn't empty — call us now if you
         need a refill.
-    - text: If you must go out, an N95 mask helps; cloth masks don't.
-    - text: Follow your action plan, and don't wait to treat early symptoms.
+    - text: >-
+        Follow your asthma or COPD action plan, and don't wait to treat early symptoms.
+    - text: >-
+        If the power is out: Never use a generator, grill, camp stove, or charcoal indoors or
+        in a garage — even with the door open. Keep generators outside and away from windows.
+        Use a battery-powered CO alarm.
+    - text: If it gets too hot inside, go to a cleaner-air or cooling center.
   caregiver: []
 
 escalation:
   - signs: >-
-      Using the rescue inhaler more often than your action plan allows, or it isn't
-      helping
-    response: call same-day
+      Rescue inhaler needed more often than the action plan allows, or not helping
+    response: same-day call
     emergency: false
   - signs: >-
-      Severe shortness of breath, can't speak full sentences, chest tightness not relieved
-      by the inhaler, or blue lips
+      Severe shortness of breath, can't speak full sentences, chest tightness unrelieved by
+      the inhaler, or blue lips
     response: 911/ED
     emergency: true
-  - signs: Any cardiac symptoms (chest pain, palpitations) during smoke days
+  - signs: Chest pain or palpitations on smoke days
     response: urgent contact
     emergency: false
 
 evidence_tier: strong
 evidence:
   mechanism: >-
-    Wildfire smoke's principal hazard is fine particulate matter (PM2.5), which penetrates
-    deep into the airways and bloodstream, triggering bronchoconstriction, airway
-    inflammation, and exacerbations in asthma/COPD, and cardiovascular events in
-    susceptible patients (EPA/CDC wildfire-smoke guidance).
+    Wildfire smoke's principal hazard is PM2.5, which penetrates deep into the airways,
+    triggering bronchoconstriction, airway inflammation, and exacerbations in asthma/COPD,
+    and cardiovascular events in susceptible patients.
   claims:
     - text: >-
-        During the June 2023 Canadian-wildfire smoke event, New York State
-        asthma-associated ED visits rose 81.9% statewide on the peak day (June 7), from a
-        baseline mean of ~81 to 147 visits; CDC's national analysis found asthma ED visits
-        17% above expected across 19 smoke days.
-      tier: strong
-      source_ids: [cdc-mmwr-72-34-2023, cdc-smoke-day-asthma-2023]
-    - text: >-
-        July 14–20, 2026 Canadian-wildfire smoke episode: more than 100 million people in
-        the US under air-quality alerts from Milwaukee to Washington DC; daily-average
-        PM2.5 near 200 µg/m³ in the Baltimore–DC area on July 17 prompting Code Purple
-        alerts; hourly AQI above 200 across Upper Midwest/Great Lakes monitors July 16–17,
-        co-occurring with a central-US heat dome — the replay-fixture event.
-      tier: strong
-      source_ids: [nbc-2026-smoke, nasa-svs-5665, clarity-2026, cnn-2026-07-17]
-    - text: >-
-        EPA/CDC wildfire smoke guides: stay indoors with windows closed and AC on
-        recirculate, HEPA/clean-room use, N95 respirators when outdoor exposure is
-        unavoidable, pre-check rescue-inhaler supply, follow the written asthma/COPD action
-        plan.
+        Wildfire smoke's principal hazard is PM2.5, which penetrates deep into the airways,
+        triggering bronchoconstriction, airway inflammation, and exacerbations in asthma/COPD,
+        and cardiovascular events in susceptible patients.
       tier: expert_guidance
       source_ids: [epa-wildfire-smoke-guide]
-  caveats: []
+    - text: >-
+        During the June 2023 smoke event, asthma-associated ED visits in New York State
+        (excluding NYC; 134 EDs) rose 81.9% on June 7 versus the June 1–5 mean.
+      tier: strong
+      source_ids: [meek-2023]
+    - text: >-
+        Nationally, asthma ED visits were 17% above expected across the 19 smoke days (AQI
+        ≥101) of April–August 2023.
+      tier: strong
+      source_ids: [cdc-smoke-asthma-2023]
+  caveats:
+    - The 81.9% figure is New York State excluding NYC.
+    - DIY box-fan filtration is an EPA-described temporary option, not an endorsement.
+    - >-
+      The keep-windows-closed advice carries the overheating escape hatch
+      (medical-references.md §3.3).
 
 sources:
-  - id: cdc-mmwr-72-34-2023
-    citation: CDC MMWR 72(34) 2023 (NY asthma ED surge)
+  - id: meek-2023
+    citation: >-
+      Meek HC et al. Notes from the Field: Asthma-Associated ED Visits During a Wildfire Smoke
+      Event — New York, June 2023. MMWR 2023;72(34):933–5.
+    url: https://doi.org/10.15585/mmwr.mm7234a6
     year: 2023
-  - id: cdc-smoke-day-asthma-2023
-    citation: CDC national smoke-day asthma analysis 2023
+  - id: cdc-smoke-asthma-2023
+    citation: >-
+      CDC. Asthma-Associated ED Visits During the Canadian Wildfire Smoke Episodes — United
+      States, April–August 2023. MMWR 2023;72(34).
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10468220/
     year: 2023
   - id: epa-wildfire-smoke-guide
-    citation: 'EPA "Wildfire Smoke: A Guide for Public Health Officials" and AirNow Fire & Smoke guidance'
-  - id: nbc-2026-smoke
-    citation: NBC News data desk, July 2026 Canadian-wildfire smoke episode (rcna588051)
-    year: 2026
-  - id: nasa-svs-5665
-    citation: NASA Scientific Visualization Studio #5665
-    year: 2026
-  - id: clarity-2026
-    citation: Clarity.io open-sensor network report, July 2026
-    year: 2026
-  - id: cnn-2026-07-17
-    citation: CNN, 2026/07/17
-    year: 2026
+    citation: >-
+      EPA, "Wildfire Smoke: A Guide for Public Health Officials"; AirNow Fire & Smoke guidance
+    note: URLs pending.
   - id: noaa-hms
-    citation: NOAA HMS product documentation
+    citation: NOAA Hazard Mapping System smoke product documentation
     note: Smoke-density trigger basis.
+  - id: respiratory-action-plans
+    citation: GINA (asthma) / GOLD (COPD) written action-plan guidance
+    note: URLs pending.
 
 window_days: {min: 1, max: 3}
 safety:

@@ -163,6 +163,8 @@ a.rank-row:hover, button.rank-row:hover, .rank-row.clickable:hover { background:
 .stat-block .v span { font-size:13px; color:var(--muted); }
 .stat-block .q { font-size:12px; color:var(--faint); margin-top:4px; }
 .stat-block details { margin-top:9px; }
+.est-kind { color:var(--ink-2); font-weight:600; }
+.est-kind[data-kind="planning_estimate"] { color:var(--warn-ink); }
 .stat-block details > div { font-size:12px; color:var(--ink-2); margin-top:6px; overflow-wrap:anywhere; }
 .stat-block details .comp { margin-left:14px; }
 

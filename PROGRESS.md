@@ -1,6 +1,81 @@
 # PROGRESS
 
-Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
+Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10, then
+M11 → M12 from `docs/implementation-plan-clinical.md`).
+
+## 2026-09-23 — M12: consistency guards, phase handling, provenance polish (done)
+
+**Done.** `make lint test` green (317 passed, 9 skipped). Goldens regenerated with
+`UPDATE_GOLDEN=all`: **zero diff** in all five scenarios. The review changed text, versions
+and source ids only, which is what the plan requires. The `make demo` pipeline runs clean from an empty
+DB (run against a scratch DB so the local `demo.db` was left alone); the card, facility and
+patient pages were smoke-tested against it.
+- `tests/test_clinical_consistency.py` covers medical-references §3. The fluid-limit sentence
+  is byte-identical on Cards 1/4/6 and the CO sentence on 5/6/7/8; Card 8 has the
+  cleaner-air/cooling escape hatch and Card 7 the insulin-freeze line; Card 1's patient text
+  has no liters-per-day figure; and no patient/caregiver string or safety line tells anyone
+  to stop, hold, skip or change "your …" (negated forms are allowed). The shared sentences
+  are read from §3 itself, not restated. **Mutation-checked:** 12 parametrized
+  perturbations, and each one must trip its guard.
+- Post-event action: **option A** shipped. Card 1's "After the event: …" is a
+  `during_event` care-team item, and the YAML has a comment explaining why. Option B
+  (`post_event` phase) is written up as a backlog entry in `docs/requirements-v2.md` §9.
+- Provenance: `Estimate.kind` (`planning_estimate | modeled_estimate | measured`), with
+  `EstimateKind` in models. The estimator sets it (rate/count/share → planning; PLACES →
+  modeled; emPOWER → measured; lower-bound and upper-bound panels inherit it). Planning
+  panels also carry `PLANNING_CAVEAT`. The popover and stat line render the label.
+  `profiles/va.yaml` sources now name their `va-*-prevalence` anchor ids. No data or number
+  changed.
+- Hotlines: a `tel_links` Jinja filter escapes the text and wraps only the phone digits in
+  `tel:` links. It is applied to patient and caregiver text (card page, patient card) and to
+  hook phones. Card 6 renders KHARES and legacy KCER as two links. The `kcer_hotline` hook
+  now names KHARES and has a `TODO(2026-Q4)` to drop the legacy number, and so does the
+  card YAML.
+- Contested findings: the card page renders `evidence.caveats` (verified); tests pin Card 2's
+  contested mechanism and Card 6's borderline survival signal on the page.
+
+**For the clinical reviewer.**
+- Card 6 has no mechanism paragraph in the reviewed library. `evidence.mechanism` is
+  required, so the v1 sentence ("Disasters cut transportation, power, and water …") was
+  kept, with a YAML comment. Card `summary` fields are sentences quoted from each card's
+  library text (Card 6's is its Katrina magnitude sentence).
+- The HFrEF ACE/ARB/ARNI share (0.62), which narrows Card 4's panel, and the ~510,000 VHA
+  HF national anchor come from the v1 library and are not restated in the review. They were
+  kept, so panels and goldens do not change, and they are labeled planning estimates.
+- Card-level `evidence_tier` values are unchanged: Card 3 stays `inferential`, although
+  most of its claims are now `strong`. The library assigns tiers per claim only.
+
+**Next:** after one green release, delete `REMOVED_SOURCE_IDS` and its test in
+`tests/test_cards.py`. Then the verification queue (medical-references §5) and caregiver text,
+both reviewer work.
+
+## 2026-09-23 — M11: adopt the reviewed card library (done)
+
+**Done.** `make lint test` green.
+- `docs/card-library.md` and `docs/medical-references.md` were replaced by the clinical-review
+  versions, and `docs/card-library-additions.md` was deleted (merged). Inbound links were
+  fixed in the guide, requirements-v2, implementation-plan-v2, CLAUDE.md and `carbon.py`. A
+  new test checks that every relative link in `docs/`, README and CLAUDE.md resolves
+  (47 links). The library header now documents the transcription rule: `[SHARED]` and
+  `[tier | ids]` markers and `*emphasis*` are stripped.
+- **All eight cards re-transcribed** from the library. The plan assigned this to the
+  maintainer; it was done here so the suite could go green. **It needs a maintainer diff
+  review.** Patient, care-team, escalation, claim and caveat strings are verbatim, and a test
+  now enforces all five against the library, not just patient text. Triggers, selectors,
+  `window_days`, acuity and hooks are untouched. Versions: 1/3/4/6 → 2.0.0; 2 → 1.1.0;
+  5 → 1.2.0; 7/8 → 1.1.0.
+- Source ids migrated to the new index. `setoguchi-hennessy-2026` is now cited only on
+  Card 5, which fixes the known-wrong Card 4 claim. Card 8's July-2026 replay-context claim
+  and its four news sources are gone, because they are not in the reviewed library. Tests:
+  every cited id is in §1; each card's ids equal its §2 row exactly; no figure-bearing claim
+  rests only on `pending` sources (§1 status parsed; "PM2.5" is not a figure); a temporary
+  `REMOVED_SOURCE_IDS` guard; no string or page contains `[SHARED]`.
+- `docs/card-reference-for-frontend.md` now has a per-card facts table generated from the
+  YAML (`make card-docs`, `scripts/card_docs.py`), with a freshness test. Stale hand counts
+  were removed, and the Card 6 note now covers both hotlines.
+- Claim tiers are clinically assigned; the "engineering placeholders" caveat was removed
+  from the guide and marked superseded in the M0 entry.
+
 
 ## 2026-09-23 — guide review; medical references
 
@@ -1219,7 +1294,8 @@ intersection if PostGIS friction appears.
   not representable, so weak/folklore claims cannot be published. Claim-level tiers were
   assigned per the card library's own tier definitions (case reports and non-significant
   subgroups → `inferential`); card-level `evidence_tier` must match the tier of at least one
-  claim. **Needs clinical reviewer confirmation.**
+  claim. ~~Needs clinical reviewer confirmation.~~ *Superseded 2026-09-23 (M11): claim tiers
+  and source ids are now clinically assigned in `docs/card-library.md`.*
 - Heat triggers list both `Excessive Heat Warning` (pre-2025 NWS name, used by the 2021
   heat-dome fixture) and `Extreme Heat Warning` (current name).
 - Terminology bindings: conditions as ICD-10-CM, medication classes as ATC, devices as

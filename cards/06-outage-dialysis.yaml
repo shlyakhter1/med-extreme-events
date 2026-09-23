@@ -1,13 +1,17 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library.md — Card 6. Clinical strings are verbatim; do not edit in code.
+# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 6 and its
+# electricity-dependent DME sub-panel. Clinical strings are verbatim; do not edit in code.
+# [SHARED] markers are library markup and are stripped.
+# TODO(2026-Q4): drop the legacy KCER number (1-866-901-3773) from the patient text once the
+# line is confirmed retired (ipro-khares); the change goes through the card library first.
 id: outage-dialysis
-version: 1.2.0
+version: 2.0.0
 number: 6
-title: Hurricane/Power Outage × Dialysis-Dependent ESRD
+title: Hurricane / Power Outage × Dialysis-Dependent ESRD
 summary: >-
-  Disasters cut transportation, power, and water, forcing missed dialysis sessions →
-  fluid overload, hyperkalemia, and uremia that can be fatal. Early dialysis before
-  landfall is the single most evidence-backed intervention.
+  After Katrina (n = 386), 44% of hemodialysis patients missed at least one session and ~17%
+  missed three or more; missing ≥3 sessions was associated with hospitalization (adjusted OR
+  2.16, 1.05–4.43).
 
 event_triggers:
   - type: hurricane_flood
@@ -35,9 +39,8 @@ population_selector:
     - empower_electricity_dependent
   denominator_key: dialysis
   denominator_note: >-
-    Denominator anchor: >52,000 veterans on dialysis; ~13,000 new kidney-failure
-    cases/year; VA historically finances ~60% of these veterans' dialysis, mostly in
-    community units. Cross-reference HHS emPOWER ZIP-level electricity-dependent counts.
+    Panel sizing uses the VA ESRD planning anchor (>52,000 veterans on dialysis — planning
+    anchor).
   sub_panels:
     - key: electricity_dependent_dme
       label: Electricity-dependent DME at home
@@ -49,130 +52,156 @@ population_selector:
         - empower_electricity_dependent
       denominator_key: empower_dme
       note: >-
-        Denominator: emPOWER county/ZIP counts (measured Medicare proxy — label as such).
+        Denominator: emPOWER county/ZIP counts — a measured Medicare proxy (>4.6M at-risk
+        beneficiaries nationally, >3M with electricity-dependent DME), always labeled as such,
+        never a veteran count.
 
 actions:
   care_team:
     - phase: pre_event
       text: >-
-        Pre-schedule early dialysis for all patients before projected landfall/outage — the
-        single most evidence-backed intervention.
+        Pre-schedule early dialysis for the full panel before projected landfall/outage
+        (observational evidence of fewer ED visits and hospitalizations).
+    - phase: pre_event
+      text: Confirm each patient's backup facility assignment and transportation plan.
+    - phase: pre_event
+      text: Push the 3-day emergency renal diet plan; confirm patients have the supplies for it.
     - phase: pre_event
       text: >-
-        Verify each patient's transportation plan and a backup/partner facility; confirm
-        generator/water status and KCER/ESRD-network facility-status reporting.
+        Home HD/PD patients: confirm backup power/water plan and a fallback in-center slot.
     - phase: pre_event
       text: >-
-        Distribute the CMS/KCER 3-day emergency renal diet (~2 cups fluid/day, strict
-        potassium limits) and an emergency kit (med list + ≥3-day supply, dry weight,
-        dialysis prescription, contacts).
-    - phase: pre_event
+        Confirm backup power (battery hours, generator) and supplier contacts; register
+        eligible patients with utility medical-baseline/priority-restoration programs;
+        identify the nearest powered facility or medical shelter; oxygen users: confirm backup
+        cylinders and conserving devices.
+    - phase: during_event
       text: >-
-        Home dialysis: confirm backup power/water and manual PD capability; flag to
-        emPOWER/utility priority-restoration lists.
-    - phase: pre_event
-      text: >-
-        Confirm backup power (battery/generator) and supplier contact for each flagged
-        patient; register eligible patients with utility medical-baseline/priority-restoration
-        programs; identify the nearest powered facility or shelter accepting medical
-        equipment; for oxygen users, confirm backup cylinders and conserving devices.
-    - phase: during_event
-      text: Activate the KCER hotline / ESRD-network coordination.
-    - phase: during_event
-      text: Track against a missed-session list.
-    - phase: during_event
-      text: Arrange emergency dialysis or transfer (Brooklyn VAMC model).
-    - phase: during_event
-      text: Triage hyperkalemia/fluid overload.
-    - phase: during_event
-      text: Start the 3-day emergency diet immediately in a widespread disaster.
+        Track facility operational status; re-route to backup units; prioritize patients
+        approaching 3 missed sessions; document session gaps.
   patient:
-    - text: Missing dialysis in a disaster can be life-threatening.
-    - text: If a storm or outage is coming, get your dialysis EARLY — before it hits.
-    - text: Know a second center and how you'll get there.
     - text: >-
-        If you can't get treatment, start the 3-day emergency diet right away: about 2
-        cups of fluid a day and no high-potassium foods (bananas, oranges, potatoes, salt
-        substitutes).
-    - text: Keep a 3-day supply of your medicines and your dialysis info with you.
-    - text: Call the KCER hotline (1-866-901-3773) or your center.
+        If a storm or outage is coming, your dialysis center may move your treatment earlier
+        — please go, even if the day changes; getting dialysis before the storm protects you.
     - text: >-
-        If your medical equipment needs electricity, plan for an outage now: know your backup
-        battery time, keep supplier and utility numbers handy, and know where you'd go if
-        power stays out. If you use oxygen, ask us about backup cylinders. If your equipment
-        stops and you can't restore power, call us or 911 — don't wait.
+        If you can't reach your center, call your backup center, or the national kidney
+        emergency line (KHARES: 866-446-3507; older KCER number: 1-866-901-3773).
+    - text: >-
+        If you must wait for dialysis, follow your 3-day emergency diet: very little fluid
+        (about 2 cups a day), and avoid high-potassium and high-salt foods.
+    - text: >-
+        If a doctor has given you a fluid limit — for your heart or your kidneys — keep to
+        that limit and call us so we can make a heat plan that is safe for you.
+    - text: >-
+        Never use a generator, grill, camp stove, or charcoal indoors or in a garage — even
+        with the door open. Keep generators outside and away from windows. Use a
+        battery-powered CO alarm.
+    - text: >-
+        If your medical equipment needs electricity, plan for an outage now: know how long
+        your backup battery lasts, keep your supplier's and utility's numbers handy, and know
+        where you would go if the power stays out.
+    - text: If you use oxygen, ask us about backup cylinders.
+    - text: If your equipment stops and you can't restore power, call us or 911 — don't wait.
   caregiver: []
 
 escalation:
-  - signs: Missed ≥1 scheduled session with no rescheduled slot
-    response: null
+  - signs: About to miss a 2nd session
+    response: same-day placement search
     emergency: false
   - signs: >-
-      Fluid overload (severe shortness of breath, can't lie flat, rapid weight
-      gain/swelling)
-    response: emergency
+      Missed ≥3 sessions, or breathlessness, chest pain, confusion, or severe weakness
+      (hyperkalemia/fluid overload)
+    response: ED, tell them the last dialysis date
     emergency: true
-  - signs: Hyperkalemia (muscle weakness, palpitations, chest pain)
-    response: emergency
-    emergency: true
-  - signs: Confusion
-    response: null
-    emergency: false
-  - signs: >-
-      Equipment on backup power with less than 4 hours remaining and no restoration
-      estimate
+  - signs: Backup power under 4 hours with no restoration estimate
     response: call now for relocation
     emergency: false
   - signs: Oxygen interruption with breathlessness
-    response: emergency
+    response: "911"
     emergency: true
 
 evidence_tier: strong
 evidence:
+  # The reviewed library gives Card 6 no mechanism paragraph; this sentence is carried over
+  # from the previously reviewed library (v1.2.0) and is flagged for the clinical reviewer.
   mechanism: >-
-    Disasters cut transportation, power, and water, forcing missed sessions → fluid
-    overload, hyperkalemia, and uremia that can be fatal.
+    Disasters cut transportation, power, and water, forcing missed sessions → fluid overload,
+    hyperkalemia, and uremia that can be fatal.
   claims:
     - text: >-
-        Post-Katrina: ~44% of New Orleans HD patients missed ≥1 session, ~17% missed ≥3;
-        missing ≥3 sessions carried adjusted OR 2.16 (95% CI 1.05–4.43) for
-        hospitalization.
+        After Katrina (n = 386), 44% of hemodialysis patients missed at least one session and
+        ~17% missed three or more; missing ≥3 sessions was associated with hospitalization
+        (adjusted OR 2.16, 1.05–4.43).
       tier: strong
       source_ids: [anderson-2009]
     - text: >-
-        Post-Sandy (13,264 ESRD patients): ED visits, hospitalizations, and 30-day
-        mortality all elevated; early dialysis before landfall was associated with lower
-        adjusted odds of ED visits (OR 0.80), hospitalization (OR 0.79), and 30-day
-        mortality (OR ~0.72).
+        After Sandy, ED visits, hospitalizations, and 30-day mortality were elevated among
+        dialysis patients.
       tier: strong
-      source_ids: [kelman-lurie-2015]
+      source_ids: [kelman-2015]
     - text: >-
-        VA precedent: essentially all Manhattan VA ESRD patients missed ≥1 treatment
-        during Sandy; hemodialysis was re-established at Brooklyn VAMC once transport
-        resumed.
-      tier: inferential
-      source_ids: [va-sandy-dialysis-study]
-  caveats: []
+        Receiving dialysis early, before landfall, was associated with lower odds of ED visits
+        (OR 0.80, 0.67–0.96) and hospitalization (OR 0.79, 0.66–0.94) among 13,836 patients;
+        the 30-day mortality result was borderline (adjusted OR 0.72, 0.52–0.997; P = 0.048).
+      tier: strong
+      source_ids: [lurie-2015]
+    - text: >-
+        VA precedent: the Manhattan VAMC dialysis unit closed from Oct 28, 2012 to mid-March
+        2013; the median gap between sessions was 5 days, and the Brooklyn campus absorbed
+        most displaced care.
+      tier: strong
+      source_ids: [lukowsky-2019]
+    - text: >-
+        Denominator: emPOWER county/ZIP counts — a measured Medicare proxy (>4.6M at-risk
+        beneficiaries nationally, >3M with electricity-dependent DME), always labeled as such,
+        never a veteran count.
+      tier: strong
+      source_ids: [hhs-empower]
+  caveats:
+    - >-
+      Early-dialysis evidence is observational; the survival signal is borderline
+      (medical-references.md §4).
+    - The emergency-diet fluid figure applies only while dialysis is delayed.
 
 sources:
   - id: anderson-2009
-    citation: Anderson et al., Kidney International 2009
+    citation: >-
+      Anderson AH et al. Missed dialysis sessions and hospitalization in hemodialysis patients
+      after Hurricane Katrina. Kidney Int 2009;75(11):1202–8.
+    url: https://doi.org/10.1038/ki.2009.5
     year: 2009
-  - id: kelman-lurie-2015
-    citation: Kelman/Lurie et al., AJKD 2015
-    url: https://www.sciencedirect.com/science/article/abs/pii/S0272638614010592
+  - id: kelman-2015
+    citation: >-
+      Kelman J et al. Dialysis care and death following Hurricane Sandy. AJKD
+      2015;65(1):109–15.
+    url: https://doi.org/10.1053/j.ajkd.2014.07.005
     year: 2015
-  - id: va-sandy-dialysis-study
-    citation: VA Sandy dialysis access study
-  - id: cms-kcer-emergency-diet
-    citation: CMS/KCER 3-Day Emergency Diet and facility preparedness
+  - id: lurie-2015
+    citation: >-
+      Lurie N et al. Early dialysis and adverse outcomes after Hurricane Sandy. AJKD
+      2015;66(3):507–12.
+    url: https://doi.org/10.1053/j.ajkd.2015.04.050
+    year: 2015
+  - id: lukowsky-2019
+    citation: >-
+      Lukowsky LR et al. Access to Care for VA Dialysis Patients During Superstorm Sandy. J
+      Prim Care Community Health 2019;10.
+    url: https://doi.org/10.1177/2150132719863599
+    year: 2019
+  - id: nkf-emergency-diet
+    citation: National Kidney Foundation, Emergency Meal Planning for Patients on Dialysis
+  - id: ipro-khares
+    citation: >-
+      IPRO ESRD Network, Kidney Health Assistance and Emergency Support (KHARES) — CMS national
+      kidney emergency support contractor effective May 1, 2026
+    note: Legacy KCER line kept until confirmed retired.
   - id: hhs-empower
-    citation: HHS emPOWER Program documentation (DME categories, REST service)
+    citation: HHS emPOWER Program FAQ
     url: https://empowerprogram.hhs.gov/about.html
-    note: Electricity-dependent DME sub-panel per docs/card-library-additions.md (Card 6 addendum).
-  - id: va-ohe-esrd-2022
-    citation: VA Office of Health Equity ESRD data (2022)
-    year: 2022
+    note: Figures update monthly — treat as order-of-magnitude.
+  - id: va-esrd-prevalence
+    citation: VA ESRD anchor (>52,000 veterans on dialysis)
+    note: Planning estimate for panel sizing only; awaits its primary VA source.
 
 window_days: {min: 3, max: 7}
 safety:

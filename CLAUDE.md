@@ -9,8 +9,9 @@ Read before any work:
 - `docs/implementation-plan-v2.md` — milestones M6–M10 (temporality, EAGLE-I outages, emPOWER, Cards 7–8)
 - `docs/requirements.md` — system concept, data model, architecture (§7 has the action-item schema)
 - `docs/requirements-v2.md` — temporality axis, trigger schema v2, outage provider, co-occurrence boost (settled decisions; do not reopen)
-- `docs/card-library.md` — the six clinical cards; the source of truth for all card YAML content
-- `docs/card-library-additions.md` — Cards 7, 8 and the Card 6 addendum; the only source for their clinical strings
+- `docs/implementation-plan-clinical.md` — milestones M11–M12 (adopting the 2026-09-23 clinical review)
+- `docs/card-library.md` — all eight clinical cards (+ Card 6 DME sub-panel), clinically reviewed; the only source for card YAML clinical strings
+- `docs/medical-references.md` — the reference index: source ids + verification status (§1), ids by card (§2), cross-card consistency rules (§3)
 
 Repo home: `shlyakhter1` GitHub. Stack: Python 3.12, FastAPI, SQLAlchemy + PostgreSQL/PostGIS (SQLite+SpatiaLite fallback), Pydantic v2, httpx, Jinja2 + htmx, pytest, ruff + mypy, Makefile entry points.
 
@@ -26,7 +27,7 @@ Repo home: `shlyakhter1` GitHub. Stack: Python 3.12, FastAPI, SQLAlchemy + Postg
 
 ## Working agreement
 
-- One milestone per session, in order M0 → … → M5 (`docs/implementation-plan.md`), then M6 → … → M10 (`docs/implementation-plan-v2.md`).
+- One milestone per session, in order M0 → … → M5 (`docs/implementation-plan.md`), then M6 → … → M10 (`docs/implementation-plan-v2.md`), then M11 → M12 (`docs/implementation-plan-clinical.md`).
 - A milestone is finished only when its *Done when* in the implementation plan is verified and `make lint test` is green.
 - End every session with a short dated entry in `PROGRESS.md`: what was done, decisions made, what's next.
 - Golden scenario tests are the engine's contract: replaying `fixtures/events/heat_dome_2021` and `ian_2022` must produce the expected action-item sets exactly.
@@ -37,7 +38,7 @@ Repo home: `shlyakhter1` GitHub. Stack: Python 3.12, FastAPI, SQLAlchemy + Postg
 - Every `Event` must carry `temporality` (`forecast | imminent | observed`); provider mapping tables are data, and the raw source basis is preserved in `metrics` (`temporality_basis`, `raw_nws_event`).
 - EAGLE-I attribution string is mandatory wherever outage data renders: "Electric customer outage data provided by EAGLE-I, Department of Energy." Customers are meters, not people — say so in provenance.
 - emPOWER numbers are always labeled as measured Medicare proxy; they never replace veteran denominators.
-- Cards 7/8 clinical strings come only from `docs/card-library-additions.md`; legacy NWS cold-product names are normalized in the provider (`LEGACY_NWS_EVENT_NAMES`), never listed in cards.
+- Cards 7/8 clinical strings come only from `docs/card-library.md`; legacy NWS cold-product names are normalized in the provider (`LEGACY_NWS_EVENT_NAMES`), never listed in cards.
 - No compound trigger grammar — compounding is the engine co-occurrence boost only (backlog item for grammar). Cross-family supersede pairs live in `engine.SUPERSEDE_FAMILIES`, not in cards.
 
 ## Environment

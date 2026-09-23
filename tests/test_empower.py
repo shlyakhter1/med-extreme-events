@@ -17,6 +17,7 @@ from xevents.cards import CARDS_DIR, load_cards
 from xevents.denominators import (
     EMPOWER_UNIT,
     MEDICARE_PROXY_CAVEAT,
+    PLANNING_CAVEAT,
     PanelEstimator,
     ReferenceTables,
     load_empower,
@@ -28,6 +29,7 @@ from xevents.models import (
     CapSeverity,
     Card,
     Estimate,
+    EstimateKind,
     Event,
     EventGeography,
     EventSource,
@@ -148,7 +150,7 @@ def test_empower_dme_rolls_up_catchment_counties(estimator: PanelEstimator) -> N
 def test_card_6_sub_panel_is_measured_not_a_share(estimator: PanelEstimator) -> None:
     cards = {c.id: c for c in load_cards(CARDS_DIR)}
     card = cards["outage-dialysis"]
-    assert card.version == "1.2.0"
+    assert card.version == "2.0.0"
     sub = next(
         s for s in card.population_selector.sub_panels if s.key == "electricity_dependent_dme"
     )
@@ -164,7 +166,25 @@ def test_card_6_sub_panel_is_measured_not_a_share(estimator: PanelEstimator) -> 
     assert dialysis.unit == "veterans" and comp.value != dialysis.value
 
 
-def test_addendum_strings_landed_on_card_6() -> None:
+def test_panels_carry_their_provenance_kind(estimator: PanelEstimator) -> None:
+    """VA planning anchors, PLACES × VetPop and emPOWER are three different kinds of number;
+    each panel says which it is (implementation-plan-clinical M12 §3)."""
+    cards = {c.number: c for c in load_cards(CARDS_DIR)}
+    dialysis = estimator.card_panel("vha_516", cards[6])
+    assert dialysis.kind is EstimateKind.PLANNING_ESTIMATE
+    assert PLANNING_CAVEAT in dialysis.components[0].caveats
+    assert {c.kind for c in dialysis.components} >= {EstimateKind.MEASURED}
+    for n in (1, 2, 4, 5):
+        assert estimator.card_panel("vha_516", cards[n]).kind is EstimateKind.PLANNING_ESTIMATE
+    assert estimator.card_panel("vha_516", cards[8]).kind is EstimateKind.MODELED_ESTIMATE
+    cold = estimator.card_panel("vha_516", cards[7])  # lower bound: the largest sub-panel's kind
+    largest = max((c for c in cold.components if "sub-panel" in c.label), key=lambda c: c.value)
+    assert cold.kind is (
+        largest.kind if largest.value > cold.components[0].value else EstimateKind.MODELED_ESTIMATE
+    )
+
+
+def test_dme_sub_panel_strings_landed_on_card_6() -> None:
     card = next(c for c in load_cards(CARDS_DIR) if c.number == 6)
     assert any(
         a.text.startswith("If your medical equipment needs electricity")
@@ -174,7 +194,7 @@ def test_addendum_strings_landed_on_card_6() -> None:
         a.text.startswith("Confirm backup power") and a.phase.value == "pre_event"
         for a in card.actions.care_team
     )
-    assert any("less than 4 hours" in e.signs for e in card.escalation)
+    assert any("under 4 hours" in e.signs for e in card.escalation)
     assert any(
         e.signs == "Oxygen interruption with breathlessness" and e.emergency
         for e in card.escalation

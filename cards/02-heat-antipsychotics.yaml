@@ -1,13 +1,14 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library.md — Card 2. Clinical strings are verbatim; do not edit in code.
+# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 2. Clinical strings
+# are verbatim; do not edit in code.
 id: heat-antipsychotics
-version: 1.0.0
+version: 1.1.0
 number: 2
 title: Extreme Heat × Schizophrenia on Antipsychotics
 summary: >-
-  Antipsychotics impair central thermoregulation and peripheral heat dissipation;
-  patients with schizophrenia/schizoaffective disorder (and antipsychotic-treated
-  bipolar) on any antipsychotic are at elevated risk of heat illness and death.
+  Antipsychotics — especially those with anticholinergic effects — are thought to impair heat
+  regulation and sweating; direct human physiological evidence is limited, but the
+  association with heat-related hospitalization and death is consistent.
 
 event_triggers:
   - type: heat
@@ -37,115 +38,151 @@ population_selector:
     - two_or_more_antipsychotics
     - homeless_or_isolated
   denominator_key: schizophrenia
-  denominator_note: "Denominator anchor: schizophrenia ≈ 3.6% of VHA enrollees."
+  denominator_note: >-
+    Panel sizing uses the VA schizophrenia planning estimate (~3.6% — planning anchor).
 
 actions:
   care_team:
     - phase: pre_event
       text: >-
-        Roster ranked by anticholinergic burden and polypharmacy; prioritize clozapine,
-        multi-antipsychotic, and homeless/isolated patients.
+        Generate the antipsychotic roster; flag anticholinergic burden, clozapine,
+        polypharmacy, age ≥65, housing instability, no-AC.
     - phase: pre_event
       text: >-
-        Arrange cooling-center placement, transportation, and daily check-ins for the
-        highest-risk.
+        Proactive outreach with heat-plan check: cooling access, water, buddy contact;
+        coordinate homeless-program (HPACT) outreach for unstably housed patients.
     - phase: pre_event
       text: >-
-        Counsel hydration and light clothing. Instruct patients and staff NOT to stop
-        antipsychotics — manage with cooling, not discontinuation.
+        Do not reduce or hold antipsychotics for heat; prescriber reviews anticholinergic
+        co-medications where clinically appropriate.
     - phase: during_event
-      text: Active wellness checks on flagged patients.
+      text: >-
+        Wellness checks on flagged patients; treat any fever or altered mental status as an
+        emergency evaluation, not phone triage.
     - phase: during_event
-      text: Ensure cooling access.
-    - phase: during_event
-      text: Monitor for heat illness.
-    - phase: during_event
-      text: Coordinate with homeless PACT teams and shelters.
-    - phase: during_event
-      text: Low threshold for bringing high-risk patients into cooled clinical space.
+      text: >-
+        Fever in a clozapine patient requires clinician review (clozapine has independent
+        fever causes, including early-treatment myocarditis).
   patient:
-    - text: Your medicine is important — keep taking it.
+    - text: Your medicine helps you stay well — keep taking it, even in a heat wave.
+    - text: But heat is harder on your body with these medicines.
     - text: >-
-        But it can make it harder for your body to cool itself, so you may not feel how
-        hot you are.
+        Stay in the coolest place you can, drink water regularly, and check in with someone
+        every day when it's very hot.
     - text: >-
-        Stay in air conditioning, drink water, and let us or a friend check on you daily
-        during the heat.
+        If you feel very hot, confused, dizzy, or stop sweating, that's an emergency — call
+        911.
+    - text: >-
+        Your skin being hot and red, with a pounding heartbeat, is an emergency even if you
+        are still sweating.
   caregiver: []
 
 escalation:
-  - signs: >-
-      Hot/dry skin, no sweating, temperature ≥103°F, confusion, agitation, fainting,
-      rapid pulse
-    response: heat-stroke emergency (911/ED)
+  - signs: Temperature ≥103°F, hot red skin (dry or damp), confusion, or collapse
+    response: "911"
     emergency: true
-  - signs: Any decompensation from missed cooling
-    response: null
+  - signs: >-
+      Heat stroke, neuroleptic malignant syndrome, and anticholinergic toxicity can look alike
+      (high temperature, confusion, rigidity, fast pulse)
+    response: >-
+      all are emergencies — call 911 and tell responders which medicines the patient takes
+    emergency: true
+  - signs: No cooling available
+    response: same-day cooling placement
     emergency: false
 
 evidence_tier: strong
 evidence:
   mechanism: >-
-    Antipsychotics impair central thermoregulation (hypothalamic dopamine blockade) and
-    peripheral heat dissipation (anticholinergic reduction of sweating); anticholinergic
-    burden is additive. Anosognosia and isolation reduce protective behavior.
+    Antipsychotics — especially those with anticholinergic effects — are thought to impair
+    heat regulation and sweating; direct human physiological evidence is limited, but the
+    association with heat-related hospitalization and death is consistent. Illness factors
+    (symptoms, isolation, reduced risk perception) independently reduce protective behavior.
   claims:
     - text: >-
-        2003 European heat wave: antipsychotics aOR 2.09 (1.89–2.35); any psychotropic
-        +30%; dose-response by drug count (aOR 1.25 per additional drug).
+        Antipsychotics — especially those with anticholinergic effects — are thought to impair
+        heat regulation and sweating; direct human physiological evidence is limited, but the
+        association with heat-related hospitalization and death is consistent. Illness
+        factors (symptoms, isolation, reduced risk perception) independently reduce protective
+        behavior.
+      tier: inferential
+      source_ids: [heat-thermoregulation-meta-2024, cdc-heat-medications-2024]
+    - text: >-
+        In the 2003 French heatwave, antipsychotic use in older people was associated with
+        heat-related death: adjusted OR 2.09 (95% CI 1.89–2.35), with a dose-response trend
+        of 1.25 per additional psychotropic.
       tier: strong
       source_ids: [nordon-2009]
     - text: >-
-        Bordeaux ED study: anticholinergics OR 6.0 (1.8–19.6); antipsychotics OR 4.6
-        (1.9–11.2); anxiolytics OR 2.4 (1.3–4.4).
+        In Bordeaux (August 2003; 56 admissions, mean age 83), heat-related hospitalization
+        was associated with anticholinergics (OR 6.0, 1.8–19.6), antipsychotics (OR 4.6,
+        1.9–11.2), and anxiolytics (OR 2.4, 1.3–4.4).
       tier: strong
-      source_ids: [martin-latry]
+      source_ids: [martin-latry-2007]
     - text: >-
-        2021 BC heat dome: any antipsychotic OR 2.43 (1.52–4.01), driven by
-        haloperidol/clozapine/zuclopenthixol; ≥2 antipsychotics OR 4.05 (2.41–6.98);
-        people with schizophrenia ≈ 8% of deaths at ≈ 1% population prevalence.
+        In the 2021 BC heat dome, any antipsychotic dispensation was associated with
+        extreme-heat-event mortality among people with schizophrenia (OR 2.43, 1.52–4.01);
+        people with schizophrenia were ~8% of heat-dome deaths against ~1% population
+        prevalence.
       tier: strong
+      source_ids: [chen-2025, bccdc-bcmj-2023]
+    - text: Multiple concurrent antipsychotics carried higher risk.
+      tier: inferential
       source_ids: [chen-2025]
     - text: >-
-        CA veterans: heat-mortality odds up 10–18%.
-      tier: strong
-      source_ids: [shannon-2025]
-    - text: >-
-        Heat-mortality odds larger among homeless veterans (up to 36% at the 97.5th
-        percentile; interaction not statistically significant).
-      tier: inferential
-      source_ids: [shannon-2025]
+        Do not reduce or hold antipsychotics for heat; prescriber reviews anticholinergic
+        co-medications where clinically appropriate.
+      tier: expert_guidance
+      source_ids: [bccdc-bcmj-2023]
   caveats:
     - >-
-      Subgroup findings in Shannon et al. 2025 (homelessness amplification) were not
-      statistically significant, though effect sizes were large.
-    - >-
-      Relative risks are not additive across cards; a homeless veteran on clozapine
-      during a heat wave sits at the intersection of Cards 2, 3, and heat generally and
-      warrants individualized priority.
+      The physiological mechanism is contested (medical-references.md §4); the card rests on
+      the epidemiology.
+    - Never present antipsychotics as a reason to pause treatment in heat.
 
 sources:
   - id: nordon-2009
-    citation: Nordon et al. 2009 (Am J Geriatr Psychiatry)
+    citation: >-
+      Nordon C et al. Risk of death related to psychotropic drug use in older people during
+      the 2003 French heatwave. Am J Geriatr Psychiatry 2009;17(12):1059–67.
+    url: https://doi.org/10.1097/JGP.0b013e3181b7ef6e
     year: 2009
-  - id: martin-latry
-    citation: Martin-Latry et al. (European Psychiatry)
-    url: https://www.sciencedirect.com/science/article/abs/pii/S0924933807013089
+  - id: martin-latry-2007
+    citation: >-
+      Martin-Latry K et al. Psychotropic drugs use and risk of heat-related hospitalisation.
+      Eur Psychiatry 2007;22(6):335–8.
+    url: https://doi.org/10.1016/j.eurpsy.2007.03.007
+    year: 2007
   - id: chen-2025
-    citation: Chen et al. 2025 (Scientific Reports) and BCCDC/BCMJ report
+    citation: >-
+      Chen SX et al. Antipsychotics and other risk factors for mortality among people with
+      schizophrenia during an extreme heat event. Sci Rep 2025.
+    url: https://doi.org/10.1038/s41598-025-17591-0
     year: 2025
+    note: OR 2.43 verified; polypharmacy OR pending full-text verification.
+  - id: bccdc-bcmj-2023
+    citation: >-
+      BCCDC. Risk of mortality among people with schizophrenia during the 2021 heat dome.
+      BCMJ.
+    year: 2023
+  - id: heat-thermoregulation-meta-2024
+    citation: >-
+      The effect of prescription and over-the-counter medications on core temperature in
+      adults during heat stress: systematic review and meta-analysis. eClinicalMedicine 2024.
+    year: 2024
   - id: cdc-heat-medications-2024
-    citation: CDC "Heat and Medications — Guidance for Clinicians" (2024)
+    citation: CDC "Heat and Medications — Guidance for Clinicians" (June 2024 version)
     url: https://restoredcdc.org/www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html
     year: 2024
-  - id: shannon-2025
-    citation: Shannon et al. 2025 (JAMA Network Open, 2545524)
-    year: 2025
+    note: Live page archived early 2025; cites the archived copy.
+  - id: va-smi-prevalence
+    citation: VA serious-mental-illness prevalence anchors (bipolar ~3.0%, schizophrenia ~3.6%)
+    note: Planning estimate for panel sizing only; awaits its primary VA source.
 
 window_days: {min: 3, max: 7}
 safety:
   do_not_stop_medication: true
   notes:
-    - Instruct patients and staff NOT to stop antipsychotics — manage with cooling, not discontinuation.
+    - Never present antipsychotics as a reason to pause treatment in heat.
 acuity_class: antipsychotic_heat
 care_system_hooks: [homeless_pact]

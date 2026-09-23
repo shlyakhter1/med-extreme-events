@@ -15,10 +15,12 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from markupsafe import Markup, escape
 from sqlalchemy import Engine
 
 from xevents.carbon import CarbonTable, load_carbon
 from xevents.cards import load_cards
+from xevents.denominators import ESTIMATE_KIND_LABELS
 from xevents.engine import safety_message
 from xevents.geography.catchment import is_anchor
 from xevents.geography.counties import CountyIndex
@@ -77,6 +79,24 @@ WELCOME_VERSION = "2026-09"
 URI_URL = "/?scenario=uri_2021&at=2021-02-16T15:00Z"
 TOUR_URL = f"{URI_URL}&tour=1"
 
+PHONE = re.compile(r"\b(?:1-)?(\d{3})-(\d{3})-(\d{4})\b")
+
+
+def tel_links(text: str) -> Markup:
+    """Make the phone numbers in verbatim card text tappable. The text is escaped and left
+    unchanged; only the digits are wrapped in a ``tel:`` link (Card 6 carries two hotlines)."""
+    return Markup(
+        PHONE.sub(
+            lambda m: f'<a href="tel:+1{"".join(m.groups())}">{m.group(0)}</a>',
+            str(escape(text)),
+        )
+    )
+
+
+templates.env.filters["tel_links"] = tel_links
+templates.env.globals["estimate_kind_labels"] = {
+    k.value: v for k, v in ESTIMATE_KIND_LABELS.items()
+}
 templates.env.globals["welcome_version"] = WELCOME_VERSION
 templates.env.globals["uri_url"] = URI_URL
 templates.env.globals["tour_url"] = TOUR_URL

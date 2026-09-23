@@ -13,7 +13,7 @@ import csv
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from xevents.models import Card, Estimate
+from xevents.models import Card, Estimate, EstimateKind
 from xevents.profiles import Denominator, Profile
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -41,6 +41,16 @@ MEDICARE_PROXY_CAVEAT = (
     "never in place of it."
 )
 EMPOWER_MASKING_CAVEAT = "emPOWER masks small cells (1–10) to 11, so small counties read high."
+PLANNING_CAVEAT = (
+    "Planning estimate: a VA planning anchor (medical-references.md, va-*-prevalence) applied "
+    "to the catchment, for panel sizing only and awaiting its primary VA source — not a "
+    "modeled (PLACES × VetPop) or measured (emPOWER) count."
+)
+ESTIMATE_KIND_LABELS = {
+    EstimateKind.PLANNING_ESTIMATE: "Planning estimate — VA planning anchor",
+    EstimateKind.MODELED_ESTIMATE: "Modeled estimate — CDC PLACES × VetPop",
+    EstimateKind.MEASURED: "Measured — emPOWER Medicare proxy",
+}
 
 
 def load_empower(path: Path = EMPOWER_PATH) -> tuple[dict[str, dict[str, int | None]], str]:
@@ -244,6 +254,7 @@ class PanelEstimator:
             ),
             value=float(total),
             unit=EMPOWER_UNIT,
+            kind=EstimateKind.MEASURED,
             formula=(
                 f"Σ emPOWER {measure}(c) over {len(counties)} catchment counties of "
                 f"station {station}"
@@ -267,10 +278,11 @@ class PanelEstimator:
             return Estimate(
                 label=f"{key} panel",
                 value=pop.value * den.rate,
+                kind=EstimateKind.PLANNING_ESTIMATE,
                 formula=f"{den.scope}_in_catchment × rate[{key}] = {pop.value:.0f} × {den.rate}",
                 inputs={"population": round(pop.value, 1), "scope": den.scope, "rate": den.rate},
                 sources=[den.source],
-                caveats=[den.basis, ESTIMATE_CAVEAT],
+                caveats=[PLANNING_CAVEAT, den.basis, ESTIMATE_CAVEAT],
                 components=[pop],
             )
         vets = self.veterans(facility_id)
@@ -280,6 +292,7 @@ class PanelEstimator:
             return Estimate(
                 label=f"{key} panel",
                 value=den.count * share,
+                kind=EstimateKind.PLANNING_ESTIMATE,
                 formula=(
                     f"national_count[{key}] × veterans_in_catchment / national_veterans = "
                     f"{den.count} × {vets.value:.0f} / {national}"
@@ -291,6 +304,7 @@ class PanelEstimator:
                 },
                 sources=[den.source, self.tables.vetpop_source],
                 caveats=[
+                    PLANNING_CAVEAT,
                     den.basis,
                     "National count allocated by veteran share (no regional variation).",
                     ESTIMATE_CAVEAT,
@@ -329,6 +343,7 @@ class PanelEstimator:
         return Estimate(
             label=f"{key} panel",
             value=total,
+            kind=EstimateKind.MODELED_ESTIMATE,
             formula=(
                 f"Σ_county veterans(c) × PLACES {measure}(c) / 100 over {len(counties)} counties"
             ),
@@ -352,10 +367,11 @@ class PanelEstimator:
         return Estimate(
             label=label,
             value=base.value * rate,
+            kind=EstimateKind.PLANNING_ESTIMATE,
             formula=f"condition_panel × share[{key}] = {base.value:.0f} × {rate}",
             inputs={"condition_panel": round(base.value, 1), "share": rate, "share_key": key},
             sources=[share.source],
-            caveats=[c for c in notes if c] + [ESTIMATE_CAVEAT],
+            caveats=[c for c in notes if c] + [PLANNING_CAVEAT, ESTIMATE_CAVEAT],
             components=[base],
         )
 
@@ -370,6 +386,7 @@ class PanelEstimator:
         return Estimate(
             label=label,
             value=base.value,
+            kind=base.kind,
             formula="condition_panel"
             + (" (no medication/device-class share in the profile)" if has_class else ""),
             inputs={"condition_panel": round(base.value, 1)},
@@ -445,6 +462,7 @@ class PanelEstimator:
             panel = panel.model_copy(
                 update={
                     "value": largest.value,
+                    "kind": largest.kind,
                     "formula": (
                         f"max(condition_panel, sub-panels) = "
                         f"{largest.label.split(' (sub-panel)')[0]} ({largest.value:.0f}); "

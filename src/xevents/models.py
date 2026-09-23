@@ -486,6 +486,15 @@ class TimeWindow(StrictModel):
 # --------------------------------------------------------------------------- estimates
 
 
+class EstimateKind(StrEnum):
+    """Where a panel number comes from, shown in the provenance popover so the three are never
+    confused (implementation-plan-clinical M12 §3)."""
+
+    PLANNING_ESTIMATE = "planning_estimate"  # VA planning anchor (va-*-prevalence) × catchment
+    MODELED_ESTIMATE = "modeled_estimate"  # CDC PLACES county prevalence × VetPop
+    MEASURED = "measured"  # emPOWER measured Medicare counts
+
+
 class Estimate(StrictModel):
     """A sized aggregate with its provenance: every number the UI shows carries the
     formula and inputs that produced it (requirements G2/G9; CLAUDE.md constraint 1)."""
@@ -493,6 +502,10 @@ class Estimate(StrictModel):
     label: NonEmptyStr
     value: float = Field(ge=0)
     unit: NonEmptyStr = "veterans"
+    kind: EstimateKind | None = Field(
+        default=None,
+        description="Provenance class of the number; None for building blocks (veteran counts).",
+    )
     formula: NonEmptyStr
     inputs: dict[str, float | int | str] = Field(default_factory=dict)
     sources: list[NonEmptyStr] = Field(default_factory=list)

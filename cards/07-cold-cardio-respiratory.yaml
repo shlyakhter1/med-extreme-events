@@ -1,15 +1,16 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library-additions.md — Card 7. Clinical strings are verbatim; do not edit in code.
+# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 7. Clinical strings
+# are verbatim; do not edit in code. [SHARED] markers are library markup and are stripped.
 # Triggers list the post-Oct-2024 NWS product names only; legacy names (Wind Chill …) are
 # normalized in the NWS provider (SCN23-44), never here.
 id: cold-cardio-respiratory
-version: 1.0.0
+version: 1.1.0
 number: 7
 title: Extreme Cold / Winter Storm × Cardiovascular & Respiratory Disease
 summary: >-
-  Cold exposure raises blood pressure and cardiac workload and shifts hemostasis toward
-  thrombosis, precipitating MI and stroke; cold, dry air worsens COPD/asthma; storm
-  conditions add hypothermia and carbon-monoxide poisoning from improvised heating.
+  Cold drives peripheral vasoconstriction, raising blood pressure and cardiac workload, and
+  shifts hemostatic factors toward thrombosis — precipitating MI and stroke; cold, dry air
+  triggers bronchospasm and worsens COPD/asthma.
 
 event_triggers:
   - type: extreme_cold
@@ -62,122 +63,126 @@ actions:
   care_team:
     - phase: pre_event
       text: >-
-        Generate rosters: cardiovascular and respiratory panels, flagging home-oxygen/DME,
-        homeless, and age ≥65 patients.
+        Rosters: cardiovascular and respiratory panels, flagging home-oxygen/DME, homeless,
+        age ≥65, and insulin users.
     - phase: pre_event
       text: >-
-        Verify heating adequacy and a warm-place plan for flagged patients; coordinate with
-        homeless PACT teams and warming centers; arrange transportation.
+        Verify heating adequacy and a warm-place plan; coordinate homeless-program outreach
+        and warming centers with transportation.
     - phase: pre_event
       text: >-
-        Counsel against strenuous cold exertion (snow shoveling) for cardiac patients; review
-        inhaler supply and cold-air pre-medication plans for asthma/COPD per their action
-        plans.
+        Counsel cardiac patients against strenuous cold exertion (snow shoveling); review
+        inhaler supply and cold-air plans for asthma/COPD patients.
     - phase: pre_event
       text: >-
-        Push CO-safety messaging: never run generators, grills, or vehicles indoors or in
-        garages; check smoke/CO detectors.
-    - phase: pre_event
-      text: >-
-        Confirm emergency refills and oxygen backup (ties to Card 6 DME sub-panel when
-        outages threaten).
-    - phase: during_event
-      text: Wellness checks on flagged patients (isolation + cold is the lethal combination).
-    - phase: during_event
-      text: Monitor for hypothermia and CO-poisoning presentations.
-    - phase: during_event
-      text: Low threshold to relocate patients in unheated homes.
+        Push CO-safety messaging; confirm oxygen backup where outages threaten (Card 6 DME
+        sub-panel).
     - phase: during_event
       text: >-
-        If outages co-occur, the boost elevates these items — treat as the compounded
-        emergency it is.
+        Wellness checks on flagged patients — isolation plus cold is the lethal combination;
+        monitor for hypothermia and CO presentations; low threshold to relocate patients in
+        unheated homes; when outages co-occur, the engine boost elevates these items — treat
+        as a compounded emergency.
   patient:
     - text: Cold weather is hard on your heart and lungs.
     - text: >-
-        Stay warm and dry, dress in layers, and avoid heavy outdoor work like shoveling snow.
-    - text: Cover your nose and mouth with a scarf so you breathe warmer air.
+        Stay warm and dry, dress in layers, and avoid heavy outdoor work like shoveling snow —
+        it strains the heart; take breaks or get help.
     - text: >-
-        Never use a generator, grill, or your car to heat your home — the fumes can kill
-        without warning.
+        Cover your nose and mouth with a scarf so you breathe warmer air, and keep your rescue
+        inhaler with you.
+    - text: >-
+        Never use a generator, grill, camp stove, or charcoal indoors or in a garage — even
+        with the door open. Keep generators outside and away from windows. Use a
+        battery-powered CO alarm.
+    - text: >-
+        If you use insulin, don't let it freeze — an unheated home or car can freeze it, and
+        frozen insulin must be thrown away.
     - text: If your heat goes out, go somewhere warm and tell us.
     - text: Keep taking your medicines.
   caregiver: []
 
 escalation:
-  - signs: Chest pain or pressure, one-sided weakness or trouble speaking (stroke signs)
-    response: emergency
+  - signs: Chest pain or pressure; one-sided weakness or trouble speaking
+    response: "911"
     emergency: true
   - signs: Severe shortness of breath or blue lips
-    response: emergency
+    response: "911"
     emergency: true
   - signs: >-
       Confusion, intense shivering or shivering that stops, slurred speech (hypothermia)
     response: 911 and rewarm
     emergency: true
-  - signs: Headache/dizziness/nausea in a heated space (possible CO)
+  - signs: Headache, dizziness, or nausea indoors while heating with fuel (possible CO)
     response: fresh air immediately and call
     emergency: false
   - signs: No heat at home during an Extreme Cold Warning
-    response: call the care team same-day
+    response: same-day call
     emergency: false
 
 evidence_tier: strong
 evidence:
   mechanism: >-
-    Cold exposure causes peripheral vasoconstriction, raising blood pressure and cardiac
-    workload, and shifts hemostatic factors toward thrombosis — precipitating MI and stroke;
-    cold, dry air triggers bronchoconstriction and worsens COPD/asthma, and winter
-    respiratory infections compound it. Storm conditions add hypothermia risk (especially
-    with power loss) and carbon-monoxide poisoning from improvised indoor heating
-    (generators, grills, vehicles).
+    Cold drives peripheral vasoconstriction, raising blood pressure and cardiac workload, and
+    shifts hemostatic factors toward thrombosis — precipitating MI and stroke; cold, dry air
+    triggers bronchospasm and worsens COPD/asthma. Storm conditions add hypothermia risk and
+    carbon-monoxide poisoning from improvised indoor heating.
   claims:
     - text: >-
-        Cold is responsible for far more temperature-attributable mortality than heat: in
-        the 74-million-death multi-country analysis, ~7.3% of deaths were attributable to
-        cold vs ~0.4% to heat.
+        Cold drives peripheral vasoconstriction, raising blood pressure and cardiac workload,
+        and shifts hemostatic factors toward thrombosis — precipitating MI and stroke; cold,
+        dry air triggers bronchospasm and worsens COPD/asthma. Storm conditions add
+        hypothermia risk and carbon-monoxide poisoning from improvised indoor heating.
       tier: strong
       source_ids: [gasparrini-2015]
     - text: >-
-        Winter Storm Uri (Feb 2021, TX): 246 storm-related deaths in the state's final
-        tally, the majority from hypothermia; a concurrent surge of carbon-monoxide
-        poisonings produced over a thousand ED visits.
+        Across 384 locations in 13 countries, 7.29% of deaths were attributable to cold versus
+        0.42% to heat — with most of the cold burden from moderate cold, so risk is not
+        confined to record-breaking days.
       tier: strong
-      source_ids: [texas-dshs-uri-2021, cdc-co-texas-2021]
+      source_ids: [gasparrini-2015]
     - text: >-
-        Cold spells are associated with increased MI and cardiovascular mortality; risk
-        rises as temperature falls, with effects lagged over days.
+        Winter Storm Uri (Texas, Feb 2021): 246 storm-related deaths; 161 (65.4%) from cold
+        exposure, 158 of them hypothermia; 19 from carbon-monoxide poisoning.
       tier: strong
-      source_ids: [aha-cold-weather]
+      source_ids: [texas-dshs-uri-2021]
     - text: >-
-        CDC/NWS extreme-cold guidance: indoor heating safety (CO), layered clothing,
-        limiting exertion (esp. snow shoveling for cardiac patients), checking on isolated
-        adults.
+        Counsel cardiac patients against strenuous cold exertion (snow shoveling); review
+        inhaler supply and cold-air plans for asthma/COPD patients.
       tier: expert_guidance
-      source_ids: [cdc-extreme-cold]
+      source_ids: [aha-snow-shoveling, cdc-co-guidance]
   caveats:
     - >-
-      Medication-specific cold interactions are weakly evidenced compared with heat; do not
-      present drug-level cold claims beyond expert guidance (beta-blocker/peripheral-
-      circulation notes are expert_guidance at most).
+      Medication-specific cold interactions are weakly evidenced compared with heat; the only
+      drug-level line is the insulin freeze rule (fda-insulin-emergency).
+    - Cardiovascular cold-risk framing beyond the epidemiology is expert guidance.
 
 sources:
   - id: gasparrini-2015
-    citation: Gasparrini et al., Lancet 2015 (mortality attributable to cold vs heat, 384 locations)
+    citation: >-
+      Gasparrini A et al. Mortality risk attributable to high and low ambient temperature: a
+      multicountry observational study. Lancet 2015;386(9991):369–75.
+    url: https://doi.org/10.1016/S0140-6736(14)62114-0
     year: 2015
+    note: The mechanism claim cites it as context.
   - id: texas-dshs-uri-2021
-    citation: Texas DSHS Winter Storm Uri mortality report (2021)
+    citation: Texas DSHS, February 2021 Winter Storm Related Deaths, final report (Dec 31, 2021)
     year: 2021
-  - id: cdc-co-texas-2021
-    citation: CDC carbon monoxide poisoning surveillance, Feb 2021 Texas
-    year: 2021
-  - id: cdc-extreme-cold
-    citation: CDC extreme-cold clinical and public guidance
-  - id: aha-cold-weather
-    citation: AHA cold-weather cardiovascular guidance
   - id: nws-scn23-44
-    citation: NWS SCN23-44 (cold-product taxonomy, Oct 2024)
+    citation: NWS Service Change Notice 23-44 (updated Mar 26, 2024)
     year: 2024
     note: Source of the current product names listed in event_triggers.
+  - id: cdc-co-guidance
+    citation: CDC carbon monoxide poisoning prevention guidance
+    note: URL pending.
+  - id: aha-snow-shoveling
+    citation: AHA advisory on snow shoveling and cardiac risk
+    note: URL pending.
+  - id: fda-insulin-emergency
+    citation: >-
+      FDA, "Information Regarding Insulin Storage and Switching Between Products in an
+      Emergency" (content current as of 09/19/2017)
+    url: https://www.fda.gov/drugs/emergency-preparedness-drugs/information-regarding-insulin-storage-and-switching-between-products-emergency
 
 window_days: {min: 1, max: 3}
 safety:

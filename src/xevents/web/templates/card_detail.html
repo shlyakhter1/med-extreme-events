@@ -44,8 +44,8 @@
   {% endif %}{% endfor %}
 
   <div class="phase-h"><span class="t">Patient &amp; caregiver</span><span class="rule"></span><span class="s">verbatim, in card order</span></div>
-  <ul class="action-list">{% for a in c.actions.patient %}<li>{{ a.text }}</li>{% endfor %}</ul>
-  {% if c.actions.caregiver %}<div class="lbl" style="margin-top:12px">For a caregiver</div><ul class="action-list">{% for a in c.actions.caregiver %}<li>{{ a.text }}</li>{% endfor %}</ul>
+  <ul class="action-list">{% for a in c.actions.patient %}<li>{{ a.text|tel_links }}</li>{% endfor %}</ul>
+  {% if c.actions.caregiver %}<div class="lbl" style="margin-top:12px">For a caregiver</div><ul class="action-list">{% for a in c.actions.caregiver %}<li>{{ a.text|tel_links }}</li>{% endfor %}</ul>
   {% else %}<p class="prov" style="margin-top:10px">Caregiver wording is not yet written for this card; the patient guidance above is what a caregiver would be given.</p>{% endif %}
 
   {% if safety %}<div class="escalate safety">{{ safety }}</div>{% endif %}
@@ -55,7 +55,7 @@
   </div>
   {% if c.care_system_hooks %}
   <div class="lbl" style="margin-top:14px">Care-system hooks</div>
-  <ul class="src-limits" style="color:var(--ink-2); font-size:12.5px">{% for k in c.care_system_hooks %}{% set h = hooks.get(k) %}<li>{% if h %}<b>{{ h.name }}</b> — {{ h.description }}{% if h.phone %} · {{ h.phone }}{% endif %}{% if h.url %} · <a href="{{ h.url }}">link ↗</a>{% endif %}{% else %}{{ k }}{% endif %}</li>{% endfor %}</ul>
+  <ul class="src-limits" style="color:var(--ink-2); font-size:12.5px">{% for k in c.care_system_hooks %}{% set h = hooks.get(k) %}<li>{% if h %}<b>{{ h.name }}</b> — {{ h.description }}{% if h.phone %} · {{ h.phone|tel_links }}{% endif %}{% if h.url %} · <a href="{{ h.url }}">link ↗</a>{% endif %}{% else %}{{ k }}{% endif %}</li>{% endfor %}</ul>
   {% endif %}
 
   <div class="phase-h"><span class="t">Evidence</span><span class="rule"></span><span class="s">card tier: {{ c.evidence_tier.value.replace('_', ' ') }}</span></div>

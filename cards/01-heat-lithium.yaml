@@ -1,13 +1,13 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library.md — Card 1. Clinical strings are verbatim; do not edit in code.
+# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 1. Clinical strings
+# are verbatim; do not edit in code. [SHARED] markers are library markup and are stripped.
 id: heat-lithium
-version: 1.0.0
+version: 2.0.0
 number: 1
 title: Extreme Heat × Bipolar Disorder on Lithium
 summary: >-
-  Sweating and reduced fluid/salt intake during extreme heat push lithium, a
-  narrow-therapeutic-index drug, toward toxicity in patients with bipolar disorder
-  (or other indication) on active lithium prescriptions.
+  The kidney handles lithium like sodium: dehydration and sodium loss increase lithium
+  reabsorption, so heat-driven volume loss pushes levels toward toxicity.
 
 event_triggers:
   - type: heat
@@ -35,90 +35,120 @@ population_selector:
     - prior_lithium_toxicity
     - homeless_or_isolated
   denominator_key: bipolar
-  denominator_note: "Denominator anchor: bipolar ≈ 3.0% of VHA enrollees."
+  denominator_note: >-
+    Panel sizing uses the VA bipolar planning estimate (~3.0% of enrollees — planning anchor,
+    not clinical text).
 
 actions:
   care_team:
     - phase: pre_event
-      text: Generate the lithium roster; auto-message hydration and salt-consistency guidance.
-    - phase: pre_event
-      text: Review co-prescribed NSAIDs/diuretics/ACE-ARBs; counsel against new NSAIDs.
-    - phase: pre_event
       text: >-
-        Ensure a recent lithium level for higher-risk patients; confirm emergency-refill
-        pathway and supply.
+        Generate the lithium roster; flag co-prescriptions (NSAID, ACE-I/ARB, thiazide), age
+        ≥65, housing instability, no-AC status.
     - phase: pre_event
       text: >-
-        Prioritize cooling-center access and a check-in contact for isolated or homeless
-        patients.
+        Prescriber reviews interacting medications; plan level checks for the highest-risk
+        patients during the event window.
+    - phase: pre_event
+      text: >-
+        Confirm cooling access (home AC, cooling-center map, transportation); outreach to
+        flagged patients before day 1 of the event.
+    - phase: pre_event
+      text: Confirm refills; patients should not run short during the event.
     - phase: during_event
       text: >-
-        Low-threshold level checks for anyone with vomiting, diarrhea, fever, or reduced
-        intake.
+        Low-threshold lithium level and renal panel for anyone with vomiting, diarrhea, fever,
+        reduced intake, or new neurological symptoms (tremor, unsteady gait, confusion,
+        slurred speech).
     - phase: during_event
-      text: Steady fluids toward 2.5–3 L/day unless contraindicated.
+      text: Dose changes only by a clinician, guided by a level.
+    # There is no post_event phase (implementation-plan-clinical M12 option A): the
+    # post-event level check ships as a during-event item, worded as the library words it.
     - phase: during_event
-      text: Hold NSAIDs.
-    - phase: during_event
-      text: Clinician-directed dose changes only with level guidance — no self-adjustment.
+      text: >-
+        After the event: repeat the level within about a week for patients who were
+        symptomatic or who take ACE inhibitors, ARBs, or thiazides.
   patient:
     - text: Heat can push your lithium to a dangerous level.
     - text: >-
-        Drink water steadily, keep salt intake about the same, don't start ibuprofen or
-        naproxen, and stay cool.
-    - text: If you get a stomach bug or fever, call us — you may need a quick blood test.
+        Drink regularly through the day so you don't get thirsty or dizzy, and keep your salt
+        intake about the same as usual.
+    - text: >-
+        If a doctor has given you a fluid limit — for your heart or your kidneys — keep to
+        that limit and call us so we can make a heat plan that is safe for you.
+    - text: Don't start ibuprofen or naproxen — ask us what to use for pain instead.
+    - text: Stay in the coolest place you can.
+    - text: >-
+        If you get a stomach bug, a fever, bad shakiness, or feel confused, call us — you may
+        need a quick blood test.
+    - text: Don't stop or change your lithium on your own.
   caregiver: []
 
 escalation:
   - signs: >-
-      New/worsening tremor, nausea/vomiting, diarrhea, drowsiness, confusion, slurred
-      speech, unsteadiness
-    response: urgent contact / same-day level / ED
+      Coarse tremor, repeated vomiting or diarrhea, unsteady walking, slurred speech, or
+      confusion
+    response: same-day level and clinical review
+    emergency: false
+  - signs: severe symptoms
+    response: "911"
     emergency: true
-  - signs: Inability to stay hydrated during heat
-    response: null
+  - signs: No cooling available at home during a warning
+    response: same-day cooling-center placement
     emergency: false
 
 evidence_tier: strong
 evidence:
   mechanism: >-
-    Sweating and reduced fluid/salt intake deplete volume; the kidney reabsorbs lithium
-    with sodium, pushing a narrow-therapeutic-index drug toward toxicity. The FDA label
-    warns of decreased heat tolerance from protracted sweating.
+    The kidney handles lithium like sodium: dehydration and sodium loss increase lithium
+    reabsorption, so heat-driven volume loss pushes levels toward toxicity. Lithium has a
+    narrow therapeutic window; relatively minor concentration increases can cause serious
+    adverse effects. Labeling warns of decreased tolerance during protracted sweating.
   claims:
     - text: >-
-        FDA-labeled interaction: the lithium label warns of decreased heat tolerance from
-        protracted sweating.
+        The kidney handles lithium like sodium: dehydration and sodium loss increase lithium
+        reabsorption, so heat-driven volume loss pushes levels toward toxicity. Lithium has a
+        narrow therapeutic window; relatively minor concentration increases can cause serious
+        adverse effects.
       tier: strong
+      source_ids: [finley-1995]
+    - text: Labeling warns of decreased tolerance during protracted sweating.
+      tier: expert_guidance
       source_ids: [fda-lithium-label]
     - text: >-
-        A 2025 BJPsych Open case: serum lithium 3.4 mEq/L with AKI after
-        fever/vomiting/diarrhea on only 400 mg/day, requiring hemodialysis.
-      tier: inferential
-      source_ids: [ali-dogar-2025]
-    - text: >-
-        NSAIDs raise mean minimum lithium ~15% and cut renal clearance ~20%; ACE
-        inhibitors/ARBs also elevate levels.
+        NSAIDs raise lithium levels (labeling studies: roughly 15% higher minimum levels and
+        20% lower clearance; individual reports higher) and ACE inhibitors/ARBs impair lithium
+        elimination, with effects that can emerge over weeks. Thiazide diuretics reduce
+        lithium clearance.
       tier: strong
-      source_ids: [lithium-interaction-pharmacology, fda-lithium-label]
+      source_ids: [finley-1995, nsaid-class-labeling]
   caveats:
     - >-
-      The CDC heat-and-medications page was archived in early 2025; citations reflect
-      the June 2024 version — re-verify against the live page.
+      The lithium label's 2,500–3,000 mL/day fluid figure describes the initial stabilization
+      period; it is not quoted to patients and never overrides a prescribed fluid restriction
+      (see medical-references.md §3.1).
 
 sources:
+  - id: finley-1995
+    citation: >-
+      Finley PR, Warner MD, Peabody CA. Clinical relevance of drug interactions with lithium.
+      Clin Pharmacokinet 1995;29(3):172–91.
+    url: https://doi.org/10.2165/00003088-199529030-00004
+    year: 1995
+  - id: nsaid-class-labeling
+    citation: NSAID class prescribing information, drug-interactions section (lithium)
+    note: Pending verification against the ibuprofen/naproxen PI on DailyMed.
+  - id: fda-lithium-label
+    citation: Lithium carbonate prescribing information (DailyMed)
+    note: Pending verification.
   - id: cdc-heat-medications-2024
-    citation: CDC "Heat and Medications — Guidance for Clinicians" (2024)
+    citation: CDC "Heat and Medications — Guidance for Clinicians" (June 2024 version)
     url: https://restoredcdc.org/www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html
     year: 2024
-    note: June 2024 version; page archived early 2025.
-  - id: fda-lithium-label
-    citation: FDA lithium prescribing information
-  - id: ali-dogar-2025
-    citation: Ali & Dogar 2025 (BJPsych Open)
-    year: 2025
-  - id: lithium-interaction-pharmacology
-    citation: NSAID/ACE-ARB lithium interaction pharmacology
+    note: Live page archived early 2025; cites the archived copy.
+  - id: va-smi-prevalence
+    citation: VA serious-mental-illness prevalence anchors (bipolar ~3.0%, schizophrenia ~3.6%)
+    note: Planning estimate for panel sizing only; awaits its primary VA source.
 
 window_days: {min: 3, max: 7}
 safety:

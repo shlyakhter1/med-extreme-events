@@ -45,9 +45,7 @@ class CarbonAssumptions(_Strict):
 class CarbonEntry(_Strict):
     """One drug or therapy. Ranges are honest bounds, not precision."""
 
-    card: int = Field(
-        ge=1, description="card number in docs/card-library.md or card-library-additions.md"
-    )
+    card: int = Field(ge=1, description="card number in docs/card-library.md")
     key: Annotated[str, Field(pattern=r"^[a-z0-9_]+$")]
     drug: NonEmptyStr
     assumed_dose: NonEmptyStr

@@ -1,13 +1,14 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library.md — Card 4. Clinical strings are verbatim; do not edit in code.
+# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 4. Clinical strings
+# are verbatim; do not edit in code. [SHARED] markers are library markup and are stripped.
 id: heat-heart-failure
-version: 1.0.0
+version: 2.0.0
 number: 4
 title: Extreme Heat × Heart Failure on Diuretics / ACE-ARB-ARNI / Beta-blockers
 summary: >-
-  Heat-sensitizing cardiovascular drugs (loop/thiazide diuretics, ACE inhibitors, ARBs,
-  ARNIs, beta-blockers) impair heat dissipation in heart-failure patients, precipitating
-  hypotension, electrolyte derangement, AKI, and HF decompensation.
+  Diuretics deplete volume and electrolytes in heat; ACE inhibitors and ARBs can blunt
+  thirst; beta-blockers limit the cardiac-output response to heat stress — CDC guidance flags
+  the ACE/ARB + diuretic combination as one that may significantly increase heat risk.
 
 event_triggers:
   - type: heat
@@ -37,124 +38,132 @@ population_selector:
     - prior_aki
     - prior_hyponatremia
   denominator_key: heart_failure
-  denominator_note: >-
-    Denominator anchor: HF ≈ 5% of veterans in VA care (~510,000 VHA HF patients
-    2016–2020); ACE/ARB/ARNI and beta-blocker prescribing each ~60–64% in VA HFrEF
-    cohorts.
+  denominator_note: Panel sizing uses the VA CHF planning estimate (~5% — planning anchor).
 
 actions:
   care_team:
     - phase: pre_event
       text: >-
-        Run the HF + heat-sensitizing-drug query; flag ACE/ARB + diuretic combos and prior
-        AKI/hyponatremia.
+        Generate the HF roster with medication classes; flag ACE/ARB + diuretic combinations,
+        CKD, age ≥65, housing instability, no-AC.
     - phase: pre_event
       text: >-
-        Pharmacist/clinician review of a "hot-day" plan: pre-specified parameters for
-        temporary diuretic adjustment and fluid intake — never abrupt discontinuation
-        without a plan.
+        Where the HF clinician judges it appropriate, pre-specify an individualized hot-day
+        plan (weights, symptoms, when to call about diuretic dosing). There is no guideline
+        rule for reducing diuretics in heat; adjustments are clinician-directed only.
     - phase: pre_event
-      text: Confirm daily weights, BP checks, and a named check-in contact.
-    - phase: pre_event
-      text: >-
-        Verify home cooling and that no medications sit in hot locations (cars, above the
-        fridge).
+      text: Confirm daily-weight capability (scale at home) and cooling access.
     - phase: during_event
       text: >-
-        Outreach calls/telehealth to the highest-risk cohort on HeatRisk orange/red/magenta
-        days.
-    - phase: during_event
-      text: Reinforce the hot-day plan.
-    - phase: during_event
-      text: Watch orthostatic symptoms, weight change, urine output.
-    - phase: during_event
-      text: Expedite electrolyte/renal checks.
+        Daily-weight and symptom telemonitoring for the flagged panel; same-day
+        electrolyte/renal checks for dizziness, cramps, palpitations, or oliguria;
+        clinician-directed diuretic adjustments only.
   patient:
+    - text: Hot days are hard on your heart.
+    - text: Weigh yourself every morning.
     - text: >-
-        Hot weather plus your heart and blood-pressure medicines can make you dehydrated,
-        dizzy, or hurt your kidneys.
-    - text: Stay cool.
-    - text: Follow the fluid plan we gave you — don't guess.
-    - text: Weigh yourself daily.
-    - text: Don't stop any medicine on your own.
+        Call us if you gain more than 2–3 pounds in a day or 5 pounds in a week — and also if
+        you lose more than 2–3 pounds in a day or feel dizzy, because in the heat that can
+        mean dehydration.
     - text: >-
-        If you feel dizzy, very weak, confused, urinate much less, or gain weight fast,
-        call us.
+        If a doctor has given you a fluid limit — for your heart or your kidneys — keep to
+        that limit and call us so we can make a heat plan that is safe for you.
+    - text: >-
+        Stay in the coolest place you can, and keep taking your medicines as prescribed — call
+        us before changing anything.
   caregiver: []
 
 escalation:
-  - signs: Weight gain >2–3 lb/day or >5 lb/week
-    response: null
+  - signs: >-
+      Weight gain >2–3 lb/day or >5 lb/week, or weight loss >2–3 lb/day with dizziness or low
+      urine output
+    response: same-day call
     emergency: false
-  - signs: Worsening dyspnea or swelling
-    response: null
-    emergency: false
-  - signs: BP drop with dizziness/fainting
-    response: null
-    emergency: false
-  - signs: Reduced urine output or confusion
-    response: null
-    emergency: false
-  - signs: Heat-exhaustion symptoms
-    response: null
-    emergency: false
-  - signs: Syncope, chest pain, or altered mental status
-    response: emergency
+  - signs: Chest pain, severe breathlessness, syncope
+    response: "911"
     emergency: true
+  - signs: No cooling at home during a warning
+    response: same-day cooling placement
+    emergency: false
 
 evidence_tier: strong
 evidence:
   mechanism: >-
-    Heat causes dehydration, vasodilation, and neurohormonal activation; diuretics deplete
-    volume and blunt thirst, ACE/ARBs reduce thirst and blood pressure, beta-blockers
-    reduce cutaneous vasodilation and sweating — together impairing heat dissipation and
-    precipitating hypotension, electrolyte derangement, AKI, and HF decompensation (CDC
-    guidance).
+    Diuretics deplete volume and electrolytes in heat; ACE inhibitors and ARBs can blunt
+    thirst; beta-blockers limit the cardiac-output response to heat stress — CDC guidance
+    flags the ACE/ARB + diuretic combination as one that may significantly increase heat risk.
   claims:
     - text: >-
-        Medicare ≥65: heatwaves raised heat-related hospitalization 21% (95% CI 7–38%) to
-        33% (95% CI 14–55%) across heat-sensitizing classes; loop diuretics specifically
-        implicated in HF, dementia, and MI patients; effects additive, not synergistic.
+        Diuretics deplete volume and electrolytes in heat; ACE inhibitors and ARBs can blunt
+        thirst; beta-blockers limit the cardiac-output response to heat stress — CDC guidance
+        flags the ACE/ARB + diuretic combination as one that may significantly increase heat
+        risk.
+      tier: strong
+      source_ids: [cdc-heat-medications-2024]
+    - text: >-
+        Among older Medicare beneficiaries with chronic conditions, common cardiovascular
+        medications were associated with 21% (7–38%) to 33% (14–55%) increases in
+        heat-related hospitalization during heatwaves; drug and heatwave effects were largely
+        additive.
       tier: strong
       source_ids: [layton-2020]
     - text: >-
-        CDC: ACE/ARB + diuretic "may significantly increase risk of harm from heat
-        exposure."
-      tier: expert_guidance
-      source_ids: [cdc-heat-medications-2024]
+        In a 27-country study, heat above the 99th temperature percentile was associated with
+        higher heart-failure mortality than the minimum-mortality temperature, and hot days
+        above the 97.5th percentile accounted for about 2.6 excess deaths per 1,000
+        heart-failure deaths — the highest excess-death proportion among cardiovascular
+        causes.
+      tier: strong
+      source_ids: [alahmad-2023]
     - text: >-
-        Extreme heat above the 97th–99th temperature percentiles is linked to roughly a
-        10–15% rise in HF-related deaths.
+        Among California veterans with cardiometabolic disease, social factors (notably
+        homelessness) amplified extreme-heat mortality risk.
       tier: inferential
-      source_ids: [setoguchi-hennessy-2026]
+      source_ids: [shannon-2025]
   caveats:
     - >-
-      Layton 2020 found drug and heatwave effects largely additive; avoid quoting a
-      multiplicative OR for any single drug.
-    - >-
-      The CDC heat-and-medications page was archived in early 2025; citations reflect
-      the June 2024 version — re-verify against the live page.
+      Daily-weight thresholds follow standard HF patient education (hf-daily-weight-education,
+      URL pending).
+    - The fluid-limit sentence is shared verbatim with Cards 1 and 6.
 
 sources:
-  - id: cdc-heat-medications-2024
-    citation: CDC "Heat and Medications — Guidance for Clinicians" (2024)
-    url: https://restoredcdc.org/www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html
-    year: 2024
+  - id: alahmad-2023
+    citation: >-
+      Alahmad B et al. Associations Between Extreme Temperatures and Cardiovascular
+      Cause-Specific Mortality: Results From 27 Countries. Circulation 2023;147(1):35–46.
+    url: https://doi.org/10.1161/CIRCULATIONAHA.122.061832
+    year: 2023
   - id: layton-2020
-    citation: Layton et al., PLOS One 2020
+    citation: >-
+      Layton JB et al. Heatwaves, medications, and heat-related hospitalization in older
+      Medicare beneficiaries with chronic conditions. PLoS One 2020;15(12):e0243665.
     url: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7728169/
     year: 2020
-  - id: setoguchi-hennessy-2026
-    citation: Setoguchi & Hennessy, Pharmacoepidemiol Drug Saf 2026
-    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13427620/
-    year: 2026
+  - id: cdc-heat-medications-2024
+    citation: CDC "Heat and Medications — Guidance for Clinicians" (June 2024 version)
+    url: https://restoredcdc.org/www.cdc.gov/heat-health/hcp/clinical-guidance/heat-and-medications-guidance-for-clinicians.html
+    year: 2024
+    note: Live page archived early 2025; cites the archived copy.
+  - id: hf-daily-weight-education
+    citation: AHA/HFSA heart-failure patient education (daily-weight call thresholds)
+    note: URL pending.
+  - id: shannon-2025
+    citation: >-
+      Shannon EM et al. Extreme Heat, Social Factors, and Mortality Among California Veterans
+      With Cardiometabolic Disease. JAMA Netw Open 2025;8(11):e2545524.
+    url: https://doi.org/10.1001/jamanetworkopen.2025.45524
+    year: 2025
+    note: Figures pending verification; the card quotes none.
   - id: va-chf-prevalence
-    citation: VA CHF prevalence (JAMA Network Open VA cohort)
+    citation: VA heart-failure prevalence anchor (~5% of veterans in VA care)
+    note: Planning estimate for panel sizing only; awaits its primary VA source.
 
 window_days: {min: 3, max: 7}
 safety:
   do_not_stop_medication: true
   notes:
-    - Never abrupt discontinuation without a plan.
+    - >-
+      There is no guideline rule for reducing diuretics in heat; adjustments are
+      clinician-directed only.
 acuity_class: heart_failure
 care_system_hooks: []

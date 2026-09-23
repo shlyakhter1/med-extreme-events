@@ -10,7 +10,7 @@
 | D2 | Observed outage fires Cards 5/6 at `outage_pct_min: 10` and Card 3 at `outage_pct_min: 25`, with `sustained_polls_min: 2` debounce. The boolean `outage_forecast` stub is **deleted**. |
 | D3 | Heat(/cold)+outage compounding is an **engine-level co-occurrence boost** (acuity bump + `compounding_events` annotation), not compound trigger grammar. Grammar goes to the backlog. |
 | D4 | emPOWER is a **parallel measured exposure layer** (cached reference data, monthly vintage), never a replacement for condition denominators; plus one new Card 6 sub-panel `electricity_dependent_dme`. |
-| D5 | New cards: **Card 7** (extreme cold × cardiovascular/respiratory) and **Card 8** (wildfire smoke × COPD/asthma) — content in `docs/card-library-additions.md`, same evidence discipline as cards 1–6. |
+| D5 | New cards: **Card 7** (extreme cold × cardiovascular/respiratory) and **Card 8** (wildfire smoke × COPD/asthma) — content in `docs/card-library.md` (formerly `card-library-additions.md`, merged 2026-09-23), same evidence discipline as cards 1–6. |
 | D6 | Fixtures built this iteration: **Winter Storm Uri 2021** (new headline/golden test), **Hurricane Ian outage upgrade**, **Canadian smoke July 2026**. Replay catalog (`fixtures/events/CATALOG.md`) lists more without building them. |
 | D7 | US hazard-source catalog ships as `docs/hazard-catalog.md` + machine-readable `data/hazard_sources.yaml`. |
 
@@ -84,11 +84,11 @@ Pure-function addition in `engine.py`: after matching, for every active action i
 - `denominators.py` gains an `empower_dme` source keyed county/ZIP → catchment rollup.
 - **Display rule:** on outage-triggered items, show both lines with provenance: the condition-based veteran estimate (existing) *and* "M electricity-dependent Medicare beneficiaries in catchment (emPOWER, measured; Medicare proxy — not veteran-specific)". emPOWER never silently replaces a veteran denominator (schema `CodeSystem.EMPOWER` already exists for the coding).
 - **Ranking rule:** for `power_outage` events, facility ranking uses `outage_pct × empower_dme_count` as the acuity multiplier (measured × measured), with the formula in the provenance popover.
-- **Card 6 change:** add sub-panel `electricity_dependent_dme` (home O₂ concentrators, ventilators, CPAP/BiPAP, home-dialysis equipment; `device_classes` with `system: empower`), `denominator_key: empower_dme`. Clinical strings for this sub-panel come from `docs/card-library-additions.md` (reviewed content), not code.
+- **Card 6 change:** add sub-panel `electricity_dependent_dme` (home O₂ concentrators, ventilators, CPAP/BiPAP, home-dialysis equipment; `device_classes` with `system: empower`), `denominator_key: empower_dme`. Clinical strings for this sub-panel come from `docs/card-library.md` (formerly `card-library-additions.md`, merged 2026-09-23) (reviewed content), not code.
 
 ## 6. Cards 7 & 8
 
-Content in `docs/card-library-additions.md`; transcribed to `cards/07-cold-cardio-respiratory.yaml` and `cards/08-smoke-copd-asthma.yaml` under the existing schema discipline (verbatim clinical strings, tiered claims, sources). Card 7 triggers on the post-2024 cold taxonomy (normalized per §1); Card 8 on `aqi_min` and HMS smoke density. Both participate in the co-occurrence boost (cold+outage; smoke card has no boost pairing this iteration).
+Content in `docs/card-library.md` (formerly `card-library-additions.md`, merged 2026-09-23); transcribed to `cards/07-cold-cardio-respiratory.yaml` and `cards/08-smoke-copd-asthma.yaml` under the existing schema discipline (verbatim clinical strings, tiered claims, sources). Card 7 triggers on the post-2024 cold taxonomy (normalized per §1); Card 8 on `aqi_min` and HMS smoke density. Both participate in the co-occurrence boost (cold+outage; smoke card has no boost pairing this iteration).
 
 ## 7. Catalogs
 
@@ -99,3 +99,19 @@ Content in `docs/card-library-additions.md`; transcribed to `cards/07-cold-cardi
 
 Unchanged: no PHI; clinical strings only from reviewed card docs; engine pure; provenance on every number; never advise stopping/changing medication; evidence tiers enforced at load.
 New: EAGLE-I attribution string wherever outage data renders; customers≠people and coverage-gap footnotes; emPOWER always labeled as measured Medicare proxy; legacy NWS names normalized with raw preserved; every Event must carry temporality.
+
+## 9. Backlog — post-event phase (from the 2026-09-23 clinical review)
+
+**Status: backlog; not built.** Card 1's reviewed text asks the care team to repeat a
+lithium level "within about a week" *after* the event. The engine derives only `pre_event`
+(forecast/imminent) and `during_event` (observed) from temporality, so the item ships today
+as a during-event care-team action worded "After the event: …" (implementation-plan-clinical
+M12 option A). A real post-event phase would need:
+
+- `post_event` added to `Phase` (schema bump; `cards/card.schema.json` regenerated).
+- Engine derivation: an item whose event has expired, within `event.expires + window`, where
+  `post_event_window_days` lives in `profiles/va.yaml` (a VA planning choice, not a card fact).
+  Phase stays a pure function of (event, now, profile) — no I/O in the engine.
+- Card 1's "After the event" action moved to `phase: post_event` through the card library.
+- One golden assertion: the heat-dome replay issues the Card 1 post-event item after the
+  warning expires and not before.

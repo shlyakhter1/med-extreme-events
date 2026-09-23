@@ -6,7 +6,7 @@ PORT ?= 8000
 ENV_FILE := $(wildcard .env)
 RUN = $(UV) run $(if $(ENV_FILE),--env-file $(ENV_FILE),)
 
-.PHONY: help install lint fmt test schema skills skills-check db-up db-down reference load serve ingest match scenarios demo container clean
+.PHONY: help install lint fmt test schema card-docs skills skills-check db-up db-down reference load serve ingest match scenarios demo container clean
 
 help: ## list targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-14s %s\n", $$1, $$2}'
@@ -28,6 +28,9 @@ test: ## run the test suite (network-marked tests skipped unless RUN_NETWORK_TES
 
 schema: ## regenerate cards/card.schema.json from the Pydantic models
 	$(RUN) python scripts/export_card_schema.py
+
+card-docs: ## regenerate the card-facts table in docs/card-reference-for-frontend.md from cards/*.yaml
+	$(RUN) python scripts/card_docs.py
 
 skills: ## (re)link data-source skills from the sibling skills repo into .claude/skills
 	SKILLS_REPO=$(SKILLS_REPO) $(RUN) python scripts/link_skills.py
