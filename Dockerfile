@@ -23,9 +23,13 @@ COPY docs/carbon.yaml ./docs/carbon.yaml
 # Build the demo database at image build time: facilities + catchments, the five replay
 # scenarios, and the action items the engine derives from them.
 ENV DATABASE_URL=sqlite:////app/demo.db
+# Then snapshot the response caches built from that data (replays, stats, boundary files),
+# so a new instance starts warm instead of computing them on its small CPU after every wake.
+ENV CACHE_SNAPSHOT=/app/cache/snapshot.pkl
 RUN python scripts/load_reference.py \
  && python scripts/ingest.py --mode replay \
- && python scripts/match.py --mode replay
+ && python scripts/match.py --mode replay \
+ && python scripts/bake_cache.py
 
 EXPOSE 8000
 ENV PORT=8000

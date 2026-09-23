@@ -16,7 +16,7 @@ from xevents.engine import match
 from xevents.geography import CountyIndex, ZipCountyCrosswalk, attribute_facilities
 from xevents.models import Card, Estimate
 from xevents.profiles import PROFILES_DIR, load_profile
-from xevents.providers.replay import load_scenario
+from xevents.providers.replay import list_scenarios, load_scenario
 from xevents.providers.va_facilities import from_geojson
 from xevents.store import (
     init_db,
@@ -808,6 +808,36 @@ def test_cache_warm_up_fills_the_entries_monitor_reads(client: TestClient) -> No
     js = client.get("/static/playback.js").text
     assert "getJSON(`/events?${q}compact=1`)" in js
     assert "getJSON(`/action-items?${q}include_superseded=true`)" in js
+
+
+def test_cache_snapshot_round_trip_serves_every_first_request(
+    client: TestClient, tmp_path: Path
+) -> None:
+    """The image bakes its caches (scripts/bake_cache.py) and a new instance loads them. After
+    a load, the map's boundary files, Monitor's replay requests and the Scenarios/Cards pages
+    must all be hits: a new key would mean an instance computing it on the free CPU again."""
+    import xevents.api as api
+    from xevents.web import views
+
+    eng = client.app.state.engine  # type: ignore[attr-defined]
+    snap = tmp_path / "snapshot.pkl"
+    assert api.bake_snapshot(eng, snap) > 0
+    baked = (set(api._BODY_CACHE), set(views._STATS_CACHE), set(api._SUMMARY_CACHE))
+    for cache in (api._BODY_CACHE, views._STATS_CACHE, api._SUMMARY_CACHE):
+        cache.clear()
+    assert api.load_snapshot(snap)
+    assert (set(api._BODY_CACHE), set(views._STATS_CACHE), set(api._SUMMARY_CACHE)) == baked
+
+    for path in ("/reference/counties", "/reference/states", "/reference/countries"):
+        assert client.get(path).status_code == 200, path
+    for name in list_scenarios():
+        client.get("/events", params={"scenario": name, "compact": "1"})
+        client.get("/action-items", params={"scenario": name, "include_superseded": "true"})
+    for path in ("/scenarios", "/replays", "/card-library"):
+        assert client.get(path).status_code == 200, path
+    after = (set(api._BODY_CACHE), set(views._STATS_CACHE), set(api._SUMMARY_CACHE))
+    assert after == baked, "every first request was served from the snapshot"
+    assert not api.load_snapshot(tmp_path / "missing.pkl")
 
 
 def test_welcome_is_reachable_from_every_page(client: TestClient) -> None:

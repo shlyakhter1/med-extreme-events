@@ -2,6 +2,36 @@
 
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10).
 
+## 2026-09-23 — cold start on the free instance: bake the caches into the image
+
+Report: on Render the Monitor took ~25 s to draw, Scenarios/Cards switches were very slow,
+live data >30 s. **Warm Render was fine** (headless Chrome, 2026-09-23 16:5x UTC: Monitor
+4.9 s to network idle, switch to Uri 1.3 s, Scenarios and Cards ~2 s each). The slowness is
+the **cold start**: the free instance sleeps after 15 min idle, so most visits hit a fresh
+process on 0.1 CPU. Reproduced with the image under `docker run --cpus=0.1 --memory=512m`
+(harsher than Render, so read ratios, not seconds): right after boot Uri took 105 s,
+`/replays` 84 s, `/scenarios` 59 s. The startup warm-up thread added in 830d761 ran 273 s
+inside the web process (same GIL, no `nice`) while the live refresh ran 144 s + 134 s beside it.
+
+**Done.** `make lint test` green (287 passed, 9 skipped).
+- `scripts/bake_cache.py` runs in the Dockerfile after ingest/match and writes
+  `CACHE_SNAPSHOT=/app/cache/snapshot.pkl` (28 entries, 18.9 MB, 1.5 s at build): Monitor's
+  replay bodies, Scenarios/Cards stats, scenario summaries, the three boundary files. The app
+  loads it at startup (0.3 s on 0.1 CPU) and then skips the warm-up thread; without the env
+  var or the file, behaviour is unchanged. Keys are the request-time keys (`replay_version`,
+  file mtimes), so a stale entry is never hit. Test: bake → clear → load → every boundary,
+  replay, `/scenarios`, `/replays`, `/card-library` request adds no new cache key.
+- `scenario_summary` uses a plain dict instead of `lru_cache` so the snapshot can seed it.
+- Emulated after: Uri switch 105 → 2.5 s, `/replays` 84 → 15 s (6 s without live refresh).
+
+**Not fixed — the live refresh at boot.** Live events cannot be baked; every wake re-runs
+ingest + match (~2.3 s CPU locally, 1.2 + 1.0; network ~7 s) in fresh subprocesses, so the
+live view is empty for the first minute or so on Render and first-page requests share the CPU
+with it. The remaining lever is not waking cold: a paid instance (no sleep, 0.5 CPU) or a
+keep-alive ping.
+
+**Not yet verified on Render** — needs a push to `main`.
+
 ## 2026-09-22 — boundary payloads: revalidation and map precision
 
 Chased a report that the "20 second delay switching tabs" was back after the welcome-screen

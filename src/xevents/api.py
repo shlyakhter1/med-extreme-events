@@ -6,13 +6,15 @@ import gzip
 import hashlib
 import json
 import math
+import os
+import pickle
 import threading
 import time
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from email.utils import format_datetime
-from functools import lru_cache, partial
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -87,11 +89,18 @@ def scenario_summary(name: str) -> dict[str, Any]:
     (invalidated when ``events.json`` changes) and the peak is found with one sweep."""
     path = EVENTS_DIR / name / "events.json"
     stat = path.stat()
-    return dict(_scenario_summary(name, stat.st_mtime_ns, stat.st_size))
+    key = (name, stat.st_mtime_ns, stat.st_size)
+    hit = _SUMMARY_CACHE.get(key)
+    if hit is None:
+        hit = _SUMMARY_CACHE[key] = _scenario_summary(name)
+    return dict(hit)
 
 
-@lru_cache(maxsize=32)
-def _scenario_summary(name: str, mtime_ns: int, size: int) -> dict[str, Any]:
+# A dict rather than lru_cache so the build-time snapshot can seed it (see bake_snapshot).
+_SUMMARY_CACHE: dict[tuple[str, int, int], dict[str, Any]] = {}
+
+
+def _scenario_summary(name: str) -> dict[str, Any]:
     evs = load_scenario(name)
     start = min(e.onset for e in evs)
     end = max(e.expires for e in evs)
@@ -134,38 +143,94 @@ def _parse_at(value: str | None) -> datetime | None:
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Start the background live refresh when LIVE_REFRESH_MINUTES > 0 (hosted demo)."""
     minutes = live_refresh.minutes_from_env()
+    snapshot = os.environ.get("CACHE_SNAPSHOT")
+    loaded = bool(snapshot) and load_snapshot(Path(snapshot))  # type: ignore[arg-type]
     if minutes:
         live_refresh.start(minutes)
-        # hosted: warm the replay caches in the background so the first visitor after a
-        # deploy is not the one who waits for them
+    if minutes and not loaded:
+        # hosted without a snapshot: warm the replay caches in the background so the first
+        # visitor after a deploy is not the one who waits for them
         threading.Thread(
             target=_warm, args=(app.state.engine,), name="warm-caches", daemon=True
         ).start()
     yield
 
 
-def _warm(engine: Engine) -> None:
+def _fill_replay_caches(engine: Engine) -> None:
+    """Build Monitor's replay responses and the Scenarios/Cards stats for every replay."""
     from xevents.web.views import warm_replay_caches  # local import: views imports api
 
+    for name in list_scenarios():
+        version = replay_version(engine, name)
+        _cache_body(
+            _events_key(name, version),
+            partial(_json_of, partial(_compact_events_doc, engine, name)),
+        )
+        _cache_body(
+            _items_key(name, version),
+            partial(_json_of, partial(_compact_items_doc, engine, name)),
+        )
+    warm_replay_caches(engine)
+
+
+def _warm(engine: Engine) -> None:
     started = time.monotonic()
     try:
-        for name in list_scenarios():
-            version = replay_version(engine, name)
-            _cache_body(
-                _events_key(name, version),
-                partial(_json_of, partial(_compact_events_doc, engine, name)),
-            )
-            _cache_body(
-                _items_key(name, version),
-                partial(_json_of, partial(_compact_items_doc, engine, name)),
-            )
-        warm_replay_caches(engine)
+        _fill_replay_caches(engine)
         print(
             f"cache warm-up: {len(list_scenarios())} replays in {time.monotonic() - started:.0f}s",
             flush=True,
         )
     except Exception as exc:  # warming is best-effort: a failure only means a slower first page
         print(f"cache warm-up failed: {type(exc).__name__}: {exc}", flush=True)
+
+
+# Build-time snapshot of the caches above. Everything in it is derived from the image alone —
+# the baked replays, the boundary files, the fixtures — so the image can carry it and a new
+# instance starts warm. Warming at startup instead took minutes of the free instance's 0.1 CPU
+# after every wake from sleep, inside the web process, and every page waited behind it.
+# Entries are keyed as at request time (replay_version, file mtimes), so an entry that no
+# longer matches the data is simply never hit.
+def bake_snapshot(engine: Engine, path: Path) -> int:
+    """Fill every cache from ``engine`` and the fixtures, and write them to ``path``. Unlike
+    the startup warm-up this raises: a failed bake should fail the image build."""
+    _fill_replay_caches(engine)
+    for name in list_scenarios():
+        scenario_summary(name)
+    for geo, display in (
+        (COUNTIES_GEOJSON, COUNTIES_DISPLAY_GEOJSON),
+        (STATES_GEOJSON, None),
+        (COUNTRIES_GEOJSON, None),
+    ):
+        key, build, _ = _geo_entry(geo, display)
+        _cache_body(key, build)
+    from xevents.web.views import _STATS_CACHE
+
+    doc = {"bodies": _BODY_CACHE, "stats": _STATS_CACHE, "summaries": _SUMMARY_CACHE}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(pickle.dumps(doc, protocol=pickle.HIGHEST_PROTOCOL))
+    return len(_BODY_CACHE) + len(_STATS_CACHE) + len(_SUMMARY_CACHE)
+
+
+def load_snapshot(path: Path) -> bool:
+    """Seed the caches from a snapshot written by ``bake_snapshot`` at image build time. The
+    file is the image's own, never user input."""
+    if not path.exists():
+        print(f"cache snapshot: {path} not found; caches fill on first request", flush=True)
+        return False
+    from xevents.web.views import _STATS_CACHE
+
+    started = time.monotonic()
+    doc = pickle.loads(path.read_bytes())  # written by our own build step
+    _BODY_CACHE.update(doc["bodies"])
+    _STATS_CACHE.update(doc["stats"])
+    _SUMMARY_CACHE.update(doc["summaries"])
+    print(
+        f"cache snapshot: {len(doc['bodies'])} bodies, {len(doc['stats'])} stats, "
+        f"{len(doc['summaries'])} summaries in {time.monotonic() - started:.1f}s",
+        flush=True,
+    )
+    return True
 
 
 _BODY_CACHE: dict[tuple[object, ...], tuple[bytes, bytes, str]] = {}
@@ -262,17 +327,20 @@ def _static_geo(request: Request, path: Path, display: Path | None = None) -> Re
     ``display`` is a smaller copy for the browser — geometry at map precision, without the
     bbox and properties only the server's county lookup reads. The full file stays the one
     ``CountyIndex`` joins facilities against, so thinning it cannot move a county line."""
+    key, build, modified = _geo_entry(path, display)
+    return _cached(
+        request, key, build, "application/geo+json", max_age=86400, last_modified=modified
+    )
+
+
+def _geo_entry(
+    path: Path, display: Path | None = None
+) -> tuple[tuple[object, ...], Callable[[], bytes], datetime]:
+    """Cache key, body builder and modification time for a boundary file (or its display copy)."""
     served = display if display is not None and display.exists() else path
     stat = served.stat()
     key = ("geo", str(served), stat.st_mtime_ns)
-    return _cached(
-        request,
-        key,
-        served.read_bytes,
-        "application/geo+json",
-        max_age=86400,
-        last_modified=datetime.fromtimestamp(stat.st_mtime, UTC),
-    )
+    return key, served.read_bytes, datetime.fromtimestamp(stat.st_mtime, UTC)
 
 
 def compact_item(i: Any) -> dict[str, Any]:
