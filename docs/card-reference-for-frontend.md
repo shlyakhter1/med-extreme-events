@@ -1,6 +1,6 @@
 # Playbook cards — reference for the front-end team
 
-*As of 2026-09-23 (clinical review adopted). Describes the eight cards as the API serves
+*As of 2026-09-23 (AI-drafted evidence review adopted; pending clinician sign-off). Describes the eight cards as the API serves
 them, and the rules for rendering them. Source of truth for the clinical wording is
 `docs/card-library.md`, and for sources `docs/medical-references.md`; the
 machine-readable form is `cards/*.yaml`, validated against `cards/card.schema.json`.*

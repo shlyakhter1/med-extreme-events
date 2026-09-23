@@ -1,4 +1,4 @@
-"""Test helpers: the reviewed card library and the medical-references index, as the tests
+"""Test helpers: the card library and the medical-references index, as the tests
 read them. Test-only — `docs/` is not shipped in the image, so nothing at runtime parses it.
 """
 

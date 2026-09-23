@@ -1,4 +1,4 @@
-"""The clinical review's rendering rules (implementation-plan-clinical M12 §3–§5): planning
+"""The evidence review's rendering rules (implementation-plan-clinical M12 §3–§5): planning
 estimates are labeled as such, both Card 6 hotlines are tappable, caveats (where the contested
 findings live) render, and no page shows library markup."""
 

@@ -3,7 +3,7 @@
 {% block title %}Cards · med-extreme-events{% endblock %}
 {% block content %}
 <h1 style="margin:0; font-size:25px; line-height:1.2; font-weight:600; letter-spacing:-.01em">Cards</h1>
-<p class="muted" style="max-width:820px; margin:6px 0 0">Each card pairs a hazard with a group of patients at risk from it. When one of its triggers matches an event near a station, the card issues action items for the care team and wording for patients. All text below is the reviewed card content, shown as written; ordered by card number.</p>
+<p class="muted" style="max-width:820px; margin:6px 0 0">Each card pairs a hazard with a group of patients at risk from it. When one of its triggers matches an event near a station, the card issues action items for the care team and wording for patients. All text below is the card content, shown as written — an AI-drafted evidence review pending clinician sign-off; ordered by card number.</p>
 
 <div class="src-grid" style="margin-top:22px; grid-template-columns:repeat(auto-fill,minmax(440px,1fr))">
 {% for c in cards %}{% set fired = firing.get(c.id, []) %}

@@ -1,6 +1,6 @@
 # Playbook Card Library — Cards 1–8
 
-*As of 2026-09-23. The reviewed source of truth for all card content. `cards/*.yaml` is
+*As of 2026-09-23. The source of truth for all card content. `cards/*.yaml` is
 transcribed from this document; patient-facing sentences are verbatim and enforced by test.
 Every quantitative claim carries an evidence tier (strong | inferential | expert_guidance)
 and cites a source id from [`medical-references.md`](medical-references.md). Sentences marked
@@ -12,6 +12,41 @@ advises stopping or changing a medication.*
 library markup, not card text. They are stripped when a sentence is copied into YAML (the
 marker and the single space after it are removed), and markdown emphasis (`*lose*`) is
 transcribed as plain text. No YAML string or rendered page ever contains "[SHARED]".*
+
+
+## Status: pending clinician sign-off
+
+This revision is an **AI-drafted evidence review** (Claude, 2026-09-23): claims were checked
+against the literature and wording was proposed, but no clinician has approved it yet. The
+cards are live in the demo with this text. A clinician should review this file end to end,
+plus [`medical-references.md`](medical-references.md) §1 (source status), §3 (shared
+sentences), §4 (contested findings) and §5 (verification queue), and decide the open
+questions below. Each card is easiest to read as rendered at `/card-library/<card-id>`.
+
+**Open questions for clinician sign-off**
+
+1. **Card 6 mechanism.** This library gives Card 6 no mechanism paragraph, and the card
+   format requires one. The YAML keeps the previous version's sentence: "Disasters cut
+   transportation, power, and water, forcing missed sessions → fluid overload,
+   hyperkalemia, and uremia that can be fatal." Approve it, or supply a replacement.
+2. **Card 4 panel figures.** Card 4's panel is narrowed by a VA HFrEF ACE/ARB/ARNI share of
+   0.62 (reported range ~60–64%), and the demo checks totals against ~510,000 VHA
+   heart-failure patients (2016–2020). Both come from the previous library and are not
+   restated here. Confirm them with a source, or say what to use instead.
+3. **Card-level evidence tiers.** Tiers are assigned per claim; each card's overall tier was
+   left as before. Card 3 is still `inferential` although most of its claims are now
+   `strong` (the clozapine-withdrawal mechanism remains `inferential`). Confirm or reassign
+   the overall tier for each card.
+4. **Caregiver text.** No card has caregiver-addressed wording; caregivers currently see the
+   patient text. Decide whether caregiver versions are needed, and supply them if so.
+5. **Pending sources.** Ten sources are marked `pending` in medical-references §1:
+   nsaid-class-labeling, fda-lithium-label, shannon-2025, shiovitz-1996,
+   hf-daily-weight-education, ada-sick-day, cdc-co-guidance, aha-snow-shoveling,
+   epa-wildfire-smoke-guide and respiratory-action-plans. So are the four VA prevalence
+   anchors (va-chf/diabetes/smi/esrd-prevalence) used for panel sizing. Two more are partly
+   verified: chen-2025 (polypharmacy OR) and weiden-2017 (primary DOI). No figure rests on a
+   pending source alone. Verify them in the §5 order, or approve launching while they are
+   pending.
 
 ---
 

@@ -9,8 +9,8 @@ Read before any work:
 - `docs/implementation-plan-v2.md` — milestones M6–M10 (temporality, EAGLE-I outages, emPOWER, Cards 7–8)
 - `docs/requirements.md` — system concept, data model, architecture (§7 has the action-item schema)
 - `docs/requirements-v2.md` — temporality axis, trigger schema v2, outage provider, co-occurrence boost (settled decisions; do not reopen)
-- `docs/implementation-plan-clinical.md` — milestones M11–M12 (adopting the 2026-09-23 clinical review)
-- `docs/card-library.md` — all eight clinical cards (+ Card 6 DME sub-panel), clinically reviewed; the only source for card YAML clinical strings
+- `docs/implementation-plan-clinical.md` — milestones M11–M12 (adopting the 2026-09-23 AI-drafted evidence review)
+- `docs/card-library.md` — all eight clinical cards (+ Card 6 DME sub-panel), AI-drafted review of 2026-09-23 **pending clinician sign-off**; the only source for card YAML clinical strings
 - `docs/medical-references.md` — the reference index: source ids + verification status (§1), ids by card (§2), cross-card consistency rules (§3)
 
 Repo home: `shlyakhter1` GitHub. Stack: Python 3.12, FastAPI, SQLAlchemy + PostgreSQL/PostGIS (SQLite+SpatiaLite fallback), Pydantic v2, httpx, Jinja2 + htmx, pytest, ruff + mypy, Makefile entry points.

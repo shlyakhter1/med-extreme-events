@@ -100,7 +100,7 @@ Content in `docs/card-library.md` (formerly `card-library-additions.md`, merged 
 Unchanged: no PHI; clinical strings only from reviewed card docs; engine pure; provenance on every number; never advise stopping/changing medication; evidence tiers enforced at load.
 New: EAGLE-I attribution string wherever outage data renders; customers≠people and coverage-gap footnotes; emPOWER always labeled as measured Medicare proxy; legacy NWS names normalized with raw preserved; every Event must carry temporality.
 
-## 9. Backlog — post-event phase (from the 2026-09-23 clinical review)
+## 9. Backlog — post-event phase (from the 2026-09-23 AI-drafted evidence review)
 
 **Status: backlog; not built.** Card 1's reviewed text asks the care team to repeat a
 lithium level "within about a week" *after* the event. The engine derives only `pre_event`

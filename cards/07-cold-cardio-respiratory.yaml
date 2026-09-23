@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 7. Clinical strings
+# Transcribed from docs/card-library.md (AI-drafted review 2026-09-23, pending clinician
+# sign-off) — Card 7. Clinical strings
 # are verbatim; do not edit in code. [SHARED] markers are library markup and are stripped.
 # Triggers list the post-Oct-2024 NWS product names only; legacy names (Wind Chill …) are
 # normalized in the NWS provider (SCN23-44), never here.

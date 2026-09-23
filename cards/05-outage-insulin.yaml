@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 5. Clinical strings
+# Transcribed from docs/card-library.md (AI-drafted review 2026-09-23, pending clinician
+# sign-off) — Card 5. Clinical strings
 # are verbatim; do not edit in code. [SHARED] markers are library markup and are stripped.
 id: outage-insulin
 version: 1.2.0

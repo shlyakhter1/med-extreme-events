@@ -77,7 +77,7 @@ def test_heat_cards_share_trigger_vocabulary(cards: list[Card]) -> None:
 
 
 def test_patient_strings_are_verbatim_from_card_library(cards: list[Card]) -> None:
-    """Every patient-facing sentence must appear verbatim in the reviewed card library
+    """Every patient-facing sentence must appear verbatim in the card library
     (docs/card-library.md), with library markup ([SHARED], claim markers) stripped."""
     library = library_text()
     for card in cards:

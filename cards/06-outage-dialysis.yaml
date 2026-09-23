@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=card.schema.json
-# Transcribed from docs/card-library.md (clinical review 2026-09-23) — Card 6 and its
+# Transcribed from docs/card-library.md (AI-drafted review 2026-09-23, pending clinician
+# sign-off) — Card 6 and its
 # electricity-dependent DME sub-panel. Clinical strings are verbatim; do not edit in code.
 # [SHARED] markers are library markup and are stripped.
 # TODO(2026-Q4): drop the legacy KCER number (1-866-901-3773) from the patient text once the
@@ -122,8 +123,8 @@ escalation:
 
 evidence_tier: strong
 evidence:
-  # The reviewed library gives Card 6 no mechanism paragraph; this sentence is carried over
-  # from the previously reviewed library (v1.2.0) and is flagged for the clinical reviewer.
+  # The 2026-09-23 library gives Card 6 no mechanism paragraph; this sentence is carried
+  # over from the previous library (v1.2.0) — open question 1 for clinician sign-off.
   mechanism: >-
     Disasters cut transportation, power, and water, forcing missed sessions → fluid overload,
     hyperkalemia, and uremia that can be fatal.

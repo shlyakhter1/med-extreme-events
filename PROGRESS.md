@@ -3,6 +3,16 @@
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10, then
 M11 → M12 from `docs/implementation-plan-clinical.md`).
 
+## 2026-09-23 — review status corrected; clinician sign-off questions
+
+The 2026-09-23 card-library revision was drafted by Claude, not by a clinician. The docs,
+card YAML headers, `CLAUDE.md` and the Cards page had called it "clinically reviewed"; they
+now say **AI-drafted, pending clinician sign-off**. `docs/card-library.md` opens with a
+status section and five open questions for the clinician: the Card 6 mechanism sentence,
+the Card 4 panel figures, card-level tiers, caregiver text, and the ten pending sources (plus
+the four VA anchors). The clinician's files are `docs/card-library.md` and
+`docs/medical-references.md` §1/§3/§4/§5. The text of all eight cards is unchanged.
+
 ## 2026-09-23 — M12: consistency guards, phase handling, provenance polish (done)
 
 **Done.** `make lint test` green (317 passed, 9 skipped). Goldens regenerated with
@@ -52,8 +62,8 @@ both reviewer work.
 ## 2026-09-23 — M11: adopt the reviewed card library (done)
 
 **Done.** `make lint test` green.
-- `docs/card-library.md` and `docs/medical-references.md` were replaced by the clinical-review
-  versions, and `docs/card-library-additions.md` was deleted (merged). Inbound links were
+- `docs/card-library.md` and `docs/medical-references.md` were replaced by the AI-drafted
+  review versions (Claude; not yet signed off by a clinician), and `docs/card-library-additions.md` was deleted (merged). Inbound links were
   fixed in the guide, requirements-v2, implementation-plan-v2, CLAUDE.md and `carbon.py`. A
   new test checks that every relative link in `docs/`, README and CLAUDE.md resolves
   (47 links). The library header now documents the transcription rule: `[SHARED]` and
@@ -73,8 +83,8 @@ both reviewer work.
 - `docs/card-reference-for-frontend.md` now has a per-card facts table generated from the
   YAML (`make card-docs`, `scripts/card_docs.py`), with a freshness test. Stale hand counts
   were removed, and the Card 6 note now covers both hotlines.
-- Claim tiers are clinically assigned; the "engineering placeholders" caveat was removed
-  from the guide and marked superseded in the M0 entry.
+- Claim tiers come from the AI-drafted review (pending clinician sign-off); the "engineering
+  placeholders" caveat was removed from the guide and marked superseded in the M0 entry.
 
 
 ## 2026-09-23 — guide review; medical references
@@ -1295,7 +1305,8 @@ intersection if PostGIS friction appears.
   assigned per the card library's own tier definitions (case reports and non-significant
   subgroups → `inferential`); card-level `evidence_tier` must match the tier of at least one
   claim. ~~Needs clinical reviewer confirmation.~~ *Superseded 2026-09-23 (M11): claim tiers
-  and source ids are now clinically assigned in `docs/card-library.md`.*
+  and source ids now come from the AI-drafted review in `docs/card-library.md`, pending
+  clinician sign-off.*
 - Heat triggers list both `Excessive Heat Warning` (pre-2025 NWS name, used by the 2021
   heat-dome fixture) and `Extreme Heat Warning` (current name).
 - Terminology bindings: conditions as ICD-10-CM, medication classes as ATC, devices as

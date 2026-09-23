@@ -81,8 +81,9 @@ panel.
 ## 4. Playbook cards
 
 The eight cards in `cards/*.yaml` are the clinical content. Each is transcribed verbatim
-from `docs/card-library.md`, the clinically reviewed source of truth for all eight cards and
-the Card 6 electricity-dependent DME sub-panel (review of 2026-09-23).
+from `docs/card-library.md`, the source of truth for all eight cards and the Card 6
+electricity-dependent DME sub-panel. Its 2026-09-23 revision is an AI-drafted evidence review
+**pending clinician sign-off** (open questions at the top of that file).
 
 | # | Card id | Fires on | Panel basis | Lead window | Acuity (1 = highest) |
 | --- | --- | --- | --- | --- | --- |
@@ -111,8 +112,8 @@ observed outage can raise a heat or cold item one class (§5).
   population, evidence tier and where each fires in the replays and live; `/card-library/{id}`
   shows one card in full, rendered verbatim from its YAML. This is the most readable view.
 - **Clinical source of truth:** [`docs/card-library.md`](../card-library.md) (all eight
-  cards and the Card 6 DME sub-panel, with claim-level evidence tiers). This is the reviewed
-  text the YAML is transcribed from.
+  cards and the Card 6 DME sub-panel, with claim-level evidence tiers). This is the text the
+  YAML is transcribed from; it awaits clinician sign-off.
 - **Machine-readable:** `cards/*.yaml`, served as JSON by `GET /cards`.
 - **For front-end work:** [`docs/card-reference-for-frontend.md`](../card-reference-for-frontend.md)
   (response shapes and rendering rules).
@@ -139,7 +140,7 @@ planning anchors (`va-*-prevalence` in medical-references §1: bipolar, schizoph
 clozapine share, heart failure, diabetes, dialysis), `modeled_estimate` for CDC PLACES ×
 VetPop panels, and `measured` for emPOWER counts. The provenance popover shows it as a label.
 
-**To change clinical content,** edit `docs/card-library.md` through clinical review first,
+**To change clinical content,** edit `docs/card-library.md` through clinician review first,
 then transcribe the change into the YAML and bump the card `version`. Tests check that the
 patient-facing, care-team, escalation, claim and caveat strings in the YAML appear verbatim
 in the library (with its `[SHARED]` and claim markers stripped); that each card's source ids
@@ -270,7 +271,9 @@ These are tracked in `PROGRESS.md`:
 - The VHA-user share (0.50 of veterans), which scales every VA-literature rate.
 - Heat cards also fire on heat **watches**, the 3–7-day lead signal. The card library names
   only advisories and warnings.
-- Claim-level evidence tiers and source ids are clinically assigned (review of 2026-09-23).
+- Claim-level evidence tiers and source ids come from the 2026-09-23 AI-drafted evidence
+  review and await clinician sign-off; see the open questions at the top of
+  [`docs/card-library.md`](../card-library.md).
   The terminology bindings (ICD-10-CM, ATC) are still engineering choices awaiting review.
 - Pending sources (medical-references §5) support no figure on any card; the verification
   queue is reviewer work.
