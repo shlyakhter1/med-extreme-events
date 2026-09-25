@@ -102,10 +102,10 @@ is stale):
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `heat-lithium` | 2.0.0 | 3–7 d | strong | 4 / 3 | 7 | 3 (1) | 3 | 1 | finley-1995, nsaid-class-labeling, fda-lithium-label, cdc-heat-medications-2024, va-smi-prevalence |
 | 2 | `heat-antipsychotics` | 1.1.0 | 3–7 d | strong | 3 / 2 | 5 | 3 (2) | 6 | 2 | nordon-2009, martin-latry-2007, chen-2025, bccdc-bcmj-2023, heat-thermoregulation-meta-2024, cdc-heat-medications-2024, va-smi-prevalence |
-| 3 | `hurricane-delivery-interruption` | 2.0.0 | 3–7 d | inferential | 4 / 2 | 5 | 4 (0) | 7 | 2 | fda-clozapine-rems-2025, clozapine-pi, shiovitz-1996, weiden-2017, maxwell-2009, mcclure-2014, griffin-2018, samhsa-42cfr8-2024, va-pharmacy-disaster-relief-plan |
+| 3 | `hurricane-delivery-interruption` | 2.1.0 | 3–7 d | inferential | 4 / 2 | 5 | 4 (0) | 7 | 2 | fda-clozapine-rems-2025, clozapine-pi, shiovitz-1996, weiden-2017, maxwell-2009, mcclure-2014, griffin-2018, samhsa-42cfr8-2024, va-pharmacy-disaster-relief-plan |
 | 4 | `heat-heart-failure` | 2.0.0 | 3–7 d | strong | 3 / 1 | 5 | 3 (1) | 4 | 2 | alahmad-2023, layton-2020, cdc-heat-medications-2024, hf-daily-weight-education, shannon-2025, va-chf-prevalence |
-| 5 | `outage-insulin` | 1.2.0 | 3–7 d | strong | 3 / 1 | 10 | 3 (1) | 3 | 2 | fda-insulin-emergency, setoguchi-hennessy-2026, fonseca-2009, ada-sick-day, va-diabetes-prevalence |
-| 6 | `outage-dialysis` | 2.0.0 | 3–7 d | strong | 5 / 1 | 8 | 4 (2) | 5 | 2 | anderson-2009, kelman-2015, lurie-2015, lukowsky-2019, nkf-emergency-diet, ipro-khares, hhs-empower, va-esrd-prevalence |
+| 5 | `outage-insulin` | 1.3.0 | 3–7 d | strong | 3 / 1 | 10 | 3 (1) | 3 | 2 | fda-insulin-emergency, setoguchi-hennessy-2026, fonseca-2009, ada-sick-day, va-diabetes-prevalence |
+| 6 | `outage-dialysis` | 2.1.0 | 3–7 d | strong | 5 / 1 | 8 | 4 (2) | 5 | 2 | anderson-2009, kelman-2015, lurie-2015, lukowsky-2019, nkf-emergency-diet, ipro-khares, hhs-empower, va-esrd-prevalence |
 | 7 | `cold-cardio-respiratory` | 1.1.0 | 1–3 d | strong | 4 / 1 | 7 | 5 (3) | 4 | 2 | gasparrini-2015, texas-dshs-uri-2021, nws-scn23-44, cdc-co-guidance, aha-snow-shoveling, fda-insulin-emergency |
 | 8 | `smoke-copd-asthma` | 1.1.0 | 1–3 d | strong | 3 / 1 | 9 | 3 (1) | 3 | 3 | meek-2023, cdc-smoke-asthma-2023, epa-wildfire-smoke-guide, noaa-hms, respiratory-action-plans |
 <!-- card-facts:end -->

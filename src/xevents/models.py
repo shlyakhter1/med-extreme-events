@@ -30,6 +30,7 @@ class EventType(StrEnum):
     HEAT = "heat"
     EXTREME_COLD = "extreme_cold"  # cold and winter-storm products (post-2024 NWS taxonomy)
     HURRICANE_FLOOD = "hurricane_flood"
+    HIGH_WIND = "high_wind"  # forecast outage risk (Cards 5/6); observed loss is POWER_OUTAGE
     POWER_OUTAGE = "power_outage"
     WILDFIRE_SMOKE = "wildfire_smoke"
     AIR_POLLUTION = "air_pollution"

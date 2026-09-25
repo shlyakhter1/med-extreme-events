@@ -3,7 +3,7 @@
 # sign-off) — Card 3. Clinical strings
 # are verbatim; do not edit in code.
 id: hurricane-delivery-interruption
-version: 2.0.0
+version: 2.1.0
 number: 3
 title: "Hurricane / Flood × Delivery Interruption: Clozapine, LAIs, Methadone"
 summary: >-
@@ -23,7 +23,10 @@ event_triggers:
         - Storm Surge Warning
         - Flood Watch
         - Flood Warning
+        - Flash Flood Watch
         - Flash Flood Warning
+        - Coastal Flood Watch
+        - Coastal Flood Warning
   - type: power_outage
     conditions:
       temporality: observed

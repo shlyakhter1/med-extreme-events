@@ -283,6 +283,28 @@ def test_observed_outage_supersedes_hurricane_watch_items(
     assert watch_items["hurricane-delivery-interruption"].status is ActionItemStatus.ISSUED
 
 
+def test_observed_outage_supersedes_high_wind_items(cards: list[Card], profile: Profile) -> None:
+    """A High Wind Warning prepares the outage cards; once the outage is observed and
+    sustained, it takes over those items."""
+    assert SUPERSEDE_FAMILIES[(EventType.HIGH_WIND, EventType.POWER_OUTAGE)] == {
+        "outage-insulin",
+        "outage-dialysis",
+    }
+    wind = _nws(
+        "High Wind Warning",
+        source_id="hw",
+        severity=CapSeverity.SEVERE,
+        temporality=Temporality.IMMINENT,
+    ).model_copy(update={"event_type": EventType.HIGH_WIND})
+    polls = [_outage(0, 15.0), _outage(1, 15.0)]
+    alone = match([wind], cards, [FACILITY], profile, _panels, now=NOW).items
+    assert {i.card_id for i in alone} == {"outage-insulin", "outage-dialysis"}
+    assert all(i.status is ActionItemStatus.ISSUED for i in alone)
+    items = match([wind, *polls], cards, [FACILITY], profile, _panels, now=NOW).items
+    wind_items = [i for i in items if i.event_key == "nws:hw"]
+    assert wind_items and all(i.status is ActionItemStatus.SUPERSEDED for i in wind_items)
+
+
 def test_observed_is_never_downgraded_by_a_stronger_forecast(
     cards: list[Card], profile: Profile
 ) -> None:

@@ -191,6 +191,7 @@
         "heat",
         "extreme_cold",
         "hurricane_flood",
+        "high_wind",
         "power_outage",
         "wildfire_smoke",
         "air_pollution"

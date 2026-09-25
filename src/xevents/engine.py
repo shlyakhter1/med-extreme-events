@@ -40,6 +40,7 @@ SUPERSEDE_FAMILIES: dict[tuple[EventType, EventType], frozenset[str]] = {
     (EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE): frozenset(
         {"hurricane-delivery-interruption", "outage-insulin", "outage-dialysis"}
     ),
+    (EventType.HIGH_WIND, EventType.POWER_OUTAGE): frozenset({"outage-insulin", "outage-dialysis"}),
 }
 
 SEVERITY_RANK = {

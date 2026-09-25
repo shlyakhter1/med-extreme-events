@@ -9,7 +9,7 @@
 (() => {
   const COLORS = XMap.EVENT_COLORS;
   const SEV = XMap.SEVERITY_RANK;
-  const TYPE_ORDER = ["hurricane_flood", "heat", "extreme_cold", "power_outage", "air_pollution", "wildfire_smoke"];
+  const TYPE_ORDER = ["hurricane_flood", "high_wind", "heat", "extreme_cold", "power_outage", "air_pollution", "wildfire_smoke"];
   const HOUR = 3600e3;
   const $ = (id) => document.getElementById(id);
 

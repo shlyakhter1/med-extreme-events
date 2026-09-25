@@ -25,7 +25,7 @@
 | Flood (observed/forecast stage) | NOAA NWPS API + Flood Inundation Mapping (ArcGIS) | Free; "not supported 24/7, may change without notice" | Gauge + inundation polygons; NWM forecast | obs + forecast | Complements 3/5/6 flood triggers | FIM coverage expanding toward national by late 2026 |
 | Wildfire incidents/perimeters | NIFC/WFIGS ArcGIS FeatureServers (IRWIN-sourced) | Free with attribution | Perimeter polygons, 5-min | observed | Sharpens 8; evacuation context | |
 | Drought / water access | US Drought Monitor REST (usdmdataservices.unl.edu); CDC Tracking API | Free | County/HUC, weekly | observed | Private-well/water-access card | |
-| High wind / tornado / derecho | NWS alerts (existing provider; taxonomy extension only) | Free | Zone/county | forecast/imminent | Outage proxy; DME pre-positioning | Cheap add when needed |
+| High wind / tornado / derecho | NWS alerts (existing provider; taxonomy extension only) | Free | Zone/county | forecast/imminent | Outage proxy; DME pre-positioning | **High wind shipped 2026-09-25** (`high_wind` → Cards 5/6); tornado/derecho still backlog |
 | Extreme-heat + power grid stress | EIA-930 hourly demand/forecast by BA | Free key | Balancing authority, hourly | forecast (day-ahead) | Indirect outage-risk signal | Proxy only; never a customers-out substitute |
 | UV / other environmental | EPA UV index; CDC Environmental Tracking APIs | Free | ZIP/county | forecast | Low priority | |
 | Major-outage incident record | DOE OE-417 filings + ORNL annual summaries | Free | Event-level, 6–72 h lag | observed | Backtest cross-check | Not a live trigger |

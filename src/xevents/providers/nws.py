@@ -93,6 +93,15 @@ NWS_EVENT_TYPES: dict[str, EventType] = {
     "Flood Warning": EventType.HURRICANE_FLOOD,
     "Flash Flood Warning": EventType.HURRICANE_FLOOD,
     "Flash Flood Watch": EventType.HURRICANE_FLOOD,
+    # Nor'easters and other non-tropical coastal storms issue coastal-flood products, not
+    # Storm Surge (which is tropical-only).
+    "Coastal Flood Watch": EventType.HURRICANE_FLOOD,
+    "Coastal Flood Warning": EventType.HURRICANE_FLOOD,
+    # Wind as a forecast of power loss (Cards 5/6). Advisory-level products (Coastal Flood
+    # Advisory, Wind Advisory, Flood Advisory) are deliberately not tracked.
+    "High Wind Watch": EventType.HIGH_WIND,
+    "High Wind Warning": EventType.HIGH_WIND,
+    "Extreme Wind Warning": EventType.HIGH_WIND,
     "Air Quality Alert": EventType.AIR_POLLUTION,
     # Cold and winter-storm products, current (post-Oct-2024) names only; legacy names are
     # normalized through LEGACY_NWS_EVENT_NAMES before this lookup (Card 7).

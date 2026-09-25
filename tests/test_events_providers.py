@@ -80,6 +80,36 @@ def test_parse_live_alert_sample(resolver: UgcResolver) -> None:
     assert heat.event_key == f"nws:{heat.source_id}"
 
 
+def test_noreaster_products_map_and_advisories_are_ignored(resolver: UgcResolver) -> None:
+    """A nor'easter issues coastal-flood and wind products, not Storm Surge; watches and
+    warnings are tracked, advisories are not."""
+    doc = json.loads((FIX / "nws_alerts_active_sample.json").read_text(encoding="utf-8"))
+    template = next(f for f in doc["features"] if f["properties"]["event"] == "Heat Advisory")
+    names = [
+        "Coastal Flood Warning",
+        "Coastal Flood Watch",
+        "High Wind Warning",
+        "High Wind Watch",
+        "Extreme Wind Warning",
+        "Coastal Flood Advisory",
+        "Wind Advisory",
+    ]
+    features = []
+    for i, name in enumerate(names):
+        f = json.loads(json.dumps(template))
+        f["properties"].update(event=name, id=f"urn:test:{i}")
+        f["id"] = f"urn:test:{i}"
+        features.append(f)
+    events = {e.event_name: e for e in parse_alerts({"features": features}, resolver)}
+    assert set(events) == set(names[:5])
+    for name in ("Coastal Flood Warning", "Coastal Flood Watch"):
+        assert events[name].event_type is EventType.HURRICANE_FLOOD
+    for name in ("High Wind Warning", "High Wind Watch", "Extreme Wind Warning"):
+        assert events[name].event_type is EventType.HIGH_WIND
+    assert events["High Wind Watch"].temporality is Temporality.FORECAST
+    assert events["High Wind Warning"].temporality is Temporality.IMMINENT
+
+
 def test_nws_provider_requires_user_agent(
     monkeypatch: pytest.MonkeyPatch, resolver: UgcResolver
 ) -> None:

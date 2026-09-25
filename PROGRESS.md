@@ -3,6 +3,32 @@
 Short dated entries, newest first. One milestone per session (M0 → M5, then M6 → M10, then
 M11 → M12 from `docs/implementation-plan-clinical.md`).
 
+## 2026-09-25 — nor'easter gap: coastal-flood and wind triggers
+
+**Why.** In live mode a nor'easter produced no flood items. The NWS provider dropped every
+product outside `NWS_EVENT_TYPES`, and a nor'easter issues Coastal Flood and High Wind
+products (Storm Surge is tropical-only). The live feed on 2026-09-25 had 30 Coastal Flood
+Warnings (CT–NC) and High Wind Warnings (DE, MA, NJ, RI), and none of them reached a card.
+
+**Done.** `make lint test` green (321 passed, 9 skipped); goldens unchanged (the scenario
+fixtures were retrieved filtered to their own VTEC phenomena).
+- Card library first: Card 3 triggers add Coastal Flood Watch/Warning and Flash Flood Watch.
+  The provider already mapped Flash Flood Watch, but no card listed it, so it never matched.
+  Cards 5/6 add High Wind Watch/Warning and Extreme Wind Warning. Advisories (Coastal Flood,
+  Wind, Flood) are deliberately not tracked. The change is recorded as open question 6 for
+  clinician sign-off; no card text changed. Versions: Card 3 2.1.0, Card 5 1.3.0, Card 6 2.1.0.
+- **Decision:** new `EventType.HIGH_WIND` (a forecast of outage risk), not a reuse of
+  `power_outage`, which stays observed-only EAGLE-I data. Cross-family supersede pair
+  `(high_wind, power_outage)` on Cards 5/6 in `engine.SUPERSEDE_FAMILIES`. There is no
+  co-occurrence boost pairing for wind.
+- IEM archive: VTEC CF.A/CF.W/HW.A/HW.W/EW.W mapped and added to the live backfill phenomena.
+- Map/playback get a `high_wind` color. Schema and card-facts table regenerated.
+- New guard (`tests/test_engine.py::test_noreaster_triggers`): every tracked NWS product
+  except Air Quality Alert must be listed by some card.
+
+**Next.** Redeploy so the live instance picks this up. Clinician to confirm that the
+hurricane-framed Card 3/5/6 text fits nor'easter/wind events.
+
 ## 2026-09-23 — review status corrected; clinician sign-off questions
 
 The 2026-09-23 card-library revision was drafted by Claude, not by a clinician. The docs,

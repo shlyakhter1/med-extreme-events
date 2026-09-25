@@ -153,6 +153,39 @@ def test_trigger_matching(cards: list[Card]) -> None:
     assert {c.id for c in cards if card_matches(c, cold)[0]} == {"cold-cardio-respiratory"}
 
 
+def test_noreaster_triggers(cards: list[Card]) -> None:
+    """Coastal flooding fires the delivery-interruption card; wind fires the outage cards
+    ahead of any observed outage. Every tracked NWS product reaches at least one card."""
+    from xevents.providers.nws import NWS_EVENT_TYPES
+
+    coastal = _event(
+        "Coastal Flood Warning",
+        ["12103"],
+        severity=CapSeverity.MODERATE,
+        source_id="cf",
+        onset=NOW,
+        event_type=EventType.HURRICANE_FLOOD,
+    )
+    assert {c.id for c in cards if card_matches(c, coastal)[0]} == {
+        "hurricane-delivery-interruption"
+    }
+    wind = _event(
+        "High Wind Warning",
+        ["12103"],
+        severity=CapSeverity.SEVERE,
+        source_id="hw",
+        onset=NOW,
+        event_type=EventType.HIGH_WIND,
+    )
+    assert {c.id for c in cards if card_matches(c, wind)[0]} == {
+        "outage-insulin",
+        "outage-dialysis",
+    }
+    listed = {n for c in cards for t in c.event_triggers for n in t.conditions.nws_events}
+    # Air Quality Alert is context only: Card 8 fires on the AQI value, not the product name
+    assert set(NWS_EVENT_TYPES) - listed == {"Air Quality Alert"}, "a tracked product no card uses"
+
+
 def test_match_produces_items_per_facility_card_role(cards: list[Card], profile: Profile) -> None:
     heat = _event(
         "Excessive Heat Warning",

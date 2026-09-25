@@ -24,8 +24,14 @@ EXPECTED = {
     2: ("heat-antipsychotics", {EventType.HEAT}),
     3: ("hurricane-delivery-interruption", {EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE}),
     4: ("heat-heart-failure", {EventType.HEAT}),
-    5: ("outage-insulin", {EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE}),
-    6: ("outage-dialysis", {EventType.HURRICANE_FLOOD, EventType.POWER_OUTAGE}),
+    5: (
+        "outage-insulin",
+        {EventType.HURRICANE_FLOOD, EventType.HIGH_WIND, EventType.POWER_OUTAGE},
+    ),
+    6: (
+        "outage-dialysis",
+        {EventType.HURRICANE_FLOOD, EventType.HIGH_WIND, EventType.POWER_OUTAGE},
+    ),
     7: ("cold-cardio-respiratory", {EventType.EXTREME_COLD}),
     8: ("smoke-copd-asthma", {EventType.AIR_POLLUTION, EventType.WILDFIRE_SMOKE}),
 }

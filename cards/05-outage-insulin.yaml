@@ -3,7 +3,7 @@
 # sign-off) — Card 5. Clinical strings
 # are verbatim; do not edit in code. [SHARED] markers are library markup and are stripped.
 id: outage-insulin
-version: 1.2.0
+version: 1.3.0
 number: 5
 title: Hurricane / Power Outage × Insulin-Dependent Diabetes
 summary: >-
@@ -18,6 +18,12 @@ event_triggers:
         - Hurricane Warning
         - Tropical Storm Watch
         - Tropical Storm Warning
+  - type: high_wind
+    conditions:
+      nws_events:
+        - High Wind Watch
+        - High Wind Warning
+        - Extreme Wind Warning
   - type: power_outage
     conditions:
       temporality: observed

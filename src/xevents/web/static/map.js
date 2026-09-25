@@ -9,6 +9,7 @@ window.XMap = (() => {
     { id: "heat", color: "#e4572e", label: "heat" },
     { id: "extreme_cold", color: "#33b5c9", label: "extreme cold / winter storm" },
     { id: "hurricane_flood", color: "#3d7fdc", label: "hurricane / flood" },
+    { id: "high_wind", color: "#7a8a99", label: "high wind" },
     { id: "wildfire_smoke", color: "#b5894e", label: "wildfire smoke" },
     { id: "air_pollution", color: "#a05cd6", label: "air pollution" },
     { id: "power_outage", color: "#d9a41a", label: "power outage" },

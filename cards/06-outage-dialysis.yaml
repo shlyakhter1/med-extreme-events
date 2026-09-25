@@ -6,7 +6,7 @@
 # TODO(2026-Q4): drop the legacy KCER number (1-866-901-3773) from the patient text once the
 # line is confirmed retired (ipro-khares); the change goes through the card library first.
 id: outage-dialysis
-version: 2.0.0
+version: 2.1.0
 number: 6
 title: Hurricane / Power Outage × Dialysis-Dependent ESRD
 summary: >-
@@ -22,6 +22,12 @@ event_triggers:
         - Hurricane Warning
         - Tropical Storm Watch
         - Tropical Storm Warning
+  - type: high_wind
+    conditions:
+      nws_events:
+        - High Wind Watch
+        - High Wind Warning
+        - Extreme Wind Warning
   - type: power_outage
     conditions:
       temporality: observed

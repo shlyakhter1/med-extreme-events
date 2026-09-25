@@ -150,7 +150,7 @@ def test_empower_dme_rolls_up_catchment_counties(estimator: PanelEstimator) -> N
 def test_card_6_sub_panel_is_measured_not_a_share(estimator: PanelEstimator) -> None:
     cards = {c.id: c for c in load_cards(CARDS_DIR)}
     card = cards["outage-dialysis"]
-    assert card.version == "2.0.0"
+    assert card.version == "2.1.0"
     sub = next(
         s for s in card.population_selector.sub_panels if s.key == "electricity_dependent_dme"
     )

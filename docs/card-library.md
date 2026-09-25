@@ -47,6 +47,11 @@ questions below. Each card is easiest to read as rendered at `/card-library/<car
    verified: chen-2025 (polypharmacy OR) and weiden-2017 (primary DOI). No figure rests on a
    pending source alone. Verify them in the §5 order, or approve launching while they are
    pending.
+6. **Coastal-flood and wind triggers (added 2026-09-25).** Card 3 now also fires on Coastal
+   Flood Watch/Warning and Flash Flood Watch; Cards 5 and 6 fire on High Wind Watch/Warning
+   and Extreme Wind Warning as a forecast of power loss. No card text changed. The pre-event
+   actions and patient text were written for hurricanes ("if a storm or outage is coming");
+   confirm they fit a nor'easter or wind event, or supply wind-specific wording.
 
 ---
 
@@ -170,9 +175,11 @@ heat-thermoregulation-meta-2024; cdc-heat-medications-2024.
 
 ## Card 3 — Hurricane / Flood × Delivery Interruption: Clozapine, LAIs, Methadone
 
-**Triggers.** NWS: Hurricane Watch/Warning, Tropical Storm Watch/Warning, Flood Watch,
-Flash Flood Warning, Storm Surge Warning; observed power outage ≥25% of county customers
-(sustained). Lead window: 3–7 days (watch), 1–3 days (warning).
+**Triggers.** NWS: Hurricane Watch/Warning, Tropical Storm Watch/Warning, Storm Surge
+Watch/Warning, Flood Watch/Warning, Flash Flood Watch/Warning, Coastal Flood Watch/Warning
+(nor'easters and other non-tropical coastal storms); observed power outage ≥25% of county
+customers (sustained). Advisory-level products (Coastal Flood Advisory, Flood Advisory) do
+not trigger. Lead window: 3–7 days (watch), 1–3 days (warning).
 
 **Population.** Patients on medications whose supply chain or dosing site can be
 interrupted: clozapine; long-acting injectable antipsychotics (LAIs); methadone via opioid
@@ -291,8 +298,10 @@ hf-daily-weight-education; shannon-2025.
 
 ## Card 5 — Hurricane / Power Outage × Insulin-Dependent Diabetes
 
-**Triggers.** Hurricane/tropical products as Card 3; observed power outage ≥10% of county
-customers (sustained 2 polls). Lead window: 3–7 days (watch) to landfall/outage.
+**Triggers.** Hurricane/tropical products as Card 3; NWS High Wind Watch/Warning and
+Extreme Wind Warning (forecast outage risk, so the panel is prepared before the power goes
+out); observed power outage ≥10% of county customers (sustained 2 polls). Wind Advisory does
+not trigger. Lead window: 3–7 days (watch) to landfall/outage.
 
 **Population.** Insulin-dependent patients (type 1 and insulin-treated type 2), with flags
 for pump/CGM users and refrigeration-dependent storage. Panel sizing uses the VA diabetes
@@ -346,8 +355,9 @@ accuracy.
 
 ## Card 6 — Hurricane / Power Outage × Dialysis-Dependent ESRD
 
-**Triggers.** Hurricane/tropical products as Card 3; observed power outage ≥10% of county
-customers (sustained 2 polls). Lead window: 3–7 days to landfall/outage.
+**Triggers.** Hurricane/tropical products as Card 3; wind products as Card 5; observed power
+outage ≥10% of county customers (sustained 2 polls). Lead window: 3–7 days to
+landfall/outage.
 
 **Population.** In-center hemodialysis patients (highest acuity), plus home hemodialysis
 and peritoneal dialysis patients (power/water dependent). Panel sizing uses the VA ESRD
